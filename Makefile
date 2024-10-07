@@ -16,7 +16,7 @@ INCLUDES_LIB += -L$(BB_LIBDIR)
 # INCLUDES += -L$(BB_LIBDIR)/json-c
 
 # lib
-LINK_LIBS += -ljson-c
+LINK_LIBS += -ljson-cxx
 
 LDFLAG += ${LDFLAGS}
 LDFLAG += ${INCLUDES_LIB}
