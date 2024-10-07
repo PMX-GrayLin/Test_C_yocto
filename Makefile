@@ -22,23 +22,20 @@ LDFLAG += ${LDFLAGS}
 LDFLAG += ${INCLUDES_LIB}
 LDFLAG += ${LINK_LIBS}
 
-
-# CFLAGS += -I$(BB_INCDIR)/json-c
-# CFLAGS += -ljson-c
-
-# LDFLAG += ${LDFLAGS}
-# LDFLAG += -L$(BB_LIBDIR)
-# LDFLAG += -L$(BB_LIBDIR)/json-c
-# LDFLAG += -L$(BB_LIBDIR)libjson-c.a
-# LDFLAG += -ljson-c
-
-
-# ${CXX} $(CFLAGS) -o test test.o $(LDFLAGS)
 all: test.o
+	@echo "========== Build all start =========="
+	@echo "CXX:${CXX}"
+	@echo "CXX:${CFLAG}"
+	@echo "CXX:${LDFLAG}"
 	${CXX} $(CFLAG) -o test test.o $(LDFLAG)
+	@echo "========== Build all end =========="
+
 test.o: 
+	@echo "========== Build test.o start =========="
 	${CXX} $(CFLAG) test.cpp -c
+	@echo "========== Build test.o end =========="
 
 .PHONY : clean 
+
 clean:
 	rm -rf *.o *.exe test
