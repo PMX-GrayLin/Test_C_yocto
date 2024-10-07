@@ -24,15 +24,15 @@ CFLAGS += ${LIBS}
 # CFLAGS += -I$(BB_INCDIR)/json-c
 # CFLAGS += -ljson-c
 
-# LDFLAG += ${LDFLAGS}
-# LDFLAG += -L$(BB_LIBDIR)
-# LDFLAG += -L$(BB_LIBDIR)/json-c
-# LDFLAG += -L$(BB_LIBDIR)libjson-c.a
-# LDFLAG += -ljson-c
+LDFLAG += ${LDFLAGS}
+LDFLAG += -L$(BB_LIBDIR)
+LDFLAG += -L$(BB_LIBDIR)/json-c
+LDFLAG += -L$(BB_LIBDIR)libjson-c.a
+LDFLAG += -ljson-c
 
 # ${CXX} $(CFLAGS) -o test test.o $(LDFLAGS)
 all: test.o
-	${CXX} $(CFLAGS) -o test test.o
+	${CXX} $(CFLAGS) -o test test.o $(LDFLAG)
 test.o: 
 	${CXX} $(CFLAGS) test.cpp -c
 
