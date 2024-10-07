@@ -6,37 +6,38 @@
 # CC = ${CXX}
 
 # header dir
-INCLUDES += -I$(BB_INCDIR)/json-c
+INCLUDES_HEADER += -I$(BB_INCDIR)/json-c
+
+CFLAG += ${CXXFLAGS}
+CFLAG += ${INCLUDES}
+
 
 # lib dir
-INCLUDES += -L$(BB_LIBDIR)
-INCLUDES += -L$(BB_LIBDIR)/json-c
+INCLUDES_LIB += -L$(BB_LIBDIR)
+# INCLUDES += -L$(BB_LIBDIR)/json-c
 
 # lib
-LIBS += -ljson-c
+LINK_LIBS += -ljson-c
 
+LDFLAG += ${LDFLAGS}
+LDFLAG += ${LINK_LIBS}
 
-CFLAGS += ${CXXFLAGS}
-CFLAGS += ${LDFLAGS}
-CFLAGS += ${INCLUDES}
-CFLAGS += ${LIBS}
 
 # CFLAGS += -I$(BB_INCDIR)/json-c
 # CFLAGS += -ljson-c
 
-LDFLAG += ${LDFLAGS}
-LDFLAG += -L$(BB_LIBDIR)
-LDFLAG += -L$(BB_LIBDIR)/json-c
-LDFLAG += -L$(BB_LIBDIR)libjson-c.a
-LDFLAG += -ljson-c
+# LDFLAG += ${LDFLAGS}
+# LDFLAG += -L$(BB_LIBDIR)
+# LDFLAG += -L$(BB_LIBDIR)/json-c
+# LDFLAG += -L$(BB_LIBDIR)libjson-c.a
+# LDFLAG += -ljson-c
 
-CFLAGS += $(LDFLAG)
 
 # ${CXX} $(CFLAGS) -o test test.o $(LDFLAGS)
 all: test.o
-	${CXX} $(CFLAGS) -o test test.o
+	${CXX} $(CFLAG) -o test test.o $(LDFLAG)
 test.o: 
-	${CXX} $(CFLAGS) test.cpp -c
+	${CXX} $(CFLAG) test.cpp -c
 
 .PHONY : clean 
 clean:
