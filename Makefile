@@ -27,6 +27,7 @@ all: test.o
 	@echo ">>>> CXX:${CXX}"
 	@echo ">>>> CFLAG:${CFLAG}"
 	@echo ">>>> CFLAG:${LDFLAG}"
+	@echo ">>>> "
 	${CXX} $(CFLAG) -o test test.o $(LDFLAG)
 	@echo "========== Build all end =========="
 
