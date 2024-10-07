@@ -16,7 +16,7 @@ INCLUDES_LIB += -L$(BB_LIBDIR)
 # INCLUDES += -L$(BB_LIBDIR)/json-c
 
 # lib
-LINK_LIBS += -ljson-cxx
+LINK_LIBS += -ljson-c
 
 LDFLAG += ${LDFLAGS}
 LDFLAG += ${INCLUDES_LIB}
@@ -26,7 +26,7 @@ all: test.o
 	@echo "========== Build all start =========="
 	@echo ">>>> CXX:${CXX}"
 	@echo ">>>> CFLAG:${CFLAG}"
-	@echo ">>>> CFLAG:${LDFLAG}"
+	@echo ">>>> LDFLAG:${LDFLAG}"
 	@echo ">>>> "
 	${CXX} $(CFLAG) -o test test.o $(LDFLAG)
 	@echo "========== Build all end =========="
