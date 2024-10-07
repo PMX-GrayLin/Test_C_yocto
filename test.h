@@ -12,7 +12,7 @@
 #include <string.h> 
 
 // yocto test
-#include "json-ccc/json.h" 
+#include "json.h" 
 
 #define MIN(a,b) (a>b) ? b : a
 #define MAX_STRING_SIZE	2048
