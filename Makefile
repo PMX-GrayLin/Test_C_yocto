@@ -3,23 +3,37 @@
 #CFLAGS = -ansi -O -Wall -std=c++11
 #LDFLAGS = -lpthread
 
-CC = ${CXX}
+# CC = ${CXX}
+
+# header dir
+INCLUDES += -I$(BB_INCDIR)/json-c
+
+# lib dir
+INCLUDES += -L$(BB_LIBDIR)
+
+# lib
+LIBS += -ljson-c
+
 
 CFLAGS += ${CXXFLAGS}
-CFLAGS += -I$(BB_INCDIR)/json-c
-CFLAGS += -ljson-c
+CFLAGS += ${LDFLAGS}
+CFLAGS += ${INCLUDES}
+CFLAGS += ${LIBS}
 
-LDFLAG += ${LDFLAGS}
-LDFLAG += -L$(BB_LIBDIR)
-LDFLAG += -L$(BB_LIBDIR)/json-c
+# CFLAGS += -I$(BB_INCDIR)/json-c
+# CFLAGS += -ljson-c
+
+# LDFLAG += ${LDFLAGS}
+# LDFLAG += -L$(BB_LIBDIR)
+# LDFLAG += -L$(BB_LIBDIR)/json-c
 # LDFLAG += -L$(BB_LIBDIR)libjson-c.a
 # LDFLAG += -ljson-c
 
-
+# ${CXX} $(CFLAGS) -o test test.o $(LDFLAGS)
 all: test.o
-	${CC} $(CFLAGS) -o test test.o $(LDFLAGS)
+	${CXX} $(CFLAGS) -o test test.o
 test.o: 
-	${CC} $(CFLAGS) test.cpp -c
+	${CXX} $(CFLAGS) test.cpp -c
 
 .PHONY : clean 
 clean:
