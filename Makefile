@@ -1,4 +1,3 @@
-#to put this makefile at project root
 
 #CC = g++
 #CFLAGS = -ansi -O -Wall -std=c++11
