@@ -10,6 +10,7 @@ INCLUDES += -I$(BB_INCDIR)/json-c
 
 # lib dir
 INCLUDES += -L$(BB_LIBDIR)
+INCLUDES += -L$(BB_LIBDIR)/json-c
 
 # lib
 LIBS += -ljson-c
