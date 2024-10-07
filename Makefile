@@ -30,9 +30,11 @@ LDFLAG += -L$(BB_LIBDIR)/json-c
 LDFLAG += -L$(BB_LIBDIR)libjson-c.a
 LDFLAG += -ljson-c
 
+CFLAGS += $(LDFLAG)
+
 # ${CXX} $(CFLAGS) -o test test.o $(LDFLAGS)
 all: test.o
-	${CXX} $(CFLAGS) -o test test.o $(LDFLAG)
+	${CXX} $(CFLAGS) -o test test.o
 test.o: 
 	${CXX} $(CFLAGS) test.cpp -c
 
