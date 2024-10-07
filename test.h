@@ -11,6 +11,9 @@
 #include <stdint.h>
 #include <string.h> 
 
+// yocto test
+#include "json-c/json.h" 
+
 #define MIN(a,b) (a>b) ? b : a
 #define MAX_STRING_SIZE	2048
 
