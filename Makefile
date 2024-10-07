@@ -24,9 +24,9 @@ LDFLAG += ${LINK_LIBS}
 
 all: test.o
 	@echo "========== Build all start =========="
-	@echo "CXX:${CXX}"
-	@echo "CXX:${CFLAG}"
-	@echo "CXX:${LDFLAG}"
+	@echo ">>>> CXX:${CXX}"
+	@echo ">>>> CFLAG:${CFLAG}"
+	@echo ">>>> CFLAG:${LDFLAG}"
 	${CXX} $(CFLAG) -o test test.o $(LDFLAG)
 	@echo "========== Build all end =========="
 
