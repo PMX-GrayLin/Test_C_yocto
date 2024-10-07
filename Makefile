@@ -11,7 +11,9 @@ CFLAGS += -I$(BB_INCDIR)/json-c
 LDFLAG += ${LDFLAGS}
 LDFLAG += -L$(BB_LIBDIR)
 LDFLAG += -L$(BB_LIBDIR)/json-c
-LDFLAG += -ljson-c
+LDFLAG += -L$(BB_LIBDIR)libjson-c.a
+# LDFLAG += -ljson-c
+
 
 all: test.o
 	${CC} $(CFLAGS) -o test test.o $(LDFLAGS)
