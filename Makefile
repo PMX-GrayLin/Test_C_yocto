@@ -3,7 +3,7 @@
 #CFLAGS = -ansi -O -Wall -std=c++11
 #LDFLAGS = -lpthread
 
-CC =$ {CXX}
+CC = ${CXX}
 
 CFLAGS += ${CXXFLAGS}
 CFLAGS += -I$(BB_INCDIR)/json-c
