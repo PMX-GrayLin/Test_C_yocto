@@ -18,8 +18,10 @@
 #define MAX_STRING_SIZE	2048
 
 #define DEBUGX
+
 #ifndef DEBUGX
-#define xlog
+#define xlog(...) ((void)0)
 #else
-#define xlog printf
+// #define xlog(...) printf(__VA_ARGS__)
+#define xlog(fmt, ...) printf("%s:%d, " fmt "\n\r", __func__, __LINE__, ##__VA_ARGS__)
 #endif

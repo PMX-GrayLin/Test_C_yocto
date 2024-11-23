@@ -7,7 +7,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	xlog("%s:%d, argc:%d \n\r", __func__, __LINE__, argc);
+	xlog("");
 
 	GstElement *pipeline;
     GstBus *bus;
@@ -15,6 +15,8 @@ int main(int argc, char *argv[])
 
     // Initialize GStreamer
     gst_init(&argc, &argv);
+
+	xlog("");
 
     // Create the pipeline
     std::string pipeline_description = "videotestsrc ! videoconvert ! autovideosink";
@@ -24,13 +26,19 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+	xlog("");
+
+
     // Start playing
     gst_element_set_state(pipeline, GST_STATE_PLAYING);
+
+	xlog("");
 
     // Wait until error or EOS
     bus = gst_element_get_bus(pipeline);
     msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE,
                                      static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+	xlog("");
 
     // Parse message
     if (msg) {
@@ -56,10 +64,14 @@ int main(int argc, char *argv[])
         gst_message_unref(msg);
     }
 
+	xlog("");
+
     // Free resources
     gst_object_unref(bus);
     gst_element_set_state(pipeline, GST_STATE_NULL);
     gst_object_unref(pipeline);
+
+	xlog("");
 
 	return 0;
 }
