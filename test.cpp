@@ -93,6 +93,9 @@ void opencv_test() {
 
 	xlog("");
 
+	// Declare the frame variable (cv::Mat) to hold the captured frame
+    cv::Mat frame;
+
 	while (true) {
         // Capture a frame
         cap >> frame;
