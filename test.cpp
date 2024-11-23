@@ -1,5 +1,5 @@
 #include "test.h"
-#include "gst/gst.h"
+#include <gst/gst.h>
 
 #include <string>
 using namespace std; 
