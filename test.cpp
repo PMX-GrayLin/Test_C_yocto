@@ -12,7 +12,8 @@ void gst_test() {
     GstMessage *msg;
 
     // Initialize GStreamer
-    gst_init(&argc, &argv);
+    // gst_init(&argc, &argv);
+    gst_init();
 
 	xlog("");
 
