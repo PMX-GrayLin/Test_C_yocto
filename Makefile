@@ -17,6 +17,7 @@ CFLAG += ${INCLUDES_HEADER}
 # lib dir
 INCLUDES_LIB += -L$(BB_LIBDIR)
 # INCLUDES += -L$(BB_LIBDIR)/json-c
+INCLUDES_LIB += -L$(BB_LIBDIR)/gstreamer-1.0
 
 # lib
 LINK_LIBS += -ljson-c
