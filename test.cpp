@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     std::string pipeline_description = "videotestsrc ! videoconvert ! autovideosink";
     pipeline = gst_parse_launch(pipeline_description.c_str(), nullptr);
     if (!pipeline) {
-        std::cerr << "Failed to create pipeline" << std::endl;
+        // std::cerr << "Failed to create pipeline" << std::endl;
         return -1;
     }
 
