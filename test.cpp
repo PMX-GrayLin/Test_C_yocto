@@ -5,9 +5,7 @@
 using namespace std; 
 
 
-int main(int argc, char *argv[])
-{
-	xlog("");
+void gst_test() {
 
 	GstElement *pipeline;
     GstBus *bus;
@@ -72,6 +70,14 @@ int main(int argc, char *argv[])
     gst_object_unref(pipeline);
 
 	xlog("");
+
+}
+
+int main(int argc, char *argv[])
+{
+	xlog("");
+
+	gst_test();
 
 	return 0;
 }
