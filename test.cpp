@@ -130,7 +130,16 @@ void opencv_test() {
 int main(int argc, char *argv[]) {
   xlog("");
 
-  if (!strcmp(argv[1], "")) {
+  for (int i = 0; i < argc; ++i) {
+	xlog("argv[%d]:%s", i, argv[i]);
+  }
+
+  if (argc < 2) {
+	xlog("to input more than 1 params...");
+    return -1;
+  }
+
+  if (!strcmp(argv[1], "test")) {
 	xlog("");
   } else if (!strcmp(argv[1], "gst")) {
     gst_test();
