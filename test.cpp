@@ -8,23 +8,23 @@ int main(int argc, char *argv[])
 {
 	xlog("%s:%d, argc:%d \n\r", __func__, __LINE__, argc);
 
-	// GstElement *pipeline;
-    // GstBus *bus;
-    // GstMessage *msg;
+	GstElement *pipeline;
+    GstBus *bus;
+    GstMessage *msg;
 
     // Initialize GStreamer
     gst_init(&argc, &argv);
 
     // Create the pipeline
-    // std::string pipeline_description = "videotestsrc ! videoconvert ! autovideosink";
-    // pipeline = gst_parse_launch(pipeline_description.c_str(), nullptr);
-    // if (!pipeline) {
-    //     std::cerr << "Failed to create pipeline" << std::endl;
-    //     return -1;
-    // }
+    std::string pipeline_description = "videotestsrc ! videoconvert ! autovideosink";
+    pipeline = gst_parse_launch(pipeline_description.c_str(), nullptr);
+    if (!pipeline) {
+        std::cerr << "Failed to create pipeline" << std::endl;
+        return -1;
+    }
 
-    // // Start playing
-    // gst_element_set_state(pipeline, GST_STATE_PLAYING);
+    // Start playing
+    gst_element_set_state(pipeline, GST_STATE_PLAYING);
 
     // // Wait until error or EOS
     // bus = gst_element_get_bus(pipeline);
