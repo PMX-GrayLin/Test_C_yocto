@@ -13,7 +13,7 @@ void gst_test() {
 
     // Initialize GStreamer
     // gst_init(&argc, &argv);
-    gst_init();
+    gst_init(nullptr, nullptr);
 
 	xlog("");
 
@@ -22,7 +22,7 @@ void gst_test() {
     pipeline = gst_parse_launch(pipeline_description.c_str(), nullptr);
     if (!pipeline) {
         // std::cerr << "Failed to create pipeline" << std::endl;
-        return -1;
+        return;
     }
 
 	xlog("");
@@ -71,6 +71,8 @@ void gst_test() {
     gst_object_unref(pipeline);
 
 	xlog("");
+
+	return;
 
 }
 
