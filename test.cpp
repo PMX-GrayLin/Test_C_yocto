@@ -17,6 +17,10 @@ void gst_test() {
 
 	xlog("");
 
+	guint major, minor, micro, nano;
+    gst_version (&major, &minor, &micro, &nano);
+	xlog("%d:%d:%d:%d", major, minor, micro, nano);
+
     // Create the pipeline
     std::string pipeline_description = "videotestsrc ! videoconvert ! autovideosink";
     pipeline = gst_parse_launch(pipeline_description.c_str(), nullptr);
@@ -26,7 +30,6 @@ void gst_test() {
     }
 
 	xlog("");
-
 
     // Start playing
     gst_element_set_state(pipeline, GST_STATE_PLAYING);
