@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
 
   if (!strcmp(argv[1], "")) {
 	xlog("");
-  }elif (!strcmp(argv[1], "gst")) {
+  } else if (!strcmp(argv[1], "gst")) {
     gst_test();
   } else if (!strcmp(argv[1], "ocv")) {
     opencv_test();
