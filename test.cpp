@@ -19,7 +19,7 @@ void gst_test() {
 
 	guint major, minor, micro, nano;
     gst_version (&major, &minor, &micro, &nano);
-	xlog("%d:%d:%d:%d", major, minor, micro, nano);
+	xlog("%d.%d.%d.%d", major, minor, micro, nano);
 
     // Create the pipeline
     std::string pipeline_description = "videotestsrc ! videoconvert ! autovideosink";
