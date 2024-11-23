@@ -90,6 +90,35 @@ void opencv_test() {
     if (!cap.isOpened()) {
         return;
     }
+
+	xlog("");
+
+	while (true) {
+        // Capture a frame
+        cap >> frame;
+
+        if (frame.empty()) {
+			xlog("");
+            // std::cerr << "Empty frame received. Exiting..." << std::endl;
+            break;
+        }
+
+        // Display the frame
+        cv::imshow("GStreamer Video", frame);
+
+        // Break on 'q' key press
+        if (cv::waitKey(10) == 'q') {
+            break;
+        }
+    }
+
+	xlog("");
+
+	// Release resources
+    cap.release();
+    cv::destroyAllWindows();
+
+	xlog("");
 	
 	return;
 }
@@ -98,7 +127,9 @@ int main(int argc, char *argv[])
 {
 	xlog("");
 
-	gst_test();
+	// gst_test();
+
+	opencv_test();
 
 	return 0;
 }
