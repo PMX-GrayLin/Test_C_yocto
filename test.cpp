@@ -6,6 +6,8 @@
 #include <string>
 using namespace std; 
 
+#define TEST_GST
+#define TEST_OCV
 
 void gst_test() {
 
@@ -125,14 +127,14 @@ void opencv_test() {
 	
 	return;
 }
+int main(int argc, char *argv[]) {
+  xlog("");
 
-int main(int argc, char *argv[])
-{
-	xlog("");
+  if (!strcmp(argv[1], "gst")) {
+    gst_test();
+  } else if (!strcmp(argv[1], "ocv")) {
+    opencv_test();
+  }
 
-	// gst_test();
-
-	opencv_test();
-
-	return 0;
+  return 0;
 }
