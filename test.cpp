@@ -1,5 +1,7 @@
 #include "test.h"
+
 #include <gst/gst.h>
+#include <opencv2/opencv.hpp>
 
 #include <string>
 using namespace std; 
@@ -76,7 +78,20 @@ void gst_test() {
 	xlog("");
 
 	return;
+}
 
+void opencv_test() {
+	// Define the GStreamer pipeline
+    std::string pipeline = "videotestsrc ! videoconvert ! appsink";
+
+    // Open the pipeline with OpenCV
+    cv::VideoCapture cap(pipeline, cv::CAP_GSTREAMER);
+
+    if (!cap.isOpened()) {
+        return;
+    }
+	
+	return;
 }
 
 int main(int argc, char *argv[])

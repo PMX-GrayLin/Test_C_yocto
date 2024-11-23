@@ -10,6 +10,7 @@ INCLUDES_HEADER += -I$(BB_INCDIR)/json-c
 INCLUDES_HEADER += -I$(BB_INCDIR)/gstreamer-1.0
 INCLUDES_HEADER += -I$(BB_INCDIR)/glib-2.0
 INCLUDES_HEADER += -I$(BB_LIBDIR)/glib-2.0/include
+INCLUDES_HEADER += -I$(BB_INCDIR)/opencv4 -I$(BB_INCDIR)/opencv4/opencv
 
 CFLAG += ${CXXFLAGS}
 CFLAG += ${INCLUDES_HEADER}
@@ -24,9 +25,23 @@ LINK_LIBS += -ljson-c
 LINK_LIBS += -lgstreamer-1.0
 LINK_LIBS += -lglib-2.0
 
+OCVLDFLAG +=-lopencv_core 
+OCVLDFLAG +=-lopencv_imgproc
+OCVLDFLAG +=-lopencv_features2d
+OCVLDFLAG +=-lopencv_video 
+OCVLDFLAG +=-lopencv_videoio 
+OCVLDFLAG +=-lopencv_imgcodecs 
+OCVLDFLAG +=-lopencv_objdetect 
+OCVLDFLAG +=-lopencv_highgui 
+OCVLDFLAG +=-lopencv_photo 
+OCVLDFLAG +=-lopencv_flann
+OCVLDFLAG +=-lopencv_ml
+OCVLDFLAG +=-lopencv_dnn
+
 LDFLAG += ${LDFLAGS}
 LDFLAG += ${INCLUDES_LIB}
 LDFLAG += ${LINK_LIBS}
+LDFLAG += ${OCVLDFLAG}
 
 all: test.o
 	@echo "========== Build all start =========="
