@@ -130,7 +130,7 @@ void opencv_test() {
 	return;
 }
 int main(int argc, char *argv[]) {
-  xlog("");
+  xlog("James");
 
   for (int i = 0; i < argc; ++i) {
     xlog("argv[%d]:%s", i, argv[i]);
