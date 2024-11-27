@@ -133,16 +133,16 @@ int main(int argc, char *argv[]) {
   xlog("");
 
   for (int i = 0; i < argc; ++i) {
-	xlog("argv[%d]:%s", i, argv[i]);
+    xlog("argv[%d]:%s", i, argv[i]);
   }
 
   if (argc < 2) {
-	xlog("to input more than 1 params...");
+    xlog("to input more than 1 params...");
     return -1;
   }
 
   if (!strcmp(argv[1], "test")) {
-	xlog("");
+    xlog("");
   } else if (!strcmp(argv[1], "gst")) {
     gst_test();
   } else if (!strcmp(argv[1], "ocv")) {
