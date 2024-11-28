@@ -26,10 +26,15 @@ void gst_test() {
 	xlog("%d.%d.%d.%d", major, minor, micro, nano);
 
     // Create the pipeline
-    // std::string pipeline_description = "videotestsrc ! videoconvert ! autovideosink";
-    std::string pipeline_description = "v4l2src device=/dev/video45 ! video/x-raw,width=640,height=480 ! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap ! rtspclientsink location=rtsp://localhost:8554/mystream";
+    // std::string pipeline = "videotestsrc ! videoconvert ! autovideosink";
+    // std::string pipeline = "v4l2src device=/dev/video45 ! video/x-raw,width=640,height=480 ! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap ! rtspclientsink location=rtsp://localhost:8554/mystream";
     
-    pipeline = gst_parse_launch(pipeline_description.c_str(), nullptr);
+    std::string pipeline = "videotestsrc "
+                            "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
+                            "! rtspclientsink location=rtsp://localhost:8554/mystream";
+    xlog("pipeline:%s", pipeline.c_str());
+
+    pipeline = gst_parse_launch(pipeline.c_str(), nullptr);
     if (!pipeline) {
         // std::cerr << "Failed to create pipeline" << std::endl;
         return;
@@ -114,9 +119,7 @@ void opencv_test() {
 
     std::string pipeline = "videotestsrc "
                             "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
-                            "! tee name=t "
-                            "t. ! queue ! appsink "
-                            "t. ! queue ! rtspclientsink location=rtsp://localhost:8554/mystream";
+                            "! appsink";
     xlog("pipeline:%s", pipeline.c_str());
 
     // Open the pipeline with OpenCV
