@@ -61,7 +61,7 @@ int print_caps(int fd)
                 cropcap.bounds.width, cropcap.bounds.height, cropcap.bounds.left, cropcap.bounds.top,
                 cropcap.defrect.width, cropcap.defrect.height, cropcap.defrect.left, cropcap.defrect.top,
                 cropcap.pixelaspect.numerator, cropcap.pixelaspect.denominator);
-#endif
+
         int support_grbg10 = 0;
 
         struct v4l2_fmtdesc fmtdesc = {0};
@@ -72,7 +72,7 @@ int print_caps(int fd)
         while (0 == xioctl(fd, VIDIOC_ENUM_FMT, &fmtdesc))
         {
                 strncpy(fourcc, (char *)&fmtdesc.pixelformat, 4);
-                if (fmtdesc.pixelformat == V4L2_PIX_FMT_MJPEG)
+                if (fmtdesc.pixelformat == V4L2_PIX_FMT_SGRBG10)
                     support_grbg10 = 1;
                 c = fmtdesc.flags & 1? 'C' : ' ';
                 e = fmtdesc.flags & 2? 'E' : ' ';
@@ -82,13 +82,14 @@ int print_caps(int fd)
 
         if (!support_grbg10)
         {
-            printf("Doesn't support V4L2_PIX_FMT_MJPEG.\n");
+            printf("Doesn't support GRBG10.\n");
             // return 1;
         }
+#endif
 
         struct v4l2_format fmt = {0};
         fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        fmt.fmt.pix.width = 752;
+        fmt.fmt.pix.width = 640;
         fmt.fmt.pix.height = 480;
         fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_SGRBG10;
         fmt.fmt.pix.field = V4L2_FIELD_NONE;
@@ -115,7 +116,7 @@ int print_caps(int fd)
 int init_mmap(int fd)
 {
     struct v4l2_requestbuffers req = {0};
-    req.count = 1;
+    req.count = 2;
     req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     req.memory = V4L2_MEMORY_MMAP;
 
