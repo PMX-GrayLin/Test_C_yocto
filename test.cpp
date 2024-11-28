@@ -99,7 +99,7 @@ void opencv_test() {
                             // ! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap
 
     std::string pipeline = "v4l2src device=/dev/video43 ! video/x-raw, width=640, height=480, framerate=30/1 "
-                            "! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=mmap "
+                            "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
                             "! tee name=t "
                             "t. ! queue ! rtspclientsink location=rtsp://localhost:8554/mystream "
                             "t. ! queue ! appsink emit-signals=true sync=false";
