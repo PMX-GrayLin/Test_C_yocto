@@ -69,7 +69,7 @@ int print_caps(int fd)
         char fourcc[5] = {0};
         char c, e;
         printf("  FMT : CE Desc\n--------------------\n");
-        while (0 == xioctl(fd, VIDIOC_G_FMT, &fmtdesc))
+        while (0 == xioctl(fd, VIDIOC_ENUM_FMT, &fmtdesc))
         {
                 strncpy(fourcc, (char *)&fmtdesc.pixelformat, 4);
                 if (fmtdesc.pixelformat == V4L2_PIX_FMT_NV12)
@@ -122,7 +122,7 @@ int init_mmap(int fd)
     if (-1 == xioctl(fd, VIDIOC_REQBUFS, &req))
     {
         perror("Requesting Buffer");
-        return 1;
+        // return 1;
     }
 
     struct v4l2_buffer buf = {0};
@@ -132,7 +132,7 @@ int init_mmap(int fd)
     if(-1 == xioctl(fd, VIDIOC_QUERYBUF, &buf))
     {
         perror("Querying Buffer");
-        return 1;
+        // return 1;
     }
 
     buffer = (uint8_t*)mmap (NULL, buf.length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, buf.m.offset);
@@ -169,13 +169,13 @@ int capture_image(int fd)
     if(-1 == r)
     {
         perror("Waiting for Frame");
-        return 1;
+        // return 1;
     }
 
     if(-1 == xioctl(fd, VIDIOC_DQBUF, &buf))
     {
         perror("Retrieving Frame");
-        return 1;
+        // return 1;
     }
 
     int outfd = open("out.img", O_RDWR);
