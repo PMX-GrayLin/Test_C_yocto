@@ -151,13 +151,13 @@ int capture_image(int fd)
     if(-1 == xioctl(fd, VIDIOC_QBUF, &buf))
     {
         perror("Query Buffer");
-        return 1;
+        // return 1;
     }
 
     if(-1 == xioctl(fd, VIDIOC_STREAMON, &buf.type))
     {
         perror("Start Capture");
-        return 1;
+        // return 1;
     }
 
     fd_set fds;
