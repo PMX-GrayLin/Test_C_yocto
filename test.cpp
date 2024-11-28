@@ -92,7 +92,7 @@ void opencv_test() {
     // std::string pipeline = "v4l2src device=/dev/video60 ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert ! appsink";
     std::string pipeline = "v4l2src device=/dev/video60 ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert  ! tee name=t \
                             t. ! queue ! appsink \
-                            t. ! queue ! rtspclientsink location=rtsp://localhost:8554/mystream"
+                            t. ! queue ! rtspclientsink location=rtsp://localhost:8554/mystream";
     xlog("pipeline:%s", pipeline.c_str());
 
     // Open the pipeline with OpenCV
