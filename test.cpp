@@ -116,7 +116,7 @@ int init_mmap(int fd)
 {
     struct v4l2_requestbuffers req = {0};
     req.count = 1;
-    req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
     req.memory = V4L2_MEMORY_MMAP;
 
     if (-1 == xioctl(fd, VIDIOC_REQBUFS, &req))
