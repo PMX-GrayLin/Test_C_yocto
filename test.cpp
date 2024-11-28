@@ -8,7 +8,10 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+// #define CROP
+
 uint8_t *buffer;
+
 
 static int xioctl(int fd, int request, void *arg)
 {
@@ -42,7 +45,7 @@ int print_caps(int fd)
                 (caps.version>>24)&&0xff,
                 caps.capabilities);
 
-
+#ifdef CROP
         struct v4l2_cropcap cropcap = {0};
         cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         if (-1 == xioctl (fd, VIDIOC_CROPCAP, &cropcap))
@@ -58,7 +61,7 @@ int print_caps(int fd)
                 cropcap.bounds.width, cropcap.bounds.height, cropcap.bounds.left, cropcap.bounds.top,
                 cropcap.defrect.width, cropcap.defrect.height, cropcap.defrect.left, cropcap.defrect.top,
                 cropcap.pixelaspect.numerator, cropcap.pixelaspect.denominator);
-
+#endif
         int support_grbg10 = 0;
 
         struct v4l2_fmtdesc fmtdesc = {0};
