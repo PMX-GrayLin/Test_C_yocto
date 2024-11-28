@@ -28,7 +28,7 @@ void gst_test() {
     // Create the pipeline
     // std::string pipeline_description = "videotestsrc ! videoconvert ! autovideosink";
     std::string pipeline_description = "v4l2src device=/dev/video72 ! video/x-raw,width=640,height=480 ! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap ! rtspclientsink location=rtsp://localhost:8554/mystream";
-    xlog(pipeline_description.c_str());
+    
     pipeline = gst_parse_launch(pipeline_description.c_str(), nullptr);
     if (!pipeline) {
         // std::cerr << "Failed to create pipeline" << std::endl;
