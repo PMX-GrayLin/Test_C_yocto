@@ -8,7 +8,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-// #define CROP
+// #define DEBUG
 
 uint8_t *buffer;
 
@@ -45,7 +45,7 @@ int print_caps(int fd)
                 (caps.version>>24)&&0xff,
                 caps.capabilities);
 
-#ifdef CROP
+#ifdef DEBUG
         struct v4l2_cropcap cropcap = {0};
         cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         if (-1 == xioctl (fd, VIDIOC_CROPCAP, &cropcap))
@@ -72,7 +72,7 @@ int print_caps(int fd)
         while (0 == xioctl(fd, VIDIOC_ENUM_FMT, &fmtdesc))
         {
                 strncpy(fourcc, (char *)&fmtdesc.pixelformat, 4);
-                if (fmtdesc.pixelformat == V4L2_PIX_FMT_SGRBG10)
+                if (fmtdesc.pixelformat == V4L2_PIX_FMT_YUYV)
                     support_grbg10 = 1;
                 c = fmtdesc.flags & 1? 'C' : ' ';
                 e = fmtdesc.flags & 2? 'E' : ' ';
@@ -82,8 +82,8 @@ int print_caps(int fd)
 
         if (!support_grbg10)
         {
-            printf("Doesn't support GRBG10.\n");
-            return 1;
+            printf("Doesn't support V4L2_PIX_FMT_YUYV.\n");
+            // return 1;
         }
 
         struct v4l2_format fmt = {0};
@@ -96,7 +96,7 @@ int print_caps(int fd)
         if (-1 == xioctl(fd, VIDIOC_S_FMT, &fmt))
         {
             perror("Setting Pixel Format");
-            return 1;
+            // return 1;
         }
 
         strncpy(fourcc, (char *)&fmt.fmt.pix.pixelformat, 4);
