@@ -8,7 +8,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#define DEBUG
+// #define DEBUG
 
 uint8_t *buffer;
 
