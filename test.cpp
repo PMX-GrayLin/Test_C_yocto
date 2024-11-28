@@ -72,7 +72,7 @@ int print_caps(int fd)
         while (0 == xioctl(fd, VIDIOC_ENUM_FMT, &fmtdesc))
         {
                 strncpy(fourcc, (char *)&fmtdesc.pixelformat, 4);
-                if (fmtdesc.pixelformat == V4L2_PIX_FMT_SGRBG10)
+                if (fmtdesc.pixelformat == V4L2_PIX_FMT_NV12)
                     support_grbg10 = 1;
                 c = fmtdesc.flags & 1? 'C' : ' ';
                 e = fmtdesc.flags & 2? 'E' : ' ';
@@ -82,7 +82,7 @@ int print_caps(int fd)
 
         if (!support_grbg10)
         {
-            printf("Doesn't support GRBG10.\n");
+            printf("Doesn't support V4L2_PIX_FMT_NV12.\n");
             // return 1;
         }
 
