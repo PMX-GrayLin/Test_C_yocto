@@ -61,7 +61,7 @@ int print_caps(int fd)
                 cropcap.bounds.width, cropcap.bounds.height, cropcap.bounds.left, cropcap.bounds.top,
                 cropcap.defrect.width, cropcap.defrect.height, cropcap.defrect.left, cropcap.defrect.top,
                 cropcap.pixelaspect.numerator, cropcap.pixelaspect.denominator);
-
+#endif
         int support_grbg10 = 0;
 
         struct v4l2_fmtdesc fmtdesc = {0};
@@ -85,7 +85,6 @@ int print_caps(int fd)
             printf("Doesn't support GRBG10.\n");
             // return 1;
         }
-#endif
 
         struct v4l2_format fmt = {0};
         fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
