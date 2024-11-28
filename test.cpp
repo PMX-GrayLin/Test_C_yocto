@@ -86,7 +86,11 @@ void gst_test() {
 
 void opencv_test() {
 	// Define the GStreamer pipeline
-    std::string pipeline = "videotestsrc ! videoconvert ! appsink";
+    // std::string pipeline = "videotestsrc ! videoconvert ! appsink";
+    // v4l2src device=/dev/video{CAM_ID} ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert ! appsink
+
+    std::string pipeline = "v4l2src device=/dev/video ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert ! appsink";
+    xlog("pipeline:%s", pipeline);
 
     // Open the pipeline with OpenCV
     cv::VideoCapture cap(pipeline, cv::CAP_GSTREAMER);
@@ -112,6 +116,7 @@ void opencv_test() {
 
         // Display the frame
         cv::imshow("GStreamer Video", frame);
+        xlog("");
 
         // Break on 'q' key press
         if (cv::waitKey(10) == 'q') {
