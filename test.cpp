@@ -8,7 +8,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-// #define DEBUG
+#define DEBUG
 
 uint8_t *buffer;
 
@@ -69,7 +69,7 @@ int print_caps(int fd)
         char fourcc[5] = {0};
         char c, e;
         printf("  FMT : CE Desc\n--------------------\n");
-        while (0 == xioctl(fd, VIDIOC_ENUM_FMT, &fmtdesc))
+        while (0 == xioctl(fd, VIDIOC_G_FMT, &fmtdesc))
         {
                 strncpy(fourcc, (char *)&fmtdesc.pixelformat, 4);
                 if (fmtdesc.pixelformat == V4L2_PIX_FMT_NV12)
