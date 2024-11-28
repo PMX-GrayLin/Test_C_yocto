@@ -114,7 +114,9 @@ void opencv_test() {
 
     std::string pipeline = "videotestsrc "
                             "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
-                            "! rtspclientsink location=rtsp://localhost:8554/mystream";
+                            "! tee name=t "
+                            "t. ! queue ! rtspclientsink location=rtsp://localhost:8554/mystream "
+                            "t. ! queue ! appsink emit-signals=true sync=false";
     xlog("pipeline:%s", pipeline.c_str());
 
     // Open the pipeline with OpenCV
