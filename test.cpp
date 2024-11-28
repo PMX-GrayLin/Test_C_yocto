@@ -119,7 +119,7 @@ int init_mmap(int fd)
     req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     req.memory = V4L2_MEMORY_MMAP;
 
-    if (-1 == xioctl(fd, V4L2_MEMORY_MMAP, &req))
+    if (-1 == xioctl(fd, V4L2_MEMORY_USERPTR, &req))
     {
         perror("Requesting Buffer");
         return 1;
