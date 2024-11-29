@@ -1,3 +1,4 @@
+#include "test.h"
 #include "test_ocv.h"
 
 void ocv_test(int testCase) {
