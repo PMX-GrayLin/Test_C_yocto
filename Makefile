@@ -43,13 +43,13 @@ LDFLAG += ${INCLUDES_LIB}
 LDFLAG += ${LINK_LIBS}
 LDFLAG += ${OCVLDFLAG}
 
-all: test_gst.o test.o
+all: test_gst.o test_ocv.o test.o
 	@echo "========== Build all start =========="
 	@echo ">>>> CXX:${CXX}"
 	@echo ">>>> CFLAG:${CFLAG}"
 	@echo ">>>> LDFLAG:${LDFLAG}"
 	@echo ">>>> "
-	${CXX} $(CFLAG) -o test test_gst.o test.o $(LDFLAG)
+	${CXX} $(CFLAG) -o test test_gst.o test_ocv.o test.o $(LDFLAG)
 	@echo "========== Build all end =========="
 
 test.o: 
@@ -62,6 +62,15 @@ test_gst.o:
 	${CXX} $(CFLAG) test_gst.cpp -c
 	@echo "========== Build test_gst.o end =========="
 
+test_ocv.o: 
+	@echo "========== Build test_ocv.o start =========="
+	${CXX} $(CFLAG) test_ocv.cpp -c
+	@echo "========== Build test_ocv.o end =========="
+
+test_gst.o: 
+	@echo "========== Build test_gst.o start =========="
+	${CXX} $(CFLAG) test_gst.cpp -c
+	@echo "========== Build test_gst.o end =========="
 .PHONY : clean 
 
 clean:
