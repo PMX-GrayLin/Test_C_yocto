@@ -9,7 +9,7 @@
 
 // add at ubuntu 18.04
 // #include <stdint.h>
-// #include <string.h> 
+#include <string.h> 
 
 // yocto test
 #include "json.h" 
