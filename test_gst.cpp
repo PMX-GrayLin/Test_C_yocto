@@ -23,7 +23,7 @@ void gst_test(int testCase) {
     // std::string pipeline = "videotestsrc ! videoconvert ! autovideosink";
     // std::string pipeline = "v4l2src device=/dev/video45 ! video/x-raw,width=640,height=480 ! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap ! rtspclientsink location=rtsp://localhost:8554/mystream";
     
-    std::string pipelineS = "videotestsrc "
+    string pipelineS = "videotestsrc "
                             "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
                             "! rtspclientsink location=rtsp://localhost:8554/mystream";
     xlog("pipeline:%s", pipelineS.c_str());

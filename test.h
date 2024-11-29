@@ -9,6 +9,8 @@
 #include <thread>
 #include <string> 
 
+using namespace std;
+
 // yocto test
 #include "json.h" 
 
