@@ -1,3 +1,4 @@
+#include "test.h"
 #include "test_gst.h"
 
 void gst_test(int testCase) {
