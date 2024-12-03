@@ -3,6 +3,25 @@
 #include "test_ocv.h"
 
 #include <regex>
+#include <mosquittopp.h>
+#include <iostream>
+
+class MQTTClient : public mosqpp::mosquittopp {
+public:
+    MQTTClient(const char* id) : mosqpp::mosquittopp(id) {}
+
+    void on_message(const struct mosquitto_message* message) override {
+        std::string payload((char*)message->payload, message->payloadlen);
+        
+        if (payload == "run_function") {
+            custom_function();
+        }
+    }
+
+    void custom_function() {
+        std::cout << "Custom function triggered via MQTT" << std::endl;
+    }
+};
 
 std::string getVideoDevice() {
   std::string result;
@@ -47,6 +66,8 @@ int main(int argc, char* argv[]) {
   } else if (!strcmp(argv[1], "dev")) {
     xlog("getVideoDevice:%s", getVideoDevice().c_str());
   }
+
+  mosqpp::lib_init();
 
   return 0;
 }
