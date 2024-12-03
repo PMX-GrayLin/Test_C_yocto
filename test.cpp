@@ -12,6 +12,7 @@ public:
 
     void on_message(const struct mosquitto_message* message) override {
         std::string payload((char*)message->payload, message->payloadlen);
+		xlog("payload:%s", payload.c_str());
         
         if (payload == "run_function") {
             custom_function();
@@ -68,6 +69,15 @@ int main(int argc, char* argv[]) {
   }
 
   mosqpp::lib_init();
+  MQTTClient client("my_client");
+  client.connect("localhost", 1883);
+  client.subscribe(nullptr, "my_topic");
+
+  while (true) {
+    client.loop();
+  }
+
+  mosqpp::lib_cleanup();
 
   return 0;
 }
