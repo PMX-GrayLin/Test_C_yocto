@@ -52,7 +52,7 @@ all: test_gst.o test_ocv.o test.o
 	@echo ">>>> CFLAG:${CFLAG}"
 	@echo ">>>> LDFLAG:${LDFLAG}"
 	@echo ">>>> "
-	${CXX} $(CFLAG) -o test test_gst.o test_ocv.o test.o $(LDFLAG)
+	${CXX} $(CFLAG) -o test test_gst.o test_ocv.o test.o $(LDFLAG) -static
 	@echo "========== Build all end =========="
 
 test.o: 
