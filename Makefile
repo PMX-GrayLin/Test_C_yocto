@@ -6,7 +6,6 @@
 # CC = ${CXX}
 
 # header dir
-INCLUDES_HEADER += -I$(BB_INCDIR)
 INCLUDES_HEADER += -I$(BB_INCDIR)/json-c
 INCLUDES_HEADER += -I$(BB_INCDIR)/gstreamer-1.0
 INCLUDES_HEADER += -I$(BB_INCDIR)/glib-2.0
@@ -22,7 +21,6 @@ INCLUDES_LIB += -L$(BB_LIBDIR)
 INCLUDES_LIB += -L$(BB_LIBDIR)/gstreamer-1.0
 
 # lib
-LINK_LIBS += -lstdc++
 LINK_LIBS += -ljson-c
 LINK_LIBS += -lgstreamer-1.0
 LINK_LIBS += -lglib-2.0
