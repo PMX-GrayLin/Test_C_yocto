@@ -83,7 +83,7 @@ void AICamera_setBrightness(int value) {
   int fd = open(AICamrea_getVideoDevice().c_str(), O_RDWR);
   if (fd == -1) {
     xlog("Failed to open video device:%s", strerror(errno));
-    return -1;
+    return;
   }
 
   struct v4l2_control ctrl;
