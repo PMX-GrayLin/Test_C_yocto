@@ -47,15 +47,17 @@ void ocv_test(int testCase) {
       break;
     }
 
-    if (frameCount % 1000 == 0) {
-      // Save the frame to a picture
-      std::string filename = "frame_" + std::to_string(imgCount++) + ".png";
-      if (cv::imwrite(filename, frame)) {
-        xlog("Saved frame to %s", filename.c_str());
-      } else {
-        xlog("Failed to save frame");
-      }
-    }
+    xlog("frameCount:%d", frameCount);
+
+    // if (frameCount % 1000 == 0) {
+    //   // Save the frame to a picture
+    //   std::string filename = "frame_" + std::to_string(imgCount++) + ".png";
+    //   if (cv::imwrite(filename, frame)) {
+    //     xlog("Saved frame to %s", filename.c_str());
+    //   } else {
+    //     xlog("Failed to save frame");
+    //   }
+    // }
 
     // Break on 'q' key press
     if (cv::waitKey(10) == 'q') {
