@@ -10,10 +10,17 @@ void ocv_test(int testCase) {
   // std::string pipeline = "videotestsrc ! videoconvert ! appsink";
 
   // Define the GStreamer pipeline
+  
+  // NG
+  // string pipelineS =
+  //     "v4l2src device=" + AICamrea_getVideoDevice() + " " +
+  //     "! video/x-raw,width=640,height=480 " +
+  //     "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
+  //     "! appsink";
+
   string pipelineS =
-      "v4l2src device=" + AICamrea_getVideoDevice() + " " +
-      "! video/x-raw,width=640,height=480 " +
-      "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
+      "videotestsrc " +
+      "! videoconvert " +
       "! appsink";
 
   xlog("pipeline:%s", pipelineS.c_str());
@@ -30,8 +37,8 @@ void ocv_test(int testCase) {
   cv::Mat frame;
 
   while (true) {
+    
     // Capture a frame
-    cap >> frame;
     if (!cap.read(frame)) {
       xlog("fail to capture frame");
       break;
