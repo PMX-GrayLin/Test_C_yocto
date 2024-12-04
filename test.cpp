@@ -96,7 +96,7 @@ void AICamera_setBrightness(int value) {
   ctrl.value = value;
 
   if (ioctl(fd, VIDIOC_S_CTRL, &ctrl) == 0) {
-    xlog("Brightness set to:%d", value);
+    xlog("Brightness set to:%d", ctrl.value);
   } else {
     xlog("Failed to set brightness:%s", strerror(errno));
   }
@@ -116,7 +116,7 @@ void AICamera_setWhiteBalanceAutomatic(bool enable) {
   ctrl.value = enable ? 1 : 0;
 
   if (ioctl(fd, VIDIOC_S_CTRL, &ctrl) == 0) {
-    xlog("white balance set to:%d", value);
+    xlog("white balance set to:%d", ctrl.value);
   } else {
     xlog("Failed to set white balance:%s", strerror(errno));
   }
