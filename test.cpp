@@ -28,6 +28,9 @@ public:
         } else if (payload == "gst") {
             std::thread t1(gst_test, 0);
             t1.detach();
+        } else if (payload == "ocv") {
+            std::thread t2(ocv_test, 0);
+            t2.detach();
         }
     }
 };

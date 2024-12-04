@@ -1,6 +1,7 @@
 #include "test_ocv.h"
 
 #include "test.h"
+#include "aicamerag2.h"
 
 void ocv_test(int testCase) {
   xlog("testCase:%d", testCase);
@@ -31,20 +32,21 @@ void ocv_test(int testCase) {
 //   ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=mmap \
 //   ! rtspclientsink location=rtsp://localhost:8554/mystream
 
-  std::string pipeline =
-      "videotestsrc "
+  string pipelineS =
+      "v4l2src device=" + AICamrea_getVideoDevice() + " " +
+      "! video/x-raw,width=640,height=480 " +
       "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
-      "! appsink";
-  xlog("pipeline:%s", pipeline.c_str());
+      "! rtspclientsink location=rtsp://localhost:8554/mystream";
+
+  xlog("pipeline:%s", pipelineS.c_str());
 
   // Open the pipeline with OpenCV
   cv::VideoCapture cap(pipeline, cv::CAP_GSTREAMER);
 
   if (!cap.isOpened()) {
+    xlog("cap.isOpened false");
     return;
   }
-
-  xlog("");
 
   // Declare the frame variable (cv::Mat) to hold the captured frame
   cv::Mat frame;
@@ -52,15 +54,18 @@ void ocv_test(int testCase) {
   while (true) {
     // Capture a frame
     cap >> frame;
+    if (!cap.read(frame)) {
+      xlog("fail to capture frame");
+      break;
+    }
 
     if (frame.empty()) {
-      xlog("");
-      // std::cerr << "Empty frame received. Exiting..." << std::endl;
+      xlog("frame is empty");
       break;
     }
 
     // Display the frame
-    cv::imshow("GStreamer Video", frame);
+    // cv::imshow("GStreamer Video", frame);
     xlog("");
 
     // Break on 'q' key press
@@ -73,7 +78,7 @@ void ocv_test(int testCase) {
 
   // Release resources
   cap.release();
-  cv::destroyAllWindows();
+  // cv::destroyAllWindows();
 
   xlog("");
 

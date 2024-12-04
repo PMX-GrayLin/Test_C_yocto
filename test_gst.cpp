@@ -20,11 +20,10 @@ void gst_test(int testCase) {
   gst_version(&major, &minor, &micro, &nano);
   xlog("%d.%d.%d.%d", major, minor, micro, nano);
 
-  // Create the pipeline
-
   // OK
   // "v4l2src device=/dev/video45 ! video/x-raw,width=640,height=480 ! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap ! rtspclientsink location=rtsp://localhost:8554/mystream";
 
+  // Create the pipeline
   string pipelineS =
       "v4l2src device=" + AICamrea_getVideoDevice() + " " +
       "! video/x-raw,width=640,height=480 " +
