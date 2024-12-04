@@ -9,7 +9,7 @@
 #include <fcntl.h>            // For open()
 
 
-std::string AICamrea_getVideoDevice();
-int AICamera_getBrightness();
-void AICamera_setBrightness(int value);
-void AICamera_setWhiteBalanceAutomatic(bool enable);
+extern std::string AICamrea_getVideoDevice();
+extern int AICamera_getBrightness();
+extern void AICamera_setBrightness(int value);
+extern void AICamera_setWhiteBalanceAutomatic(bool enable);
