@@ -69,7 +69,7 @@ int AICamera_getBrightness() {
   }
 
   if (ioctl(fd, VIDIOC_G_CTRL, &queryctrl) == 0) {
-    xlog("Current brightness:%d", ctrl.value);
+    xlog("Current brightness:%d", queryctrl.value);
   } else {
     xlog("ioctl fail, VIDIOC_G_CTRL... error:%s", strerror(errno));
   }
