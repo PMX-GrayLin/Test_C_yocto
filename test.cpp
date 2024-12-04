@@ -17,11 +17,13 @@ public:
         if (payload == "1") {
             AICamera_getBrightness();
         } else if (payload == "2") {
-            int brightness = 10;
+            int brightness =0;
             AICamera_setBrightness(brightness);
+            AICamera_getBrightness()
         } else if (payload == "3") {
-            int brightness = 200;
+            int brightness = 100;
             AICamera_setBrightness(brightness);
+            AICamera_getBrightness()
         }
 
     }
