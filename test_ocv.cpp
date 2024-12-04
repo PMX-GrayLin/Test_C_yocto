@@ -55,12 +55,13 @@ void ocv_test(int testCase) {
       } else {
         xlog("Failed to save frame");
       }
+    }
 
       // Break on 'q' key press
       if (cv::waitKey(10) == 'q') {
         break;
       }
-    }
+
   }
 
   xlog("");
