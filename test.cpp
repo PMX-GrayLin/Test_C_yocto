@@ -19,11 +19,11 @@ public:
         } else if (payload == "2") {
             int brightness =0;
             AICamera_setBrightness(brightness);
-            AICamera_getBrightness()
+            AICamera_getBrightness();
         } else if (payload == "3") {
             int brightness = 100;
             AICamera_setBrightness(brightness);
-            AICamera_getBrightness()
+            AICamera_getBrightness();
         }
 
     }
