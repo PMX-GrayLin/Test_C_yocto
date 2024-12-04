@@ -25,9 +25,7 @@ public:
             AICamera_setBrightness(brightness);
             AICamera_getBrightness();
         }
-
     }
-
 };
 
 std::string AICamrea_getVideoDevice() {
