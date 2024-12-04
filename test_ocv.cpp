@@ -10,7 +10,7 @@ void ocv_test(int testCase) {
   // std::string pipeline = "videotestsrc ! videoconvert ! appsink";
 
   // Define the GStreamer pipeline
-  
+
   string pipelineS = "videotestsrc ! videoconvert ! appsink";
 
   // NG
@@ -35,12 +35,12 @@ void ocv_test(int testCase) {
   int frameCount = 0;
   int imgCount = 0;
   while (true) {
-    
     // Capture a frame
     if (!cap.read(frame)) {
       xlog("fail to capture frame");
       break;
     }
+    frameCount++;
 
     if (frame.empty()) {
       xlog("frame is empty");
@@ -49,7 +49,6 @@ void ocv_test(int testCase) {
 
     if (frameCount % 1000 == 0) {
       // Save the frame to a picture
-      imgCount++;
       std::string filename = "frame_" + std::to_string(imgCount++) + ".png";
       if (cv::imwrite(filename, frame)) {
         xlog("Saved frame to " + filename);
