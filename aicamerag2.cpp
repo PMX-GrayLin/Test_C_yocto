@@ -1,4 +1,5 @@
 #include "aicamerag2.h"
+#include "test.h"
 
 std::string AICamrea_getVideoDevice() {
   std::string result;
