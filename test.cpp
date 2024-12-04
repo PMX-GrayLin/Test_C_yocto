@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
     int testCase = (argv[2] == nullptr) ? 0 : 1;
     ocv_test(testCase);
   } else if (!strcmp(argv[1], "dev")) {
-    xlog("getVideoDevice:%s", getVideoDevice().c_str());
+    xlog("getVideoDevice:%s", AICamrea_getVideoDevice().c_str());
   }
 
   mosqpp::lib_init();
