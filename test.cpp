@@ -24,7 +24,7 @@ public:
     }
 };
 
-std::string getVideoDevice() {
+std::string AICamrea_getVideoDevice() {
   std::string result;
   FILE* pipe = popen("v4l2-ctl --list-devices | grep mtk-v4l2-camera -A 3", "r");
   if (pipe) {
@@ -48,10 +48,18 @@ int AICamera_getBrightness() {
   struct v4l2_control ctrl;
   memset(&ctrl, 0, sizeof(ctrl));
   ctrl.id = V4L2_CID_BRIGHTNESS;
+  int brightness = -1;
+  int fd = open(AICamrea_getVideoDevice().c_str(), O_RDWR);
+  if (fd == -1) {
+    xlog("Failed to open video device: %s", strerror(errno));
+    return -1;
+  }
 
   if (ioctl(fd, VIDIOC_G_CTRL, &ctrl) == 0) {
     xlog("Current brightness: %d", ctrl.value);
   }
+
+  close(fd);
   return 0;
 }
 
