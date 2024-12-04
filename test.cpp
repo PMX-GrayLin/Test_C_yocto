@@ -44,6 +44,21 @@ std::string getVideoDevice() {
   return result;
 }
 
+int AICamera_getBrightness() {
+  struct v4l2_control ctrl;
+  memset(&ctrl, 0, sizeof(ctrl));
+  ctrl.id = V4L2_CID_BRIGHTNESS;
+
+  if (ioctl(fd, VIDIOC_G_CTRL, &ctrl) == 0) {
+    xlog("Current brightness: %d", ctrl.value);
+  }
+  return 0;
+}
+
+void AICamera_setBrightness(int value) {
+}
+
+
 int main(int argc, char* argv[]) {
   xlog("");
 
