@@ -44,7 +44,7 @@ LDFLAG += ${INCLUDES_LIB}
 LDFLAG += ${LINK_LIBS}
 LDFLAG += ${OCVLDFLAG}
 
-all: test_gst.o test_ocv.o test.o
+all: test_gst.o test_ocv.o aicamerag2.0 test.o
 	@echo "========== Build all start =========="
 	@echo ">>>> CXX:${CXX}"
 	@echo ">>>> CFLAG:${CFLAG}"
@@ -57,6 +57,11 @@ test.o:
 	@echo "========== Build test.o start =========="
 	${CXX} $(CFLAG) test.cpp -c
 	@echo "========== Build test.o end =========="
+
+aicamerag2.o: 
+	@echo "========== Build aicamerag2.o start =========="
+	${CXX} $(CFLAG) aicamerag2.cpp -c
+	@echo "========== Build aicamerag2.o end =========="
 
 test_gst.o: 
 	@echo "========== Build test_gst.o start =========="
