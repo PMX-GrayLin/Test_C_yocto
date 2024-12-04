@@ -11,10 +11,7 @@ void ocv_test(int testCase) {
 
   // Define the GStreamer pipeline
   
-  std::string pipelineS =
-    "videotestsrc " +
-    "! videoconvert " +
-    "! appsink";
+  string pipelineS = "videotestsrc ! videoconvert ! appsink";
 
   // NG
   // string pipelineS =
