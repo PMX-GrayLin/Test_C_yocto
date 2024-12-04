@@ -57,11 +57,10 @@ void ocv_test(int testCase) {
       }
     }
 
-      // Break on 'q' key press
-      if (cv::waitKey(10) == 'q') {
-        break;
-      }
-
+    // Break on 'q' key press
+    if (cv::waitKey(10) == 'q') {
+      break;
+    }
   }
 
   xlog("");
