@@ -33,3 +33,4 @@ using namespace std;
 std::string AICamrea_getVideoDevice();
 int AICamera_getBrightness();
 void AICamera_setBrightness(int value);
+void AICamera_setWhiteBalanceAutomatic(bool enable);

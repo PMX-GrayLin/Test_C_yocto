@@ -21,6 +21,10 @@ public:
             int brightness = 100;
             AICamera_setBrightness(brightness);
             AICamera_getBrightness();
+        } else if (payload == "4") {
+            AICamera_setWhiteBalanceAutomatic(0);
+        } else if (payload == "5") {
+            AICamera_setWhiteBalanceAutomatic(1);
         }
     }
 };
@@ -94,12 +98,29 @@ void AICamera_setBrightness(int value) {
   if (ioctl(fd, VIDIOC_S_CTRL, &ctrl) == 0) {
     xlog("Brightness set to:%d", value);
   } else {
-    xlog("Failed to set brightness: %s", strerror(errno));
+    xlog("Failed to set brightness:%s", strerror(errno));
   }
   close(fd);
 }
 
 void AICamera_setWhiteBalanceAutomatic(bool enable) {
+  int fd = open(AICamrea_getVideoDevice().c_str(), O_RDWR);
+  if (fd == -1) {
+    xlog("Failed to open video device:%s", strerror(errno));
+    return;
+  }
+
+  struct v4l2_control ctrl;
+  memset(&ctrl, 0, sizeof(ctrl));
+  ctrl.id = V4L2_CID_AUTO_WHITE_BALANCE;
+  ctrl.value = enable ? 1 : 0;
+
+  if (ioctl(fd, VIDIOC_S_CTRL, &ctrl) == 0) {
+    xlog("white balance set to:%d", value);
+  } else {
+    xlog("Failed to set white balance:%s", strerror(errno));
+  }
+  close(fd);
 }
 
 
