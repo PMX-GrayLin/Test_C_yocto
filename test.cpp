@@ -50,9 +50,6 @@ std::string AICamrea_getVideoDevice() {
 
 int AICamera_getBrightness() {
 
-  struct v4l2_queryctrl queryctrl;
-  memset(&queryctrl, 0, sizeof(queryctrl));
-  queryctrl.id = V4L2_CID_BRIGHTNESS;
   int brightness = -1;
 
   int fd = open(AICamrea_getVideoDevice().c_str(), O_RDWR);
@@ -61,6 +58,9 @@ int AICamera_getBrightness() {
     return -1;
   }
 
+  struct v4l2_queryctrl queryctrl;
+  memset(&queryctrl, 0, sizeof(queryctrl));
+  queryctrl.id = V4L2_CID_BRIGHTNESS;
   if (ioctl(fd, VIDIOC_QUERYCTRL, &queryctrl) == 0) {
     xlog("queryctrl.minimum:%d", queryctrl.minimum);
     xlog("queryctrl.maximum:%d", queryctrl.maximum);
@@ -68,8 +68,11 @@ int AICamera_getBrightness() {
     xlog("ioctl fail, VIDIOC_QUERYCTRL... error:%s", strerror(errno));
   }
 
-  if (ioctl(fd, VIDIOC_G_CTRL, &queryctrl) == 0) {
-    xlog("Current brightness:%d", queryctrl.value);
+  struct v4l2_control ctrl;
+  memset(&ctrl, 0, sizeof(ctrl));
+  ctrl.id = V4L2_CID_BRIGHTNESS;
+  if (ioctl(fd, VIDIOC_G_CTRL, &ctrl) == 0) {
+    xlog("Current brightness:%d", ctrl.value);
   } else {
     xlog("ioctl fail, VIDIOC_G_CTRL... error:%s", strerror(errno));
   }
