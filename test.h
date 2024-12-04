@@ -8,6 +8,10 @@
 #include <algorithm>
 #include <thread>
 #include <string> 
+#include <regex>
+#include <iostream>
+
+#include <mosquittopp.h>
 #include <linux/videodev2.h>  // For V4L2 definitions
 #include <sys/ioctl.h>        // For ioctl()
 #include <fcntl.h>            // For open()

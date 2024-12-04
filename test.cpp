@@ -2,9 +2,6 @@
 #include "test_gst.h"
 #include "test_ocv.h"
 
-#include <regex>
-#include <mosquittopp.h>
-#include <iostream>
 
 class MQTTClient : public mosqpp::mosquittopp {
 public:
@@ -101,6 +98,10 @@ void AICamera_setBrightness(int value) {
   }
   close(fd);
 }
+
+void AICamera_setWhiteBalanceAutomatic(bool enable) {
+}
+
 
 int main(int argc, char* argv[]) {
   xlog("");
