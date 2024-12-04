@@ -1,6 +1,7 @@
 #include "test_gst.h"
 
 #include "test.h"
+#include "aicamerag2.h"
 
 void gst_test(int testCase) {
   xlog("testCase:%d", testCase);
@@ -23,7 +24,7 @@ void gst_test(int testCase) {
   // std::string pipeline = "v4l2src device=/dev/video45 ! video/x-raw,width=640,height=480 ! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap ! rtspclientsink location=rtsp://localhost:8554/mystream";
 
   string pipelineS =
-      "videotestsrc "
+      "v4l2src device=" + AICamrea_getVideoDevice() + " " +
       "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
       "! rtspclientsink location=rtsp://localhost:8554/mystream";
 
