@@ -60,17 +60,12 @@ void gst_test(int testCase) {
     switch (GST_MESSAGE_TYPE(msg)) {
       case GST_MESSAGE_ERROR:
         gst_message_parse_error(msg, &err, &debug_info);
-        // std::cerr << "Error received from element " << GST_OBJECT_NAME(msg->src)
-        //           << ": " << err->message << std::endl;
-        // std::cerr << "Debugging information: " << (debug_info ? debug_info : "none") << std::endl;
         g_clear_error(&err);
         g_free(debug_info);
         break;
       case GST_MESSAGE_EOS:
-        // std::cout << "End-Of-Stream reached." << std::endl;
         break;
       default:
-        // std::cerr << "Unexpected message received." << std::endl;
         break;
     }
     gst_message_unref(msg);
