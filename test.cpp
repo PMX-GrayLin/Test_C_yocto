@@ -25,6 +25,8 @@ public:
             AICamera_setWhiteBalanceAutomatic(0);
         } else if (payload == "5") {
             AICamera_setWhiteBalanceAutomatic(1);
+        } else if (payload == "gst") {
+            gst_test(0);
         }
     }
 };
