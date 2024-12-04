@@ -20,7 +20,6 @@ void ocv_test(int testCase) {
   //     "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
   //     "! appsink";
 
-
   xlog("pipeline:%s", pipelineS.c_str());
 
   // Open the pipeline with OpenCV
@@ -33,7 +32,8 @@ void ocv_test(int testCase) {
 
   // Declare the frame variable (cv::Mat) to hold the captured frame
   cv::Mat frame;
-
+  int frameCount = 0;
+  int imgCount = 0;
   while (true) {
     
     // Capture a frame
@@ -47,13 +47,20 @@ void ocv_test(int testCase) {
       break;
     }
 
-    // Display the frame
-    // cv::imshow("GStreamer Video", frame);
-    xlog("");
+    if (frameCount % 1000 == 0) {
+      // Save the frame to a picture
+      imgCount++;
+      std::string filename = "frame_" + std::to_string(imgCount++) + ".png";
+      if (cv::imwrite(filename, frame)) {
+        xlog("Saved frame to " + filename);
+      } else {
+        xlog("Failed to save frame to " + filename);
+      }
 
-    // Break on 'q' key press
-    if (cv::waitKey(10) == 'q') {
-      break;
+      // Break on 'q' key press
+      if (cv::waitKey(10) == 'q') {
+        break;
+      }
     }
   }
 
