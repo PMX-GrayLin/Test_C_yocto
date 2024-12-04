@@ -41,7 +41,7 @@ void ocv_test(int testCase) {
   xlog("pipeline:%s", pipelineS.c_str());
 
   // Open the pipeline with OpenCV
-  cv::VideoCapture cap(pipeline, cv::CAP_GSTREAMER);
+  cv::VideoCapture cap(pipelineS, cv::CAP_GSTREAMER);
 
   if (!cap.isOpened()) {
     xlog("cap.isOpened false");
