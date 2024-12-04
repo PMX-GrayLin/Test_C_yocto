@@ -16,8 +16,6 @@ using namespace std;
 // yocto test
 #include "json.h"
 
-#include "aicamerag2.h"
-
 #define DEBUGX
 
 #ifndef DEBUGX
