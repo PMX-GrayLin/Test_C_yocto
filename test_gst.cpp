@@ -21,13 +21,13 @@ void gst_test(int testCase) {
   xlog("%d.%d.%d.%d", major, minor, micro, nano);
 
   // OK
-  // "v4l2src device=/dev/video45 ! video/x-raw,width=640,height=480 ! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap ! rtspclientsink location=rtsp://localhost:8554/mystream";
+  // gst-launch-1.0 -v v4l2src device=/dev/video47 ! video/x-raw,width=1920,height=1080 ! v4l2h264enc extra-controls="cid,video_gop_size=60" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
 
   // Create the pipeline
   string pipelineS =
       "v4l2src device=" + AICamrea_getVideoDevice() + " " +
-      "! video/x-raw,width=640,height=480 " +
-      "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
+      "! video/x-raw,width=1920,height=1080 " +
+      "! v4l2h264enc extra-controls=\"cid,video_gop_size=60\" capture-io-mode=dmabuf "
       "! rtspclientsink location=rtsp://localhost:8554/mystream";
 
   xlog("pipeline:%s", pipelineS.c_str());
