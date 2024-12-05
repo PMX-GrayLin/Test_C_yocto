@@ -147,10 +147,10 @@ void gst_test2(int testCase) {
 
       switch (GST_MESSAGE_TYPE(msg)) {
         case GST_MESSAGE_ERROR:
-          gst_message_parse_error(msg, &err, &debug_info);
-          xlog("GST_MESSAGE_ERROR, err->message:%s", err->message);
-          g_error_free(err);
-          g_free(debug_info);
+          xlog("GST_MESSAGE_ERROR");
+          // gst_message_parse_error(msg, &err, &debug_info);
+          // g_error_free(err);
+          // g_free(debug_info);
           break;
 
         case GST_MESSAGE_EOS:
@@ -161,7 +161,7 @@ void gst_test2(int testCase) {
           xlog("default, Unexpected message received");
           break;
       }
-      gst_message_unref(msg);
+      // gst_message_unref(msg);
     }
   } while (msg != nullptr);
 
