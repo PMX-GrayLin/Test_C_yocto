@@ -26,8 +26,8 @@ void ocv_test(int testCase) {
 
   string pipelineS =
       "v4l2src device=" + AICamrea_getVideoDevice() + " " +
-      "! videoconvert "
       "! video/x-raw, width=640, height=480, framerate=30/1  " +
+      "! videoconvert "
       "! v4l2h264enc "
       "! appsink";
 
