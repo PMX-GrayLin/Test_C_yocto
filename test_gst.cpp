@@ -99,6 +99,9 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
       xlog("Failed to get caps");
       return GST_PAD_PROBE_PASS;
     }
+    // Print the entire caps for debugging
+    xlog("caps: %s", gst_caps_to_string(caps));
+
     // Get the structure of the first capability (format)
     GstStructure *str = gst_caps_get_structure(caps, 0);
     const gchar *format = gst_structure_get_string(str, "format");
