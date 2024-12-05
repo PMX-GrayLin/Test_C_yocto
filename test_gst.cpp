@@ -191,10 +191,10 @@ void gst_test2(int testCase) {
   }
 
   // Connect signals
-  g_signal_connect(sink, "pad-added", G_CALLBACK(on_pad_added), encoder);
+  // g_signal_connect(sink, "pad-added", G_CALLBACK(on_pad_added), encoder);
 
   // Attach pad probe to capture frames
-  GstPad *pad = gst_element_get_static_pad(sink, "src");
+  GstPad *pad = gst_element_get_static_pad(encoder, "src");
   if (pad) {
     gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)cb_have_data, nullptr, nullptr);
     gst_object_unref(pad);
