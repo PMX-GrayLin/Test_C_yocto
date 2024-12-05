@@ -82,6 +82,54 @@ void gst_test(int testCase) {
   return;
 }
 
+// Callback to handle incoming buffer data
+GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+    GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
+    if (buffer) {
+        buffer = gst_buffer_ref(buffer);
+
+        // Map the buffer to access its data
+        GstMapInfo map;
+        if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+            std::cout << "Frame captured. Size: " << map.size << " bytes" << std::endl;
+
+            // Example: Copy the frame data to a vector
+            std::vector<uint8_t> frame_data(map.data, map.data + map.size);
+
+            // Process the frame_data as needed (e.g., save to a file, analyze, etc.)
+            // ...
+
+            gst_buffer_unmap(buffer, &map);
+        } else {
+            std::cerr << "Failed to map buffer" << std::endl;
+        }
+
+        gst_buffer_unref(buffer);
+    }
+    return GST_PAD_PROBE_OK;
+}
+
+// Callback for the "pad-added" signal
+void on_pad_added(GstElement *src, GstPad *new_pad, gpointer user_data) {
+    GstElement *decode = GST_ELEMENT(user_data);
+
+    // Check if the new pad is compatible with our decode sink pad
+    GstCaps *new_pad_caps = gst_pad_get_current_caps(new_pad);
+    const gchar *new_pad_type = gst_structure_get_name(gst_caps_get_structure(new_pad_caps, 0));
+    if (g_str_has_prefix(new_pad_type, "video/")) {
+        GstPad *sink_pad = gst_element_get_static_pad(decode, "sink");
+        if (!gst_pad_is_linked(sink_pad)) {
+            if (gst_pad_link(new_pad, sink_pad) != GST_PAD_LINK_OK) {
+                std::cerr << "Failed to link decode sink pad." << std::endl;
+            } else {
+                std::cout << "Linked new pad to decode sink pad." << std::endl;
+            }
+        }
+        gst_object_unref(sink_pad);
+    }
+    gst_caps_unref(new_pad_caps);
+}
+
 void gst_test2(int testCase) {
   xlog("testCase:%d", testCase);
 
@@ -132,6 +180,16 @@ void gst_test2(int testCase) {
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
   gst_caps_unref(caps);
+
+  // Connect signals
+  // g_signal_connect(depay, "pad-added", G_CALLBACK(on_pad_added), decode);
+
+  // Attach pad probe to capture frames
+  GstPad *pad = gst_element_get_static_pad(sink, "src");
+  if (pad) {
+    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)cb_have_data, nullptr, nullptr);
+    gst_object_unref(pad);
+  }
 
   // Build the pipeline
   gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, encoder, sink, nullptr);
