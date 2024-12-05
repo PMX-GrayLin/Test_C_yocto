@@ -182,22 +182,22 @@ void gst_test2(int testCase) {
   g_object_set(capsfilter, "caps", caps, nullptr);
   gst_caps_unref(caps);
 
-  // Connect signals
-  g_signal_connect(encoder, "pad-added", G_CALLBACK(on_pad_added), sink);
-
-  // Attach pad probe to capture frames
-  GstPad *pad = gst_element_get_static_pad(sink, "src");
-  if (pad) {
-    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)cb_have_data, nullptr, nullptr);
-    gst_object_unref(pad);
-  }
-
   // Build the pipeline
   gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, encoder, sink, nullptr);
   if (!gst_element_link_many(source, capsfilter, encoder, sink, nullptr)) {
     xlog("failed to link elements in the pipeline");
     gst_object_unref(pipeline);
     return;
+  }
+
+  // Connect signals
+  g_signal_connect(sink, "pad-added", G_CALLBACK(on_pad_added), encoder);
+
+  // Attach pad probe to capture frames
+  GstPad *pad = gst_element_get_static_pad(sink, "src");
+  if (pad) {
+    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)cb_have_data, nullptr, nullptr);
+    gst_object_unref(pad);
   }
 
   // Start the pipeline
