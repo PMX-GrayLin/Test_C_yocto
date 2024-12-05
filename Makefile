@@ -24,6 +24,7 @@ INCLUDES_LIB += -L$(BB_LIBDIR)/gstreamer-1.0
 LINK_LIBS += -ljson-c
 LINK_LIBS += -lgstreamer-1.0
 LINK_LIBS += -lglib-2.0
+LINK_LIBS += -lgobject-2.0
 LINK_LIBS += -lmosquitto -lmosquittopp
 
 OCVLDFLAG +=-lopencv_core 
