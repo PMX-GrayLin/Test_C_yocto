@@ -129,8 +129,9 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
 
 void gst_test2(int testCase) {
   xlog("testCase:%d", testCase);
-  gst_frame_counter = 0;
-
+  counterFrame = 0;
+  counterImg = 0;
+  
   // Initialize GStreamer
   gst_init(nullptr, nullptr);
 
