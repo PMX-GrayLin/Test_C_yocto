@@ -105,7 +105,22 @@ void gst_test2(int testCase) {
   // Set properties for the elements
   xlog("AICamrea_getVideoDevice:%s", AICamrea_getVideoDevice().c_str());
   g_object_set( G_OBJECT(source), "device", AICamrea_getVideoDevice().c_str(), nullptr );
-  g_object_set( G_OBJECT(encoder), "extra-controls", "\"cid,video_gop_size=60\"", nullptr);
+
+  // Create a GstStructure for extra-controls
+  GstStructure *controls = gst_structure_new(
+      "extra-controls",                      // Name of the structure
+      "cid,video_gop_size", G_TYPE_INT, 60,  // Key-value pair
+      nullptr                                // End of key-value pairs
+  );
+  if (!controls) {
+    xlog("Failed to create GstStructure");
+    gst_object_unref(pipeline);
+    return;
+  }
+  g_object_set(G_OBJECT(encoder), "extra-controls", controls, nullptr);
+  // Free the GstStructure after use
+  gst_structure_free(controls);
+
   // g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf = 4
   // g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
 
