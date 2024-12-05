@@ -99,7 +99,7 @@ void gst_test2(int testCase) {
 
   if (!pipeline || !source || !capsfilter || !encoder || !sink) {
     xlog("failed to create GStreamer elements");
-    return -1;
+    return;
   }
 
   // Set properties for the elements
@@ -122,7 +122,7 @@ void gst_test2(int testCase) {
   if (!gst_element_link_many(source, capsfilter, encoder, sink, nullptr)) {
     xlog("failed to link elements in the pipeline");
     gst_object_unref(pipeline);
-    return -1;
+    return;
   }
 
   // Start the pipeline
@@ -130,7 +130,7 @@ void gst_test2(int testCase) {
   if (ret == GST_STATE_CHANGE_FAILURE) {
     xlog("failed to start the pipeline");
     gst_object_unref(pipeline);
-    return -1;
+    return;
   }
 
   xlog("pipeline is running...");
