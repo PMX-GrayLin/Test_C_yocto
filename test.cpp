@@ -26,11 +26,14 @@ public:
         } else if (payload == "5") {
             AICamera_setWhiteBalanceAutomatic(1);
         } else if (payload == "gst") {
-            std::thread t1(gst_test, 0);
-            t1.detach();
+            std::thread t(gst_test, 0);
+            t.detach();
+        } else if (payload == "gst2") {
+            std::thread t(gst_test2, 0);
+            t.detach();
         } else if (payload == "ocv") {
-            std::thread t2(ocv_test, 0);
-            t2.detach();
+            std::thread t(ocv_test, 0);
+            t.detach();
         }
     }
 };
