@@ -81,3 +81,92 @@ void gst_test(int testCase) {
 
   return;
 }
+
+void gst_test2(int testCase) {
+  xlog("testCase:%d", testCase);
+
+  // Initialize GStreamer
+  gst_init(nullptr, nullptr);
+
+  // gst-launch-1.0 -v v4l2src device=/dev/video47 ! video/x-raw,width=1920,height=1080 ! v4l2h264enc extra-controls="cid,video_gop_size=60" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
+
+  // Create the elements
+  GstElement *pipeline = gst_pipeline_new("video-pipeline");
+  GstElement *source = gst_element_factory_make("v4l2src", "source");
+  GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
+  GstElement *encoder = gst_element_factory_make("v4l2h264enc", "encoder");
+  GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
+
+  if (!pipeline || !source || !capsfilter || !encoder || !sink) {
+    xlog("failed to create GStreamer elements");
+    return -1;
+  }
+
+  // Set properties for the elements
+  g_object_set(source, "device", AICamrea_getVideoDevice().c_str(), nullptr);
+  g_object_set(encoder, "extra-controls", "cid,video_gop_size=60", nullptr);
+  g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf = 4
+  g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
+
+  // Define the capabilities for the capsfilter
+  GstCaps *caps = gst_caps_new_simple(
+      "video/x-raw",
+      "width", G_TYPE_INT, 1920,
+      "height", G_TYPE_INT, 1080,
+      nullptr);
+  g_object_set(capsfilter, "caps", caps, nullptr);
+  gst_caps_unref(caps);
+
+  // Build the pipeline
+  gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, encoder, sink, nullptr);
+  if (!gst_element_link_many(source, capsfilter, encoder, sink, nullptr)) {
+    xlog("failed to link elements in the pipeline");
+    gst_object_unref(pipeline);
+    return -1;
+  }
+
+  // Start the pipeline
+  GstStateChangeReturn ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
+  if (ret == GST_STATE_CHANGE_FAILURE) {
+    xlog("failed to start the pipeline");
+    gst_object_unref(pipeline);
+    return -1;
+  }
+
+  xlog("pipeline is running...");
+
+  // Wait until an error or EOS
+  GstBus *bus = gst_element_get_bus(pipeline);
+  GstMessage *msg;
+  do {
+    msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE,
+                                     (GstMessageType)(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+    if (msg != nullptr) {
+      GError *err;
+      gchar *debug_info;
+
+      switch (GST_MESSAGE_TYPE(msg)) {
+        case GST_MESSAGE_ERROR:
+          gst_message_parse_error(msg, &err, &debug_info);
+          xlog("error:%s", err->message.c_str());
+          g_error_free(err);
+          g_free(debug_info);
+          break;
+
+        case GST_MESSAGE_EOS:
+          xlog("End-Of-Stream reached");
+          break;
+
+        default:
+          xlog("Unexpected message received");
+          break;
+      }
+      gst_message_unref(msg);
+    }
+  } while (msg != nullptr);
+
+  // Clean up
+  gst_object_unref(bus);
+  gst_element_set_state(pipeline, GST_STATE_NULL);
+  gst_object_unref(pipeline);
+}
