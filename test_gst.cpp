@@ -113,7 +113,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
 // Callback for the "pad-added" signal
 void on_pad_added(GstElement *src, GstPad *new_pad, gpointer user_data) {
     GstElement *decode = GST_ELEMENT(user_data);
-
+    xlog("");
     // Check if the new pad is compatible with our decode sink pad
     GstCaps *new_pad_caps = gst_pad_get_current_caps(new_pad);
     const gchar *new_pad_type = gst_structure_get_name(gst_caps_get_structure(new_pad_caps, 0));
@@ -183,7 +183,7 @@ void gst_test2(int testCase) {
   gst_caps_unref(caps);
 
   // Connect signals
-  // g_signal_connect(depay, "pad-added", G_CALLBACK(on_pad_added), decode);
+  g_signal_connect(encoder, "pad-added", G_CALLBACK(on_pad_added), sink);
 
   // Attach pad probe to capture frames
   GstPad *pad = gst_element_get_static_pad(sink, "src");
