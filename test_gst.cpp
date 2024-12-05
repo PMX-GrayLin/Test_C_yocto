@@ -2,6 +2,7 @@
 
 #include "test.h"
 #include "aicamerag2.h"
+#include <opencv2/opencv.hpp>
 
 int counterFrame = 0;
 int counterImg = 0;
