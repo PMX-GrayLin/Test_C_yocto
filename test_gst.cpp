@@ -131,7 +131,7 @@ void gst_test2(int testCase) {
   xlog("testCase:%d", testCase);
   counterFrame = 0;
   counterImg = 0;
-  
+
   // Initialize GStreamer
   gst_init(nullptr, nullptr);
 
@@ -176,6 +176,7 @@ void gst_test2(int testCase) {
       "video/x-raw",
       "width", G_TYPE_INT, 1920,
       "height", G_TYPE_INT, 1080,
+      "format", G_TYPE_STRING, "BGR",
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
   gst_caps_unref(caps);
