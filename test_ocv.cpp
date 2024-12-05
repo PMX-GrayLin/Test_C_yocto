@@ -45,7 +45,7 @@ void ocv_test(int testCase) {
   // NG
   string pipelineS =
       "v4l2src device=" + AICamrea_getVideoDevice() + " " +
-      "! video/x-raw,width=2316,height=1746,format=UYVY  " +
+      "! video/x-raw,width=2316,height=1746 " +
       "! videoconvert "
       "! appsink";
 
