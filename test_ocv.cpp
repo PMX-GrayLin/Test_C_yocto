@@ -9,27 +9,13 @@ void ocv_test(int testCase) {
   // OK
   // std::string pipeline = "videotestsrc ! videoconvert ! appsink";
 
-  // Define the GStreamer pipeline
-  
-  // OK
-  // v4l2src device=/dev/video{CAM_ID} ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert ! appsink
-
-  // OK
-  // string pipelineS = "videotestsrc ! videoconvert ! appsink";
-
-  // OK
+    // NG
   // string pipelineS =
   //     "v4l2src device=" + AICamrea_getVideoDevice() + " " +
   //     "! video/x-raw, width=640, height=480, framerate=30/1  " +
   //     "! videoconvert "
+  //     "! v4l2h264enc "
   //     "! appsink";
-
-  string pipelineS =
-      "v4l2src device=" + AICamrea_getVideoDevice() + " " +
-      "! video/x-raw, width=640, height=480, framerate=30/1  " +
-      "! videoconvert "
-      "! v4l2h264enc "
-      "! appsink";
 
   // NG
   // string pipelineS =
@@ -46,8 +32,26 @@ void ocv_test(int testCase) {
   //     "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
   //     "! appsink";
 
+  // OK
+  // string pipelineS = "videotestsrc ! videoconvert ! appsink";
+
+  // OK
+  // string pipelineS =
+  //     "v4l2src device=" + AICamrea_getVideoDevice() + " " +
+  //     "! video/x-raw, width=640, height=480, framerate=30/1  " +
+  //     "! videoconvert "
+  //     "! appsink";
+
+  // NG
+  string pipelineS =
+      "v4l2src device=" + AICamrea_getVideoDevice() + " " +
+      "! video/x-raw,width=2316,height=1746,format=UYVY  " +
+      "! videoconvert "
+      "! appsink";
+
   xlog("pipeline:%s", pipelineS.c_str());
 
+  // Define the GStreamer pipeline
   // Open the pipeline with OpenCV
   cv::VideoCapture cap(pipelineS, cv::CAP_GSTREAMER);
 
