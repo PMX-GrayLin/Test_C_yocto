@@ -84,6 +84,7 @@ void gst_test(int testCase) {
 
 // Callback to handle incoming buffer data
 GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+  xlog("");
     GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buffer) {
         buffer = gst_buffer_ref(buffer);
