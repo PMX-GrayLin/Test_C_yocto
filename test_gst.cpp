@@ -148,17 +148,17 @@ void gst_test2(int testCase) {
       switch (GST_MESSAGE_TYPE(msg)) {
         case GST_MESSAGE_ERROR:
           gst_message_parse_error(msg, &err, &debug_info);
-          xlog("error:%s", err->message);
+          xlog("GST_MESSAGE_ERROR, err->message:%s", err->message);
           g_error_free(err);
           g_free(debug_info);
           break;
 
         case GST_MESSAGE_EOS:
-          xlog("End-Of-Stream reached");
+          xlog("GST_MESSAGE_EOS, End-Of-Stream reached");
           break;
 
         default:
-          xlog("Unexpected message received");
+          xlog("default, Unexpected message received");
           break;
       }
       gst_message_unref(msg);
