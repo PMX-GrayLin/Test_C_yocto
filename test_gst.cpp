@@ -109,7 +109,7 @@ void gst_test2(int testCase) {
   // Create a GstStructure for extra-controls
   GstStructure *controls = gst_structure_new(
       "extra-controls",                      // Name of the structure
-      "cid,video_gop_size", G_TYPE_INT, 60,  // Key-value pair
+      "cid_video_gop_size", G_TYPE_INT, 60,  // Key-value pair
       nullptr                                // End of key-value pairs
   );
   if (!controls) {
