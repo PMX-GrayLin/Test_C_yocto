@@ -203,7 +203,7 @@ void gst_test2(int testCase) {
   }
 
   // Attach pad probe to capture frames
-  GstPad *pad = gst_element_get_static_pad(encoder, "src");
+  GstPad *pad = gst_element_get_static_pad(encoder, "sink");
   if (pad) {
     gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)cb_have_data, nullptr, nullptr);
     gst_object_unref(pad);
