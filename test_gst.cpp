@@ -3,7 +3,8 @@
 #include "test.h"
 #include "aicamerag2.h"
 
-int frame_counter = 0;
+int counterFrame = 0;
+int counterImg = 0;
 
 void gst_test(int testCase) {
   xlog("testCase:%d", testCase);
@@ -88,13 +89,13 @@ void gst_test(int testCase) {
 GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
   GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
   if (buffer) {
-    frame_counter++;
+    counterFrame++;
     buffer = gst_buffer_ref(buffer);
 
     // Map the buffer to access its data
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-      xlog("frame captured, frame_counter:%d, Size:%d bytes", frame_counter, map.size);
+      xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
 
       // Define frame properties (update width, height, and type as per your caps)
       int width = 1920;    // Set your video width
@@ -105,9 +106,9 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
       // Create an OpenCV Mat from the raw buffer data
       cv::Mat frame(height, width, type, map.data);
 
-      if (frameCount % 200 == 0) {
+      if (counterFrame % 200 == 0) {
         // Save the frame to a picture
-        std::string filename = "frame_" + std::to_string(imgCount++) + ".png";
+        std::string filename = "frame_" + std::to_string(counterImg++) + ".png";
         if (cv::imwrite(filename, frame)) {
           xlog("Saved frame to %s", filename.c_str());
         } else {
