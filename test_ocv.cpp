@@ -28,8 +28,16 @@ void ocv_test(int testCase) {
       "v4l2src device=" + AICamrea_getVideoDevice() + " " +
       "! video/x-raw, width=640, height=480, framerate=30/1  " +
       "! videoconvert "
-      "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
+      "! v4l2h264enc "
       "! appsink";
+
+  // NG
+  // string pipelineS =
+  //     "v4l2src device=" + AICamrea_getVideoDevice() + " " +
+  //     "! video/x-raw, width=640, height=480, framerate=30/1  " +
+  //     "! videoconvert "
+  //     "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
+  //     "! appsink";
 
   // NG
   // string pipelineS =
