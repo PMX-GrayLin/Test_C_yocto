@@ -148,7 +148,7 @@ void gst_test2(int testCase) {
       switch (GST_MESSAGE_TYPE(msg)) {
         case GST_MESSAGE_ERROR:
           gst_message_parse_error(msg, &err, &debug_info);
-          xlog("error:%s", err->message.c_str());
+          xlog("error:%s", err->message);
           g_error_free(err);
           g_free(debug_info);
           break;
