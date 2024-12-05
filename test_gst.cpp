@@ -121,9 +121,8 @@ void gst_test2(int testCase) {
   // Free the GstStructure after use
   gst_structure_free(controls);
 
-  // g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf = 4
+  g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf = 4
   g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
-
 
   // Define the capabilities for the capsfilter
   GstCaps *caps = gst_caps_new_simple(
