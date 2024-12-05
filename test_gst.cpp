@@ -176,7 +176,6 @@ void gst_test2(int testCase) {
       "video/x-raw",
       "width", G_TYPE_INT, 1920,
       "height", G_TYPE_INT, 1080,
-      "format", G_TYPE_STRING, "RGB3",
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
   gst_caps_unref(caps);
