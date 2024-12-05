@@ -103,10 +103,13 @@ void gst_test2(int testCase) {
   }
 
   // Set properties for the elements
-  g_object_set(source, "device", AICamrea_getVideoDevice().c_str(), nullptr);
-  g_object_set(encoder, "extra-controls", "cid,video_gop_size=60", nullptr);
-  g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf = 4
-  g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
+  xlog("AICamrea_getVideoDevice:%s", AICamrea_getVideoDevice().c_str());
+  g_object_set( G_OBJECT(source), "device", AICamrea_getVideoDevice().c_str(), nullptr );
+  // g_object_set(encoder, "extra-controls", "cid,video_gop_size=60", nullptr);
+  // g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf = 4
+  // g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
+
+  xlog("");
 
   // Define the capabilities for the capsfilter
   GstCaps *caps = gst_caps_new_simple(
