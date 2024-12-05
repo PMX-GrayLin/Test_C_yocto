@@ -93,6 +93,17 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
     counterFrame++;
     buffer = gst_buffer_ref(buffer);
 
+    // Get the capabilities of the pad to understand the format
+    GstCaps *caps = gst_pad_get_current_caps(pad);
+    if (!caps) {
+      xlog("Failed to get caps");
+      return GST_PAD_PROBE_PASS;
+    }
+    // Get the structure of the first capability (format)
+    GstStructure *str = gst_caps_get_structure(caps, 0);
+    const gchar *format = gst_structure_get_string(str, "format");
+    xlog("format:%s", format);
+
     // Map the buffer to access its data
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
