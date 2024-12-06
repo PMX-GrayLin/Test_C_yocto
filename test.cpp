@@ -1,7 +1,7 @@
-#include "test.h"
-#include "test_gst.h"
-#include "test_ocv.h"
-#include "aicamerag2.h"
+#include "test.hpp"
+#include "test_gst.hpp"
+#include "test_ocv.hpp"
+#include "aicamerag2.hpp"
 
 class MQTTClient : public mosqpp::mosquittopp {
 public:

@@ -1,7 +1,7 @@
-#include "test_ocv.h"
+#include "test_ocv.hpp"
 
-#include "test.h"
-#include "aicamerag2.h"
+#include "test.hpp"
+#include "aicamerag2.hpp"
 
 void ocv_test(int testCase) {
   xlog("testCase:%d", testCase);

@@ -1,7 +1,7 @@
-#include "test_gst.h"
+#include "test_gst.hpp"
 
-#include "test.h"
-#include "aicamerag2.h"
+#include "test.hpp"
+#include "aicamerag2.hpp"
 #include <opencv2/opencv.hpp>
 
 int counterFrame = 0;
