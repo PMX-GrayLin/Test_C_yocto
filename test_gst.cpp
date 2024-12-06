@@ -24,7 +24,9 @@ void startTimer(int ms) {
       while (isTimerRunning) {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
         counterTimer++;
-        xlog("timer triger... counterTimer:%d", counterTimer);
+        // xlog("timer triger... counterTimer:%d", counterTimer);
+
+        counterFrame = 0;
       }
       xlog("timer stoped...");
     }).detach();  // Detach to run in the background
