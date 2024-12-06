@@ -266,6 +266,7 @@ void gst_test2(int testCase) {
   } while (msg != nullptr);
 
   // Clean up
+  xlog("Clean up..");
   gst_object_unref(bus);
   gst_element_set_state(pipeline, GST_STATE_NULL);
   gst_object_unref(pipeline);
