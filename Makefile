@@ -59,7 +59,7 @@ all: ${CPPOBJECTS}
 
 %.o: %.cpp
 	@echo "========== Build $< to $@ start =========="
-	$(CXX) $(CPPFLAG) $(INCLUDE) -c $< -o $@
+	$(CXX) $(CPPFLAG) $(INCLUDE) -c $<
 	@echo "========== Build $< to $@ end =========="
 
 # test.o: 
