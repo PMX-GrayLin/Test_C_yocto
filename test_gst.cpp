@@ -282,10 +282,9 @@ void gst_test2(int testCase) {
 }
 
 void stopPipeline() {
-  if (g_atomic_int_get(&gst_loop->ref_count) > 0) {
+  if (gst_loop) {
     g_main_loop_quit(gst_loop);
+  } else {
+    xlog("Main loop is invalid or already destroyed.");
   }
-  // if (gst_loop) {
-  //   g_main_loop_quit(gst_loop);
-  // }
 }
