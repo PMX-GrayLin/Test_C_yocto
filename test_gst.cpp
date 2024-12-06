@@ -173,8 +173,8 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
         // Save the frame to a picture
         counterImg++;
         std::ostringstream oss;
-        // oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".jpg";
-        oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".png";
+        oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".jpg";
+        // oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".png";
         std::string filename = oss.str();
         if (cv::imwrite(filename, bgr_frame)) {
           xlog("Saved frame to %s", filename.c_str());
