@@ -118,9 +118,14 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
     xlog("format:%s", format);
     // Only proceed if the format is NV12
     if (format && g_strcmp0(format, "NV12") == 0) {
-      int width = gst_structure_get_int(str, "width");
-      int height = gst_structure_get_int(str, "height");
-
+      int width = 0, height = 0;
+      if (gst_structure_get_int(str, "width", &width) &&
+          gst_structure_get_int(str, "height", &height)) {
+        xlog("Video dimensions: %dx%d", width, height);
+      } else {
+        xlog("Failed to get video dimensions");
+      }
+      
       // NV12 has 1.5x the size of the Y plane
       size_t y_size = width * height;
       size_t uv_size = y_size / 2;  // UV plane is half the size of Y plane
