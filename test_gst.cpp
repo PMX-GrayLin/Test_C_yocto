@@ -28,7 +28,7 @@ void gst_test(int testCase) {
   // Create the pipeline
   string pipelineS =
       "v4l2src device=" + AICamrea_getVideoDevice() + " " +
-      "! video/x-raw,width=1920,height=1080 " +
+      "! video/x-raw,width=2048,height=1536 " +
       "! v4l2h264enc extra-controls=\"cid,video_gop_size=60\" capture-io-mode=dmabuf "
       "! rtspclientsink location=rtsp://localhost:8554/mystream";
 
@@ -160,7 +160,7 @@ void gst_test2(int testCase) {
   // Initialize GStreamer
   gst_init(nullptr, nullptr);
 
-  // gst-launch-1.0 -v v4l2src device=/dev/video47 ! video/x-raw,width=1920,height=1080 ! v4l2h264enc extra-controls="cid,video_gop_size=60" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
+  // gst-launch-1.0 -v v4l2src device=/dev/video18 ! video/x-raw,width=2048,height=1536 ! v4l2h264enc extra-controls="cid,video_gop_size=60" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
 
   // Create the elements
   GstElement *pipeline = gst_pipeline_new("video-pipeline");
@@ -199,8 +199,8 @@ void gst_test2(int testCase) {
   // Define the capabilities for the capsfilter
   GstCaps *caps = gst_caps_new_simple(
       "video/x-raw",
-      "width", G_TYPE_INT, 1920,
-      "height", G_TYPE_INT, 1080,
+      "width", G_TYPE_INT, 2048,
+      "height", G_TYPE_INT, 1536,
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
   gst_caps_unref(caps);
