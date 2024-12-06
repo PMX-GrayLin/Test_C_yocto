@@ -93,54 +93,53 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
     counterFrame++;
     buffer = gst_buffer_ref(buffer);
 
-    // Get the capabilities of the pad to understand the format
-    GstCaps *caps = gst_pad_get_current_caps(pad);
-    if (!caps) {
-      xlog("Failed to get caps");
-      return GST_PAD_PROBE_PASS;
-    }
-
-    // Map the buffer to access its data
-    GstMapInfo map;
-    if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-      // xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
-    } else {
-      xlog("Failed to map buffer");
-    }
-
-    // Print the entire caps for debugging
-    // xlog("caps: %s", gst_caps_to_string(caps));
-
-    // Get the structure of the first capability (format)
-    GstStructure *str = gst_caps_get_structure(caps, 0);
-    const gchar *format = gst_structure_get_string(str, "format");
-    // xlog("format:%s", format);
-
-    // Only proceed if the format is NV12
-    if (format && g_strcmp0(format, "NV12") == 0) {
-      int width = 0, height = 0;
-      if (gst_structure_get_int(str, "width", &width) &&
-          gst_structure_get_int(str, "height", &height)) {
-        // xlog("Video dimensions: %dx%d", width, height);
-      } else {
-        xlog("Failed to get video dimensions");
+    if (counterFrame % 200 == 0) {
+      // Get the capabilities of the pad to understand the format
+      GstCaps *caps = gst_pad_get_current_caps(pad);
+      if (!caps) {
+        xlog("Failed to get caps");
+        return GST_PAD_PROBE_PASS;
       }
 
-      // NV12 has 1.5x the size of the Y plane
-      // size_t y_size = width * height;
-      // size_t uv_size = y_size / 2;  // UV plane is half the size of Y plane
+      // Map the buffer to access its data
+      GstMapInfo map;
+      if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+        // xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
+      } else {
+        xlog("Failed to map buffer");
+      }
 
-      // Create a cv::Mat to store the frame in NV12 format
-      cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
+      // Print the entire caps for debugging
+      // xlog("caps: %s", gst_caps_to_string(caps));
 
-      // Create a cv::Mat to store the frame in BGR format
-      cv::Mat bgr_frame(height, width, CV_8UC3);
+      // Get the structure of the first capability (format)
+      GstStructure *str = gst_caps_get_structure(caps, 0);
+      const gchar *format = gst_structure_get_string(str, "format");
+      // xlog("format:%s", format);
 
-      // Convert NV12 to BGR using OpenCV
-      cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
+      // Only proceed if the format is NV12
+      if (format && g_strcmp0(format, "NV12") == 0) {
+        int width = 0, height = 0;
+        if (gst_structure_get_int(str, "width", &width) &&
+            gst_structure_get_int(str, "height", &height)) {
+          // xlog("Video dimensions: %dx%d", width, height);
+        } else {
+          xlog("Failed to get video dimensions");
+        }
 
-      // Process or save the frame
-      if (counterFrame % 200 == 0) {
+        // NV12 has 1.5x the size of the Y plane
+        // size_t y_size = width * height;
+        // size_t uv_size = y_size / 2;  // UV plane is half the size of Y plane
+
+        // Create a cv::Mat to store the frame in NV12 format
+        cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
+
+        // Create a cv::Mat to store the frame in BGR format
+        cv::Mat bgr_frame(height, width, CV_8UC3);
+
+        // Convert NV12 to BGR using OpenCV
+        cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
+
         // Save the frame to a picture
         std::string filename = "frame_" + std::to_string(counterImg++) + ".jpg";
         if (cv::imwrite(filename, bgr_frame)) {
