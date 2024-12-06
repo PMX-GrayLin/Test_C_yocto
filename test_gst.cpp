@@ -139,8 +139,9 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
         cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
 
         // Save the frame to a picture
+        counterImg++;
         std::ostringstream oss;
-        oss << "frame_" << std::setw(4) << std::setfill('0') << counterImg++ << ".jpg";
+        oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".jpg";
         std::string filename = oss.str();
         if (cv::imwrite(filename, bgr_frame)) {
           xlog("Saved frame to %s", filename.c_str());
