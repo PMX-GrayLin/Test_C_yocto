@@ -15,7 +15,7 @@ GMainLoop *gst_loop = nullptr;
 void startTimer(int ms) {
   if (!isTimerRunning) {
     isTimerRunning = true;
-    std::thread([]() {
+    std::thread([ms]() {
       while (isTimerRunning) {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
         xlog("timer triger...");
