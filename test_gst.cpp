@@ -122,7 +122,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
     // xlog("frame captured, counterFrame:%d", counterFrame);
 
     // set some conditions to save pic
-    if (counterFrame % 200 == 0) {
+    if (counterFrame % 300 == 0) {
       buffer = gst_buffer_ref(buffer);
 
       // Get the capabilities of the pad to understand the format
