@@ -18,8 +18,6 @@ void gst_test(int testCase) {
   // gst_init(&argc, &argv);
   gst_init(nullptr, nullptr);
 
-  xlog("");
-
   guint major, minor, micro, nano;
   gst_version(&major, &minor, &micro, &nano);
   xlog("%d.%d.%d.%d", major, minor, micro, nano);
@@ -98,6 +96,8 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
         xlog("Failed to get caps");
         return GST_PAD_PROBE_PASS;
       }
+      // Print the entire caps for debugging
+      // xlog("caps: %s", gst_caps_to_string(caps));
 
       // Map the buffer to access its data
       GstMapInfo map;
@@ -106,9 +106,6 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
       } else {
         xlog("Failed to map buffer");
       }
-
-      // Print the entire caps for debugging
-      // xlog("caps: %s", gst_caps_to_string(caps));
 
       // Get the structure of the first capability (format)
       GstStructure *str = gst_caps_get_structure(caps, 0);
