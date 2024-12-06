@@ -54,7 +54,7 @@ all: ${CPPOBJECTS}
 	@echo ">>>> CFLAG:${CFLAG}"
 	@echo ">>>> LDFLAG:${LDFLAG}"
 	@echo ">>>> "
-	${CXX} $(CFLAG) -o test test_gst.o test_ocv.o aicamerag2.o test.o $(LDFLAG)
+	${CXX} $(CFLAG) -o test ${CPPOBJECTS} $(LDFLAG)
 	@echo "========== Build all end =========="
 
 %.o: %.cpp
