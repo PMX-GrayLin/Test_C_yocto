@@ -103,29 +103,29 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
     // Map the buffer to access its data
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-      xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
-
+      // xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
     } else {
       xlog("Failed to map buffer");
     }
 
     // Print the entire caps for debugging
-    xlog("caps: %s", gst_caps_to_string(caps));
+    // xlog("caps: %s", gst_caps_to_string(caps));
 
     // Get the structure of the first capability (format)
     GstStructure *str = gst_caps_get_structure(caps, 0);
     const gchar *format = gst_structure_get_string(str, "format");
-    xlog("format:%s", format);
+    // xlog("format:%s", format);
+
     // Only proceed if the format is NV12
     if (format && g_strcmp0(format, "NV12") == 0) {
       int width = 0, height = 0;
       if (gst_structure_get_int(str, "width", &width) &&
           gst_structure_get_int(str, "height", &height)) {
-        xlog("Video dimensions: %dx%d", width, height);
+        // xlog("Video dimensions: %dx%d", width, height);
       } else {
         xlog("Failed to get video dimensions");
       }
-      
+
       // NV12 has 1.5x the size of the Y plane
       size_t y_size = width * height;
       size_t uv_size = y_size / 2;  // UV plane is half the size of Y plane
