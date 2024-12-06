@@ -62,30 +62,30 @@ all: ${CPPOBJECTS}
 	$(CXX) $(CPPFLAG) $(INCLUDE) -c $<
 	@echo "========== Build $< to $@ end =========="
 
-# test.o: 
-# 	@echo "========== Build test.o start =========="
-# 	${CXX} $(CFLAG) test.cpp -c
-# 	@echo "========== Build test.o end =========="
+test.o: 
+	@echo "========== Build test.o start =========="
+	${CXX} $(CFLAG) test.cpp -c
+	@echo "========== Build test.o end =========="
 
-# test_gst.o: 
-# 	@echo "========== Build test_gst.o start =========="
-# 	${CXX} $(CFLAG) test_gst.cpp -c
-# 	@echo "========== Build test_gst.o end =========="
+test_gst.o: 
+	@echo "========== Build test_gst.o start =========="
+	${CXX} $(CFLAG) test_gst.cpp -c
+	@echo "========== Build test_gst.o end =========="
 
-# test_ocv.o: 
-# 	@echo "========== Build test_ocv.o start =========="
-# 	${CXX} $(CFLAG) test_ocv.cpp -c
-# 	@echo "========== Build test_ocv.o end =========="
+test_ocv.o: 
+	@echo "========== Build test_ocv.o start =========="
+	${CXX} $(CFLAG) test_ocv.cpp -c
+	@echo "========== Build test_ocv.o end =========="
 
-# test_gst.o: 
-# 	@echo "========== Build test_gst.o start =========="
-# 	${CXX} $(CFLAG) test_gst.cpp -c
-# 	@echo "========== Build test_gst.o end =========="
+test_gst.o: 
+	@echo "========== Build test_gst.o start =========="
+	${CXX} $(CFLAG) test_gst.cpp -c
+	@echo "========== Build test_gst.o end =========="
 
-# aicamerag2.o: 
-# 	@echo "========== Build aicamerag2.o start =========="
-# 	${CXX} $(CFLAG) aicamerag2.cpp -c
-# 	@echo "========== Build aicamerag2.o end =========="
+aicamerag2.o: 
+	@echo "========== Build aicamerag2.o start =========="
+	${CXX} $(CFLAG) aicamerag2.cpp -c
+	@echo "========== Build aicamerag2.o end =========="
 
 .PHONY : clean 
 
