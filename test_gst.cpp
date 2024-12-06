@@ -119,7 +119,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
   GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
   if (buffer) {
     counterFrame++;
-    // xlog("frame captured, counterFrame:%d", counterFrame);
+    xlog("frame captured, counterFrame:%d", counterFrame);
 
     // set some conditions to save pic
     if (counterFrame % 200 == 0) {
@@ -234,11 +234,12 @@ void gst_test2(int testCase) {
   g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
 
   // Define the capabilities for the capsfilter
+  // 2048 * 1536
   GstCaps *caps = gst_caps_new_simple(
       "video/x-raw",
       "width", G_TYPE_INT, 2048,
       "height", G_TYPE_INT, 1536,
-      "framerate", GST_TYPE_FRACTION, 60, 1,  // Add frame rate as 30/1
+      "framerate", GST_TYPE_FRACTION, 10, 1,  // Add frame rate as 30/1
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
   gst_caps_unref(caps);
