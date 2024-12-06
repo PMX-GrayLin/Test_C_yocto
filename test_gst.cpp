@@ -277,7 +277,7 @@ void gst_test2(int testCase) {
 
   // Clean up
   gst_object_unref(gst_pipeline);
-  // g_main_loop_unref(gst_loop);
+  g_main_loop_unref(gst_loop);
   xlog("Pipeline stopped and resources cleaned up.");
 }
 
