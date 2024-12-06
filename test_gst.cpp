@@ -4,6 +4,7 @@
 #include "aicamerag2.hpp"
 #include <opencv2/opencv.hpp>
 
+bool stop_pipeline = true;
 int counterFrame = 0;
 int counterImg = 0;
 
@@ -234,6 +235,7 @@ void gst_test2(int testCase) {
   GstBus *bus = gst_element_get_bus(pipeline);
   GstMessage *msg;
   do {
+    xlog("");
     msg = gst_bus_timed_pop_filtered(
       bus, 
       GST_CLOCK_TIME_NONE,
@@ -267,4 +269,8 @@ void gst_test2(int testCase) {
   gst_object_unref(bus);
   gst_element_set_state(pipeline, GST_STATE_NULL);
   gst_object_unref(pipeline);
+}
+
+void stopPipeline() {
+  stop_pipeline = true;
 }
