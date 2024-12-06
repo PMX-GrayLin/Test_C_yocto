@@ -34,6 +34,11 @@ public:
         } else if (payload == "gst2x") {
             stopPipeline();
      
+        } else if (payload == "ts") {
+            startTimer(1000);
+        } else if (payload == "tx") {
+            stopTimer();
+            
         } else if (payload == "ocv") {
             std::thread t(ocv_test, 0);
             t.detach();

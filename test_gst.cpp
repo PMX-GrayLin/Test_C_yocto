@@ -4,10 +4,35 @@
 #include "aicamerag2.hpp"
 #include <opencv2/opencv.hpp>
 
+bool isTimerRunning = false;
+
 int counterFrame = 0;
 int counterImg = 0;
 
-GMainLoop *gst_loop;
+GstElement *gst_pipeline = nullptr;
+GMainLoop *gst_loop = nullptr;
+
+void startTimer(int ms) {
+  if (!isTimerRunning) {
+    isTimerRunning = true;
+    std::thread([]() {
+      while (isTimerRunning) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+        xlog("timer triger...");
+      }
+      xlog("");
+    }).detach();  // Detach to run in the background
+  } else {
+    xlog("timer already running...");
+  }
+
+  xlog("timer stoped...");
+}
+
+void stopTimer() {
+  isTimerRunning = false;
+}
+
 
 void gst_test(int testCase) {
   xlog("testCase:%d", testCase);
@@ -162,16 +187,17 @@ void gst_test2(int testCase) {
   // Initialize GStreamer
   gst_init(nullptr, nullptr);
 
+  // final gst pipeline
   // gst-launch-1.0 -v v4l2src device=/dev/video18 ! video/x-raw,width=2048,height=1536 ! v4l2h264enc extra-controls="cid,video_gop_size=60" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
 
   // Create the elements
-  GstElement *pipeline = gst_pipeline_new("video-pipeline");
+  gst_pipeline = gst_pipeline_new("video-pipeline");
   GstElement *source = gst_element_factory_make("v4l2src", "source");
   GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
   GstElement *encoder = gst_element_factory_make("v4l2h264enc", "encoder");
   GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
 
-  if (!pipeline || !source || !capsfilter || !encoder || !sink) {
+  if (!gst_pipeline || !source || !capsfilter || !encoder || !sink) {
     xlog("failed to create GStreamer elements");
     return;
   }
@@ -188,7 +214,7 @@ void gst_test2(int testCase) {
   );
   if (!controls) {
     xlog("Failed to create GstStructure");
-    gst_object_unref(pipeline);
+    gst_object_unref(gst_pipeline);
     return;
   }
   g_object_set(G_OBJECT(encoder), "extra-controls", controls, nullptr);
@@ -208,10 +234,10 @@ void gst_test2(int testCase) {
   gst_caps_unref(caps);
 
   // Build the pipeline
-  gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, encoder, sink, nullptr);
+  gst_bin_add_many(GST_BIN(gst_pipeline), source, capsfilter, encoder, sink, nullptr);
   if (!gst_element_link_many(source, capsfilter, encoder, sink, nullptr)) {
     xlog("failed to link elements in the pipeline");
-    gst_object_unref(pipeline);
+    gst_object_unref(gst_pipeline);
     return;
   }
 
@@ -223,48 +249,14 @@ void gst_test2(int testCase) {
   }
 
   // Start the pipeline
-  GstStateChangeReturn ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
+  GstStateChangeReturn ret = gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
   if (ret == GST_STATE_CHANGE_FAILURE) {
     xlog("failed to start the pipeline");
-    gst_object_unref(pipeline);
+    gst_object_unref(gst_pipeline);
     return;
   }
 
   xlog("pipeline is running...");
-
-  // Wait until an error or EOS
-  // GstBus *bus = gst_element_get_bus(pipeline);
-  // GstMessage *msg;
-  // do {
-  //   msg = gst_bus_timed_pop_filtered(
-  //     bus, 
-  //     GST_CLOCK_TIME_NONE,
-  //     (GstMessageType)(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
-
-  //   if (msg != nullptr) {
-  //     GError *err;
-  //     gchar *debug_info;
-
-  //     switch (GST_MESSAGE_TYPE(msg)) {
-  //       case GST_MESSAGE_ERROR:
-  //         gst_message_parse_error(msg, &err, &debug_info);
-  //         xlog("GST_MESSAGE_ERROR. err->message%s", err->message);
-  //         g_error_free(err);
-  //         g_free(debug_info);
-  //         break;
-
-  //       case GST_MESSAGE_EOS:
-  //         xlog("GST_MESSAGE_EOS, End-Of-Stream reached");
-  //         break;
-
-  //       default:
-  //         xlog("default, Unexpected message received");
-  //         break;
-  //     }
-  //     gst_message_unref(msg);
-  //   }
-  // } while (msg != nullptr);
-  // gst_object_unref(bus);
 
   // Run the main loop
   gst_loop = g_main_loop_new(nullptr, FALSE);
@@ -272,10 +264,10 @@ void gst_test2(int testCase) {
 
   // Stop the pipeline when finished or interrupted
   xlog("Stopping the pipeline...");
-  gst_element_set_state(pipeline, GST_STATE_NULL);
+  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
 
   // Clean up
-  gst_object_unref(pipeline);
+  gst_object_unref(gst_pipeline);
   g_main_loop_unref(gst_loop);
   xlog("Pipeline stopped and resources cleaned up.");
 }
