@@ -4,7 +4,7 @@
 #include "aicamerag2.hpp"
 #include <opencv2/opencv.hpp>
 
-bool isStopPipeline = true;
+bool isStopPipeline = false;
 int counterFrame = 0;
 int counterImg = 0;
 
@@ -263,7 +263,8 @@ void gst_test2(int testCase) {
       }
       gst_message_unref(msg);
     }
-  } while (msg != nullptr || !isStopPipeline);
+  } while (!isStopPipeline);
+  // } while (msg != nullptr || !isStopPipeline);
 
   // Clean up
   xlog("Clean up..");
