@@ -218,6 +218,7 @@ void gst_test2(int testCase) {
   GstStructure *controls = gst_structure_new(
       "extra-controls",                  // Name of the structure
       "video_gop_size", G_TYPE_INT, 60,  // Key-value pair
+      "h264_level", G_TYPE_INT, 13,      // Key-value pair
       nullptr                            // End of key-value pairs
   );
   if (!controls) {
@@ -230,7 +231,6 @@ void gst_test2(int testCase) {
   gst_structure_free(controls);
 
   g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf = 4
-  g_object_set(encoder, "h264_level", 13, nullptr);
   g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
 
   // Define the capabilities for the capsfilter
