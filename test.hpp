@@ -1,29 +1,24 @@
 #pragma once
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
-#include <unistd.h>
+#include "global.hpp"
 
-#include <string> 
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <thread>
-#include <chrono>
+// #include <stdlib.h>
+// #include <stdio.h>
+// #include <assert.h>
+// #include <unistd.h>
 
-using namespace std;
+// #include <string> 
+// #include <iostream>
+// #include <vector>
+// #include <algorithm>
+// #include <thread>
+// #include <chrono>
 
-// yocto test
-#include "json.h"
+// using namespace std;
 
-#define DEBUGX
+// // yocto test
+// #include "json.h"
 
-#ifndef DEBUGX
-#define xlog(...) ((void)0)
-#else
-#define xlog(fmt, ...) printf("%s:%d, " fmt "\n\r", __func__, __LINE__, ##__VA_ARGS__)
-#endif
 
 
 

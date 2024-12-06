@@ -45,8 +45,8 @@ LDFLAG += ${INCLUDES_LIB}
 LDFLAG += ${LINK_LIBS}
 LDFLAG += ${OCVLDFLAG}
 
-CPPSOURCEFILE = $(wildcard *.cpp)
-CPPOBJECTS = $(patsubst %.cpp,%.o,$(CPPSOURCEFILE))
+CPPSOURCEFILES = $(wildcard *.cpp)
+CPPOBJECTS = $(patsubst %.cpp,%.o,$(CPPSOURCEFILES))
 
 all: ${CPPOBJECTS}
 	@echo "========== Build all start =========="

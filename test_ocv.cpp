@@ -1,6 +1,6 @@
 #include "test_ocv.hpp"
 
-#include "test.hpp"
+#include "global.hpp"
 #include "aicamerag2.hpp"
 
 void ocv_test(int testCase) {

@@ -1,6 +1,6 @@
 #include "test_gst.hpp"
 
-#include "test.hpp"
+#include "global.hpp"
 #include "aicamerag2.hpp"
 #include <opencv2/opencv.hpp>
 

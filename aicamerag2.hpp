@@ -8,7 +8,6 @@
 #include <sys/ioctl.h>        // For ioctl()
 #include <fcntl.h>            // For open()
 
-
 extern std::string AICamrea_getVideoDevice();
 extern int AICamera_getBrightness();
 extern void AICamera_setBrightness(int value);
