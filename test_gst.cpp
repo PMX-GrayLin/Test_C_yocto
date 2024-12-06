@@ -99,6 +99,16 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
       xlog("Failed to get caps");
       return GST_PAD_PROBE_PASS;
     }
+
+    // Map the buffer to access its data
+    GstMapInfo map;
+    if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+      xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
+
+    } else {
+      xlog("Failed to map buffer");
+    }
+
     // Print the entire caps for debugging
     xlog("caps: %s", gst_caps_to_string(caps));
 
@@ -106,35 +116,64 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
     GstStructure *str = gst_caps_get_structure(caps, 0);
     const gchar *format = gst_structure_get_string(str, "format");
     xlog("format:%s", format);
+    // Only proceed if the format is NV12
+    if (format && g_strcmp0(format, "NV12") == 0) {
+      int width = gst_structure_get_int(str, "width");
+      int height = gst_structure_get_int(str, "height");
 
-    // Map the buffer to access its data
-    GstMapInfo map;
-    if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-      xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
+      // NV12 has 1.5x the size of the Y plane
+      size_t y_size = width * height;
+      size_t uv_size = y_size / 2;  // UV plane is half the size of Y plane
 
-      // Define frame properties (update width, height, and type as per your caps)
-      int width = 1920;    // Set your video width
-      int height = 1080;   // Set your video height
-      int channels = 3;    // Assuming BGR format
-      int type = CV_8UC3;  // OpenCV type for BGR format
+      // Create a cv::Mat to store the frame in NV12 format
+      cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
 
-      // Create an OpenCV Mat from the raw buffer data
-      cv::Mat frame(height, width, type, map.data);
+      // Create a cv::Mat to store the frame in BGR format
+      cv::Mat bgr_frame(height, width, CV_8UC3);
 
+      // Convert NV12 to BGR using OpenCV
+      cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
+
+      // Process or save the frame
       if (counterFrame % 200 == 0) {
         // Save the frame to a picture
-        std::string filename = "frame_" + std::to_string(counterImg++) + ".png";
-        if (cv::imwrite(filename, frame)) {
+        std::string filename = "frame_" + std::to_string(counterImg++) + ".jpg";
+        if (cv::imwrite(filename, bgr_frame)) {
           xlog("Saved frame to %s", filename.c_str());
         } else {
           xlog("Failed to save frame");
         }
       }
-
-      gst_buffer_unmap(buffer, &map);
-    } else {
-      std::cerr << "Failed to map buffer" << std::endl;
     }
+
+    // // Map the buffer to access its data
+    // GstMapInfo map;
+    // if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+    //   xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
+
+    //   // Define frame properties (update width, height, and type as per your caps)
+    //   int width = 1920;    // Set your video width
+    //   int height = 1080;   // Set your video height
+    //   int channels = 3;    // Assuming BGR format
+    //   int type = CV_8UC3;  // OpenCV type for BGR format
+
+    //   // Create an OpenCV Mat from the raw buffer data
+    //   cv::Mat frame(height, width, type, map.data);
+
+    //   if (counterFrame % 200 == 0) {
+    //     // Save the frame to a picture
+    //     std::string filename = "frame_" + std::to_string(counterImg++) + ".png";
+    //     if (cv::imwrite(filename, frame)) {
+    //       xlog("Saved frame to %s", filename.c_str());
+    //     } else {
+    //       xlog("Failed to save frame");
+    //     }
+    //   }
+
+    //   gst_buffer_unmap(buffer, &map);
+    // } else {
+    //   std::cerr << "Failed to map buffer" << std::endl;
+    // }
 
     gst_buffer_unref(buffer);
   }
