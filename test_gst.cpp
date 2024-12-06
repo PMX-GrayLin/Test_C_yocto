@@ -4,9 +4,10 @@
 #include "aicamerag2.hpp"
 #include <opencv2/opencv.hpp>
 
-bool isStopPipeline = false;
 int counterFrame = 0;
 int counterImg = 0;
+
+GMainLoop *gst_loop;
 
 void gst_test(int testCase) {
   xlog("testCase:%d", testCase);
@@ -232,47 +233,55 @@ void gst_test2(int testCase) {
   xlog("pipeline is running...");
 
   // Wait until an error or EOS
-  GstBus *bus = gst_element_get_bus(pipeline);
-  GstMessage *msg;
-  do {
-    xlog("");
-    msg = gst_bus_timed_pop_filtered(
-      bus, 
-      500 * GST_MSECOND, // GST_CLOCK_TIME_NONE,
-      (GstMessageType)(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+  // GstBus *bus = gst_element_get_bus(pipeline);
+  // GstMessage *msg;
+  // do {
+  //   msg = gst_bus_timed_pop_filtered(
+  //     bus, 
+  //     GST_CLOCK_TIME_NONE,
+  //     (GstMessageType)(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 
-    if (msg != nullptr) {
-      GError *err;
-      gchar *debug_info;
+  //   if (msg != nullptr) {
+  //     GError *err;
+  //     gchar *debug_info;
 
-      switch (GST_MESSAGE_TYPE(msg)) {
-        case GST_MESSAGE_ERROR:
-          gst_message_parse_error(msg, &err, &debug_info);
-          xlog("GST_MESSAGE_ERROR. err->message%s", err->message);
-          g_error_free(err);
-          g_free(debug_info);
-          break;
+  //     switch (GST_MESSAGE_TYPE(msg)) {
+  //       case GST_MESSAGE_ERROR:
+  //         gst_message_parse_error(msg, &err, &debug_info);
+  //         xlog("GST_MESSAGE_ERROR. err->message%s", err->message);
+  //         g_error_free(err);
+  //         g_free(debug_info);
+  //         break;
 
-        case GST_MESSAGE_EOS:
-          xlog("GST_MESSAGE_EOS, End-Of-Stream reached");
-          break;
+  //       case GST_MESSAGE_EOS:
+  //         xlog("GST_MESSAGE_EOS, End-Of-Stream reached");
+  //         break;
 
-        default:
-          xlog("default, Unexpected message received");
-          break;
-      }
-      gst_message_unref(msg);
-    }
-  } while (!isStopPipeline);
-  // } while (msg != nullptr || !isStopPipeline);
+  //       default:
+  //         xlog("default, Unexpected message received");
+  //         break;
+  //     }
+  //     gst_message_unref(msg);
+  //   }
+  // } while (msg != nullptr);
+  // gst_object_unref(bus);
+
+  // Run the main loop
+  gst_loop = g_main_loop_new(nullptr, FALSE);
+  g_main_loop_run(gst_loop);
+
+  // Stop the pipeline when finished or interrupted
+  xlog("Stopping the pipeline...");
+  gst_element_set_state(pipeline, GST_STATE_NULL);
 
   // Clean up
-  xlog("Clean up..");
-  gst_object_unref(bus);
-  gst_element_set_state(pipeline, GST_STATE_NULL);
   gst_object_unref(pipeline);
+  g_main_loop_unref(gst_loop);
+  xlog("Pipeline stopped and resources cleaned up.");
 }
 
 void stopPipeline() {
-  isStopPipeline = true;
+  if (gst_loop) {
+    g_main_loop_quit(gst_loop);
+  }
 }
