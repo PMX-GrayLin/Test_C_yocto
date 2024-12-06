@@ -238,7 +238,7 @@ void gst_test2(int testCase) {
     xlog("");
     msg = gst_bus_timed_pop_filtered(
       bus, 
-      GST_CLOCK_TIME_NONE,
+      100 * GST_MSECOND, // GST_CLOCK_TIME_NONE,
       (GstMessageType)(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 
     if (msg != nullptr) {
