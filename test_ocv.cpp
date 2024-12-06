@@ -95,13 +95,7 @@ void ocv_test(int testCase) {
     }
   }
 
-  xlog("");
-
   // Release resources
   cap.release();
-  // cv::destroyAllWindows();
-
-  xlog("");
-
   return;
 }

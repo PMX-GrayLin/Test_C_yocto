@@ -230,6 +230,7 @@ void gst_test2(int testCase) {
   gst_structure_free(controls);
 
   g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf = 4
+  g_object_set(encoder, "h264_level", 13, nullptr);
   g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
 
   // Define the capabilities for the capsfilter
@@ -237,7 +238,7 @@ void gst_test2(int testCase) {
       "video/x-raw",
       "width", G_TYPE_INT, 2048,
       "height", G_TYPE_INT, 1536,
-      "framerate", GST_TYPE_FRACTION, 30, 1,  // Add frame rate as 30/1
+      "framerate", GST_TYPE_FRACTION, 60, 1,  // Add frame rate as 30/1
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
   gst_caps_unref(caps);
