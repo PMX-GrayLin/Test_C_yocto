@@ -119,7 +119,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
   GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
   if (buffer) {
     counterFrame++;
-    xlog("frame captured, counterFrame:%d", counterFrame);
+    // xlog("frame captured, counterFrame:%d", counterFrame);
 
     // set some conditions to save pic
     if (counterFrame % 200 == 0) {
@@ -137,7 +137,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
       // Map the buffer to access its data
       GstMapInfo map;
       if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-        xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
+        // xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
       } else {
         xlog("Failed to map buffer");
       }
