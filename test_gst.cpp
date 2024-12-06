@@ -8,25 +8,31 @@ bool isTimerRunning = false;
 
 int counterFrame = 0;
 int counterImg = 0;
+int counterTimer = 0;
 
 GstElement *gst_pipeline = nullptr;
 GMainLoop *gst_loop = nullptr;
 
 void startTimer(int ms) {
+
   if (!isTimerRunning) {
+
     isTimerRunning = true;
+    counterTimer = 0;
+
     std::thread([ms]() {
       while (isTimerRunning) {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-        xlog("timer triger...");
+        counterTimer++;
+        xlog("timer triger... counterTimer:%d", counterTimer);
       }
-      xlog("");
+      xlog("timer stoped...");
     }).detach();  // Detach to run in the background
+
   } else {
     xlog("timer already running...");
   }
 
-  xlog("timer stoped...");
 }
 
 void stopTimer() {
