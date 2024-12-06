@@ -127,8 +127,8 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
       }
 
       // NV12 has 1.5x the size of the Y plane
-      size_t y_size = width * height;
-      size_t uv_size = y_size / 2;  // UV plane is half the size of Y plane
+      // size_t y_size = width * height;
+      // size_t uv_size = y_size / 2;  // UV plane is half the size of Y plane
 
       // Create a cv::Mat to store the frame in NV12 format
       cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
@@ -150,36 +150,6 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
         }
       }
     }
-
-    // // Map the buffer to access its data
-    // GstMapInfo map;
-    // if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-    //   xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
-
-    //   // Define frame properties (update width, height, and type as per your caps)
-    //   int width = 1920;    // Set your video width
-    //   int height = 1080;   // Set your video height
-    //   int channels = 3;    // Assuming BGR format
-    //   int type = CV_8UC3;  // OpenCV type for BGR format
-
-    //   // Create an OpenCV Mat from the raw buffer data
-    //   cv::Mat frame(height, width, type, map.data);
-
-    //   if (counterFrame % 200 == 0) {
-    //     // Save the frame to a picture
-    //     std::string filename = "frame_" + std::to_string(counterImg++) + ".png";
-    //     if (cv::imwrite(filename, frame)) {
-    //       xlog("Saved frame to %s", filename.c_str());
-    //     } else {
-    //       xlog("Failed to save frame");
-    //     }
-    //   }
-
-    //   gst_buffer_unmap(buffer, &map);
-    // } else {
-    //   std::cerr << "Failed to map buffer" << std::endl;
-    // }
-
     gst_buffer_unref(buffer);
   }
   return GST_PAD_PROBE_OK;
