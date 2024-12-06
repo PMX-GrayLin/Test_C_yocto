@@ -42,18 +42,17 @@ void gst_test(int testCase) {
     return;
   }
 
-  xlog("");
-
   // Start playing
   gst_element_set_state(pipeline, GST_STATE_PLAYING);
 
-  xlog("");
+  xlog("pipeline is running...");
 
   // Wait until error or EOS
   bus = gst_element_get_bus(pipeline);
-  msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE,
-                                   static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
-  xlog("");
+  msg = gst_bus_timed_pop_filtered(
+    bus, 
+    GST_CLOCK_TIME_NONE,                               
+    static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 
   // Parse message
   if (msg) {
@@ -74,14 +73,10 @@ void gst_test(int testCase) {
     gst_message_unref(msg);
   }
 
-  xlog("");
-
   // Free resources
   gst_object_unref(bus);
   gst_element_set_state(pipeline, GST_STATE_NULL);
   gst_object_unref(pipeline);
-
-  xlog("");
 
   return;
 }
@@ -91,9 +86,12 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
   GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
   if (buffer) {
     counterFrame++;
-    buffer = gst_buffer_ref(buffer);
+    xlog("frame captured, counterFrame:%d", counterFrame);
 
+    // set some conditions to save pic
     if (counterFrame % 200 == 0) {
+      buffer = gst_buffer_ref(buffer);
+
       // Get the capabilities of the pad to understand the format
       GstCaps *caps = gst_pad_get_current_caps(pad);
       if (!caps) {
@@ -104,7 +102,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
       // Map the buffer to access its data
       GstMapInfo map;
       if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-        // xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
+        xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
       } else {
         xlog("Failed to map buffer");
       }
@@ -148,8 +146,8 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
           xlog("Failed to save frame");
         }
       }
+      gst_buffer_unref(buffer);
     }
-    gst_buffer_unref(buffer);
   }
   return GST_PAD_PROBE_OK;
 }
