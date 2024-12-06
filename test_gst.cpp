@@ -218,7 +218,7 @@ void gst_test2(int testCase) {
   GstStructure *controls = gst_structure_new(
       "extra-controls",                  // Name of the structure
       "video_gop_size", G_TYPE_INT, 60,  // Key-value pair
-      "h264_level", G_TYPE_INT, 13,      // Key-value pair
+      // "h264_level", G_TYPE_INT, 13,      // Key-value pair
       nullptr                            // End of key-value pairs
   );
   if (!controls) {
