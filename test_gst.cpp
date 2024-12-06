@@ -6,7 +6,7 @@
 
 bool isTimerRunning = false;
 
-valitile int counterFrame = 0;
+volatile int counterFrame = 0;
 int counterImg = 0;
 int counterTimer = 0;
 
