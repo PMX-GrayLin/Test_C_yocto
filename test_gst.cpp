@@ -239,7 +239,7 @@ void gst_test2(int testCase) {
       "video/x-raw",
       "width", G_TYPE_INT, 2048,
       "height", G_TYPE_INT, 1536,
-      "framerate", GST_TYPE_FRACTION, 10, 1,  // Add frame rate as 30/1
+      "framerate", GST_TYPE_FRACTION, 30, 1,  // Add frame rate as 30/1
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
   gst_caps_unref(caps);
