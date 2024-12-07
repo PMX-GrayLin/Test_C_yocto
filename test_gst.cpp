@@ -142,6 +142,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
       } else {
         gst_caps_unref(caps);
         xlog("Failed to map buffer");
+        return GST_PAD_PROBE_PASS;
       }
 
       // Get the structure of the first capability (format)
@@ -151,7 +152,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
 
       // Only proceed if the format is NV12
       if (format && g_strcmp0(format, "NV12") == 0) {
-        int width = 0, height = 0;
+        int width = 2048, height = 1536;
         if (gst_structure_get_int(str, "width", &width) &&
             gst_structure_get_int(str, "height", &height)) {
           // xlog("Video dimensions: %dx%d", width, height);
