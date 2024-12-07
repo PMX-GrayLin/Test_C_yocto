@@ -123,12 +123,13 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
 
     // set some conditions to save pic
     if (counterFrame % 1800 == 0) {
-      buffer = gst_buffer_ref(buffer);
+    //   buffer = gst_buffer_ref(buffer);
 
       // Get the capabilities of the pad to understand the format
       GstCaps *caps = gst_pad_get_current_caps(pad);
       if (!caps) {
         xlog("Failed to get caps");
+        gst_caps_unref(caps);
         return GST_PAD_PROBE_PASS;
       }
       // Print the entire caps for debugging
@@ -139,6 +140,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
       if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
         // xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
       } else {
+        gst_caps_unref(caps);
         xlog("Failed to map buffer");
       }
 
@@ -182,7 +184,10 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
           xlog("Failed to save frame");
         }
       }
-      gst_buffer_unref(buffer);
+      // Cleanup
+      gst_buffer_unmap(buffer, &map);
+      gst_caps_unref(caps);
+    //   gst_buffer_unref(buffer);
     }
   }
   return GST_PAD_PROBE_OK;
