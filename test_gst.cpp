@@ -123,7 +123,6 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
 
     // set some conditions to save pic
     if (counterFrame % 1800 == 0) {
-    //   buffer = gst_buffer_ref(buffer);
 
       // Get the capabilities of the pad to understand the format
       GstCaps *caps = gst_pad_get_current_caps(pad);
@@ -152,24 +151,17 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
 
       // Only proceed if the format is NV12
       if (format && g_strcmp0(format, "NV12") == 0) {
-        int width = 2048, height = 1536;
-        if (gst_structure_get_int(str, "width", &width) &&
-            gst_structure_get_int(str, "height", &height)) {
-          // xlog("Video dimensions: %dx%d", width, height);
-        } else {
+        int width = 0, height = 0;
+        if (!gst_structure_get_int(str, "width", &width) ||
+            !gst_structure_get_int(str, "height", &height)) {
           xlog("Failed to get video dimensions");
         }
-
-        // NV12 has 1.5x the size of the Y plane
-        // size_t y_size = width * height;
-        // size_t uv_size = y_size / 2;  // UV plane is half the size of Y plane
+        // xlog("Video dimensions: %dx%d", width, height);
 
         // Create a cv::Mat to store the frame in NV12 format
-        cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
-
+        cv::Mat nv12_frame(height + 3 / 2, width, CV_8UC1, map.data);
         // Create a cv::Mat to store the frame in BGR format
         cv::Mat bgr_frame(height, width, CV_8UC3);
-
         // Convert NV12 to BGR using OpenCV
         cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
 
@@ -188,7 +180,6 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
       // Cleanup
       gst_buffer_unmap(buffer, &map);
       gst_caps_unref(caps);
-    //   gst_buffer_unref(buffer);
     }
   }
   return GST_PAD_PROBE_OK;
