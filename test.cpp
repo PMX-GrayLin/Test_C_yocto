@@ -55,12 +55,19 @@ public:
         } else if (payload == "es40") {
             AICamera_setExposure(40);
 
-        } else if (payload == "epg") {
+        } else if (payload == "eag") {
             AICamera_getExposureAuto();
-        } else if (payload == "eps0") {
+        } else if (payload == "eas0") {
             AICamera_setExposureAuto(0);
-        } else if (payload == "eps1") {
+        } else if (payload == "eas1") {
             AICamera_setExposureAuto(1);
+
+        } else if (payload == "fag") {
+            AICamera_getFocusAuto();
+        } else if (payload == "fas0") {
+            AICamera_setFocusAuto(0);
+        } else if (payload == "fas1") {
+            AICamera_setFocusAuto(1);
 
         } else if (payload == "wbtg") {
             AICamera_getWhiteBalanceTemperature();

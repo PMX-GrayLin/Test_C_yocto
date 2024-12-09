@@ -136,3 +136,11 @@ int AICamera_getExposureAuto() {
 void AICamera_setExposureAuto(bool enable) {
   ioctl_set_value(V4L2_CID_EXPOSURE_AUTO, enable ? 1 : 0);
 }
+
+int AICamera_getFocusAuto() {
+  return ioctl_get_value(V4L2_CID_FOCUS_AUTO);
+}
+
+void AICamera_setFocusAuto(bool enable) {
+  ioctl_set_value(V4L2_CID_FOCUS_AUTO, enable ? 1 : 0);
+}
