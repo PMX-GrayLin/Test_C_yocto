@@ -83,14 +83,13 @@ public:
         } else if (payload == "wbts6500") {
             AICamera_setWhiteBalanceAutomatic(6500);
 
-        } else if (payload == "gst") {
+        } else if (payload == "gsttest") {
             std::thread t(gst_test, 0);
             t.detach();
-        } else if (payload == "gst2") {
-            std::thread t(gst_test2, 0);
-            t.detach();
-        } else if (payload == "gst2x") {
-            stopPipeline();
+        } else if (payload == "gst") {
+            AICamera_startStreaming();
+        } else if (payload == "gstx") {
+            AICamera_stopStreaming();
      
         } else if (payload == "ts") {
             startTimer(1000);
