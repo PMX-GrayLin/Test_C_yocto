@@ -92,7 +92,7 @@ public:
             AICamera_stopStreaming();
      
         } else if (payload == "ts") {
-            startTimer(1000);
+            startTimer(60000);
         } else if (payload == "tx") {
             stopTimer();
         
