@@ -51,7 +51,7 @@ int ioctl_get_value(int control_ID) {
   memset(&ctrl, 0, sizeof(ctrl));
   ctrl.id = control_ID;
   if (ioctl(fd, VIDIOC_G_CTRL, &ctrl) == 0) {
-    xlog("ctrl.value:%d", ctrl.value);
+    xlog("ctrl.id:0x%x, ctrl.value:%d", ctrl.id, ctrl.value);
   } else {
     xlog("ioctl fail, VIDIOC_G_CTRL... error:%s", strerror(errno));
   }
@@ -72,7 +72,7 @@ int ioctl_set_value(int control_ID, int value) {
   ctrl.value = value;
 
   if (ioctl(fd, VIDIOC_S_CTRL, &ctrl) == 0) {
-    xlog("set to:%d", ctrl.value);
+    xlog("ctrl.id:0x%x, set to:%d", ctrl.id, ctrl.value);
   } else {
     xlog("fail to set value, error:%s", strerror(errno));
   }
@@ -113,10 +113,15 @@ void AICamera_setHue(int value) {
   ioctl_set_value(V4L2_CID_HUE, value);
 }
 
+// command example
+// v4l2-ctl -d 78 --get-ctrl=white_balance_automatic
 int AICamera_getWhiteBalanceAutomatic() {
   return ioctl_get_value(V4L2_CID_AUTO_WHITE_BALANCE);
 }
 
+// command example
+// v4l2-ctl -d 78 --set-ctrl=white_balance_automatic=0
+// v4l2-ctl -d 78 --set-ctrl=white_balance_automatic=1
 void AICamera_setWhiteBalanceAutomatic(bool enable) {
   ioctl_set_value(V4L2_CID_AUTO_WHITE_BALANCE, enable ? 1 : 0);
 }
@@ -165,11 +170,9 @@ void AICamera_setFocusAuto(bool enable) {
 GstPadProbeReturn cb_streaming_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
   GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
   if (buffer) {
-    counterFrame++;
-    // xlog("frame captured, counterFrame:%d", counterFrame);
-
-    // set some conditions to save pic
-    if (counterFrame % 300 == 0) {
+    
+    if (isSave2Jpeg) {
+      isSave2Jpeg = false
       // Get the capabilities of the pad to understand the format
       GstCaps *caps = gst_pad_get_current_caps(pad);
       if (!caps) {
@@ -182,9 +185,7 @@ GstPadProbeReturn cb_streaming_data(GstPad *pad, GstPadProbeInfo *info, gpointer
 
       // Map the buffer to access its data
       GstMapInfo map;
-      if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-        // xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
-      } else {
+      if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
         gst_caps_unref(caps);
         xlog("Failed to map buffer");
         return GST_PAD_PROBE_PASS;

@@ -5,39 +5,11 @@
 #include "aicamerag2.hpp"
 #include "global.hpp"
 
-bool isTimerRunning = false;
-
 volatile int counterFrame = 0;
 int counterImg = 0;
-int counterTimer = 0;
 
 GstElement *gst_pipeline = nullptr;
 GMainLoop *gst_loop = nullptr;
-
-void startTimer(int ms) {
-  if (!isTimerRunning) {
-    isTimerRunning = true;
-    counterTimer = 0;
-
-    std::thread([ms]() {
-      while (isTimerRunning) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-        counterTimer++;
-        // xlog("timer triger... counterTimer:%d", counterTimer);
-
-        counterFrame = 0;
-      }
-      xlog("timer stoped...");
-    }).detach();  // Detach to run in the background
-
-  } else {
-    xlog("timer already running...");
-  }
-}
-
-void stopTimer() {
-  isTimerRunning = false;
-}
 
 void gst_test(int testCase) {
   xlog("testCase:%d", testCase);

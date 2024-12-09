@@ -28,3 +28,9 @@ using namespace std;
 #else
 #define xlog(fmt, ...) printf("%s:%d, " fmt "\n\r", __func__, __LINE__, ##__VA_ARGS__)
 #endif
+
+extern bool isSave2Jpeg = false;
+
+extern void startTimer(int ms);
+extern void stopTimer();
+
