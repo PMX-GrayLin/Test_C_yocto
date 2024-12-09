@@ -1,9 +1,5 @@
 #include "test_gst.hpp"
 
-#include <opencv2/opencv.hpp>
-
-#include "aicamerag2.hpp"
-#include "global.hpp"
 
 volatile int counterFrame = 0;
 int counterImg = 0;
