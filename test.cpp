@@ -39,13 +39,13 @@ public:
             AICamera_getSaturation();
 
         } else if (payload == "hg") {
-            AICamera_getSaturation();
+            AICamera_getHue();
         } else if (payload == "hs0") {
-            AICamera_setSaturation(0);
-            AICamera_getSaturation();
+            AICamera_setHue(0);
+            AICamera_getHue();
         } else if (payload == "hs100") {
-            AICamera_setSaturation(100);
-            AICamera_getSaturation();
+            AICamera_setHue(100);
+            AICamera_getHue();
 
         } else if (payload == "wbag") {
             AICamera_getWhiteBalanceAutomatic();
