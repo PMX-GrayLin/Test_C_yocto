@@ -17,6 +17,9 @@ using namespace std;
 // yocto test
 #include "json.h"
 
+#include <gst/gst.h>
+#include <opencv2/opencv.hpp>
+
 #define DEBUGX
 
 #ifndef DEBUGX
