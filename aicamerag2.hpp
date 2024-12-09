@@ -35,3 +35,6 @@ extern int AICamera_getFocusAuto();
 extern void AICamera_setFocusAuto(bool enable);  
 
 // Streaming
+void ThreadAICameraStreaming(int param);
+extern void AICamera_startStreaming();
+extern void AICamera_stopStreaming();

@@ -1,6 +1,11 @@
 #include "global.hpp"
 #include "aicamerag2.hpp"
 
+std::thread t_aicamera_streaming = nullptr;
+std::atomic<bool> is_aicamera_streaming(false); // To track the thread's state
+
+GstElement *gst_pipeline = nullptr;
+GMainLoop *gst_loop = nullptr;
 
 std::string AICamrea_getVideoDevice() {
   std::string result;
@@ -151,4 +156,120 @@ int AICamera_getFocusAuto() {
 
 void AICamera_setFocusAuto(bool enable) {
   ioctl_set_value(V4L2_CID_FOCUS_AUTO, enable ? 1 : 0);
+}
+
+void ThreadAICameraStreaming(int param) {
+  xlog("start >>>>, param:%d", param);
+  counterFrame = 0;
+  counterImg = 0;
+
+  // Initialize GStreamer
+  gst_init(nullptr, nullptr);
+
+  // final gst pipeline
+  // gst-launch-1.0 -v v4l2src device=/dev/video18 ! video/x-raw,width=2048,height=1536 ! v4l2h264enc extra-controls="cid,video_gop_size=60" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
+
+  // Create the elements
+  gst_pipeline = gst_pipeline_new("video-pipeline");
+  GstElement *source = gst_element_factory_make("v4l2src", "source");
+  GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
+  GstElement *encoder = gst_element_factory_make("v4l2h264enc", "encoder");
+  GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
+
+  if (!gst_pipeline || !source || !capsfilter || !encoder || !sink) {
+    xlog("failed to create GStreamer elements");
+    return;
+  }
+
+  // Set properties for the elements
+  xlog("AICamrea_getVideoDevice:%s", AICamrea_getVideoDevice().c_str());
+  g_object_set(G_OBJECT(source), "device", AICamrea_getVideoDevice().c_str(), nullptr);
+
+  // Create a GstStructure for extra-controls
+  GstStructure *controls = gst_structure_new(
+      "extra-controls",                  // Name of the structure
+      "video_gop_size", G_TYPE_INT, 60,  // Key-value pair
+      // "h264_level", G_TYPE_INT, 13,      // Key-value pair
+      nullptr  // End of key-value pairs
+  );
+  if (!controls) {
+    xlog("Failed to create GstStructure");
+    gst_object_unref(gst_pipeline);
+    return;
+  }
+  g_object_set(G_OBJECT(encoder), "extra-controls", controls, nullptr);
+  // Free the GstStructure after use
+  gst_structure_free(controls);
+
+  g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf = 4
+  g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
+
+  // Define the capabilities for the capsfilter
+  // 2048 * 1536
+  GstCaps *caps = gst_caps_new_simple(
+      "video/x-raw",
+      "width", G_TYPE_INT, 2048,
+      "height", G_TYPE_INT, 1536,
+      "framerate", GST_TYPE_FRACTION, 30, 1,  // Add frame rate as 30/1
+      nullptr);
+  g_object_set(capsfilter, "caps", caps, nullptr);
+  gst_caps_unref(caps);
+
+  // Build the pipeline
+  gst_bin_add_many(GST_BIN(gst_pipeline), source, capsfilter, encoder, sink, nullptr);
+  if (!gst_element_link_many(source, capsfilter, encoder, sink, nullptr)) {
+    xlog("failed to link elements in the pipeline");
+    gst_object_unref(gst_pipeline);
+    return;
+  }
+
+  // Attach pad probe to capture frames
+  GstPad *pad = gst_element_get_static_pad(encoder, "sink");
+  if (pad) {
+    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)cb_have_data, nullptr, nullptr);
+    gst_object_unref(pad);
+  }
+
+  // Start the pipeline
+  GstStateChangeReturn ret = gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
+  if (ret == GST_STATE_CHANGE_FAILURE) {
+    xlog("failed to start the pipeline");
+    gst_object_unref(gst_pipeline);
+    return;
+  }
+
+  xlog("pipeline is running...");
+
+  // Run the main loop
+  gst_loop = g_main_loop_new(nullptr, FALSE);
+  g_main_loop_run(gst_loop);
+
+  // Stop the pipeline when finished or interrupted
+  xlog("Stopping the pipeline...");
+  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
+
+  // Clean up
+  gst_object_unref(gst_pipeline);
+  is_aicamera_streaming false;
+  xlog("stop >>>>, Pipeline stopped and resources cleaned up.");
+}
+
+void AICamera_startStreaming() {
+  if (is_aicamera_streaming) {
+    xlog("thread already running");
+    return;
+  }
+  is_aicamera_streaming = true;
+  t_aicamera_streaming = std::thread(ThreadAICameraStreaming, 0);
+  t_aicamera_streaming.detach();
+}
+
+void AICamera_stopStreaming() {
+    if (gst_loop) {
+    g_main_loop_quit(gst_loop);
+    g_main_loop_unref(gst_loop);
+    gst_loop = nullptr;
+  } else {
+    xlog("gst_loop is invalid or already destroyed.");
+  }
 }
