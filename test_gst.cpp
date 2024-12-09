@@ -119,7 +119,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
     // xlog("frame captured, counterFrame:%d", counterFrame);
 
     // set some conditions to save pic
-    if (counterFrame % 1800 == 0) {
+    if (counterFrame % 300 == 0) {
       // Get the capabilities of the pad to understand the format
       GstCaps *caps = gst_pad_get_current_caps(pad);
       if (!caps) {
@@ -152,7 +152,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
             !gst_structure_get_int(str, "height", &height)) {
           xlog("Failed to get video dimensions");
         }
-        // xlog("Video dimensions: %dx%d", width, height);
+        xlog("Video dimensions: %dx%d", width, height);
 
         // Create a cv::Mat to store the frame in NV12 format
         cv::Mat nv12_frame(height + 3 / 2, width, CV_8UC1, map.data);
