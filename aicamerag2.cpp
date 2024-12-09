@@ -128,3 +128,11 @@ int AICamera_getWhiteBalanceTemperature() {
 void AICamera_setWhiteBalanceTemperature(int value) {
   ioctl_set_value(V4L2_CID_WHITE_BALANCE_TEMPERATURE, value);
 }
+
+int AICamera_getExposureAuto() {
+  return ioctl_get_value(V4L2_CID_EXPOSURE_AUTO);
+}
+
+void AICamera_setExposureAuto(bool enable) {
+  ioctl_set_value(V4L2_CID_EXPOSURE_AUTO, enable ? 1 : 0);
+}

@@ -48,10 +48,19 @@ public:
 
         } else if (payload == "eg") {
             AICamera_getExposure();
+        } else if (payload == "es0") {
+            AICamera_setExposure(0);
         } else if (payload == "es-40") {
             AICamera_setExposure(-40);
         } else if (payload == "es40") {
             AICamera_setExposure(40);
+
+        } else if (payload == "epg") {
+            AICamera_getExposureAuto();
+        } else if (payload == "eps0") {
+            AICamera_setExposureAuto(0);
+        } else if (payload == "eps1") {
+            AICamera_setExposureAuto(1);
 
         } else if (payload == "wbtg") {
             AICamera_getWhiteBalanceTemperature();
