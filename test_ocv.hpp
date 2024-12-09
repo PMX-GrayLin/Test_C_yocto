@@ -1,5 +1,6 @@
 #pragma once
 
-#include <opencv2/opencv.hpp>
+#include "global.hpp"
+#include "aicamerag2.hpp"
 
 void ocv_test(int testCase);

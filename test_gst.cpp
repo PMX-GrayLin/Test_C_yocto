@@ -1,6 +1,5 @@
 #include "test_gst.hpp"
 
-
 volatile int counterFrame = 0;
 int counterImg = 0;
 
