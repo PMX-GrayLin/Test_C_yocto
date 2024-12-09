@@ -2,7 +2,7 @@
 #include "aicamerag2.hpp"
 
 std::thread t_aicamera_streaming = nullptr;
-std::atomic<bool> is_aicamera_streaming(false); // To track the thread's state
+bool is_aicamera_streaming = false;
 
 GstElement *gst_pipeline = nullptr;
 GMainLoop *gst_loop = nullptr;
