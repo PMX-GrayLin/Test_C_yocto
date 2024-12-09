@@ -324,7 +324,7 @@ void ThreadAICameraStreaming(int param) {
 
   // Clean up
   gst_object_unref(gst_pipeline);
-  is_aicamera_streaming false;
+  is_aicamera_streaming = false;
   xlog("stop >>>>, Pipeline stopped and resources cleaned up.");
 }
 
