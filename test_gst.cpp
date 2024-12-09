@@ -1,8 +1,9 @@
 #include "test_gst.hpp"
 
-#include "global.hpp"
-#include "aicamerag2.hpp"
 #include <opencv2/opencv.hpp>
+
+#include "aicamerag2.hpp"
+#include "global.hpp"
 
 bool isTimerRunning = false;
 
@@ -14,9 +15,7 @@ GstElement *gst_pipeline = nullptr;
 GMainLoop *gst_loop = nullptr;
 
 void startTimer(int ms) {
-
   if (!isTimerRunning) {
-
     isTimerRunning = true;
     counterTimer = 0;
 
@@ -34,13 +33,11 @@ void startTimer(int ms) {
   } else {
     xlog("timer already running...");
   }
-
 }
 
 void stopTimer() {
   isTimerRunning = false;
 }
-
 
 void gst_test(int testCase) {
   xlog("testCase:%d", testCase);
@@ -83,9 +80,9 @@ void gst_test(int testCase) {
   // Wait until error or EOS
   bus = gst_element_get_bus(pipeline);
   msg = gst_bus_timed_pop_filtered(
-    bus, 
-    GST_CLOCK_TIME_NONE,                               
-    static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+      bus,
+      GST_CLOCK_TIME_NONE,
+      static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 
   // Parse message
   if (msg) {
@@ -123,7 +120,6 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
 
     // set some conditions to save pic
     if (counterFrame % 1800 == 0) {
-
       // Get the capabilities of the pad to understand the format
       GstCaps *caps = gst_pad_get_current_caps(pad);
       if (!caps) {
@@ -210,14 +206,14 @@ void gst_test2(int testCase) {
 
   // Set properties for the elements
   xlog("AICamrea_getVideoDevice:%s", AICamrea_getVideoDevice().c_str());
-  g_object_set( G_OBJECT(source), "device", AICamrea_getVideoDevice().c_str(), nullptr );
+  g_object_set(G_OBJECT(source), "device", AICamrea_getVideoDevice().c_str(), nullptr);
 
   // Create a GstStructure for extra-controls
   GstStructure *controls = gst_structure_new(
       "extra-controls",                  // Name of the structure
       "video_gop_size", G_TYPE_INT, 60,  // Key-value pair
       // "h264_level", G_TYPE_INT, 13,      // Key-value pair
-      nullptr                            // End of key-value pairs
+      nullptr  // End of key-value pairs
   );
   if (!controls) {
     xlog("Failed to create GstStructure");

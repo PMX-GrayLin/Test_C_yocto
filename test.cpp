@@ -21,10 +21,14 @@ public:
             int brightness = 100;
             AICamera_setBrightness(brightness);
             AICamera_getBrightness();
-        } else if (payload == "4") {
+
+        } else if (payload == "wbag") {
+            AICamera_getWhiteBalanceAutomatic();
+        } else if (payload == "wbas0") {
             AICamera_setWhiteBalanceAutomatic(0);
-        } else if (payload == "5") {
+        } else if (payload == "wbas1") {
             AICamera_setWhiteBalanceAutomatic(1);
+            
         } else if (payload == "gst") {
             std::thread t(gst_test, 0);
             t.detach();
@@ -38,7 +42,8 @@ public:
             startTimer(1000);
         } else if (payload == "tx") {
             stopTimer();
-            
+        
+    
         } else if (payload == "ocv") {
             std::thread t(ocv_test, 0);
             t.detach();
