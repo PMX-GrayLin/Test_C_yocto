@@ -8,6 +8,8 @@
 #include <sys/ioctl.h>        // For ioctl()
 #include <fcntl.h>            // For open()
 
+#include <gst/gst.h>
+
 extern std::string AICamrea_getVideoDevice();
 
 // IOCTLS
