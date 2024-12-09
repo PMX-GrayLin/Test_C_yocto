@@ -162,7 +162,7 @@ void AICamera_setFocusAuto(bool enable) {
 }
 
 // Callback to handle incoming buffer data
-GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+GstPadProbeReturn cb_streaming_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
   GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
   if (buffer) {
     counterFrame++;
@@ -299,7 +299,7 @@ void ThreadAICameraStreaming(int param) {
   // Attach pad probe to capture frames
   GstPad *pad = gst_element_get_static_pad(encoder, "sink");
   if (pad) {
-    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)cb_have_data, nullptr, nullptr);
+    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)cb_streaming_data, nullptr, nullptr);
     gst_object_unref(pad);
   }
 
