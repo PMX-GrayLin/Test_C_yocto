@@ -20,7 +20,7 @@ public:
             AICamera_setBrightness(100);
             AICamera_getBrightness();
 
-        if (payload == "cg") {
+        } else if (payload == "cg") {
             AICamera_getContrast();
         } else if (payload == "cs0") {
             AICamera_setContrast(0);
