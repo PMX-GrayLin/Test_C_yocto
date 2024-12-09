@@ -11,13 +11,13 @@ public:
         std::string payload((char*)message->payload, message->payloadlen);
 		xlog("MQTT payload:%s", payload.c_str());
         
-        if (payload == "1") {
+        if (payload == "bg") {
             AICamera_getBrightness();
-        } else if (payload == "2") {
+        } else if (payload == "bs0") {
             int brightness =0;
             AICamera_setBrightness(brightness);
             AICamera_getBrightness();
-        } else if (payload == "3") {
+        } else if (payload == "bs100") {
             int brightness = 100;
             AICamera_setBrightness(brightness);
             AICamera_getBrightness();
@@ -28,7 +28,7 @@ public:
             AICamera_setWhiteBalanceAutomatic(0);
         } else if (payload == "wbas1") {
             AICamera_setWhiteBalanceAutomatic(1);
-            
+
         } else if (payload == "gst") {
             std::thread t(gst_test, 0);
             t.detach();
@@ -43,7 +43,6 @@ public:
         } else if (payload == "tx") {
             stopTimer();
         
-    
         } else if (payload == "ocv") {
             std::thread t(ocv_test, 0);
             t.detach();

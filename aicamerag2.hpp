@@ -12,6 +12,7 @@ extern std::string AICamrea_getVideoDevice();
 
 // IOCTLS
 int ioctl_get_value(int control_ID);
+int ioctl_set_value(int control_ID, int value);
 extern int AICamera_getBrightness();
 extern void AICamera_setBrightness(int value);
 extern int AICamera_getContrast();
