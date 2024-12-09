@@ -7,8 +7,8 @@ bool is_aicamera_streaming = false;
 static volatile int counterFrame = 0;
 static int counterImg = 0;
 
-GstElement *gst_pipeline = nullptr;
-GMainLoop *gst_loop = nullptr;
+static GstElement *gst_pipeline = nullptr;
+static GMainLoop *gst_loop = nullptr;
 
 std::string AICamrea_getVideoDevice() {
   std::string result;
