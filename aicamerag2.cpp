@@ -89,6 +89,22 @@ void AICamera_setContrast(int value) {
   ioctl_set_value(V4L2_CID_CONTRAST, value);
 }
 
+int AICamera_getSaturation() {
+  return ioctl_get_value(V4L2_CID_SATURATION);
+}
+
+void AICamera_setSaturation(int value) {
+  ioctl_set_value(V4L2_CID_SATURATION, value);
+}
+
+int AICamera_getHue() {
+  return ioctl_get_value(V4L2_CID_HUE);
+}
+
+void AICamera_setHue(int value) {
+  ioctl_set_value(V4L2_CID_HUE, value);
+}
+
 int AICamera_getWhiteBalanceAutomatic() {
   return ioctl_get_value(V4L2_CID_AUTO_WHITE_BALANCE);
 }

@@ -29,6 +29,24 @@ public:
             AICamera_setContrast(10);
             AICamera_getContrast();
 
+        } else if (payload == "sg") {
+            AICamera_getSaturation();
+        } else if (payload == "ss0") {
+            AICamera_setSaturation(0);
+            AICamera_getSaturation();
+        } else if (payload == "ss10") {
+            AICamera_setSaturation(10);
+            AICamera_getSaturation();
+
+        } else if (payload == "hg") {
+            AICamera_getSaturation();
+        } else if (payload == "hs0") {
+            AICamera_setSaturation(0);
+            AICamera_getSaturation();
+        } else if (payload == "hs100") {
+            AICamera_setSaturation(100);
+            AICamera_getSaturation();
+
         } else if (payload == "wbag") {
             AICamera_getWhiteBalanceAutomatic();
         } else if (payload == "wbas0") {
