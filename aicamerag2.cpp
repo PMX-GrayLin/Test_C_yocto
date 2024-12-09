@@ -1,4 +1,3 @@
-#include "global.hpp"
 #include "aicamerag2.hpp"
 
 std::thread t_aicamera_streaming;

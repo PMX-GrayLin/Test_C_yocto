@@ -5,12 +5,17 @@
 #include <assert.h>
 #include <unistd.h>
 
+#include <linux/videodev2.h>  // For V4L2 definitions
+#include <sys/ioctl.h>        // For ioctl()
+#include <fcntl.h>            // For open()
+
 #include <string> 
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <thread>
 #include <chrono>
+#include <regex>
 
 using namespace std;
 
