@@ -15,37 +15,29 @@ public:
             AICamera_getBrightness();
         } else if (payload == "bs0") {
             AICamera_setBrightness(0);
-            AICamera_getBrightness();
         } else if (payload == "bs100") {
             AICamera_setBrightness(100);
-            AICamera_getBrightness();
 
         } else if (payload == "cg") {
             AICamera_getContrast();
         } else if (payload == "cs0") {
             AICamera_setContrast(0);
-            AICamera_getContrast();
         } else if (payload == "cs10") {
             AICamera_setContrast(10);
-            AICamera_getContrast();
 
         } else if (payload == "sg") {
             AICamera_getSaturation();
         } else if (payload == "ss0") {
             AICamera_setSaturation(0);
-            AICamera_getSaturation();
         } else if (payload == "ss10") {
             AICamera_setSaturation(10);
-            AICamera_getSaturation();
 
         } else if (payload == "hg") {
             AICamera_getHue();
         } else if (payload == "hs0") {
             AICamera_setHue(0);
-            AICamera_getHue();
         } else if (payload == "hs100") {
             AICamera_setHue(100);
-            AICamera_getHue();
 
         } else if (payload == "wbag") {
             AICamera_getWhiteBalanceAutomatic();
@@ -53,6 +45,20 @@ public:
             AICamera_setWhiteBalanceAutomatic(0);
         } else if (payload == "wbas1") {
             AICamera_setWhiteBalanceAutomatic(1);
+
+        } else if (payload == "eg") {
+            AICamera_getExposure();
+        } else if (payload == "es-40") {
+            AICamera_setExposure(-40);
+        } else if (payload == "es40") {
+            AICamera_setExposure(40);
+
+        } else if (payload == "wbtg") {
+            AICamera_getWhiteBalanceTemperature();
+        } else if (payload == "wbts2700") {
+            AICamera_setWhiteBalanceTemperature(2700);
+        } else if (payload == "wbts6500") {
+            AICamera_setWhiteBalanceAutomatic(6500);
 
         } else if (payload == "gst") {
             std::thread t(gst_test, 0);

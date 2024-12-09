@@ -112,3 +112,19 @@ int AICamera_getWhiteBalanceAutomatic() {
 void AICamera_setWhiteBalanceAutomatic(bool enable) {
   ioctl_set_value(V4L2_CID_AUTO_WHITE_BALANCE, enable ? 1 : 0);
 }
+
+int AICamera_getExposure() {
+  return ioctl_get_value(V4L2_CID_EXPOSURE);
+}
+
+void AICamera_setExposure(int value) {
+  ioctl_set_value(V4L2_CID_EXPOSURE, value);
+}
+
+int AICamera_getWhiteBalanceTemperature() {
+  return ioctl_get_value(V4L2_CID_WHITE_BALANCE_TEMPERATURE);
+}
+
+void AICamera_setWhiteBalanceTemperature(int value) {
+  ioctl_set_value(V4L2_CID_WHITE_BALANCE_TEMPERATURE, value);
+}

@@ -23,5 +23,9 @@ extern int AICamera_getHue();
 extern void AICamera_setHue(int value);
 extern int AICamera_getWhiteBalanceAutomatic();
 extern void AICamera_setWhiteBalanceAutomatic(bool enable);
+extern int AICamera_getExposure();
+extern void AICamera_setExposure(int value);
+extern int AICamera_getWhiteBalanceTemperature();
+extern void AICamera_setWhiteBalanceTemperature(int value);
 
 // Streaming
