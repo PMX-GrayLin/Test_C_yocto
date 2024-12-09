@@ -69,6 +69,13 @@ public:
         } else if (payload == "fas1") {
             AICamera_setFocusAuto(1);
 
+        } else if (payload == "fabsg") {
+            AICamera_getFocusAbsolute();
+        } else if (payload == "fabss0") {
+            AICamera_setFocusAbsolute(0);
+        } else if (payload == "fabss255") {
+            AICamera_setFocusAbsolute(255);
+
         } else if (payload == "wbtg") {
             AICamera_getWhiteBalanceTemperature();
         } else if (payload == "wbts2700") {

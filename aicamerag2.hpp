@@ -29,7 +29,9 @@ extern int AICamera_getWhiteBalanceTemperature();
 extern void AICamera_setWhiteBalanceTemperature(int value);
 extern int AICamera_getExposureAuto();
 extern void AICamera_setExposureAuto(bool enable);
+extern int AICamera_getFocusAbsolute();
+extern void AICamera_setFocusAbsolute(int value);
 extern int AICamera_getFocusAuto();
-extern void AICamera_setFocusAuto(bool enable);
+extern void AICamera_setFocusAuto(bool enable);  
 
 // Streaming
