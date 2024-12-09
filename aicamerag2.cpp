@@ -172,7 +172,7 @@ GstPadProbeReturn cb_streaming_data(GstPad *pad, GstPadProbeInfo *info, gpointer
   if (buffer) {
     
     if (isSave2Jpeg) {
-      isSave2Jpeg = false
+      isSave2Jpeg = false;
       // Get the capabilities of the pad to understand the format
       GstCaps *caps = gst_pad_get_current_caps(pad);
       if (!caps) {
