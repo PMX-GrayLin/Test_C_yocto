@@ -1,7 +1,7 @@
 #include "global.hpp"
 #include "aicamerag2.hpp"
 
-std::thread t_aicamera_streaming = nullptr;
+std::thread t_aicamera_streaming;
 bool is_aicamera_streaming = false;
 
 GstElement *gst_pipeline = nullptr;
