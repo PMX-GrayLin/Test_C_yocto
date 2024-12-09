@@ -158,6 +158,76 @@ void AICamera_setFocusAuto(bool enable) {
   ioctl_set_value(V4L2_CID_FOCUS_AUTO, enable ? 1 : 0);
 }
 
+// Callback to handle incoming buffer data
+GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+  GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
+  if (buffer) {
+    counterFrame++;
+    // xlog("frame captured, counterFrame:%d", counterFrame);
+
+    // set some conditions to save pic
+    if (counterFrame % 300 == 0) {
+      // Get the capabilities of the pad to understand the format
+      GstCaps *caps = gst_pad_get_current_caps(pad);
+      if (!caps) {
+        xlog("Failed to get caps");
+        gst_caps_unref(caps);
+        return GST_PAD_PROBE_PASS;
+      }
+      // Print the entire caps for debugging
+      // xlog("caps: %s", gst_caps_to_string(caps));
+
+      // Map the buffer to access its data
+      GstMapInfo map;
+      if (gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+        // xlog("frame captured, counterFrame:%d, Size:%ld bytes", counterFrame, map.size);
+      } else {
+        gst_caps_unref(caps);
+        xlog("Failed to map buffer");
+        return GST_PAD_PROBE_PASS;
+      }
+
+      // Get the structure of the first capability (format)
+      GstStructure *str = gst_caps_get_structure(caps, 0);
+      const gchar *format = gst_structure_get_string(str, "format");
+      // xlog("format:%s", format);
+
+      // Only proceed if the format is NV12
+      if (format && g_strcmp0(format, "NV12") == 0) {
+        int width = 0, height = 0;
+        if (!gst_structure_get_int(str, "width", &width) ||
+            !gst_structure_get_int(str, "height", &height)) {
+          xlog("Failed to get video dimensions");
+        }
+        // xlog("Video dimensions: %dx%d", width, height);
+
+        // Create a cv::Mat to store the frame in NV12 format
+        cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
+        // Create a cv::Mat to store the frame in BGR format
+        cv::Mat bgr_frame(height, width, CV_8UC3);
+        // Convert NV12 to BGR using OpenCV
+        cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
+
+        // Save the frame to a picture
+        counterImg++;
+        std::ostringstream oss;
+        oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".jpg";
+        // oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".png";
+        std::string filename = oss.str();
+        if (cv::imwrite(filename, bgr_frame)) {
+          xlog("Saved frame to %s", filename.c_str());
+        } else {
+          xlog("Failed to save frame");
+        }
+      }
+      // Cleanup
+      gst_buffer_unmap(buffer, &map);
+      gst_caps_unref(caps);
+    }
+  }
+  return GST_PAD_PROBE_OK;
+}
+
 void ThreadAICameraStreaming(int param) {
   xlog("start >>>>, param:%d", param);
   counterFrame = 0;
