@@ -14,13 +14,20 @@ public:
         if (payload == "bg") {
             AICamera_getBrightness();
         } else if (payload == "bs0") {
-            int brightness =0;
-            AICamera_setBrightness(brightness);
+            AICamera_setBrightness(0);
             AICamera_getBrightness();
         } else if (payload == "bs100") {
-            int brightness = 100;
-            AICamera_setBrightness(brightness);
+            AICamera_setBrightness(100);
             AICamera_getBrightness();
+
+        if (payload == "cg") {
+            AICamera_getContrast();
+        } else if (payload == "cs0") {
+            AICamera_setContrast(0);
+            AICamera_getContrast();
+        } else if (payload == "cs10") {
+            AICamera_setContrast(10);
+            AICamera_getContrast();
 
         } else if (payload == "wbag") {
             AICamera_getWhiteBalanceAutomatic();

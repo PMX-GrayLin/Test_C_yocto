@@ -69,7 +69,7 @@ int ioctl_set_value(int control_ID, int value) {
     xlog("fail to set value, error:%s", strerror(errno));
   }
   close(fd);
-  
+
   return 0;
 }
 
@@ -79,6 +79,14 @@ int AICamera_getBrightness() {
 
 void AICamera_setBrightness(int value) {
   ioctl_set_value(V4L2_CID_BRIGHTNESS, value);
+}
+
+int AICamera_getContrast() {
+  return ioctl_get_value(V4L2_CID_CONTRAST);
+}
+
+void AICamera_setContrast(int value) {
+  ioctl_set_value(V4L2_CID_CONTRAST, value);
 }
 
 int AICamera_getWhiteBalanceAutomatic() {
