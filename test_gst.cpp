@@ -155,7 +155,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
         xlog("Video dimensions: %dx%d", width, height);
 
         // Create a cv::Mat to store the frame in NV12 format
-        cv::Mat nv12_frame(height + 3 / 2, width, CV_8UC1, map.data);
+        cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
         // Create a cv::Mat to store the frame in BGR format
         cv::Mat bgr_frame(height, width, CV_8UC3);
         // Convert NV12 to BGR using OpenCV
