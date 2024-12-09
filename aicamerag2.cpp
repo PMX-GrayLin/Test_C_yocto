@@ -4,6 +4,10 @@
 std::thread t_aicamera_streaming;
 bool is_aicamera_streaming = false;
 
+volatile int counterFrame = 0;
+int counterImg = 0;
+int counterTimer = 0;
+
 GstElement *gst_pipeline = nullptr;
 GMainLoop *gst_loop = nullptr;
 
