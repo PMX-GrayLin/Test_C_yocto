@@ -152,7 +152,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
             !gst_structure_get_int(str, "height", &height)) {
           xlog("Failed to get video dimensions");
         }
-        xlog("Video dimensions: %dx%d", width, height);
+        // xlog("Video dimensions: %dx%d", width, height);
 
         // Create a cv::Mat to store the frame in NV12 format
         cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);

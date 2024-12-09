@@ -22,9 +22,7 @@ std::string AICamrea_getVideoDevice() {
   return result;
 }
 
-int AICamera_getBrightness() {
-
-  int brightness = -1;
+int ioctl_get_value(int control_ID) {
 
   int fd = open(AICamrea_getVideoDevice().c_str(), O_RDWR);
   if (fd == -1) {
@@ -46,13 +44,46 @@ int AICamera_getBrightness() {
   memset(&ctrl, 0, sizeof(ctrl));
   ctrl.id = V4L2_CID_BRIGHTNESS;
   if (ioctl(fd, VIDIOC_G_CTRL, &ctrl) == 0) {
-    xlog("Current brightness:%d", ctrl.value);
+    xlog("ctrl.value:%d", ctrl.value);
   } else {
     xlog("ioctl fail, VIDIOC_G_CTRL... error:%s", strerror(errno));
   }
 
-  close(fd);
-  return 0;
+  return ctrl.value;
+}
+
+int AICamera_getBrightness() {
+
+  int brightness = ioctl_get_value(V4L2_CID_BRIGHTNESS);
+
+  // int brightness = -1;
+  // int fd = open(AICamrea_getVideoDevice().c_str(), O_RDWR);
+  // if (fd == -1) {
+  //   xlog("Failed to open video device:%s", strerror(errno));
+  //   return -1;
+  // }
+
+  // struct v4l2_queryctrl queryctrl;
+  // memset(&queryctrl, 0, sizeof(queryctrl));
+  // queryctrl.id = V4L2_CID_BRIGHTNESS;
+  // if (ioctl(fd, VIDIOC_QUERYCTRL, &queryctrl) == 0) {
+  //   xlog("queryctrl.minimum:%d", queryctrl.minimum);
+  //   xlog("queryctrl.maximum:%d", queryctrl.maximum);
+  // } else {
+  //   xlog("ioctl fail, VIDIOC_QUERYCTRL... error:%s", strerror(errno));
+  // }
+
+  // struct v4l2_control ctrl;
+  // memset(&ctrl, 0, sizeof(ctrl));
+  // ctrl.id = V4L2_CID_BRIGHTNESS;
+  // if (ioctl(fd, VIDIOC_G_CTRL, &ctrl) == 0) {
+  //   xlog("Current brightness:%d", ctrl.value);
+  // } else {
+  //   xlog("ioctl fail, VIDIOC_G_CTRL... error:%s", strerror(errno));
+  // }
+  // close(fd);
+
+  return brightness;
 }
 
 void AICamera_setBrightness(int value) {
@@ -78,35 +109,36 @@ void AICamera_setBrightness(int value) {
 
 int AICamera_getWhiteBalanceAutomatic() {
 
-  int brightness = -1;
+  int whiteBalanceAutomatic = ioctl_get_value(V4L2_CID_AUTO_WHITE_BALANCE);
 
-  int fd = open(AICamrea_getVideoDevice().c_str(), O_RDWR);
-  if (fd == -1) {
-    xlog("Failed to open video device:%s", strerror(errno));
-    return -1;
-  }
+  // int brightness = -1;
+  // int fd = open(AICamrea_getVideoDevice().c_str(), O_RDWR);
+  // if (fd == -1) {
+  //   xlog("Failed to open video device:%s", strerror(errno));
+  //   return -1;
+  // }
 
-  struct v4l2_queryctrl queryctrl;
-  memset(&queryctrl, 0, sizeof(queryctrl));
-  queryctrl.id = V4L2_CID_AUTO_WHITE_BALANCE;
-  if (ioctl(fd, VIDIOC_QUERYCTRL, &queryctrl) == 0) {
-    xlog("queryctrl.minimum:%d", queryctrl.minimum);
-    xlog("queryctrl.maximum:%d", queryctrl.maximum);
-  } else {
-    xlog("ioctl fail, VIDIOC_QUERYCTRL... error:%s", strerror(errno));
-  }
+  // struct v4l2_queryctrl queryctrl;
+  // memset(&queryctrl, 0, sizeof(queryctrl));
+  // queryctrl.id = V4L2_CID_AUTO_WHITE_BALANCE;
+  // if (ioctl(fd, VIDIOC_QUERYCTRL, &queryctrl) == 0) {
+  //   xlog("queryctrl.minimum:%d", queryctrl.minimum);
+  //   xlog("queryctrl.maximum:%d", queryctrl.maximum);
+  // } else {
+  //   xlog("ioctl fail, VIDIOC_QUERYCTRL... error:%s", strerror(errno));
+  // }
 
-  struct v4l2_control ctrl;
-  memset(&ctrl, 0, sizeof(ctrl));
-  ctrl.id = V4L2_CID_AUTO_WHITE_BALANCE;
-  if (ioctl(fd, VIDIOC_G_CTRL, &ctrl) == 0) {
-    xlog("Current WhiteBalanceAutomatic:%d", ctrl.value);
-  } else {
-    xlog("ioctl fail, VIDIOC_G_CTRL... error:%s", strerror(errno));
-  }
+  // struct v4l2_control ctrl;
+  // memset(&ctrl, 0, sizeof(ctrl));
+  // ctrl.id = V4L2_CID_AUTO_WHITE_BALANCE;
+  // if (ioctl(fd, VIDIOC_G_CTRL, &ctrl) == 0) {
+  //   xlog("Current WhiteBalanceAutomatic:%d", ctrl.value);
+  // } else {
+  //   xlog("ioctl fail, VIDIOC_G_CTRL... error:%s", strerror(errno));
+  // }
 
-  close(fd);
-  return 0;
+  // close(fd);
+  return whiteBalanceAutomatic;
 }
 
 void AICamera_setWhiteBalanceAutomatic(bool enable) {
