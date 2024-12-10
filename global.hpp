@@ -27,14 +27,20 @@ using namespace std;
 #include <opencv2/opencv.hpp>
 
 #define DEBUGX
-
 #ifndef DEBUGX
 #define xlog(...) ((void)0)
 #else
 #define xlog(fmt, ...) printf("%s:%d, " fmt "\n\r", __func__, __LINE__, ##__VA_ARGS__)
 #endif
 
+#define NUM_CAM_USE 2
+#define USE_TOF
+#define DEBUG_TOF
+// #define DEBUG_SPI
+
 extern bool isSave2Jpeg;
+
+extern int testCounter;
 
 extern void startTimer(int ms);
 extern void stopTimer();
