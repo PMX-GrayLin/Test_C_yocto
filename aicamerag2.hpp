@@ -29,6 +29,7 @@ extern int AICamera_getFocusAuto();
 extern void AICamera_setFocusAuto(bool enable);  
 
 // Streaming
+GstPadProbeReturn cb_streaming_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
 void ThreadAICameraStreaming(int param);
 extern void AICamera_startStreaming();
 extern void AICamera_stopStreaming();
