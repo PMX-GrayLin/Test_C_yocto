@@ -17,8 +17,6 @@
 #include <chrono>
 #include <regex>
 
-using namespace std;
-
 // yocto test
 #include "json.h"
 #include <mosquittopp.h>
@@ -37,6 +35,8 @@ using namespace std;
 #define USE_TOF
 #define DEBUG_TOF
 // #define DEBUG_SPI
+
+using namespace std;
 
 extern bool isSave2Jpeg;
 

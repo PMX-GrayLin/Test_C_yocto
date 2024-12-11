@@ -240,7 +240,7 @@ void ThreadAICameraStreaming(int param) {
   gst_init(nullptr, nullptr);
 
   // final gst pipeline
-  // gst-launch-1.0 -v v4l2src device=/dev/video18 ! video/x-raw,width=2048,height=1536 ! v4l2h264enc extra-controls="cid,video_gop_size=60" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
+  // gst-launch-1.0 -v v4l2src device=/dev/video18 ! video/x-raw,width=2048,height=1536 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
 
   // Create the elements
   gst_pipeline = gst_pipeline_new("video-pipeline");
@@ -261,7 +261,7 @@ void ThreadAICameraStreaming(int param) {
   // Create a GstStructure for extra-controls
   GstStructure *controls = gst_structure_new(
       "extra-controls",                  // Name of the structure
-      "video_gop_size", G_TYPE_INT, 60,  // Key-value pair
+      "video_gop_size", G_TYPE_INT, 30,  // Key-value pair
       // "h264_level", G_TYPE_INT, 13,      // Key-value pair
       nullptr  // End of key-value pairs
   );

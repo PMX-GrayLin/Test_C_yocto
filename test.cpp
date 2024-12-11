@@ -131,12 +131,12 @@ int main(int argc, char* argv[]) {
   mosqpp::lib_init();
   MQTTClient client("my_client");
   client.connect("localhost", 1883);
-  client.subscribe(nullptr, "my_topic");
+//   client.subscribe(nullptr, "my_topic");
+  client.subscribe(nullptr, "PX/VBS/Cmd");
 
   while (true) {
     client.loop();
   }
-
   mosqpp::lib_cleanup();
 
   return 0;
