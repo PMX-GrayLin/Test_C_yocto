@@ -3,6 +3,10 @@
 std::thread t_aicamera_streaming;
 bool is_aicamera_streaming = false;
 
+bool isSavePhoto = false;
+SavedPhotoFormat savedPhotoFormat = spf_PNG;
+std::string fileName_savedImage = "";
+
 static volatile int counterFrame = 0;
 static int counterImg = 0;
 
@@ -85,6 +89,7 @@ int AICamera_getBrightness() {
 }
 
 void AICamera_setBrightness(int value) {
+  xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_BRIGHTNESS, value);
 }
 
@@ -93,6 +98,7 @@ int AICamera_getContrast() {
 }
 
 void AICamera_setContrast(int value) {
+  xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_CONTRAST, value);
 }
 
@@ -101,6 +107,7 @@ int AICamera_getSaturation() {
 }
 
 void AICamera_setSaturation(int value) {
+  xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_SATURATION, value);
 }
 
@@ -109,6 +116,7 @@ int AICamera_getHue() {
 }
 
 void AICamera_setHue(int value) {
+  xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_HUE, value);
 }
 
@@ -122,6 +130,7 @@ int AICamera_getWhiteBalanceAutomatic() {
 // v4l2-ctl -d 78 --set-ctrl=white_balance_automatic=0
 // v4l2-ctl -d 78 --set-ctrl=white_balance_automatic=1
 void AICamera_setWhiteBalanceAutomatic(bool enable) {
+  xlog("enable:%d", enable);
   ioctl_set_value(V4L2_CID_AUTO_WHITE_BALANCE, enable ? 1 : 0);
 }
 
@@ -130,6 +139,7 @@ int AICamera_getExposure() {
 }
 
 void AICamera_setExposure(int value) {
+  xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_EXPOSURE, value);
 }
 
@@ -138,6 +148,7 @@ int AICamera_getWhiteBalanceTemperature() {
 }
 
 void AICamera_setWhiteBalanceTemperature(int value) {
+  xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_WHITE_BALANCE_TEMPERATURE, value);
 }
 
@@ -146,6 +157,7 @@ int AICamera_getExposureAuto() {
 }
 
 void AICamera_setExposureAuto(bool enable) {
+  xlog("enable:%d", enable);
   ioctl_set_value(V4L2_CID_EXPOSURE_AUTO, enable ? 1 : 0);
 }
 
@@ -154,6 +166,7 @@ int AICamera_getFocusAbsolute() {
 }
 
 void AICamera_setFocusAbsolute(int value) {
+  xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_FOCUS_ABSOLUTE, value);
 }
 
@@ -162,72 +175,93 @@ int AICamera_getFocusAuto() {
 }
 
 void AICamera_setFocusAuto(bool enable) {
+  xlog("enable:%d", enable);
   ioctl_set_value(V4L2_CID_FOCUS_AUTO, enable ? 1 : 0);
 }
 
-// Callback to handle incoming buffer data
-GstPadProbeReturn cb_streaming_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
-  GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
-  if (buffer) {
+void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info) {
+  if (isSavePhoto) {
+
+    isSavePhoto = false;
     
-    if (isSave2Jpeg) {
-      isSave2Jpeg = false;
-      // Get the capabilities of the pad to understand the format
-      GstCaps *caps = gst_pad_get_current_caps(pad);
-      if (!caps) {
-        xlog("Failed to get caps");
-        gst_caps_unref(caps);
-        return GST_PAD_PROBE_PASS;
-      }
-      // Print the entire caps for debugging
-      // xlog("caps: %s", gst_caps_to_string(caps));
-
-      // Map the buffer to access its data
-      GstMapInfo map;
-      if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-        gst_caps_unref(caps);
-        xlog("Failed to map buffer");
-        return GST_PAD_PROBE_PASS;
-      }
-
-      // Get the structure of the first capability (format)
-      GstStructure *str = gst_caps_get_structure(caps, 0);
-      const gchar *format = gst_structure_get_string(str, "format");
-      // xlog("format:%s", format);
-
-      // Only proceed if the format is NV12
-      if (format && g_strcmp0(format, "NV12") == 0) {
-        int width = 0, height = 0;
-        if (!gst_structure_get_int(str, "width", &width) ||
-            !gst_structure_get_int(str, "height", &height)) {
-          xlog("Failed to get video dimensions");
-        }
-        // xlog("Video dimensions: %dx%d", width, height);
-
-        // Create a cv::Mat to store the frame in NV12 format
-        cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
-        // Create a cv::Mat to store the frame in BGR format
-        cv::Mat bgr_frame(height, width, CV_8UC3);
-        // Convert NV12 to BGR using OpenCV
-        cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
-
-        // Save the frame to a picture
-        counterImg++;
-        std::ostringstream oss;
-        oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".jpg";
-        // oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".png";
-        std::string filename = oss.str();
-        if (cv::imwrite(filename, bgr_frame)) {
-          xlog("Saved frame to %s", filename.c_str());
-        } else {
-          xlog("Failed to save frame");
-        }
-      }
-      // Cleanup
-      gst_buffer_unmap(buffer, &map);
-      gst_caps_unref(caps);
+    GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
+    if (buffer == nullptr) {
+      xlog("Failed to get buffer");
+      return;
     }
+
+    // Get the capabilities of the pad to understand the format
+    GstCaps *caps = gst_pad_get_current_caps(pad);
+    if (!caps) {
+      xlog("Failed to get caps");
+      gst_caps_unref(caps);
+      return;
+    }
+    // Print the entire caps for debugging
+    // xlog("caps: %s", gst_caps_to_string(caps));
+
+    // Map the buffer to access its data
+    GstMapInfo map;
+    if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+      xlog("Failed to map buffer");
+      gst_caps_unref(caps);
+      return;
+    }
+
+    // Get the structure of the first capability (format)
+    GstStructure *str = gst_caps_get_structure(caps, 0);
+    const gchar *format = gst_structure_get_string(str, "format");
+    // xlog("format:%s", format);
+
+    // Only proceed if the format is NV12
+    if (format && g_strcmp0(format, "NV12") == 0) {
+      int width = 0, height = 0;
+      if (!gst_structure_get_int(str, "width", &width) ||
+          !gst_structure_get_int(str, "height", &height)) {
+        xlog("Failed to get video dimensions");
+      }
+      // xlog("Video dimensions: %dx%d", width, height);
+
+      // Create a cv::Mat to store the frame in NV12 format
+      cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
+      // Create a cv::Mat to store the frame in BGR format
+      cv::Mat bgr_frame(height, width, CV_8UC3);
+      // Convert NV12 to BGR using OpenCV
+      cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
+
+      // Save the frame to a picture
+      counterImg++;
+      std::ostringstream oss;
+      std::string filename = "";
+
+      if (fileName_savedImage == "") {
+        if (savedPhotoFormat == spf_BMP) {
+          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".bmp";
+        } else if (savedPhotoFormat == spf_JPEG) {
+          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".jpg";
+        } else {
+          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".png";
+        }
+        filename = oss.str();
+      } else {
+        filename = fileName_savedImage;
+      }
+
+      if (cv::imwrite(filename, bgr_frame)) {
+        xlog("Saved frame to %s", filename.c_str());
+      } else {
+        xlog("Failed to save frame");
+      }
+    }
+    // Cleanup
+    gst_buffer_unmap(buffer, &map);
+    gst_caps_unref(caps);
   }
+}
+
+// Callback to handle incoming buffer data
+GstPadProbeReturn AICAMERA_streamingDataCallback(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+  AICAMERA_saveImage(pad, info);
   return GST_PAD_PROBE_OK;
 }
 
@@ -299,7 +333,7 @@ void ThreadAICameraStreaming(int param) {
   // Attach pad probe to capture frames
   GstPad *pad = gst_element_get_static_pad(encoder, "sink");
   if (pad) {
-    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)cb_streaming_data, nullptr, nullptr);
+    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)AICAMERA_streamingDataCallback, nullptr, nullptr);
     gst_object_unref(pad);
   }
 
@@ -328,6 +362,7 @@ void ThreadAICameraStreaming(int param) {
 }
 
 void AICamera_startStreaming() {
+  xlog("");
   if (is_aicamera_streaming) {
     xlog("thread already running");
     return;
@@ -338,7 +373,8 @@ void AICamera_startStreaming() {
 }
 
 void AICamera_stopStreaming() {
-    if (gst_loop) {
+  xlog("");
+  if (gst_loop) {
     g_main_loop_quit(gst_loop);
     g_main_loop_unref(gst_loop);
     gst_loop = nullptr;

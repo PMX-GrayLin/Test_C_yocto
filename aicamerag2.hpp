@@ -2,6 +2,15 @@
 
 #include "global.hpp"
 
+extern bool isSavePhoto;
+extern std::string fileName_savedImage;
+
+typedef enum {
+    spf_BMP,
+    spf_JPEG,
+    spf_PNG,
+} SavedPhotoFormat;
+
 extern std::string AICamrea_getVideoDevice();
 
 // IOCTLS
@@ -29,7 +38,7 @@ extern int AICamera_getFocusAuto();
 extern void AICamera_setFocusAuto(bool enable);  
 
 // Streaming
-GstPadProbeReturn cb_streaming_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
+GstPadProbeReturn AICAMERA_streamingDataCallback(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
 void ThreadAICameraStreaming(int param);
 extern void AICamera_startStreaming();
 extern void AICamera_stopStreaming();
