@@ -82,7 +82,7 @@ public:
         } else if (payload == "wbts2700") {
             AICamera_setWhiteBalanceTemperature(2700);
         } else if (payload == "wbts6500") {
-            AICamera_setWhiteBalanceAutomatic(6500);
+            AICamera_setWhiteBalanceTemperature(6500);
 
         } else if (payload == "gsttest") {
             std::thread t(gst_test, 0);
