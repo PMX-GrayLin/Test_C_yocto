@@ -16,6 +16,7 @@
 #include <thread>
 #include <chrono>
 #include <regex>
+#include <filesystem>
 
 // yocto test
 #include "json.h"
