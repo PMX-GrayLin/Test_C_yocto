@@ -2,9 +2,6 @@
 
 #include "global.hpp"
 
-extern bool isSavePhoto;
-extern std::string fileName_savedImage;
-
 typedef enum {
     spf_BMP,
     spf_JPEG,
@@ -37,8 +34,20 @@ extern void AICamera_setFocusAbsolute(int value);
 extern int AICamera_getFocusAuto();
 extern void AICamera_setFocusAuto(bool enable);  
 
+extern void AICamera_setImagePath(string imagePath);
+extern void AICamera_setCropImagePath(string imagePath);
+extern void AICamera_setInputImagePath(string imagePath);
+extern void AICamera_setCropROI(cv::Rect roi);
+extern bool AICamera_isCropImage();
+extern void AICamera_captureImage();
+extern void AICamera_enableCrop(bool enable);
+extern void AICamera_enablePadding(bool enable);
+
 // Streaming
 GstPadProbeReturn AICAMERA_streamingDataCallback(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
 void ThreadAICameraStreaming(int param);
 extern void AICamera_startStreaming();
 extern void AICamera_stopStreaming();
+
+// image processing
+extern void AICAMERA_load_crop_saveImage();

@@ -3,9 +3,14 @@
 std::thread t_aicamera_streaming;
 bool is_aicamera_streaming = false;
 
-bool isSavePhoto = false;
+bool isCapturePhoto = false;
+bool isCropPhoto = false;
+bool isPaddingPhoto = false;
 SavedPhotoFormat savedPhotoFormat = spf_PNG;
-std::string fileName_savedImage = "";
+std::string pathName_savedImage = "";
+std::string pathName_croppedImage = "";
+std::string pathName_inputImage = "";
+cv::Rect crop_roi(0, 0, 0, 0);
 
 static volatile int counterFrame = 0;
 static int counterImg = 0;
@@ -13,8 +18,10 @@ static int counterImg = 0;
 static GstElement *gst_pipeline = nullptr;
 static GMainLoop *gst_loop = nullptr;
 
+namespace fs = std::filesystem;
+
 std::string AICamrea_getVideoDevice() {
-  std::string result;
+  std::string videoPath;
   FILE* pipe = popen("v4l2-ctl --list-devices | grep mtk-v4l2-camera -A 3", "r");
   if (pipe) {
     std::string output;
@@ -27,10 +34,12 @@ std::string AICamrea_getVideoDevice() {
     std::regex device_regex("/dev/video\\d+");
     std::smatch match;
     if (std::regex_search(output, match, device_regex)) {
-      result = match[0];
+      videoPath = match[0];
     }
   }
-  return result;
+
+  xlog("videoPath:%s", videoPath.c_str());
+  return videoPath;
 }
 
 int ioctl_get_value(int control_ID) {
@@ -40,8 +49,8 @@ int ioctl_get_value(int control_ID) {
     return -1;
   }
 
-  struct v4l2_queryctrl queryctrl;
-  memset(&queryctrl, 0, sizeof(queryctrl));
+  struct v4l2_queryctrl queryctrl = {};
+  // memset(&queryctrl, 0, sizeof(queryctrl));
   queryctrl.id = control_ID;
   if (ioctl(fd, VIDIOC_QUERYCTRL, &queryctrl) == 0) {
     xlog("queryctrl.minimum:%d", queryctrl.minimum);
@@ -50,8 +59,8 @@ int ioctl_get_value(int control_ID) {
     xlog("ioctl fail, VIDIOC_QUERYCTRL... error:%s", strerror(errno));
   }
 
-  struct v4l2_control ctrl;
-  memset(&ctrl, 0, sizeof(ctrl));
+  struct v4l2_control ctrl = {};
+  // memset(&ctrl, 0, sizeof(ctrl));
   ctrl.id = control_ID;
   if (ioctl(fd, VIDIOC_G_CTRL, &ctrl) == 0) {
     xlog("ctrl.id:0x%x, ctrl.value:%d", ctrl.id, ctrl.value);
@@ -69,8 +78,8 @@ int ioctl_set_value(int control_ID, int value) {
     return -1;
   }
 
-  struct v4l2_control ctrl;
-  memset(&ctrl, 0, sizeof(ctrl));
+  struct v4l2_control ctrl = {};
+  // memset(&ctrl, 0, sizeof(ctrl));
   ctrl.id = control_ID;
   ctrl.value = value;
 
@@ -179,10 +188,196 @@ void AICamera_setFocusAuto(bool enable) {
   ioctl_set_value(V4L2_CID_FOCUS_AUTO, enable ? 1 : 0);
 }
 
-void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info) {
-  if (isSavePhoto) {
+void AICamera_setImagePath(string imagePath) {
+  pathName_savedImage = imagePath;
+  xlog("pathName_savedImage:%s", pathName_savedImage.c_str());
+}
 
-    isSavePhoto = false;
+void AICamera_setCropImagePath(string imagePath) {
+  pathName_croppedImage = imagePath;
+  xlog("pathName_croppedImage:%s", pathName_croppedImage.c_str());
+}
+
+void AICamera_setInputImagePath(string imagePath) {
+  pathName_inputImage = imagePath;
+  xlog("pathName_inputImage:%s", pathName_inputImage.c_str());
+}
+
+void AICamera_setCropROI(cv::Rect roi) {
+  crop_roi = roi;
+  xlog("ROI x:%d, y:%d, w:%d, h:%d", crop_roi.x, crop_roi.y, crop_roi.width, crop_roi.height);
+}
+
+bool AICamera_isCropImage() {
+  return (crop_roi != cv::Rect(0, 0, 0, 0));
+}
+
+void AICamera_captureImage() {
+  if (!is_aicamera_streaming) {
+    xlog("do nothing...camera is not streaming");
+    return;
+  }
+  xlog("");
+  isCapturePhoto = true;
+}
+
+void AICamera_enableCrop(bool enable) {
+  isCropPhoto = enable;
+  xlog("isCropPhoto:%d", isCropPhoto);
+}
+
+void AICamera_enablePadding(bool enable) {
+  isPaddingPhoto = enable;
+  xlog("isPaddingPhoto:%d", isPaddingPhoto);
+}
+
+void AICAMERA_load_crop_saveImage() {
+  // not use thread here
+  // std::thread([]() {
+    try {
+      xlog("---- AICAMERA_load_crop_saveImage start ----");
+
+      // Load the image
+      cv::Mat image = cv::imread(pathName_inputImage);
+      if (image.empty()) {
+        xlog("Failed to load image from %s", pathName_inputImage.c_str());
+        return;
+      }
+
+      // Ensure the ROI is within the bounds of the image
+      crop_roi &= cv::Rect(0, 0, image.cols, image.rows);
+
+      // Crop the image
+      cv::Mat croppedImage = image(crop_roi);
+
+      // Save the cropped image
+      if (cv::imwrite(pathName_savedImage, croppedImage)) {
+        xlog("Cropped image saved to %s", pathName_savedImage.c_str());
+      } else {
+        xlog("Failed to save cropped image to %s", pathName_savedImage.c_str());
+      }
+    } catch (const std::exception &e) {
+      xlog("Exception during image save: %s", e.what());
+    }
+    xlog("---- AICAMERA_load_crop_saveImage stop ----");
+  // }).detach();  // Detach to run in the background
+}
+
+void AICAMERA_threadSaveImage(const std::string path, const cv::Mat &frameBuffer) {
+  std::thread([path, frameBuffer]() {
+    try {
+      xlog("---- AICAMERA_threadSaveImage start ----");
+      // Extract directory from the full path
+      std::string directory = fs::path(path).parent_path().string();
+      if (!fs::exists(directory)) {
+        xlog("Directory does not exist, creating: %s", directory.c_str());
+        fs::create_directories(directory);
+      }
+
+      // Check if frameBuffer is valid
+      if (frameBuffer.empty()) {
+        xlog("Frame buffer is empty. Cannot save image to %s", path.c_str());
+        return;
+      }
+
+      // save the image
+      if (cv::imwrite(path, frameBuffer)) {
+        xlog("Saved frame to %s", path.c_str());
+      } else {
+        xlog("Failed to save frame to %s", path.c_str());
+      }
+
+    } catch (const std::exception &e) {
+      xlog("Exception during image save: %s", e.what());
+    }
+
+    xlog("---- AICAMERA_threadSaveImage stop ----");
+  }).detach();  // Detach to run in the background
+}
+
+void AICAMERA_threadSaveCropImage(const std::string path, const cv::Mat &frameBuffer, cv::Rect roi) {
+  std::thread([path, frameBuffer, roi]() {
+    try {
+      xlog("---- AICAMERA_threadSaveCropImage start ----");
+      bool isCrop = true;
+      bool isPadding = true;
+
+      // Extract directory from the full path
+      std::string directory = fs::path(path).parent_path().string();
+      if (!fs::exists(directory)) {
+        xlog("Directory does not exist, creating: %s", directory.c_str());
+        fs::create_directories(directory);
+      }
+
+      // Check if frameBuffer is valid
+      if (frameBuffer.empty()) {
+        xlog("Frame buffer is empty. Cannot save image to %s", path.c_str());
+        return;
+      }
+
+      // Validate ROI dimensions
+      if (roi.x < 0 || roi.y < 0 || roi.width == 0 || roi.height == 0 ||
+          roi.x + roi.width > frameBuffer.cols ||
+          roi.y + roi.height > frameBuffer.rows) {
+        xlog("ROI not correct... not crop");
+        isCrop = false;
+      }
+
+      if (isCrop) {
+        // Crop the region of interest (ROI)
+        cv::Mat croppedImage = frameBuffer(roi);
+
+        // Create a black canvas of the target size
+        int squqareSize = (croppedImage.cols > croppedImage.rows) ? croppedImage.cols : croppedImage.rows;
+        cv::Size paddingSize(squqareSize, squqareSize);
+        cv::Mat paddedImage = cv::Mat::zeros(paddingSize, croppedImage.type());
+
+        // Calculate offsets to center the cropped image
+        int offsetX = (paddedImage.cols - croppedImage.cols) / 2;
+        int offsetY = (paddedImage.rows - croppedImage.rows) / 2;
+        // Check if offsets are valid
+        if (offsetX < 0 || offsetY < 0) {
+          xlog("Error: Cropped image is larger than the padding canvas!");
+          return;
+        }
+
+        // Define the ROI on the black canvas where the cropped image will be placed
+        cv::Rect roi_padding(offsetX, offsetY, croppedImage.cols, croppedImage.rows);
+
+        // Copy the cropped image onto the black canvas
+        croppedImage.copyTo(paddedImage(roi_padding));
+
+        // Attempt to save the image
+        if (cv::imwrite(path, paddedImage)) {
+          xlog("Saved crop frame to %s", path.c_str());
+        } else {
+          xlog("Failed crop to save frame to %s", path.c_str());
+        }
+
+        cv::Rect reset_roi(0, 0, 0, 0);
+        AICamera_setCropROI(reset_roi);
+
+      } else {
+        // save the image
+        if (cv::imwrite(path, frameBuffer)) {
+          xlog("Saved crop frame to %s", path.c_str());
+        } else {
+          xlog("Failed crop to save frame to %s", path.c_str());
+        }
+      }
+
+    } catch (const std::exception &e) {
+      xlog("Exception during image save: %s", e.what());
+    }
+
+    xlog("---- AICAMERA_threadSaveCropImage stop ----");
+  }).detach();  // Detach to run in the background
+}
+
+void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info) {
+  if (isCapturePhoto) {
+
+    isCapturePhoto = false;
     
     GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buffer == nullptr) {
@@ -234,7 +429,7 @@ void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info) {
       std::ostringstream oss;
       std::string filename = "";
 
-      if (fileName_savedImage == "") {
+      if (pathName_savedImage == "") {
         if (savedPhotoFormat == spf_BMP) {
           oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".bmp";
         } else if (savedPhotoFormat == spf_JPEG) {
@@ -244,15 +439,13 @@ void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info) {
         }
         filename = oss.str();
       } else {
-        filename = fileName_savedImage;
+        filename = pathName_savedImage;
       }
 
-      if (cv::imwrite(filename, bgr_frame)) {
-        xlog("Saved frame to %s", filename.c_str());
-      } else {
-        xlog("Failed to save frame");
-      }
+      AICAMERA_threadSaveImage(filename, bgr_frame);
+      AICAMERA_threadSaveCropImage(pathName_croppedImage, bgr_frame, crop_roi);
     }
+
     // Cleanup
     gst_buffer_unmap(buffer, &map);
     gst_caps_unref(caps);
@@ -266,7 +459,7 @@ GstPadProbeReturn AICAMERA_streamingDataCallback(GstPad *pad, GstPadProbeInfo *i
 }
 
 void ThreadAICameraStreaming(int param) {
-  xlog("start >>>>, param:%d", param);
+  xlog("++++ start ++++");
   counterFrame = 0;
   counterImg = 0;
 
@@ -289,7 +482,6 @@ void ThreadAICameraStreaming(int param) {
   }
 
   // Set properties for the elements
-  xlog("AICamrea_getVideoDevice:%s", AICamrea_getVideoDevice().c_str());
   g_object_set(G_OBJECT(source), "device", AICamrea_getVideoDevice().c_str(), nullptr);
 
   // Create a GstStructure for extra-controls
@@ -358,7 +550,8 @@ void ThreadAICameraStreaming(int param) {
   // Clean up
   gst_object_unref(gst_pipeline);
   is_aicamera_streaming = false;
-  xlog("stop >>>>, Pipeline stopped and resources cleaned up.");
+  xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
+
 }
 
 void AICamera_startStreaming() {
