@@ -171,6 +171,7 @@ void AICamera_setExposureAuto(bool enable) {
 }
 
 int AICamera_getExposureTimeAbsolute() {
+  xlog("");
   return ioctl_get_value(V4L2_CID_EXPOSURE_ABSOLUTE);
 }
 
