@@ -63,6 +63,16 @@ public:
         } else if (payload == "eas1") {
             AICamera_setExposureAuto(1);
 
+        } else if (payload == "geta") {
+            AICamera_getExposureTimeAbsolute();
+        } else if (payload == "seta1") {
+            AICamera_setExposureTimeAbsolute(0.01);
+        } else if (payload == "seta2") {
+            AICamera_setExposureTimeAbsolute(3.3);
+        } else if (payload == "seta3") {
+            AICamera_setExposureTimeAbsolute(10);
+
+
         } else if (payload == "fag") {
             AICamera_getFocusAuto();
         } else if (payload == "fas0") {

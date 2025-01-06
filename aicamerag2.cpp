@@ -170,6 +170,17 @@ void AICamera_setExposureAuto(bool enable) {
   ioctl_set_value(V4L2_CID_EXPOSURE_AUTO, enable ? 1 : 0);
 }
 
+int AICamera_getExposureTimeAbsolute() {
+  return ioctl_get_value(V4L2_CID_EXPOSURE_ABSOLUTE);
+}
+
+void AICamera_setExposureTimeAbsolute(double sec) {
+  xlog("sec:%f", sec);
+  int value = (int)(sec * 10000000.0);
+  xlog("value:%d", value);
+  ioctl_set_value(V4L2_CID_EXPOSURE_ABSOLUTE, value);
+}
+
 int AICamera_getFocusAbsolute() {
   return ioctl_get_value(V4L2_CID_FOCUS_ABSOLUTE);
 }
@@ -300,7 +311,7 @@ void AICAMERA_threadSaveCropImage(const std::string path, const cv::Mat &frameBu
     try {
       xlog("---- AICAMERA_threadSaveCropImage start ----");
       bool isCrop = true;
-      bool isPadding = true;
+      // bool isPadding = true;
 
       // Extract directory from the full path
       std::string directory = fs::path(path).parent_path().string();
@@ -458,7 +469,7 @@ GstPadProbeReturn AICAMERA_streamingDataCallback(GstPad *pad, GstPadProbeInfo *i
   return GST_PAD_PROBE_OK;
 }
 
-void ThreadAICameraStreaming(int param) {
+void ThreadAICameraStreaming() {
   xlog("++++ start ++++");
   counterFrame = 0;
   counterImg = 0;
@@ -504,11 +515,12 @@ void ThreadAICameraStreaming(int param) {
   g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
 
   // Define the capabilities for the capsfilter
-  // 2048 * 1536
+  // AD : 2048 * 1536
+  // elic : 1920 * 1080
   GstCaps *caps = gst_caps_new_simple(
       "video/x-raw",
-      "width", G_TYPE_INT, 2048,
-      "height", G_TYPE_INT, 1536,
+      "width", G_TYPE_INT, 1920,
+      "height", G_TYPE_INT, 1080,
       "framerate", GST_TYPE_FRACTION, 30, 1,  // Add frame rate as 30/1
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
@@ -561,7 +573,7 @@ void AICamera_startStreaming() {
     return;
   }
   is_aicamera_streaming = true;
-  t_aicamera_streaming = std::thread(ThreadAICameraStreaming, 0);
+  t_aicamera_streaming = std::thread(ThreadAICameraStreaming);
   t_aicamera_streaming.detach();
 }
 
