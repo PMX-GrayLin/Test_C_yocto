@@ -63,15 +63,18 @@ public:
         } else if (payload == "eas1") {
             AICamera_setExposureAuto(1);
 
-        } else if (payload == "geta") {
+        } else if (payload == "etag") {
             AICamera_getExposureTimeAbsolute();
-        } else if (payload == "seta1") {
+        } else if (payload == "etas1") {
             AICamera_setExposureTimeAbsolute(0.01);
-        } else if (payload == "seta2") {
+        } else if (payload == "etas2") {
             AICamera_setExposureTimeAbsolute(3.3);
-        } else if (payload == "seta3") {
+        } else if (payload == "etas3") {
             AICamera_setExposureTimeAbsolute(10);
-
+        } else if (payload == "etas4") {
+            AICamera_setExposureTimeAbsolute(1.5);
+        } else if (payload == "etas5") {
+            AICamera_setExposureTimeAbsolute(6);
 
         } else if (payload == "fag") {
             AICamera_getFocusAuto();
