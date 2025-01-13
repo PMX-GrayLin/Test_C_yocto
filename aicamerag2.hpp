@@ -62,6 +62,8 @@ extern int AICamera_getExposure();
 extern void AICamera_setExposure(int value);
 extern int AICamera_getWhiteBalanceTemperature();
 extern void AICamera_setWhiteBalanceTemperature(int value);
+extern int AICamera_getSharpness();
+extern void AICamera_setSharpness(int value);
 extern int AICamera_getExposureAuto();
 extern void AICamera_setExposureAuto(bool enable);
 extern int AICamera_getExposureTimeAbsolute();

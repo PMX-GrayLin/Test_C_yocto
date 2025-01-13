@@ -161,6 +161,15 @@ void AICamera_setWhiteBalanceTemperature(int value) {
   ioctl_set_value(V4L2_CID_WHITE_BALANCE_TEMPERATURE, value);
 }
 
+int AICamera_getSharpness() {
+  return ioctl_get_value(V4L2_CID_SHARPNESS);
+}
+
+void AICamera_setSharpness(int value) {
+  xlog("value:%d", value);
+  ioctl_set_value(V4L2_CID_SHARPNESS, value);
+}
+
 int AICamera_getExposureAuto() {
   return ioctl_get_value(V4L2_CID_EXPOSURE_AUTO);
 }
