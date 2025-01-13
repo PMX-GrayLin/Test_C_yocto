@@ -14,88 +14,117 @@ public:
         
         if (payload == "bg") {
             AICamera_getBrightness();
-        } else if (payload == "bs0") {
+        } else if (payload == "bn1") {
             AICamera_setBrightness(0);
-        } else if (payload == "bs100") {
+        } else if (payload == "bn2") {
+            AICamera_setBrightness(25);
+        } else if (payload == "bn3") {
+            AICamera_setBrightness(50);
+        } else if (payload == "bn4") {
+            AICamera_setBrightness(75);
+        } else if (payload == "bn5") {
             AICamera_setBrightness(100);
 
         } else if (payload == "cg") {
             AICamera_getContrast();
-        } else if (payload == "cs0") {
+        } else if (payload == "ct1") {
             AICamera_setContrast(0);
-        } else if (payload == "cs10") {
+        } else if (payload == "ct2") {
+            AICamera_setContrast(2);
+        } else if (payload == "ct3") {
+            AICamera_setContrast(4);
+        } else if (payload == "ct4") {
+            AICamera_setContrast(6);
+        } else if (payload == "ct5") {
+            AICamera_setContrast(8);
+        } else if (payload == "ct6") {
             AICamera_setContrast(10);
 
         } else if (payload == "sg") {
             AICamera_getSaturation();
-        } else if (payload == "ss0") {
+        } else if (payload == "sr1") {
             AICamera_setSaturation(0);
-        } else if (payload == "ss10") {
+        } else if (payload == "sr2") {
+            AICamera_setSaturation(2);
+        } else if (payload == "sr3") {
+            AICamera_setSaturation(4);
+        } else if (payload == "sr4") {
+            AICamera_setSaturation(6);
+        } else if (payload == "sr5") {
+            AICamera_setSaturation(8);
+        } else if (payload == "sr6") {
             AICamera_setSaturation(10);
 
         } else if (payload == "hg") {
             AICamera_getHue();
-        } else if (payload == "hs0") {
+        } else if (payload == "hu1") {
             AICamera_setHue(0);
-        } else if (payload == "hs100") {
+        } else if (payload == "hu2") {
+            AICamera_setHue(25);
+        } else if (payload == "hu3") {
+            AICamera_setHue(50);
+        } else if (payload == "hu4") {
+            AICamera_setHue(75);
+        } else if (payload == "hu5") {
             AICamera_setHue(100);
 
         } else if (payload == "wbag") {
             AICamera_getWhiteBalanceAutomatic();
-        } else if (payload == "wbas0") {
+        } else if (payload == "wba0") {
             AICamera_setWhiteBalanceAutomatic(0);
-        } else if (payload == "wbas1") {
+        } else if (payload == "wba1") {
             AICamera_setWhiteBalanceAutomatic(1);
 
         } else if (payload == "eg") {
             AICamera_getExposure();
-        } else if (payload == "es0") {
+        } else if (payload == "ep0") {
             AICamera_setExposure(0);
-        } else if (payload == "es-40") {
+        } else if (payload == "ep-40") {
             AICamera_setExposure(-40);
-        } else if (payload == "es40") {
+        } else if (payload == "ep40") {
             AICamera_setExposure(40);
 
         } else if (payload == "eag") {
             AICamera_getExposureAuto();
-        } else if (payload == "eas0") {
+        } else if (payload == "epa0") {
             AICamera_setExposureAuto(0);
-        } else if (payload == "eas1") {
+        } else if (payload == "epa1") {
             AICamera_setExposureAuto(1);
 
         } else if (payload == "etag") {
             AICamera_getExposureTimeAbsolute();
-        } else if (payload == "etas1") {
+        } else if (payload == "ept1") {
             AICamera_setExposureTimeAbsolute(0.01);
-        } else if (payload == "etas2") {
+        } else if (payload == "ept2") {
             AICamera_setExposureTimeAbsolute(3.3);
-        } else if (payload == "etas3") {
+        } else if (payload == "ept3") {
+            AICamera_setExposureTimeAbsolute(6.6);
+        } else if (payload == "ept4") {
             AICamera_setExposureTimeAbsolute(10);
-        } else if (payload == "etas4") {
-            AICamera_setExposureTimeAbsolute(1.5);
-        } else if (payload == "etas5") {
-            AICamera_setExposureTimeAbsolute(6);
-
-        } else if (payload == "fag") {
-            AICamera_getFocusAuto();
-        } else if (payload == "fas0") {
-            AICamera_setFocusAuto(0);
-        } else if (payload == "fas1") {
-            AICamera_setFocusAuto(1);
-
-        } else if (payload == "fabsg") {
-            AICamera_getFocusAbsolute();
-        } else if (payload == "fabss0") {
-            AICamera_setFocusAbsolute(0);
-        } else if (payload == "fabss255") {
-            AICamera_setFocusAbsolute(255);
 
         } else if (payload == "wbtg") {
             AICamera_getWhiteBalanceTemperature();
-        } else if (payload == "wbts2700") {
+        } else if (payload == "wbt1") {
             AICamera_setWhiteBalanceTemperature(2700);
-        } else if (payload == "wbts6500") {
+        } else if (payload == "wbt2") {
+            AICamera_setWhiteBalanceTemperature(4600);
+        } else if (payload == "wbt3") {
             AICamera_setWhiteBalanceTemperature(6500);
+
+        // } else if (payload == "fag") {
+        //     AICamera_getFocusAuto();
+        // } else if (payload == "fas0") {
+        //     AICamera_setFocusAuto(0);
+        // } else if (payload == "fas1") {
+        //     AICamera_setFocusAuto(1);
+
+        // } else if (payload == "fabsg") {
+        //     AICamera_getFocusAbsolute();
+        // } else if (payload == "fabss0") {
+        //     AICamera_setFocusAbsolute(0);
+        // } else if (payload == "fabss255") {
+        //     AICamera_setFocusAbsolute(255);
+
 
         } else if (payload == "gsttest") {
             std::thread t(gst_test, 0);
