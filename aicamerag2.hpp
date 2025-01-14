@@ -74,9 +74,9 @@ extern int AICamera_getFocusAuto();
 extern void AICamera_setFocusAuto(bool enable);  
 // IOCTLS ===========
 
-extern void AICamera_setImagePath(string imagePath);
-extern void AICamera_setCropImagePath(string imagePath);
-extern void AICamera_setInputImagePath(string imagePath);
+extern void AICamera_setImagePath(const string& imagePath);
+extern void AICamera_setCropImagePath(const string& imagePath);
+extern void AICamera_setInputImagePath(const string& imagePath);
 extern void AICamera_setCropROI(cv::Rect roi);
 extern bool AICamera_isCropImage();
 extern void AICamera_captureImage();

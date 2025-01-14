@@ -209,17 +209,17 @@ void AICamera_setFocusAuto(bool enable) {
   ioctl_set_value(V4L2_CID_FOCUS_AUTO, enable ? 1 : 0);
 }
 
-void AICamera_setImagePath(string imagePath) {
+void AICamera_setImagePath(const string& imagePath) {
   pathName_savedImage = imagePath;
   xlog("pathName_savedImage:%s", pathName_savedImage.c_str());
 }
 
-void AICamera_setCropImagePath(string imagePath) {
+void AICamera_setCropImagePath(const string& imagePath) {
   pathName_croppedImage = imagePath;
   xlog("pathName_croppedImage:%s", pathName_croppedImage.c_str());
 }
 
-void AICamera_setInputImagePath(string imagePath) {
+void AICamera_setInputImagePath(const string& imagePath) {
   pathName_inputImage = imagePath;
   xlog("pathName_inputImage:%s", pathName_inputImage.c_str());
 }
