@@ -143,6 +143,24 @@ void AICamera_setWhiteBalanceAutomatic(bool enable) {
   ioctl_set_value(V4L2_CID_AUTO_WHITE_BALANCE, enable ? 1 : 0);
 }
 
+int AICamera_getSharpness() {
+  return ioctl_get_value(V4L2_CID_SHARPNESS);
+}
+
+void AICamera_setSharpness(int value) {
+  xlog("value:%d", value);
+  ioctl_set_value(V4L2_CID_SHARPNESS, value);
+}
+
+int AICamera_getISO() {
+  return ioctl_get_value(V4L2_CID_SHARPNESS);
+}
+
+void AICamera_setISO(int value) {
+  xlog("value:%d", value);
+  ioctl_set_value(V4L2_CID_ISO_SENSITIVITY, value);
+}
+
 int AICamera_getExposure() {
   return ioctl_get_value(V4L2_CID_EXPOSURE);
 }
@@ -161,22 +179,13 @@ void AICamera_setWhiteBalanceTemperature(int value) {
   ioctl_set_value(V4L2_CID_WHITE_BALANCE_TEMPERATURE, value);
 }
 
-int AICamera_getSharpness() {
-  return ioctl_get_value(V4L2_CID_SHARPNESS);
-}
-
-void AICamera_setSharpness(int value) {
-  xlog("value:%d", value);
-  ioctl_set_value(V4L2_CID_SHARPNESS, value);
-}
-
 int AICamera_getExposureAuto() {
   return ioctl_get_value(V4L2_CID_EXPOSURE_AUTO);
 }
 
 void AICamera_setExposureAuto(bool enable) {
   xlog("enable:%d", enable);
-  ioctl_set_value(V4L2_CID_EXPOSURE_AUTO, enable ? 1 : 0);
+  ioctl_set_value(V4L2_CID_EXPOSURE_AUTO, enable ? 0 : 1);
 }
 
 int AICamera_getExposureTimeAbsolute() {
@@ -185,7 +194,10 @@ int AICamera_getExposureTimeAbsolute() {
 }
 
 void AICamera_setExposureTimeAbsolute(double sec) {
-  xlog("sec:%f", sec);
+  // temp
+  sec *= 100.0;
+
+  xlog("tmp sec:%f", sec);
   int value = (int)(sec * 10000000.0);
   xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_EXPOSURE_ABSOLUTE, value);
@@ -529,8 +541,8 @@ void ThreadAICameraStreaming() {
   // elic : 1920 * 1080
   GstCaps *caps = gst_caps_new_simple(
       "video/x-raw",
-      "width", G_TYPE_INT, 1920,
-      "height", G_TYPE_INT, 1080,
+      "width", G_TYPE_INT, 2048,
+      "height", G_TYPE_INT, 1536,
       "framerate", GST_TYPE_FRACTION, 30, 1,  // Add frame rate as 30/1
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);

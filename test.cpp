@@ -99,6 +99,19 @@ public:
         } else if (payload == "sp6") {
           AICamera_setSharpness(10);
 
+        } else if (payload == "isog") {
+          AICamera_getISO();
+        } else if (payload == "iso1") {
+          AICamera_setISO(100);
+        } else if (payload == "iso2") {
+          AICamera_setISO(200);
+        } else if (payload == "iso3") {
+          AICamera_setISO(400);
+        } else if (payload == "iso4") {
+          AICamera_setISO(1600);
+        } else if (payload == "iso5") {
+          AICamera_setISO(6400);
+
         } else if (payload == "eg") {
           AICamera_getExposure();
         } else if (payload == "ep0") {
