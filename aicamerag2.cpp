@@ -153,12 +153,12 @@ void AICamera_setSharpness(int value) {
 }
 
 int AICamera_getISO() {
-  return ioctl_get_value(V4L2_CID_SHARPNESS);
+  return ioctl_get_value(0x009819a9);
 }
 
 void AICamera_setISO(int value) {
   xlog("value:%d", value);
-  ioctl_set_value(V4L2_CID_ISO_SENSITIVITY, value);
+  ioctl_set_value(0x009819a9, value);
 }
 
 int AICamera_getExposure() {
