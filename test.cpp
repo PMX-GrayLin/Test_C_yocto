@@ -158,7 +158,8 @@ public:
           t.detach();
         
         } else if (payload == "ttt") {
-
+          OTI322 oti322;
+          oti322.readTemperature();
 
         }        
     }

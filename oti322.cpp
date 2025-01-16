@@ -41,6 +41,7 @@ bool OTI322::readTemperature(float &ambientTemp, float &objectTemp) {
     // Convert raw data to temperature (Assumption: Scale factor = 0.01)
     ambientTemp = ambient_raw * 0.01;
     objectTemp = object_raw * 0.01;
+    xlog("ambientTemp:%d, objectTemp:%d", ambientTemp, objectTemp);
 
     return true;
 }
