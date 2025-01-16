@@ -159,7 +159,9 @@ public:
         
         } else if (payload == "ttt") {
           OTI322 oti322;
-          oti322.readTemperature();
+          float ambientTemp = 0.0;
+          float objectTemp = 0.0;
+          oti322.readTemperature(float &ambientTemp, float &objectTemp);
 
         }        
     }
