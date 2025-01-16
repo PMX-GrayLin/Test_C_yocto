@@ -161,7 +161,7 @@ public:
           OTI322 oti322;
           float ambientTemp = 0.0;
           float objectTemp = 0.0;
-          oti322.readTemperature(float &ambientTemp, float &objectTemp);
+          oti322.readTemperature(&ambientTemp, &objectTemp);
 
         }        
     }
