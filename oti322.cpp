@@ -35,12 +35,20 @@ bool OTI322::readTemperature(float &ambientTemp, float &objectTemp) {
     }
 
     // Convert received data to temperature values
-    int ambient_raw = (buffer[2] << 16) | (buffer[1] << 8) | buffer[0];
-    int object_raw = (buffer[5] << 16) | (buffer[4] << 8) | buffer[3];
+    int ambient_raw = (buffer[0]) | (buffer[1] << 8) | (buffer[2] << 16);
+    int object_raw  = (buffer[3]) | (buffer[4] << 8) | (buffer[5] << 16);
 
-    // Convert raw data to temperature (Assumption: Scale factor = 0.01)
-    ambientTemp = ambient_raw * 0.01;
-    objectTemp = object_raw * 0.01;
+    // Check if Byte_3 (ambient) or Byte_6 (object) is >= 0x80
+    if (buffer[2] >= 0x80) {
+        ambient_raw -= 16777216;  // Convert from 24-bit signed
+    }
+    if (buffer[5] >= 0x80) {
+        object_raw -= 16777216;  // Convert from 24-bit signed
+    }
+
+    // Convert raw data to temperature (Scale factor = 200)
+    ambientTemp = ambient_raw / 200.0;
+    objectTemp = object_raw / 200.0;
     xlog("ambientTemp:%f, objectTemp:%f", ambientTemp, objectTemp);
 
     return true;
