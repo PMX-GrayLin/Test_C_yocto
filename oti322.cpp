@@ -4,7 +4,7 @@ OTI322::OTI322() {
     file = open(OTI322_I2C_BUS, O_RDWR);
     if (file < 0) {
         std::cerr << "Error: Unable to open I2C bus " << OTI322_I2C_BUS << std::endl;
-    } else if (ioctl(file, OTI322_I2C_BUS, OTI322_I2C_ADDR) < 0) {
+    } else if (ioctl(file, I2C_SLAVE, OTI322_I2C_ADDR) < 0) {
         std::cerr << "Error: Failed to set I2C address 0x" 
                   << std::hex << OTI322_I2C_ADDR << std::endl;
         close(file);
