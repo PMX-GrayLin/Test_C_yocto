@@ -3,6 +3,7 @@
 #include "test_gst.hpp"
 #include "test_ocv.hpp"
 #include "aicamerag2.hpp"
+#include "oti322.hpp"
 
 class MQTTClient : public mosqpp::mosquittopp {
 public:
@@ -139,20 +140,6 @@ public:
         } else if (payload == "ept4") {
           AICamera_setExposureTimeAbsolute(10);
 
-          // } else if (payload == "fag") {
-          //     AICamera_getFocusAuto();
-          // } else if (payload == "fas0") {
-          //     AICamera_setFocusAuto(0);
-          // } else if (payload == "fas1") {
-          //     AICamera_setFocusAuto(1);
-
-          // } else if (payload == "fabsg") {
-          //     AICamera_getFocusAbsolute();
-          // } else if (payload == "fabss0") {
-          //     AICamera_setFocusAbsolute(0);
-          // } else if (payload == "fabss255") {
-          //     AICamera_setFocusAbsolute(255);
-
         } else if (payload == "gsttest") {
           std::thread t(gst_test, 0);
           t.detach();
@@ -169,7 +156,11 @@ public:
         } else if (payload == "ocv") {
           std::thread t(ocv_test, 0);
           t.detach();
-        }
+        
+        } else if (payload == "ttt") {
+
+
+        }        
     }
 };
 

@@ -541,8 +541,8 @@ void ThreadAICameraStreaming() {
   // elic : 1920 * 1080
   GstCaps *caps = gst_caps_new_simple(
       "video/x-raw",
-      "width", G_TYPE_INT, 2048,
-      "height", G_TYPE_INT, 1536,
+      "width", G_TYPE_INT, 1920,
+      "height", G_TYPE_INT, 1080,
       "framerate", GST_TYPE_FRACTION, 30, 1,  // Add frame rate as 30/1
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
