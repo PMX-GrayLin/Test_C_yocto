@@ -6,7 +6,7 @@
 #include "oti322.hpp"
 #include "httplib.h"
 
-MQTTClient gClient;
+// MQTTClient gClient;
 class MQTTClient : public mosqpp::mosquittopp {
 public:
     MQTTClient(const char* id) : mosqpp::mosquittopp(id) {}
