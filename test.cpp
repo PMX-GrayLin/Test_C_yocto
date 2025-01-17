@@ -4,6 +4,7 @@
 #include "test_ocv.hpp"
 #include "aicamerag2.hpp"
 #include "oti322.hpp"
+#include "httplib.h"
 
 class MQTTClient : public mosqpp::mosquittopp {
 public:
