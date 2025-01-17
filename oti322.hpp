@@ -8,13 +8,18 @@
 #define OTI322_I2C_ADDR 0x10
 
 class OTI322 {
-public:
-    OTI322();
-    ~OTI322();
+ public:
+  OTI322();
+  ~OTI322();
 
-    bool readTemperature(float &ambientTemp, float &objectTemp);
+  bool readTemperature(float &ambientTemp, float &objectTemp);
+  void startReading();  // Start the periodic reading thread
+  void stopReading();   // Stop the thread
 
-private:
-    int file;
+ private:
+  int file;
+  std::thread readThread;
+  std::atomic<bool> stopThread;
 
+  void readTemperatureLoop();  // Thread function
 };

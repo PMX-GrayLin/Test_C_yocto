@@ -148,9 +148,11 @@ public:
         } else if (payload == "gstx") {
           AICamera_stopStreaming();
 
-        } else if (payload == "ts") {
-          startTimer(60000);
-        } else if (payload == "tx") {
+        } else if (payload == "tms") {
+          xlog("timer start...");
+          startTimer(1000);
+        } else if (payload == "tmx") {
+          xlog("timer stop...");
           stopTimer();
 
         } else if (payload == "ocv") {
@@ -161,7 +163,8 @@ public:
           OTI322 oti322;
           float ambientTemp = 0.0;
           float objectTemp = 0.0;
-          oti322.readTemperature(ambientTemp, objectTemp);
+          // oti322.readTemperature(ambientTemp, objectTemp);
+          oti322.startReading();
 
         }        
     }

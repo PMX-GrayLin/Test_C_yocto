@@ -18,8 +18,10 @@ void startTimer(int ms) {
       xlog("timer start >>>>");
       while (isTimerRunning) {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-        counterTimer++;
-        isSave2Jpeg = true;
+        // counterTimer++;
+        // isSave2Jpeg = true;
+
+        
       }
       xlog("timer stop >>>>");
     }).detach();  // Detach to run in the background
