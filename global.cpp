@@ -1,5 +1,7 @@
 #include "global.hpp"
 
+#include "oti322.hpp"
+
 // test vars
 int testCounter = 0;
 
@@ -21,7 +23,10 @@ void startTimer(int ms) {
         // counterTimer++;
         // isSave2Jpeg = true;
 
-        
+        OTI322 oti322;
+        float ambientTemp = 0.0;
+        float objectTemp = 0.0;
+        oti322.readTemperature(ambientTemp, objectTemp);
       }
       xlog("timer stop >>>>");
     }).detach();  // Detach to run in the background

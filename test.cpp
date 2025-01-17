@@ -165,12 +165,6 @@ public:
           float objectTemp = 0.0;
           oti322.readTemperature(ambientTemp, objectTemp);
 
-        } else if (payload == "t2") {
-          OTI322 oti322;
-          float ambientTemp = 0.0;
-          float objectTemp = 0.0;
-          // oti322.readTemperature(ambientTemp, objectTemp);
-          oti322.startReading();
 
         }        
     }
