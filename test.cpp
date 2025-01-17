@@ -6,6 +6,7 @@
 #include "oti322.hpp"
 #include "httplib.h"
 
+MQTTClient gClient;
 class MQTTClient : public mosqpp::mosquittopp {
 public:
     MQTTClient(const char* id) : mosqpp::mosquittopp(id) {}
@@ -166,7 +167,7 @@ public:
           float objectTemp = 0.0;
           oti322.readTemperature(ambientTemp, objectTemp);
 
-          client.publishMessage("PX/VBS/Cmd", "Hello, MQTT!");
+          gClient.publishMessage("PX/VBS/Cmd", "Hello, MQTT!");
         }        
     }
 };
@@ -211,6 +212,8 @@ int main(int argc, char* argv[]) {
 
   mosqpp::lib_init();
   MQTTClient client("my_client");
+  gClient = client;
+
   client.connect("localhost", 1883);
 //   client.subscribe(nullptr, "my_topic");
   client.subscribe(nullptr, "PX/VBS/Cmd");
