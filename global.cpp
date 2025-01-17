@@ -18,14 +18,16 @@ void startTimer(int ms) {
 
     std::thread([ms]() {
       xlog("timer start >>>>");
+
+      OTI322 oti322;
+      float ambientTemp = 0.0;
+      float objectTemp = 0.0;
+
       while (isTimerRunning) {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
         // counterTimer++;
         // isSave2Jpeg = true;
 
-        OTI322 oti322;
-        float ambientTemp = 0.0;
-        float objectTemp = 0.0;
         oti322.readTemperature(ambientTemp, objectTemp);
       }
       xlog("timer stop >>>>");
