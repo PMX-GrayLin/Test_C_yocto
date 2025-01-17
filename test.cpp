@@ -196,6 +196,8 @@ int main(int argc, char* argv[]) {
 //   }
 
   OTI322 oti322;
+  oti322.startReading();
+
   httplib::Server svr;
 
   // REST API: Get Temperature
