@@ -19,7 +19,7 @@ class OTI322 {
  private:
   int file;
   std::thread readThread;
-  std::atomic<bool> stopThread;
+  bool isStopThread;
 
   void readTemperatureLoop();  // Thread function
 };

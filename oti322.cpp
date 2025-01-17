@@ -55,7 +55,7 @@ bool OTI322::readTemperature(float &ambientTemp, float &objectTemp) {
 
 // Thread function to read temperature every 1 second
 void OTI322::readTemperatureLoop() {
-    while (!stopThread) {
+    while (!isStopThread) {
         float ambientTemp, objectTemp;
         if (readTemperature(ambientTemp, objectTemp)) {
             // Successfully read temperature, printed inside readTemperature()
@@ -66,13 +66,13 @@ void OTI322::readTemperatureLoop() {
 
 // Start the temperature reading thread
 void OTI322::startReading() {
-    stopThread = false;
+    isStopThread = false;
     readThread = std::thread(&OTI322::readTemperatureLoop, this);
 }
 
 // Stop the reading thread safely
 void OTI322::stopReading() {
-    stopThread = true;
+    isStopThread = true;
     if (readThread.joinable()) {
         readThread.join();
     }
