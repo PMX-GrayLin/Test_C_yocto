@@ -77,3 +77,11 @@ void OTI322::stopReading() {
         readThread.join();
     }
 }
+
+float OTI322::getLastAmbientTemp() {
+    return lastAmbientTemp;
+}
+
+float OTI322::getLastObjectTemp() {
+    return lastObjectTemp;
+}

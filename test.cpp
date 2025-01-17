@@ -195,6 +195,22 @@ int main(int argc, char* argv[]) {
 //     xlog("getVideoDevice:%s", AICamrea_getVideoDevice().c_str());
 //   }
 
+  OTI322 oti322;
+  httplib::Server svr;
+
+  // REST API: Get Temperature
+  svr.Get("/temperature", [&](const httplib::Request& req, httplib::Response& res) {
+    float ambientTemp = sensor.getLastAmbientTemp();
+    float objectTemp = sensor.getLastObjectTemp();
+
+    std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
+                           ", \"object\": " + std::to_string(objectTemp) + " }";
+    res.set_content(response, "application/json");
+  });
+
+  // std::cout << "Server running at http://localhost:8080" << std::endl;
+  svr.listen("0.0.0.0", 8080);
+
   mosqpp::lib_init();
   MQTTClient client("my_client");
   client.connect("localhost", 1883);

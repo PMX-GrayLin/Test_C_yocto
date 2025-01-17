@@ -13,6 +13,9 @@ class OTI322 {
   ~OTI322();
 
   bool readTemperature(float &ambientTemp, float &objectTemp);
+  float getLastAmbientTemp();
+  float getLastObjectTemp();
+
   void startReading();  // Start the periodic reading thread
   void stopReading();   // Stop the thread
 
@@ -20,6 +23,7 @@ class OTI322 {
   int file;
   std::thread readThread;
   bool isStopThread;
-
+  float lastAmbientTemp;
+  float lastObjectTemp;
   void readTemperatureLoop();  // Thread function
 };
