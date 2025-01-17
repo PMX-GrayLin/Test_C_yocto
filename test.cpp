@@ -200,8 +200,8 @@ int main(int argc, char* argv[]) {
 
   // REST API: Get Temperature
   svr.Get("/temperature", [&](const httplib::Request& req, httplib::Response& res) {
-    float ambientTemp = sensor.getLastAmbientTemp();
-    float objectTemp = sensor.getLastObjectTemp();
+    float ambientTemp = oti322.getLastAmbientTemp();
+    float objectTemp = oti322.getLastObjectTemp();
 
     std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
                            ", \"object\": " + std::to_string(objectTemp) + " }";
