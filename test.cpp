@@ -167,7 +167,7 @@ public:
           float objectTemp = 0.0;
           oti322.readTemperature(ambientTemp, objectTemp);
 
-          gClient.publishMessage("PX/VBS/Cmd", "Hello, MQTT!");
+          publishMessage("PX/VBS/Cmd", "Hello, MQTT!");
         }        
     }
 };
@@ -212,7 +212,7 @@ int main(int argc, char* argv[]) {
 
   mosqpp::lib_init();
   MQTTClient client("my_client");
-  gClient = client;
+  // gClient = client;
 
   client.connect("localhost", 1883);
 //   client.subscribe(nullptr, "my_topic");
