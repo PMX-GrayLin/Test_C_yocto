@@ -197,7 +197,7 @@ int main(int argc, char* argv[]) {
 //     xlog("getVideoDevice:%s", AICamrea_getVideoDevice().c_str());
 //   }
 
-  // OTI322 oti322;
+  OTI322 oti322;
   // oti322.startReading();
 
   // REST API: Get Temperature
