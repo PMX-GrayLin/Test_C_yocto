@@ -203,8 +203,11 @@ int main(int argc, char* argv[]) {
   // REST API: Get Temperature
   httplib::Server svr;
   svr.Get("/temperature", [&](const httplib::Request& req, httplib::Response& res) {
-    float ambientTemp = oti322.getLastAmbientTemp();
-    float objectTemp = oti322.getLastObjectTemp();
+    // float ambientTemp = oti322.getLastAmbientTemp();
+    // float objectTemp = oti322.getLastObjectTemp();
+    float ambientTemp = 0.0;
+    float objectTemp = 0.0;
+    oti322.readTemperature(ambientTemp, objectTemp);
     std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
                            ", \"object\": " + std::to_string(objectTemp) + " }";
     res.set_content(response, "application/json");
