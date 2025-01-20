@@ -167,7 +167,7 @@ public:
           float objectTemp = 0.0;
           oti322.readTemperature(ambientTemp, objectTemp);
 
-          string s = "{ temperature : " + std::to_string(objectTemp) + " }";
+          string s = "{ \"temperature\" : " + std::to_string(objectTemp) + " }";
           publish(nullptr, "PX/VBS/Cmd", s.length(), s.c_str() , 1, false);
         }        
     }
