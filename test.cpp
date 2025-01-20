@@ -167,7 +167,8 @@ public:
           float objectTemp = 0.0;
           oti322.readTemperature(ambientTemp, objectTemp);
 
-          publish(nullptr, "PX/VBS/Cmd", strlen("Hello, MQTT!"), "Hello, MQTT!", 1, false);
+          string s = "{ temperature : " + objectTemp + " }";
+          publish(nullptr, "PX/VBS/Cmd", s.length(), s.c_str() , 1, false);
         }        
     }
 };
