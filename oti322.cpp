@@ -9,24 +9,12 @@ OTI322::OTI322() {
         close(file);
         file = -1;
     }
-
-    setI2CBusSpeed(file, 100000);
 }
 
 OTI322::~OTI322() {
     if (file >= 0) {
         close(file);
     }
-}
-
-int OTI322::setI2CBusSpeed(int file, unsigned int speed) {
-  // Use an ioctl command to set the speed
-  if (ioctl(file, I2C_SPEED, speed) < 0) {
-    std::cerr << "Failed to set I2C speed: " << strerror(errno) << std::endl;
-    return -1;
-  }
-  std::cout << "I2C speed set to " << speed << " Hz" << std::endl;
-  return 0;
 }
 
 bool OTI322::readTemperature(float &ambientTemp, float &objectTemp) {

@@ -1,3 +1,5 @@
+// check I2C BUS Speed is 100 kHz
+
 #pragma once
 
 #include "global.hpp"
@@ -11,7 +13,6 @@ class OTI322 {
  public:
   OTI322();
   ~OTI322();
-  int setI2CBusSpeed(int file, unsigned int speed);
 
   bool readTemperature(float &ambientTemp, float &objectTemp);
   float getLastAmbientTemp();
