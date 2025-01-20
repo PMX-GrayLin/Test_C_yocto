@@ -200,23 +200,22 @@ int main(int argc, char* argv[]) {
   // OTI322 oti322;
   // oti322.startReading();
 
-  // httplib::Server svr;
-  // // REST API: Get Temperature
-  // svr.Get("/temperature", [&](const httplib::Request& req, httplib::Response& res) {
-  //   float ambientTemp = oti322.getLastAmbientTemp();
-  //   float objectTemp = oti322.getLastObjectTemp();
-  //   std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
-  //                          ", \"object\": " + std::to_string(objectTemp) + " }";
-  //   res.set_content(response, "application/json");
-  // });
-  // svr.listen("0.0.0.0", 8765);
+  // REST API: Get Temperature
+  httplib::Server svr;
+  svr.Get("/temperature", [&](const httplib::Request& req, httplib::Response& res) {
+    float ambientTemp = oti322.getLastAmbientTemp();
+    float objectTemp = oti322.getLastObjectTemp();
+    std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
+                           ", \"object\": " + std::to_string(objectTemp) + " }";
+    res.set_content(response, "application/json");
+  });
+  svr.listen("0.0.0.0", 8765);
 
+  // MQTT loop
   mosqpp::lib_init();
   MQTTClient client("my_client");
-  // gClient = client;
 
   client.connect("localhost", 1883);
-//   client.subscribe(nullptr, "my_topic");
   client.subscribe(nullptr, "PX/VBS/Cmd");
 
   while (true) {
