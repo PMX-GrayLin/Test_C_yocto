@@ -197,34 +197,39 @@ int main(int argc, char* argv[]) {
 //     xlog("getVideoDevice:%s", AICamrea_getVideoDevice().c_str());
 //   }
 
-  OTI322 oti322;
-  // oti322.startReading();
+  bool isUseMQTT = false;
+  if (!isUseMQTT) {
 
-  // REST API: Get Temperature
-  httplib::Server svr;
-  svr.Get("/temperature", [&](const httplib::Request& req, httplib::Response& res) {
-    // float ambientTemp = oti322.getLastAmbientTemp();
-    // float objectTemp = oti322.getLastObjectTemp();
-    float ambientTemp = 0.0;
-    float objectTemp = 0.0;
-    oti322.readTemperature(ambientTemp, objectTemp);
-    std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
-                           ", \"object\": " + std::to_string(objectTemp) + " }";
-    res.set_content(response, "application/json");
-  });
-  svr.listen("0.0.0.0", 12345);
+    OTI322 oti322;
+    // oti322.startReading();
 
-  // MQTT loop
-  mosqpp::lib_init();
-  MQTTClient client("my_client");
+    // REST API: Get Temperature
+    httplib::Server svr;
+    svr.Get("/temperature", [&](const httplib::Request& req, httplib::Response& res) {
+      // float ambientTemp = oti322.getLastAmbientTemp();
+      // float objectTemp = oti322.getLastObjectTemp();
+      float ambientTemp = 0.0;
+      float objectTemp = 0.0;
+      oti322.readTemperature(ambientTemp, objectTemp);
+      std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
+                             ", \"object\": " + std::to_string(objectTemp) + " }";
+      res.set_content(response, "application/json");
+    });
+    svr.listen("0.0.0.0", 8765);
+  } else {
 
-  client.connect("localhost", 1883);
-  client.subscribe(nullptr, "PX/VBS/Cmd");
+    // MQTT loop
+    mosqpp::lib_init();
+    MQTTClient client("my_client");
 
-  while (true) {
-    client.loop();
+    client.connect("localhost", 1883);
+    client.subscribe(nullptr, "PX/VBS/Cmd");
+
+    while (true) {
+      client.loop();
+    }
+    mosqpp::lib_cleanup();
   }
-  mosqpp::lib_cleanup();
 
   return 0;
 }
