@@ -212,7 +212,7 @@ int main(int argc, char* argv[]) {
                            ", \"object\": " + std::to_string(objectTemp) + " }";
     res.set_content(response, "application/json");
   });
-  svr.listen("0.0.0.0", 8765);
+  svr.listen("0.0.0.0", 12345);
 
   // MQTT loop
   mosqpp::lib_init();
