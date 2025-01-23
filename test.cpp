@@ -199,7 +199,8 @@ int main(int argc, char* argv[]) {
 
   bool isUseMQTT = false;
   if (!isUseMQTT) {
-
+    xlog("USE RESTful...");
+    
     OTI322 oti322;
     // oti322.startReading();
 
@@ -216,7 +217,12 @@ int main(int argc, char* argv[]) {
       res.set_content(response, "application/json");
     });
     svr.listen("0.0.0.0", 8765);
+
+    // test from command line
+    // curl http://localhost:8765/temperature
+
   } else {
+    xlog("USE MQTT...");
 
     // MQTT loop
     mosqpp::lib_init();
