@@ -194,9 +194,6 @@ int AICamera_getExposureTimeAbsolute() {
 }
 
 void AICamera_setExposureTimeAbsolute(double sec) {
-  // temp
-  sec *= 100.0;
-
   xlog("tmp sec:%f", sec);
   int value = (int)(sec * 10000000.0);
   xlog("value:%d", value);
@@ -277,18 +274,61 @@ void AICAMERA_load_crop_saveImage() {
         return;
       }
 
-      // Ensure the ROI is within the bounds of the image
-      crop_roi &= cv::Rect(0, 0, image.cols, image.rows);
+      if (isCropPhoto) {
+        // Crop the region of interest (ROI)
+        cv::Mat croppedImage = image(crop_roi);
 
-      // Crop the image
-      cv::Mat croppedImage = image(crop_roi);
+        // Create a black canvas of the target size
+        int squqareSize = (croppedImage.cols > croppedImage.rows) ? croppedImage.cols : croppedImage.rows;
+        cv::Size paddingSize(squqareSize, squqareSize);
+        cv::Mat paddedImage = cv::Mat::zeros(paddingSize, croppedImage.type());
+
+        // Calculate offsets to center the cropped image
+        int offsetX = (paddedImage.cols - croppedImage.cols) / 2;
+        int offsetY = (paddedImage.rows - croppedImage.rows) / 2;
+        // Check if offsets are valid
+        if (offsetX < 0 || offsetY < 0) {
+          xlog("Error: Cropped image is larger than the padding canvas!");
+          return;
+        }
+
+        // Define the ROI on the black canvas where the cropped image will be placed
+        cv::Rect roi_padding(offsetX, offsetY, croppedImage.cols, croppedImage.rows);
+
+        // Copy the cropped image onto the black canvas
+        croppedImage.copyTo(paddedImage(roi_padding));
+
+        // Attempt to save the image
+        if (cv::imwrite(pathName_savedImage, paddedImage)) {
+          xlog("Saved crop frame to %s", pathName_savedImage.c_str());
+        } else {
+          xlog("Failed crop to save frame to %s", pathName_savedImage.c_str());
+        }
+
+        cv::Rect reset_roi(0, 0, 0, 0);
+        AICamera_setCropROI(reset_roi);
+
+      } else {
+        // save the image
+        if (cv::imwrite(pathName_savedImage, image)) {
+          xlog("Saved crop frame to %s", pathName_savedImage.c_str());
+        } else {
+          xlog("Failed crop to save frame to %s", pathName_savedImage.c_str());
+        }
+      }
+
+      // // Ensure the ROI is within the bounds of the image
+      // crop_roi &= cv::Rect(0, 0, image.cols, image.rows);
+
+      // // Crop the image
+      // cv::Mat croppedImage = image(crop_roi);
 
       // Save the cropped image
-      if (cv::imwrite(pathName_savedImage, croppedImage)) {
-        xlog("Cropped image saved to %s", pathName_savedImage.c_str());
-      } else {
-        xlog("Failed to save cropped image to %s", pathName_savedImage.c_str());
-      }
+    //   if (cv::imwrite(pathName_savedImage, croppedImage)) {
+    //     xlog("Cropped image saved to %s", pathName_savedImage.c_str());
+    //   } else {
+    //     xlog("Failed to save cropped image to %s", pathName_savedImage.c_str());
+    //   }
     } catch (const std::exception &e) {
       xlog("Exception during image save: %s", e.what());
     }
@@ -541,8 +581,8 @@ void ThreadAICameraStreaming() {
   // elic : 1920 * 1080
   GstCaps *caps = gst_caps_new_simple(
       "video/x-raw",
-      "width", G_TYPE_INT, 1920,
-      "height", G_TYPE_INT, 1080,
+      "width", G_TYPE_INT, 2048,
+      "height", G_TYPE_INT, 1536,
       "framerate", GST_TYPE_FRACTION, 30, 1,  // Add frame rate as 30/1
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
