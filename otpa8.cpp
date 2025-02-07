@@ -12,6 +12,7 @@ OTPA8::OTPA8() {
 }
 
 OTPA8::~OTPA8() {
+  xlog("");
   if (file >= 0) {
     close(file);
   }

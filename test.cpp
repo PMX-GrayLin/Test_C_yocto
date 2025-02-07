@@ -4,6 +4,7 @@
 #include "test_ocv.hpp"
 #include "aicamerag2.hpp"
 #include "oti322.hpp"
+#include "otpa8.hpp"
 #include "httplib.h"
 
 // MQTTClient gClient;
@@ -207,8 +208,8 @@ int main(int argc, char* argv[]) {
     // REST API: Get Temperature
     httplib::Server svr;
     svr.Get("/temperature", [&](const httplib::Request& req, httplib::Response& res) {
-      // float ambientTemp = oti322.getLastAmbientTemp();
-      // float objectTemp = oti322.getLastObjectTemp();
+
+      xlog("query oti322...");
       float ambientTemp = 0.0;
       float objectTemp = 0.0;
       oti322.readTemperature(ambientTemp, objectTemp);
@@ -217,8 +218,11 @@ int main(int argc, char* argv[]) {
       res.set_content(response, "application/json");
     });
     svr.Get("/temperatures", [&](const httplib::Request& req, httplib::Response& res) {
-      xlog("temperatures ...");
       
+      xlog("query otpa8...");
+      OTPA8 otpa8;
+
+
     });
 
     svr.listen("0.0.0.0", 8765);
