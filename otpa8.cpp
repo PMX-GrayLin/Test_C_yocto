@@ -35,6 +35,9 @@ bool OTPA8::readTemperature(float& ambientTemp, float& objectTemp) {
     return false;
   }
 
+  // check
+  printBuffer(buffer, 141);
+
   // Parse ambient temperature (bytes 10-13)
   uint8_t ambHigh = buffer[9];  // Byte 10: AMB_H
   uint8_t ambLow = buffer[10];  // Byte 11: AMB_L

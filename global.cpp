@@ -41,3 +41,11 @@ void startTimer(int ms) {
 void stopTimer() {
     isTimerRunning = false;
 }
+
+void printBuffer(const uint8_t* buffer, size_t len) {
+  printf("len:%d: ", len);
+  for (size_t i = 0; i < len; i++) {
+    printf("0x%02X ", buffer[i]);
+  }
+  printf("\n\r");
+}

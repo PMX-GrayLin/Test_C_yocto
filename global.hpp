@@ -46,3 +46,6 @@ extern int testCounter;
 extern void startTimer(int ms);
 extern void stopTimer();
 
+extern void printBuffer(const uint8_t* buffer, size_t len);
+
+
