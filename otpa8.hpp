@@ -20,4 +20,4 @@ class OTPA8 {
  private:
   int file;
 
-}
+};
