@@ -28,6 +28,16 @@ bool OTPA8::readTemperature(float& ambientTemp, float& objectTemp) {
     return false;
   }
 
+  // Optional: Add a small delay to allow the sensor to prepare data
+  usleep(100000); // 100ms delay
+
+  // Step 2: Switch to read mode (send 0xD1)
+  uint8_t readCommand = 0xD1;
+  if (write(file, &readCommand, 1) != 1) {
+    std::cerr << "Failed to switch to read mode" << std::endl;
+    return false;
+  }
+
   // Read 141 bytes of response from sensor
   uint8_t buffer[141] = {0};
   if (read(file, buffer, sizeof(buffer)) != sizeof(buffer)) {
