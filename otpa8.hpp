@@ -17,5 +17,7 @@ class OTPA8 {
   OTPA8();
   ~OTPA8();
 
+ private:
+  int file;
 
 }
