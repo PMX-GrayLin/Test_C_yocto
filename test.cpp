@@ -223,7 +223,7 @@ int main(int argc, char* argv[]) {
       float ambientTemp = 0.0;
       float objectTemp = 0.0;
       OTPA8 otpa8;
-      opta8.readTemperature(ambientTemp, objectTemp);
+      otpa8.readTemperature(ambientTemp, objectTemp);
 
     });
 
