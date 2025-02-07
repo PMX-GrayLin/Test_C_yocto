@@ -216,6 +216,11 @@ int main(int argc, char* argv[]) {
                              ", \"object\": " + std::to_string(objectTemp) + " }";
       res.set_content(response, "application/json");
     });
+    svr.Get("/temperatures", [&](const httplib::Request& req, httplib::Response& res) {
+      xlog("temperatures ...");
+      
+    });
+
     svr.listen("0.0.0.0", 8765);
 
     // test from command line
