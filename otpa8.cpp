@@ -17,3 +17,42 @@ OTPA8::~OTPA8() {
     close(file);
   }
 }
+
+bool OTPA8::readTemperature(float& ambientTemp, float& objectTemp) {
+  // Readout command for OTPA-8 (3 bytes: ADR, CMD, NUL)
+  uint8_t command[3] = {0xD0, 0x4E, 0x00};
+
+  // Send the readout command
+  if (write(file, command, sizeof(command)) != sizeof(command)) {
+    xlog("Failed to send readout command");
+    return false;
+  }
+
+  // Read 141 bytes of response from sensor
+  uint8_t buffer[141] = {0};
+  if (read(file, buffer, sizeof(buffer)) != sizeof(buffer)) {
+    xlog("Failed to read temperature data");
+    return false;
+  }
+
+  // Parse ambient temperature (bytes 10-13)
+  uint8_t ambHigh = buffer[9];  // Byte 10: AMB_H
+  uint8_t ambLow = buffer[10];  // Byte 11: AMB_L
+  int16_t ambientRaw = (ambHigh << 8) | ambLow;
+  ambientTemp = (static_cast<float>(ambientRaw) - 27315) / 100.0f;
+
+  // Parse object temperature (bytes 14-141)
+  // For simplicity, we'll average all 64 object temperature readings
+  float objectSum = 0.0f;
+  for (int i = 0; i < 64; ++i) {
+    uint8_t objHigh = buffer[13 + 2 * i];  // High byte of pixel i
+    uint8_t objLow = buffer[14 + 2 * i];   // Low byte of pixel i
+    int16_t objectRaw = (objHigh << 8) | objLow;
+    objectSum += (static_cast<float>(objectRaw) - 27315) / 100.0f;
+  }
+  objectTemp = objectSum / 64.0f;  // Average temperature
+
+  // Log the results
+  xlog("ambientTemp: %f, objectTemp: %f", ambientTemp, objectTemp);
+  return true;
+}

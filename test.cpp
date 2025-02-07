@@ -220,8 +220,10 @@ int main(int argc, char* argv[]) {
     svr.Get("/temperatures", [&](const httplib::Request& req, httplib::Response& res) {
       
       xlog("query otpa8...");
+      float ambientTemp = 0.0;
+      float objectTemp = 0.0;
       OTPA8 otpa8;
-
+      opta8.readTemperature(ambientTemp, objectTemp);
 
     });
 
