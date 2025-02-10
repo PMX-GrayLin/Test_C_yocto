@@ -17,7 +17,7 @@ class OTPA8 {
   OTPA8();
   ~OTPA8();
 
-  bool readTemperature(float &ambientTemp, float &objectTemp);
+  bool readTemperature_avg(float &ambientTemp, float &objectTemp);
   bool readTemperature_max(float &ambientTemp, float &objectTemp);
 
  private:

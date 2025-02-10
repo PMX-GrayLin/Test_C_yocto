@@ -223,8 +223,11 @@ int main(int argc, char* argv[]) {
       float ambientTemp = 0.0;
       float objectTemp = 0.0;
       OTPA8 otpa8;
-      otpa8.readTemperature(ambientTemp, objectTemp);
+      // otpa8.readTemperature_avg(ambientTemp, objectTemp);
       otpa8.readTemperature_max(ambientTemp, objectTemp);
+      std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
+                             ", \"object\": " + std::to_string(objectTemp) + " }";
+      res.set_content(response, "application/json");
 
     });
 
