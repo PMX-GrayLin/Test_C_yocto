@@ -39,7 +39,7 @@ bool OTPA8::readTemperature(float& ambientTemp, float& objectTemp) {
 //     return false;
 //   }
 
-//   usleep(10000);
+  usleep(10000);
 
   // Read 141 bytes of response from sensor
   uint8_t buffer[141] = {0};
