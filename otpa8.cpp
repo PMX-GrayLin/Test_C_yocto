@@ -22,14 +22,19 @@ bool OTPA8::readTemperature(float& ambientTemp, float& objectTemp) {
   // Readout command for OTPA-8 (3 bytes: ADR, CMD, NUL)
 //   uint8_t command[3] = {0xD0, 0x4E, 0x00};
 //   uint8_t command[3] = {0x68, 0x4E, 0x00};
-  uint8_t command[2] = {0x4E, 0x00};
+//   uint8_t command[2] = {0x4E, 0x00};
+  uint8_t command = 0x4E;
 
   // check
   xlog("write...");
-  printBuffer(command, 2);
+//   printBuffer(command, 2);
 
   // Send the readout command
-  if (write(file, command, sizeof(command)) != sizeof(command)) {
+//   if (write(file, command, sizeof(command)) != sizeof(command)) {
+//     xlog("Failed to send readout command");
+//     return false;
+//   }
+  if (write(file, command, 1) != 1) {
     xlog("Failed to send readout command");
     return false;
   }
