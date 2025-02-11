@@ -113,7 +113,7 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
     }
   }
 
-  printArray_float(buffer, 64);
+  printArray_float(tempArray, 64);
   objectTemp = tempMax;
 
   // Log the results
