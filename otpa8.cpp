@@ -101,16 +101,20 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
 
   // Parse object temperature (bytes 14-141)
   // find Max
-  int16_t objectMax = 0;
+  float tempArray[64] = { 0.0 };
+  float tempMax = 0.0;
   for (int i = 0; i < 64; ++i) {
     uint8_t objHigh = buffer[13 + 2 * i];  // High byte of pixel i
     uint8_t objLow = buffer[14 + 2 * i];   // Low byte of pixel i
     int16_t objectRaw = (objHigh << 8) | objLow;
-    if (objectRaw > objectMax) {
-      objectMax = objectRaw;
+    tempArray[i] = (static_cast<float>(objectRaw) - 27315) / 100.0f;
+    if (tempArray[i] > tempMax) {
+      tempMax = tempArray[i];
     }
   }
-  objectTemp += (static_cast<float>(objectMax) - 27315) / 100.0f;
+
+  printArray_float(buffer, 64);
+  objectTemp = tempMax;
 
   // Log the results
   xlog("ambientTemp: %f, objectTemp: %f", ambientTemp, objectTemp);

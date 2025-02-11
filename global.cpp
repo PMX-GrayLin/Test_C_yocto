@@ -49,3 +49,11 @@ void printBuffer(const uint8_t* buffer, size_t len) {
   }
   printf("\n\r");
 }
+
+void printArray_float(const float* buffer, size_t len) {
+  printf("len:%d: ", len);
+  for (size_t i = 0; i < len; i++) {
+    printf("%.3f ", buffer[i]);
+  }
+  printf("\n\r");
+}

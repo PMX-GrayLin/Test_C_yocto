@@ -47,5 +47,5 @@ extern void startTimer(int ms);
 extern void stopTimer();
 
 extern void printBuffer(const uint8_t* buffer, size_t len);
-
+extern void printArray_float(const float* buffer, size_t len);
 
