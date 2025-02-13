@@ -57,3 +57,14 @@ void printArray_float(const float* buffer, size_t len) {
   }
   printf("\n\r");
 }
+
+void printArray_forUI(const float* buffer, size_t len) {
+  // printf("len:%d: ", len);
+  for (size_t i = 0; i < len; i++) {
+    printf("%.3f \t", buffer[i]);
+    if (len % 8 == 0) {
+      printf("\n");
+    }
+  }
+  printf("\n\r");
+}
