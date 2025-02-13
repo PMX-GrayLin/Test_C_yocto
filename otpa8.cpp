@@ -97,7 +97,7 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
   uint8_t ambHigh = buffer[9];  // Byte 10: AMB_H
   uint8_t ambLow = buffer[10];  // Byte 11: AMB_L
   uint16_t ambientRaw = (ambHigh << 8) | ambLow;
-  ambientTemp = (static_cast<float>(ambientRaw) - 27315) / 100.0f;
+  ambientTemp = (static_cast<float>(ambientRaw) - 27315.0f) / 100.0f;
 
   printf("\033[3J\033[H\033[2J");
   // Parse object temperature (bytes 14-141)
