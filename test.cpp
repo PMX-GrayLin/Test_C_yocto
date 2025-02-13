@@ -181,10 +181,16 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-  
   xlog("");
   for (int i = 0; i < argc; ++i) {
     xlog("argv[%d]:%s", i, argv[i]);
+
+    if (argv[1] == "tt") {
+      OTPA8 otpa8;
+      float ambientTemp = 0.0;
+      float objectTemp = 0.0;
+      otpa8.startReading();
+    }
   }
 
 //   if (argc < 2) {
