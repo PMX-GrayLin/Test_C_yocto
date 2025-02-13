@@ -245,7 +245,7 @@ int main(int argc, char* argv[]) {
     });
     svr.Get("/stopReading", [&](const httplib::Request& req, httplib::Response& res) {
       
-      xlog("startReading...");
+      xlog("stopReading...");
       otpa8.stopReading();
 
     });
