@@ -184,15 +184,6 @@ int main(int argc, char* argv[]) {
   xlog("");
   for (int i = 0; i < argc; ++i) {
     xlog("argv[%d]:%s", i, argv[i]);
-
-    if (strcmp( argv[1], "tt") == 0) {
-      OTPA8 otpa8;
-      float ambientTemp = 0.0;
-      float objectTemp = 0.0;
-      otpa8.startReading();
-    } else {
-      xlog("");
-    }
   }
 
 //   if (argc < 2) {
@@ -217,6 +208,8 @@ int main(int argc, char* argv[]) {
     xlog("USE RESTful...");
     
     OTI322 oti322;
+    OTPA8 otpa8;
+
     // oti322.startReading();
 
     // REST API: Get Temperature
@@ -236,11 +229,24 @@ int main(int argc, char* argv[]) {
       xlog("query otpa8...");
       float ambientTemp = 0.0;
       float objectTemp = 0.0;
-      OTPA8 otpa8;
       otpa8.readTemperature_max(ambientTemp, objectTemp);
       std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
                              ", \"object\": " + std::to_string(objectTemp) + " }";
       res.set_content(response, "application/json");
+
+    });
+    svr.Get("/startReading", [&](const httplib::Request& req, httplib::Response& res) {
+      
+      xlog("startReading...");
+      float ambientTemp = 0.0;
+      float objectTemp = 0.0;
+      otpa8.startReading();
+
+    });
+    svr.Get("/stopReading", [&](const httplib::Request& req, httplib::Response& res) {
+      
+      xlog("startReading...");
+      otpa8.stopReading();
 
     });
 
