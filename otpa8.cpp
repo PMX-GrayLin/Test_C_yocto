@@ -127,7 +127,7 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
   // printArray_forUI(tempArray, 64);
 
   // Log the results
-  xlog("ambientTemp: %f, objectTemp: %f", ambientTemp, objectTemp);
+  xlog("ambientTemp: %.2f, objectTemp: %.2f", ambientTemp, objectTemp);
   return true;
 }
 
