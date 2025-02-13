@@ -62,8 +62,8 @@ void printArray_forUI(const float* buffer, size_t len) {
   // printf("len:%d: ", len);
   for (size_t i = 0; i < len; i++) {
     printf("%.3f \t", buffer[i]);
-    if (i % 8 == 0) {
-      printf("\n");
+    if (i % 8 == 8) {
+      printf("\n\n");
     }
   }
   printf("\n\r");
