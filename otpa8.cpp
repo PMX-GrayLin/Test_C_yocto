@@ -128,7 +128,6 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
 
   // Log the results
   printf("ambientTemp: %.2f, objectTemp: %.2f\n", ambientTemp, objectTemp);
-
   // xlog("ambientTemp: %.2f, objectTemp: %.2f", ambientTemp, objectTemp);
   return true;
 }
