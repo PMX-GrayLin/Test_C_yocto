@@ -60,11 +60,12 @@ void printArray_float(const float* buffer, size_t len) {
 
 void printArray_forUI(const float* buffer, size_t len) {
   // printf("len:%d: ", len);
+  printf("\033[3J\033[H\033[2J");
   for (size_t i = 0; i < len; i++) {
     if (i % 8 == 0) {
       printf("\n\n");
     }
     printf("%.3f \t", buffer[i]);
   }
-  printf("\n\r");
+  printf("\n\n\r");
 }
