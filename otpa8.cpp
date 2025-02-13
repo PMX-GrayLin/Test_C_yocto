@@ -127,6 +127,7 @@ void OTPA8::startReading() {
   xlog("");
   isStopThread = false;
   readThread = std::thread(&OTPA8::readTemperatureLoop, this);
+  readThread.detach();
 }
 
 void OTPA8::stopReading() {
