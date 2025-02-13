@@ -113,13 +113,14 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
     if (i % 8 == 0) {
       printf("\n\n");
     }
-    printf("%.3f [%X%X,]\t", tempArray[i], objHigh, objLow);
+    printf("%.2f [%X%X]\t", tempArray[i], objHigh, objLow);
 
     if (tempArray[i] > tempMax) {
       tempMax = tempArray[i];
     }
   }
   objectTemp = tempMax;
+  printf("\n\n");
 
   // check
   // printArray_float(tempArray, 64);
