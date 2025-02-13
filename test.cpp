@@ -170,6 +170,12 @@ public:
 
           string s = "{ \"temperature\" : " + std::to_string(objectTemp) + " }";
           publish(nullptr, "PX/VBS/Cmd", s.length(), s.c_str() , 1, false);
+
+        } else if (payload == "t2") {
+          OTPA8 otpa8;
+          float ambientTemp = 0.0;
+          float objectTemp = 0.0;
+          otpa8.startReading();
         }        
     }
 };
@@ -223,7 +229,6 @@ int main(int argc, char* argv[]) {
       float ambientTemp = 0.0;
       float objectTemp = 0.0;
       OTPA8 otpa8;
-      // otpa8.readTemperature_avg(ambientTemp, objectTemp);
       otpa8.readTemperature_max(ambientTemp, objectTemp);
       std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
                              ", \"object\": " + std::to_string(objectTemp) + " }";

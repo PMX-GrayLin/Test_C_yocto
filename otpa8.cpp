@@ -122,3 +122,25 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
   xlog("ambientTemp: %f, objectTemp: %f", ambientTemp, objectTemp);
   return true;
 }
+
+void OTPA8::startReading() {
+    isStopThread = false;
+    readThread = std::thread(&OTPA8::readTemperatureLoop, this);
+}
+
+void OTPA8::stopReading() {
+    isStopThread = true;
+    if (readThread.joinable()) {
+        readThread.join();
+    }
+}
+
+void OTPA8::readTemperatureLoop() {
+  while (!isStopThread) {
+    float ambientTemp, objectTemp;
+    if (readTemperature_max(ambientTemp, objectTemp)) {
+      // Successfully read temperature, printed inside readTemperature()
+    }
+    usleep(1000000);  // Sleep for 1 second (1,000,000 microseconds)
+  }
+}
