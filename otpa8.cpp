@@ -173,7 +173,7 @@ float OTPA8::getMultipler(float readSensorTemp) {
   int index = 0;
 
   if (readSensorTemp < temperatureSensor[0]) {
-    index = 20;
+    index = 22;
   } else if (readSensorTemp > temperatureSensor[95]) {
     index = 82;
   } else {
