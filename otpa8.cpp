@@ -152,7 +152,7 @@ void OTPA8::stopReading() {
 float OTPA8::getMultipler(float readSensorTemp) {
   int index = 0;
   for (int i = 0; i < 96; i++) {
-    if (temperatureSensor[i] < x && x < temperatureSensor[i + 1]) {
+    if (temperatureSensor[i] < readSensorTemp && readSensorTemp < temperatureSensor[i + 1]) {
       index = i;
       break;
     }
