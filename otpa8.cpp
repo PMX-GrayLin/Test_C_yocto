@@ -152,7 +152,7 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
   // printArray_forUI(tempArray, 64);
 
   // Log the results
-  printf("ambientTemp: %.2f, objectTemp: %.2f, multipler:%.2f\n", ambientTemp, objectTemp, multipler);
+  printf("ambientTemp: %.2f, maxTemp: %.2f, multipler:%.2f, originTemp\n", ambientTemp, objectTemp, multipler, tempMax);
   // xlog("ambientTemp: %.2f, objectTemp: %.2f", ambientTemp, objectTemp);
   return true;
 }
