@@ -112,8 +112,6 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
     uint16_t objectRaw = (objHigh << 8) | objLow;
 
     tempArray[i] = (static_cast<float>(objectRaw) - 27315.0f) / 100.0f;
-    float multipler = getMultipler(tempArray[i]);
-    tempArray[i] *= multipler; 
 
     if (i % 8 == 0) {
       printf("\n\n");
@@ -124,7 +122,12 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
       tempMax = tempArray[i];
     }
   }
-  objectTemp = tempMax;
+
+  float multipler = getMultipler(tempMax);
+  objectTemp = tempMax * multipler;
+  
+  printf("\n\n");
+  printf(multipler:%.2f, multipler);
   printf("\n\n");
 
   // check
