@@ -125,9 +125,9 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
 
   float multipler = getMultipler(tempMax);
   objectTemp = tempMax * multipler;
-  
+
   printf("\n\n");
-  printf(multipler:%.2f, multipler);
+  printf("multipler:%.2f", multipler);
   printf("\n\n");
 
   // check
