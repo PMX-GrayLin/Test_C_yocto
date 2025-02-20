@@ -242,6 +242,7 @@ int main(int argc, char* argv[]) {
       xlog("req.path:%s", req.path);
       if (std::regex_match(req.path, match, regex) && match.size() > 1) {
         xlog("");
+        
       } else {
         res.status = 400;  // Bad Request
         res.set_content("{ \"error\": \"Invalid request\" }", "application/json");
