@@ -240,12 +240,10 @@ int main(int argc, char* argv[]) {
       std::regex regex(R"(/test/(.+))");
 
       xlog("req.path:%s", req.path.c_str());
-      xlog("req.matches.size:%d", req.matches.size());
-      xlog("req.matches[0]: %s", req.matches[0].c_str());
-      xlog("req.matches[1]: %s", req.matches[1].c_str());
+      xlog("req.matches.size:%ld", req.matches.size());
       
       if (std::regex_match(req.path, match, regex) && match.size() > 1) {
-        xlog("");
+        xlog("req.matches[1]:%s", req.matches[1].c_str());
 
       } else {
         res.status = 400;  // Bad Request
