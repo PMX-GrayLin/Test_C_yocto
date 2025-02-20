@@ -243,7 +243,8 @@ int main(int argc, char* argv[]) {
       xlog("req.matches.size:%ld", req.matches.size());
       
       if (std::regex_match(req.path, match, regex) && match.size() > 1) {
-        xlog("req.matches[1]:%s", req.matches[1].c_str());
+        xlog("req.matches[0]:%s", req.matches[0].str().c_str());
+        xlog("req.matches[1]:%s", req.matches[1].str().c_str());
 
       } else {
         res.status = 400;  // Bad Request
