@@ -235,8 +235,20 @@ int main(int argc, char* argv[]) {
       res.set_content(response, "application/json");
 
     });
+    svr.Get(R"(/temperature/(.+))", [&](const httplib::Request& req, httplib::Response& res) {
+      std::smatch match;
+      std::regex regex(R"(/temperature/(.+))");
+
+      xlog("req.path:%s", req.path);
+      if (std::regex_match(req.path, match, regex) && match.size() > 1) {
+        xlog("");
+      } else {
+        res.status = 400;  // Bad Request
+        res.set_content("{ \"error\": \"Invalid request\" }", "application/json");
+      }
+    });
     // svr.Post("/startReading", [&](const httplib::Request& req, httplib::Response& res) {
-      
+
     //   xlog("startReading...");
     //   float ambientTemp = 0.0;
     //   float objectTemp = 0.0;
@@ -249,7 +261,6 @@ int main(int argc, char* argv[]) {
     //   otpa8.stopReading();
 
     // });
-
     svr.listen("0.0.0.0", 8765);
 
     // test from command line
