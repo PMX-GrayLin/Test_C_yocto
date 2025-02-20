@@ -235,9 +235,9 @@ int main(int argc, char* argv[]) {
       res.set_content(response, "application/json");
 
     });
-    svr.Get(R"(/temperature/(.+))", [&](const httplib::Request& req, httplib::Response& res) {
+    svr.Get(R"(/test/(.+))", [&](const httplib::Request& req, httplib::Response& res) {
       std::smatch match;
-      std::regex regex(R"(/temperature/(.+))");
+      std::regex regex(R"(/test/(.+))");
 
       xlog("req.path:%s", req.path);
       if (std::regex_match(req.path, match, regex) && match.size() > 1) {
