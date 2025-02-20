@@ -214,16 +214,16 @@ int main(int argc, char* argv[]) {
 
     // REST API: Get Temperature
     httplib::Server svr;
-    svr.Get("/temperature", [&](const httplib::Request& req, httplib::Response& res) {
+    // svr.Get("/temperature", [&](const httplib::Request& req, httplib::Response& res) {
 
-      xlog("query oti322...");
-      float ambientTemp = 0.0;
-      float objectTemp = 0.0;
-      oti322.readTemperature(ambientTemp, objectTemp);
-      std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
-                             ", \"object\": " + std::to_string(objectTemp) + " }";
-      res.set_content(response, "application/json");
-    });
+    //   xlog("query oti322...");
+    //   float ambientTemp = 0.0;
+    //   float objectTemp = 0.0;
+    //   oti322.readTemperature(ambientTemp, objectTemp);
+    //   std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
+    //                          ", \"object\": " + std::to_string(objectTemp) + " }";
+    //   res.set_content(response, "application/json");
+    // });
     svr.Get("/temperatures", [&](const httplib::Request& req, httplib::Response& res) {
       
       xlog("query otpa8...");
@@ -235,20 +235,20 @@ int main(int argc, char* argv[]) {
       res.set_content(response, "application/json");
 
     });
-    svr.Get("/startReading", [&](const httplib::Request& req, httplib::Response& res) {
+    // svr.Post("/startReading", [&](const httplib::Request& req, httplib::Response& res) {
       
-      xlog("startReading...");
-      float ambientTemp = 0.0;
-      float objectTemp = 0.0;
-      otpa8.startReading();
+    //   xlog("startReading...");
+    //   float ambientTemp = 0.0;
+    //   float objectTemp = 0.0;
+    //   otpa8.startReading();
 
-    });
-    svr.Get("/stopReading", [&](const httplib::Request& req, httplib::Response& res) {
+    // });
+    // svr.Post("/stopReading", [&](const httplib::Request& req, httplib::Response& res) {
       
-      xlog("stopReading...");
-      otpa8.stopReading();
+    //   xlog("stopReading...");
+    //   otpa8.stopReading();
 
-    });
+    // });
 
     svr.listen("0.0.0.0", 8765);
 
