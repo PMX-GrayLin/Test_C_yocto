@@ -96,7 +96,7 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
     return false;
   }
 
-  usleep(10000);
+  // usleep(10000);
 
   // Read 141 bytes of response from sensor
   uint8_t buffer[141] = {0};
@@ -115,7 +115,7 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
   uint16_t ambientRaw = (ambHigh << 8) | ambLow;
   ambientTemp = (static_cast<float>(ambientRaw) - 27315.0f) / 100.0f;
 
-  printf("\033[3J\033[H\033[2J");
+  // printf("\033[3J\033[H\033[2J");
   // Parse object temperature (bytes 14-141)
   // find Max
   float tempArray[64] = { 0.0 };
@@ -129,10 +129,10 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
 
     tempArray[i] = (static_cast<float>(objectRaw) - 27315.0f) / 100.0f;
 
-    if (i % 8 == 0) {
-      printf("\n\n");
-    }
-    printf("%.2f [%02X%02X]\t", tempArray[i], objHigh, objLow);
+    // if (i % 8 == 0) {
+    //   printf("\n\n");
+    // }
+    // printf("%.2f [%02X%02X]\t", tempArray[i], objHigh, objLow);
 
     if (tempArray[i] > tempMax) {
       tempMax = tempArray[i];
@@ -142,8 +142,7 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
   float multipler = getMultipler(tempMax);
   objectTemp = tempMax * multipler;
 
-  printf("\n\n");
-
+  // printf("\n\n");
   // printf("multipler:%.2f", multipler);
   // printf("\n\n");
 
