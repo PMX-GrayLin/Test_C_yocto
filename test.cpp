@@ -239,6 +239,7 @@ int main(int argc, char* argv[]) {
       std::smatch match;
       std::regex regex(R"(/test/(.+))");
 
+      std::cout << "req.path: " << req.path << std::endl;
       xlog("req.path:%s", req.path.c_str());
       if (std::regex_match(req.path, match, regex) && match.size() > 1) {
         xlog("");
