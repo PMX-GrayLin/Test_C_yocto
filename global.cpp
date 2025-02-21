@@ -69,3 +69,13 @@ void printArray_forUI(const float* buffer, size_t len) {
   }
   printf("\n\n\r");
 }
+
+bool isSameString(char* s1, char* s2, bool isCaseSensitive) {
+  bool isSameString(char* s1, char* s2, bool isCaseSensitive) {
+    if (s1 == NULL || s2 == NULL) {
+      return false;  // Handle NULL pointers safely
+    }
+
+    return isCaseSensitive ? strcmp(s1, s2) == 0 : strcasecmp(s1, s2) == 0;
+  }
+}
