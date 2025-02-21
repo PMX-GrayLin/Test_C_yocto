@@ -43,7 +43,7 @@ void stopTimer() {
 }
 
 void printBuffer(const uint8_t* buffer, size_t len) {
-  printf("len:%d: ", len);
+  printf("len:%ld: ", len);
   for (size_t i = 0; i < len; i++) {
     printf("0x%02X ", buffer[i]);
   }
@@ -51,7 +51,7 @@ void printBuffer(const uint8_t* buffer, size_t len) {
 }
 
 void printArray_float(const float* buffer, size_t len) {
-  printf("len:%d: ", len);
+  printf("len:%ld: ", len);
   for (size_t i = 0; i < len; i++) {
     printf("%.3f ", buffer[i]);
   }
@@ -71,11 +71,9 @@ void printArray_forUI(const float* buffer, size_t len) {
 }
 
 bool isSameString(char* s1, char* s2, bool isCaseSensitive) {
-  bool isSameString(char* s1, char* s2, bool isCaseSensitive) {
-    if (s1 == NULL || s2 == NULL) {
-      return false;  // Handle NULL pointers safely
-    }
-
-    return isCaseSensitive ? strcmp(s1, s2) == 0 : strcasecmp(s1, s2) == 0;
+  if (s1 == NULL || s2 == NULL) {
+    return false;  // Handle NULL pointers safely
   }
+
+  return isCaseSensitive ? strcmp(s1, s2) == 0 : strcasecmp(s1, s2) == 0;
 }
