@@ -156,6 +156,66 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
   return true;
 }
 
+bool OTPA8::readTemperature_array(float& ambientTemp, float* objectTemp) {
+  // Readout command for OTPA-8 (3 bytes: ADR, CMD, NUL)
+  uint8_t command[2] = {0x4E, 0x00};            // OK
+
+  // Send the readout command
+  if (write(file, command, sizeof(command)) != sizeof(command)) {
+    xlog("Failed to send readout command");
+    return false;
+  }
+
+  // Read 141 bytes of response from sensor
+  uint8_t buffer[141] = {0};
+  if (read(file, buffer, sizeof(buffer)) != sizeof(buffer)) {
+    xlog("Failed to read temperature data");
+    return false;
+  }
+
+  // Parse ambient temperature (bytes 10-13)
+  uint8_t ambHigh = buffer[9];  // Byte 10: AMB_H
+  uint8_t ambLow = buffer[10];  // Byte 11: AMB_L
+  uint16_t ambientRaw = (ambHigh << 8) | ambLow;
+  ambientTemp = (static_cast<float>(ambientRaw) - 27315.0f) / 100.0f;
+
+  printf("\033[3J\033[H\033[2J");
+  
+  // Parse object temperature (bytes 14-141)
+  float tempArray[64] = { 0.0 };
+  float tempMax = 0.0;
+  float multipler = 1.0;
+
+  for (int i = 0; i < 64; ++i) {
+    uint8_t objHigh = buffer[13 + 2 * i];  // High byte of pixel i
+    uint8_t objLow = buffer[14 + 2 * i];   // Low byte of pixel i
+    uint16_t objectRaw = (objHigh << 8) | objLow;
+
+    tempArray[i] = (static_cast<float>(objectRaw) - 27315.0f) / 100.0f;
+
+    multipler = getMultipler(tempArray[i]);
+    objectTemp[i] = tempArray[i] * multipler
+    
+    if (i % 8 == 0) {
+      printf("\n\n");
+    }
+    printf("%.2f [%02X%02X]\t", objectTemp[i], objHigh, objLow);
+  }
+  
+  // printf("\n\n");
+  // printf("multipler:%.2f", multipler);
+  // printf("\n\n");
+
+  // check
+  // printArray_float(tempArray, 64);
+  // printArray_forUI(tempArray, 64);
+
+  // Log the results
+  // printf("ambientTemp: %.2f, maxTemp: %.2f, multipler:%.2f, originTemp:%.2f\n", ambientTemp, objectTemp, multipler, tempMax);
+  // xlog("ambientTemp: %.2f, objectTemp: %.2f", ambientTemp, objectTemp);
+  return true;
+}
+
 void OTPA8::startReading() {
   isStopThread = false;
   readThread = std::thread(&OTPA8::readTemperatureLoop, this);

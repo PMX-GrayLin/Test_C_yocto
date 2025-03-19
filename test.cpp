@@ -235,38 +235,61 @@ int main(int argc, char* argv[]) {
       res.set_content(response, "application/json");
 
     });
-    svr.Get(R"(/test/(.+))", [&](const httplib::Request& req, httplib::Response& res) {
-      std::smatch match;
-      std::regex regex(R"(/test/(.+))");
-
-      xlog("req.path:%s", req.path.c_str());
-      xlog("req.matches.size:%ld", req.matches.size());
+    svr.Get("/temperature_array", [&](const httplib::Request& req, httplib::Response& res) {
       
-      if (std::regex_match(req.path, match, regex) && match.size() > 1) {
-        xlog("req.matches[0]:%s", req.matches[0].str().c_str());
-        xlog("req.matches[1]:%s", req.matches[1].str().c_str());
+      xlog("query otpa8 matrix...");
+      float ambientTemp = 0.0;
+      float objectTemp = 0.0;
+      otpa8.readTemperature_max(ambientTemp, objectTemp);
+      std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
+                             ", \"object\": " + std::to_string(objectTemp) + " }";
+      res.set_content(response, "application/json");
 
-        
-
+    });
+    svr.Get(R"(/test/(.*))", [&](const httplib::Request &req, httplib::Response &res) {
+      std::smatch match;
+      std::regex regex(R"(/test/(.*))");
+  
+      xlog("req.path:%s", req.path.c_str());
+      if (std::regex_match(req.path, match, regex)) {
+        // Create a dynamic array (vector) to store path segments
+        std::vector<std::string> segments;
+  
+        // Get the matched string (e.g., "1/2/3")
+        std::string matched_str = match[1].str();
+        xlog("Matched string: %s", matched_str.c_str());
+  
+        // Split the matched string by '/' and store each segment in the vector
+        std::stringstream ss(matched_str);
+        std::string segment;
+        while (std::getline(ss, segment, '/')) {
+          segments.push_back(segment);
+        }
+        for (const auto& seg : segments) {
+          xlog("Stored segment: %s", seg.c_str());
+        }
+        for (size_t i = 0; i < segments.size(); ++i) {
+          xlog("Stored segment at index %zu: %s", i, segments[i].c_str());
+        }
+  
+        if (isSameString(segments[0].c_str(), "gst")) {
+          AICamera_startStreaming();
+        } else if (isSameString(segments[0].c_str(), "ci")) {
+          std::string path = "";
+          if (segments.size() > 1 && !segments[1].empty()) {
+            path = "/home/root/primax/" + segments[1];
+          } else {
+            path = "/home/root/primax/fw_test_" + getTimeString() + ".png";
+          }
+          AICamera_setImagePath(path.c_str());
+          AICamera_captureImage();
+        }
+  
       } else {
         res.status = 400;  // Bad Request
         res.set_content("{ \"error\": \"Invalid request\" }", "application/json");
       }
     });
-    // svr.Post("/startReading", [&](const httplib::Request& req, httplib::Response& res) {
-
-    //   xlog("startReading...");
-    //   float ambientTemp = 0.0;
-    //   float objectTemp = 0.0;
-    //   otpa8.startReading();
-
-    // });
-    // svr.Post("/stopReading", [&](const httplib::Request& req, httplib::Response& res) {
-      
-    //   xlog("stopReading...");
-    //   otpa8.stopReading();
-
-    // });
     svr.listen("0.0.0.0", 8765);
 
     // test from command line

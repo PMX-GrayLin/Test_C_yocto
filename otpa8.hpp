@@ -20,6 +20,7 @@ class OTPA8 {
 
   bool readTemperature_avg(float &ambientTemp, float &objectTemp);
   bool readTemperature_max(float &ambientTemp, float &objectTemp);
+  bool readTemperature_array(float &ambientTemp, float *objectTemp);
 
   void startReading();  // Start the periodic reading thread
   void stopReading();   // Stop the thread
