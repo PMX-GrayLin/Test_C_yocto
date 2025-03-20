@@ -240,11 +240,14 @@ int main(int argc, char* argv[]) {
       xlog("query otpa8 matrix...");
       float ambientTemp = 0.0;
       float objectTemp[64] = { 0.0 };
-      otpa8.readTemperature_array(ambientTemp, objectTemp);
-      std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
-                             ", \"object\": " + std::to_string(objectTemp[0]) + " }";
-      res.set_content(response, "application/json");
-
+      std::ostringstream response;
+      response << "{ \"ambient\": " << ambientTemp << ", \"object\": [";
+      for (int i = 0; i < 64; ++i) {
+          response << objectTemp[i];
+          if (i < 63) response << ", ";
+      }
+      response << "] }";
+      res.set_content(response.str(), "application/json");
     });
     svr.Get(R"(/test/(.*))", [&](const httplib::Request &req, httplib::Response &res) {
       std::smatch match;
