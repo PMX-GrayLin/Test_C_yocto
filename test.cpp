@@ -240,7 +240,7 @@ int main(int argc, char* argv[]) {
       xlog("query otpa8 matrix...");
       float ambientTemp = 0.0;
       float objectTemp[64] = { 0.0 };
-      otpa8.readTemperature_array(ambientTemp, *objectTemp);
+      otpa8.readTemperature_array(ambientTemp, objectTemp);
       std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
                              ", \"object\": " + std::to_string(objectTemp[0]) + " }";
       res.set_content(response, "application/json");
