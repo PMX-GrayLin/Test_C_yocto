@@ -156,7 +156,7 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
   return true;
 }
 
-bool OTPA8::readTemperature_array(float& ambientTemp, float* objectTemp[]) {
+bool OTPA8::readTemperature_array(float& ambientTemp, float objectTemp[]) {
   // Readout command for OTPA-8 (3 bytes: ADR, CMD, NUL)
   uint8_t command[2] = {0x4E, 0x00};            // OK
 
