@@ -2,6 +2,9 @@
 
 #include "global.hpp"
 
+#define CHIP_NAME "/dev/gpiochip0"  // Corresponds to "0" in `gpioset 0 79=...`
+#define GPIO_NUM 79                 // GPIO number
+
 typedef enum {
     spf_BMP,
     spf_JPEG,
