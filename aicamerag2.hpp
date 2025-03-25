@@ -5,8 +5,6 @@
 #define AICamreaCSIPath "/dev/csi_cam_preview"
 #define AICamreaUSBPath "/dev/video137"
 
-#define CHIP_NAME "/dev/gpiochip0"  // Corresponds to "0" in `gpioset 0 79=...`
-
 typedef enum {
   lc_red,
   lc_green,
