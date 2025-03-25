@@ -70,10 +70,26 @@ void printArray_forUI(const float* buffer, size_t len) {
   printf("\n\n\r");
 }
 
-bool isSameString(char* s1, char* s2, bool isCaseSensitive) {
+bool isSameString(const char* s1, const char* s2, bool isCaseSensitive) {
   if (s1 == NULL || s2 == NULL) {
     return false;  // Handle NULL pointers safely
   }
 
   return isCaseSensitive ? strcmp(s1, s2) == 0 : strcasecmp(s1, s2) == 0;
+}
+
+bool isPathExist(const char* path) {
+  struct stat buffer;
+  return (stat(path, &buffer) == 0);
+}
+
+std::string getTimeString() {
+  std::time_t now = std::time(nullptr);
+  std::tm* localTime = std::localtime(&now + 8);
+
+  std::ostringstream oss;
+  oss << std::setw(2) << std::setfill('0') << localTime->tm_hour
+      << std::setw(2) << std::setfill('0') << localTime->tm_min;
+  
+  return oss.str();
 }
