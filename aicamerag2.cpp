@@ -840,7 +840,7 @@ void AICamera_setGPIO(int gpio_num, int value) {
   // Open GPIO chip
   chip = gpiod_chip_open(CHIP_NAME);
   if (!chip) {
-    xlog("Failed to open GPIO chip:%s", Failed to open GPIO chip);
+    xlog("Failed to open GPIO chip:%s", CHIP_NAME);
     return;
   }
 
