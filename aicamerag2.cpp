@@ -654,7 +654,7 @@ void AICamera_stopStreaming() {
 
 void AICamera_set_gpio(int value) {
 
-  xlog("");
+
   xlog("gpiod version:%s", gpiod_version_string());
 
   // gpiod_chip *chip;
