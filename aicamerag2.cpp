@@ -845,7 +845,7 @@ void AICamera_setGPIO(int gpio_num, int value) {
   }
 
   // Get GPIO line
-  line = gpiod_chip_get_line(chip, GPIO_NUM);
+  line = gpiod_chip_get_line(chip, gpio_num);
   if (!line) {
     xlog("Failed to get GPIO line");
     gpiod_chip_close(chip);
