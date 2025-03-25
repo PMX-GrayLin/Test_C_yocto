@@ -1,5 +1,7 @@
 #include "aicamerag2.hpp"
 
+#include <gpiod.h>
+
 std::thread t_aicamera_streaming;
 bool is_aicamera_streaming = false;
 
