@@ -549,6 +549,39 @@ void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info) {
 
       AICAMERA_threadSaveImage(filename, bgr_frame);
       AICAMERA_threadSaveCropImage(pathName_croppedImage, bgr_frame, crop_roi);
+      
+    } else if (format && g_strcmp0(format, "I420") == 0) {
+      int width = 0, height = 0;
+      if (!gst_structure_get_int(str, "width", &width) ||
+          !gst_structure_get_int(str, "height", &height)) {
+        xlog("Failed to get video dimensions");
+      }
+
+      // Convert I420 to BGR using OpenCV
+      cv::Mat i420_frame(height + height / 2, width, CV_8UC1, map.data);
+      cv::Mat bgr_frame(height, width, CV_8UC3);
+      cv::cvtColor(i420_frame, bgr_frame, cv::COLOR_YUV2BGR_I420);
+
+      // Save the frame
+      counterImg++;
+      std::ostringstream oss;
+      std::string filename = "";
+
+      if (pathName_savedImage == "") {
+        if (savedPhotoFormat == spf_BMP) {
+          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".bmp";
+        } else if (savedPhotoFormat == spf_JPEG) {
+          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".jpg";
+        } else {
+          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".png";
+        }
+        filename = oss.str();
+      } else {
+        filename = pathName_savedImage;
+      }
+
+      AICAMERA_threadSaveImage(filename, bgr_frame);
+      AICAMERA_threadSaveCropImage(pathName_croppedImage, bgr_frame, crop_roi);
     }
 
     // Cleanup
@@ -799,42 +832,69 @@ void AICamera_stopStreaming() {
   }
 }
 
-void AICamera_set_gpio(int value) {
-
-
-  xlog("gpiod version:%s", gpiod_version_string());
-
+void AICamera_setGPIO(int gpio_num, int value) {
+  // xlog("gpiod version:%s", gpiod_version_string());
   gpiod_chip *chip;
   gpiod_line *line;
 
   // Open GPIO chip
   chip = gpiod_chip_open(CHIP_NAME);
   if (!chip) {
-      std::cerr << "Failed to open GPIO chip\n";
-      exit(1);
+    xlog("Failed to open GPIO chip:%s", Failed to open GPIO chip);
+    return;
   }
 
   // Get GPIO line
   line = gpiod_chip_get_line(chip, GPIO_NUM);
   if (!line) {
-      std::cerr << "Failed to get GPIO line\n";
-      gpiod_chip_close(chip);
-      exit(1);
+    xlog("Failed to get GPIO line");
+    gpiod_chip_close(chip);
+    return;
   }
 
   // Request line as output
   if (gpiod_line_request_output(line, "my_gpio_control", value) < 0) {
-      std::cerr << "Failed to request GPIO line as output\n";
-      gpiod_chip_close(chip);
-      exit(1);
+    xlog("Failed to request GPIO line as output");
+    gpiod_chip_close(chip);
+    return;
   }
 
   // Set the GPIO value
   if (gpiod_line_set_value(line, value) < 0) {
-      std::cerr << "Failed to set GPIO value\n";
+    xlog("Failed to set GPIO value");
   }
 
   // Release resources
   gpiod_line_release(line);
   gpiod_chip_close(chip);
+}
+
+void AICamera_setLED(string led_index, string led_color) {
+  int gpio_index1 = 0;
+  int gpio_index2 = 0;
+
+  if (led_index == "1") {
+    gpio_index1 = 79;
+    gpio_index2 = 80;  
+  } else if (led_index == "2") {
+    gpio_index1 = 81;
+    gpio_index2 = 82;  
+  } else if (led_index == "3") {
+    gpio_index1 = 107;
+    gpio_index2 = 108;  
+  }
+
+  if (isSameString(led_color, "red")) {
+    AICamera_setGPIO(gpio_index1, 1);
+    AICamera_setGPIO(gpio_index2, 0);
+  } else if (isSameString(led_color, "green")) {
+    AICamera_setGPIO(gpio_index1, 0);
+    AICamera_setGPIO(gpio_index2, 1);;
+  } else if (isSameString(led_color, "orange")) {
+    AICamera_setGPIO(gpio_index1, 1);
+    AICamera_setGPIO(gpio_index2, 1);
+  } else if (isSameString(led_color, "off")) {
+    AICamera_setGPIO(gpio_index1, 0);
+    AICamera_setGPIO(gpio_index2, 0);
+  }
 }

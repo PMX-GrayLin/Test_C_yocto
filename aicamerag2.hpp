@@ -6,7 +6,13 @@
 #define AICamreaUSBPath "/dev/video137"
 
 #define CHIP_NAME "/dev/gpiochip0"  // Corresponds to "0" in `gpioset 0 79=...`
-#define GPIO_NUM 79                 // GPIO number
+
+typedef enum {
+  lc_red,
+  lc_green,
+  lc_orange,
+  lc_off,
+} LEDColor;
 
 typedef enum {
     spf_BMP,
@@ -103,4 +109,5 @@ extern void AICamera_stopStreaming();
 extern void AICAMERA_load_crop_saveImage();
 
 // led
-void AICamera_set_gpio(int value);
+void AICamera_setGPIO(int gpio_num, int value);
+void AICamera_setLED(string led_index, string led_color);
