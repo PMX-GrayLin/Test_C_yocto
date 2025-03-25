@@ -22,23 +22,49 @@ static GMainLoop *gst_loop = nullptr;
 
 namespace fs = std::filesystem;
 
+bool AICamrea_isUseCSICamera() {
+  if (isPathExist(AICamreaCSIPath)) {
+    xlog("path /dev/csi_cam_preview exist");
+    return true;
+  } else {
+    xlog("path /dev/csi_cam_preview not exist");
+    return false;
+  }
+}
+
 std::string AICamrea_getVideoDevice() {
   std::string videoPath;
-  FILE* pipe = popen("v4l2-ctl --list-devices | grep mtk-v4l2-camera -A 3", "r");
-  if (pipe) {
-    std::string output;
-    char buffer[256];
-    while (fgets(buffer, sizeof(buffer), pipe)) {
-      output += buffer;
-    }
-    pclose(pipe);
 
-    std::regex device_regex("/dev/video\\d+");
-    std::smatch match;
-    if (std::regex_search(output, match, device_regex)) {
-      videoPath = match[0];
-    }
+  bool isUseCSICamera = AICamrea_isUseCSICamera();
+
+  if (isUseCSICamera) {
+    videoPath = AICamreaCSIPath;
+  } else {
+    videoPath = AICamreaUSBPath;
   }
+
+  // #if defined(USE_USB_CAM)
+
+  //   videoPath = "/dev/video137";
+
+  // #else
+  //   FILE *pipe = popen("v4l2-ctl --list-devices | grep mtk-v4l2-camera -A 3", "r");
+  //   if (pipe) {
+  //     std::string output;
+  //     char buffer[256];
+  //     while (fgets(buffer, sizeof(buffer), pipe)) {
+  //       output += buffer;
+  //     }
+  //     pclose(pipe);
+
+  //     std::regex device_regex("/dev/video\\d+");
+  //     std::smatch match;
+  //     if (std::regex_search(output, match, device_regex)) {
+  //       videoPath = match[0];
+  //     }
+  //   }
+
+  // #endif
 
   xlog("videoPath:%s", videoPath.c_str());
   return videoPath;
@@ -280,31 +306,42 @@ void AICAMERA_load_crop_saveImage() {
         // Crop the region of interest (ROI)
         cv::Mat croppedImage = image(crop_roi);
 
-        // Create a black canvas of the target size
-        int squqareSize = (croppedImage.cols > croppedImage.rows) ? croppedImage.cols : croppedImage.rows;
-        cv::Size paddingSize(squqareSize, squqareSize);
-        cv::Mat paddedImage = cv::Mat::zeros(paddingSize, croppedImage.type());
+        if (isPaddingPhoto) {
+          // Create a black canvas of the target size
+          int squqareSize = (croppedImage.cols > croppedImage.rows) ? croppedImage.cols : croppedImage.rows;
+          cv::Size paddingSize(squqareSize, squqareSize);
+          cv::Mat paddedImage = cv::Mat::zeros(paddingSize, croppedImage.type());
 
-        // Calculate offsets to center the cropped image
-        int offsetX = (paddedImage.cols - croppedImage.cols) / 2;
-        int offsetY = (paddedImage.rows - croppedImage.rows) / 2;
-        // Check if offsets are valid
-        if (offsetX < 0 || offsetY < 0) {
-          xlog("Error: Cropped image is larger than the padding canvas!");
-          return;
-        }
+          // Calculate offsets to center the cropped image
+          int offsetX = (paddedImage.cols - croppedImage.cols) / 2;
+          int offsetY = (paddedImage.rows - croppedImage.rows) / 2;
+          // Check if offsets are valid
+          if (offsetX < 0 || offsetY < 0) {
+            xlog("Error: Cropped image is larger than the padding canvas!");
+            return;
+          }
 
-        // Define the ROI on the black canvas where the cropped image will be placed
-        cv::Rect roi_padding(offsetX, offsetY, croppedImage.cols, croppedImage.rows);
+          // Define the ROI on the black canvas where the cropped image will be placed
+          cv::Rect roi_padding(offsetX, offsetY, croppedImage.cols, croppedImage.rows);
 
-        // Copy the cropped image onto the black canvas
-        croppedImage.copyTo(paddedImage(roi_padding));
+          // Copy the cropped image onto the black canvas
+          croppedImage.copyTo(paddedImage(roi_padding));
 
-        // Attempt to save the image
-        if (cv::imwrite(pathName_savedImage, paddedImage)) {
-          xlog("Saved crop frame to %s", pathName_savedImage.c_str());
+          // Attempt to save the image
+          if (cv::imwrite(pathName_savedImage, paddedImage)) {
+            xlog("Saved crop frame to %s", pathName_savedImage.c_str());
+          } else {
+            xlog("Failed crop to save frame to %s", pathName_savedImage.c_str());
+          }
+
         } else {
-          xlog("Failed crop to save frame to %s", pathName_savedImage.c_str());
+          
+          // Attempt to save the image
+          if (cv::imwrite(pathName_savedImage, croppedImage)) {
+            xlog("Saved crop frame to %s", pathName_savedImage.c_str());
+          } else {
+            xlog("Failed crop to save frame to %s", pathName_savedImage.c_str());
+          }
         }
 
         cv::Rect reset_roi(0, 0, 0, 0);
@@ -319,18 +356,6 @@ void AICAMERA_load_crop_saveImage() {
         }
       }
 
-      // // Ensure the ROI is within the bounds of the image
-      // crop_roi &= cv::Rect(0, 0, image.cols, image.rows);
-
-      // // Crop the image
-      // cv::Mat croppedImage = image(crop_roi);
-
-      // Save the cropped image
-    //   if (cv::imwrite(pathName_savedImage, croppedImage)) {
-    //     xlog("Cropped image saved to %s", pathName_savedImage.c_str());
-    //   } else {
-    //     xlog("Failed to save cropped image to %s", pathName_savedImage.c_str());
-    //   }
     } catch (const std::exception &e) {
       xlog("Exception during image save: %s", e.what());
     }
@@ -344,7 +369,9 @@ void AICAMERA_threadSaveImage(const std::string path, const cv::Mat &frameBuffer
       xlog("---- AICAMERA_threadSaveImage start ----");
       // Extract directory from the full path
       std::string directory = fs::path(path).parent_path().string();
-      if (!fs::exists(directory)) {
+      xlog("Raw path: [%s]", path.c_str());
+      xlog("Parent directory: [%s]", directory.c_str());
+      if (!isPathExist(directory.c_str())) {
         xlog("Directory does not exist, creating: %s", directory.c_str());
         fs::create_directories(directory);
       }
@@ -379,7 +406,9 @@ void AICAMERA_threadSaveCropImage(const std::string path, const cv::Mat &frameBu
 
       // Extract directory from the full path
       std::string directory = fs::path(path).parent_path().string();
-      if (!fs::exists(directory)) {
+      xlog("Raw path: [%s]", path.c_str());
+      xlog("Parent directory: [%s]", directory.c_str());
+      if (!isPathExist(directory.c_str())) {
         xlog("Directory does not exist, creating: %s", directory.c_str());
         fs::create_directories(directory);
       }
@@ -452,6 +481,7 @@ void AICAMERA_threadSaveCropImage(const std::string path, const cv::Mat &frameBu
 void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info) {
   if (isCapturePhoto) {
 
+    xlog("");
     isCapturePhoto = false;
     
     GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
@@ -481,7 +511,7 @@ void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info) {
     // Get the structure of the first capability (format)
     GstStructure *str = gst_caps_get_structure(caps, 0);
     const gchar *format = gst_structure_get_string(str, "format");
-    // xlog("format:%s", format);
+    xlog("format:%s", format);
 
     // Only proceed if the format is NV12
     if (format && g_strcmp0(format, "NV12") == 0) {
@@ -559,6 +589,18 @@ void ThreadAICameraStreaming() {
   // Set properties for the elements
   g_object_set(G_OBJECT(source), "device", AICamrea_getVideoDevice().c_str(), nullptr);
 
+  // Define the capabilities for the capsfilter
+  // AD : 2048 * 1536
+  // elic : 1920 * 1080
+  GstCaps *caps = gst_caps_new_simple(
+      "video/x-raw",
+      "width", G_TYPE_INT, 2048,
+      "height", G_TYPE_INT, 1536,
+      "framerate", GST_TYPE_FRACTION, 30, 1,  // Add frame rate as 30/1
+      nullptr);
+  g_object_set(capsfilter, "caps", caps, nullptr);
+  gst_caps_unref(caps);
+
   // Create a GstStructure for extra-controls
   GstStructure *controls = gst_structure_new(
       "extra-controls",                  // Name of the structure
@@ -577,18 +619,6 @@ void ThreadAICameraStreaming() {
 
   g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf = 4
   g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
-
-  // Define the capabilities for the capsfilter
-  // AD : 2048 * 1536
-  // elic : 1920 * 1080
-  GstCaps *caps = gst_caps_new_simple(
-      "video/x-raw",
-      "width", G_TYPE_INT, 2048,
-      "height", G_TYPE_INT, 1536,
-      "framerate", GST_TYPE_FRACTION, 30, 1,  // Add frame rate as 30/1
-      nullptr);
-  g_object_set(capsfilter, "caps", caps, nullptr);
-  gst_caps_unref(caps);
 
   // Build the pipeline
   gst_bin_add_many(GST_BIN(gst_pipeline), source, capsfilter, encoder, sink, nullptr);
@@ -614,6 +644,107 @@ void ThreadAICameraStreaming() {
   }
 
   xlog("pipeline is running...");
+  is_aicamera_streaming = true;
+
+  // Run the main loop
+  gst_loop = g_main_loop_new(nullptr, FALSE);
+  g_main_loop_run(gst_loop);
+
+  // Stop the pipeline when finished or interrupted
+  xlog("Stopping the pipeline...");
+  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
+
+  // Clean up
+  gst_object_unref(gst_pipeline);
+  is_aicamera_streaming = false;
+  xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
+
+}
+
+void ThreadAICameraStreaming_usb() {
+  xlog("++++ start ++++");
+  counterFrame = 0;
+  counterImg = 0;
+
+  // Initialize GStreamer
+  gst_init(nullptr, nullptr);
+
+  // final gst pipeline
+  // gst-launch-1.0 v4l2src device="/dev/video137" io-mode=2 ! image/jpeg,width=2048,height=1536,framerate=30/1 ! jpegdec ! videoconvert ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
+  
+  // Create the elements
+  gst_pipeline = gst_pipeline_new("video-pipeline");
+  GstElement *source = gst_element_factory_make("v4l2src", "source");
+  GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
+  GstElement *jpegdec = gst_element_factory_make("jpegdec", "jpegdec");
+  GstElement *videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
+  GstElement *encoder = gst_element_factory_make("v4l2h264enc", "encoder");
+  GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
+
+  if (!gst_pipeline || !source || !capsfilter || !jpegdec || !videoconvert || !encoder || !sink) {
+    xlog("failed to create GStreamer elements");
+    return;
+  }
+
+  // Set properties for the elements
+  g_object_set(G_OBJECT(source), "device", AICamrea_getVideoDevice().c_str(), nullptr);
+
+  // Define the capabilities for the capsfilter
+  // AD : 2048 * 1536
+  // elic : 1920 * 1080
+  GstCaps *caps = gst_caps_new_simple(
+      "image/jpeg",
+      "width", G_TYPE_INT, 2048,
+      "height", G_TYPE_INT, 1536,
+      "framerate", GST_TYPE_FRACTION, 30, 1,  // Add frame rate as 30/1
+      nullptr);
+  g_object_set(capsfilter, "caps", caps, nullptr);
+  gst_caps_unref(caps);
+
+  // Create a GstStructure for extra-controls
+  GstStructure *controls = gst_structure_new(
+      "extra-controls",                  // Name of the structure
+      "video_gop_size", G_TYPE_INT, 30,  // Key-value pair
+      // "h264_level", G_TYPE_INT, 13,      // Key-value pair
+      nullptr  // End of key-value pairs
+  );
+  if (!controls) {
+    xlog("Failed to create GstStructure");
+    gst_object_unref(gst_pipeline);
+    return;
+  }
+  g_object_set(G_OBJECT(encoder), "extra-controls", controls, nullptr);
+  // Free the GstStructure after use
+  gst_structure_free(controls);
+
+  g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf = 4
+  g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
+
+  // // Build the pipeline
+  gst_bin_add_many(GST_BIN(gst_pipeline), source, capsfilter, jpegdec, videoconvert, encoder, sink, nullptr);
+  if (!gst_element_link_many(source, capsfilter, jpegdec, videoconvert, encoder, sink, nullptr)) {
+    xlog("failed to link elements in the pipeline");
+    gst_object_unref(gst_pipeline);
+    return;
+  }
+
+  // Attach pad probe to capture frames
+  GstPad *pad = gst_element_get_static_pad(encoder, "sink");
+  if (pad) {
+    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)AICAMERA_streamingDataCallback, nullptr, nullptr);
+    gst_object_unref(pad);
+  }
+
+  // Start the pipeline
+  GstStateChangeReturn ret = gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
+  if (ret == GST_STATE_CHANGE_FAILURE) {
+    xlog("failed to start the pipeline");
+    gst_object_unref(gst_pipeline);
+    return;
+  }
+
+  xlog("pipeline is running...");
+  is_aicamera_streaming = true;
 
   // Run the main loop
   gst_loop = g_main_loop_new(nullptr, FALSE);
@@ -637,7 +768,20 @@ void AICamera_startStreaming() {
     return;
   }
   is_aicamera_streaming = true;
-  t_aicamera_streaming = std::thread(ThreadAICameraStreaming);
+
+  if (AICamrea_isUseCSICamera())
+  {
+    t_aicamera_streaming = std::thread(ThreadAICameraStreaming);
+  } else {
+    t_aicamera_streaming = std::thread(ThreadAICameraStreaming_usb);  
+  }
+  
+// #if defined(USE_USB_CAM)
+//   t_aicamera_streaming = std::thread(ThreadAICameraStreaming_usb);
+// #else
+//   t_aicamera_streaming = std::thread(ThreadAICameraStreaming);
+// #endif
+
   t_aicamera_streaming.detach();
 }
 
@@ -647,6 +791,9 @@ void AICamera_stopStreaming() {
     g_main_loop_quit(gst_loop);
     g_main_loop_unref(gst_loop);
     gst_loop = nullptr;
+
+    // ??
+    is_aicamera_streaming = false;
   } else {
     xlog("gst_loop is invalid or already destroyed.");
   }

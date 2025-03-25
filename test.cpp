@@ -302,9 +302,6 @@ int main(int argc, char* argv[]) {
     });
     svr.listen("0.0.0.0", 8765);
 
-    // test from command line
-    // curl http://localhost:8765/temperature
-
   } else {
     xlog("USE MQTT...");
 
