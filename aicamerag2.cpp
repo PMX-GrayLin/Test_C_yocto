@@ -884,16 +884,16 @@ void AICamera_setLED(string led_index, string led_color) {
     gpio_index2 = 108;  
   }
 
-  if (isSameString(led_color, "red")) {
+  if (isSameString(led_color.c_str(), "red")) {
     AICamera_setGPIO(gpio_index1, 1);
     AICamera_setGPIO(gpio_index2, 0);
-  } else if (isSameString(led_color, "green")) {
+  } else if (isSameString(led_color.c_str(), "green")) {
     AICamera_setGPIO(gpio_index1, 0);
     AICamera_setGPIO(gpio_index2, 1);;
-  } else if (isSameString(led_color, "orange")) {
+  } else if (isSameString(led_color.c_str(), "orange")) {
     AICamera_setGPIO(gpio_index1, 1);
     AICamera_setGPIO(gpio_index2, 1);
-  } else if (isSameString(led_color, "off")) {
+  } else if (isSameString(led_color.c_str(), "off")) {
     AICamera_setGPIO(gpio_index1, 0);
     AICamera_setGPIO(gpio_index2, 0);
   }
