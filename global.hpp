@@ -10,7 +10,7 @@
 #include <sys/ioctl.h>        // For ioctl()
 #include <fcntl.h>            // For open()
 
-#include <string> 
+#include <string>
 #include <iostream>
 #include <vector>
 #include <algorithm>
