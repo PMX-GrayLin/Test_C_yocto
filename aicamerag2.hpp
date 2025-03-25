@@ -2,6 +2,9 @@
 
 #include "global.hpp"
 
+#define AICamreaCSIPath "/dev/csi_cam_preview"
+#define AICamreaUSBPath "/dev/video137"
+
 #define CHIP_NAME "/dev/gpiochip0"  // Corresponds to "0" in `gpioset 0 79=...`
 #define GPIO_NUM 79                 // GPIO number
 
@@ -11,6 +14,7 @@ typedef enum {
     spf_PNG,
 } SavedPhotoFormat;
 
+extern bool AICamrea_isUseCSICamera();
 extern std::string AICamrea_getVideoDevice();
 
 // IOCTLS ===========
@@ -91,8 +95,12 @@ extern void AICamera_enablePadding(bool enable);
 // Streaming
 GstPadProbeReturn AICAMERA_streamingDataCallback(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
 void ThreadAICameraStreaming();
+void ThreadAICameraStreaming_usb();
 extern void AICamera_startStreaming();
 extern void AICamera_stopStreaming();
 
 // image processing
 extern void AICAMERA_load_crop_saveImage();
+
+// led
+void AICamera_set_gpio(int value);

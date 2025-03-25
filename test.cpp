@@ -275,18 +275,18 @@ int main(int argc, char* argv[]) {
           xlog("Stored segment at index %zu: %s", i, segments[i].c_str());
         }
   
-        // if (isSameString(segments[0].c_str(), "gst")) {
-        //   AICamera_startStreaming();
-        // } else if (isSameString(segments[0].c_str(), "ci")) {
-        //   std::string path = "";
-        //   if (segments.size() > 1 && !segments[1].empty()) {
-        //     path = "/home/root/primax/" + segments[1];
-        //   } else {
-        //     path = "/home/root/primax/fw_test_" + getTimeString() + ".png";
-        //   }
-        //   AICamera_setImagePath(path.c_str());
-        //   AICamera_captureImage();
-        // }
+        if (isSameString(segments[0].c_str(), "gst")) {
+          AICamera_startStreaming();
+        } else if (isSameString(segments[0].c_str(), "ci")) {
+          std::string path = "";
+          if (segments.size() > 1 && !segments[1].empty()) {
+            path = "/home/root/primax/" + segments[1];
+          } else {
+            path = "/home/root/primax/fw_test_" + getTimeString() + ".png";
+          }
+          AICamera_setImagePath(path.c_str());
+          AICamera_captureImage();
+        }
   
       } else {
         res.status = 400;  // Bad Request
