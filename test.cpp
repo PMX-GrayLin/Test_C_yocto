@@ -287,7 +287,10 @@ int main(int argc, char* argv[]) {
           AICamera_setImagePath(path.c_str());
           AICamera_captureImage();
         
-        } else if (isSameString(segments[0].c_str(), "gpio")) {
+        } else if (isSameString(segments[0].c_str(), "gpio0")) {
+          AICamera_set_gpio(0);
+
+        } else if (isSameString(segments[0].c_str(), "gpio1")) {
           AICamera_set_gpio(1);
 
         }

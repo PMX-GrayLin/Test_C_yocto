@@ -657,37 +657,37 @@ void AICamera_set_gpio(int value) {
 
   xlog("gpiod version:%s", gpiod_version_string());
 
-  // gpiod_chip *chip;
-  // gpiod_line *line;
+  gpiod_chip *chip;
+  gpiod_line *line;
 
-  // // Open GPIO chip
-  // chip = gpiod_chip_open(CHIP_NAME);
-  // if (!chip) {
-  //     std::cerr << "Failed to open GPIO chip\n";
-  //     exit(1);
-  // }
+  // Open GPIO chip
+  chip = gpiod_chip_open(CHIP_NAME);
+  if (!chip) {
+      std::cerr << "Failed to open GPIO chip\n";
+      exit(1);
+  }
 
-  // // Get GPIO line
-  // line = gpiod_chip_get_line(chip, GPIO_NUM);
-  // if (!line) {
-  //     std::cerr << "Failed to get GPIO line\n";
-  //     gpiod_chip_close(chip);
-  //     exit(1);
-  // }
+  // Get GPIO line
+  line = gpiod_chip_get_line(chip, GPIO_NUM);
+  if (!line) {
+      std::cerr << "Failed to get GPIO line\n";
+      gpiod_chip_close(chip);
+      exit(1);
+  }
 
-  // // Request line as output
-  // if (gpiod_line_request_output(line, "my_gpio_control", value) < 0) {
-  //     std::cerr << "Failed to request GPIO line as output\n";
-  //     gpiod_chip_close(chip);
-  //     exit(1);
-  // }
+  // Request line as output
+  if (gpiod_line_request_output(line, "my_gpio_control", value) < 0) {
+      std::cerr << "Failed to request GPIO line as output\n";
+      gpiod_chip_close(chip);
+      exit(1);
+  }
 
-  // // Set the GPIO value
-  // if (gpiod_line_set_value(line, value) < 0) {
-  //     std::cerr << "Failed to set GPIO value\n";
-  // }
+  // Set the GPIO value
+  if (gpiod_line_set_value(line, value) < 0) {
+      std::cerr << "Failed to set GPIO value\n";
+  }
 
-  // // Release resources
-  // gpiod_line_release(line);
-  // gpiod_chip_close(chip);
+  // Release resources
+  gpiod_line_release(line);
+  gpiod_chip_close(chip);
 }
