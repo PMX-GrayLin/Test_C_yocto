@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include <linux/videodev2.h>  // For V4L2 definitions
 #include <sys/ioctl.h>        // For ioctl()
