@@ -26,6 +26,7 @@ LINK_LIBS += -lgstreamer-1.0
 LINK_LIBS += -lglib-2.0
 LINK_LIBS += -lgobject-2.0
 LINK_LIBS += -lmosquitto -lmosquittopp
+LINK_LIBS += -lgpiod
 
 OCVLDFLAG +=-lopencv_core 
 OCVLDFLAG +=-lopencv_imgproc
