@@ -1,7 +1,5 @@
 #include "aicamerag2.hpp"
 
-#include <gpiod.h>
-
 std::thread t_aicamera_streaming;
 bool is_aicamera_streaming = false;
 
@@ -835,14 +833,13 @@ void AICamera_stopStreaming() {
 void AICamera_setGPIO(int gpio_num, int value) {
   // xlog("gpiod version:%s", gpiod_version_string());
 
-  char* CHIP_NAME = "/dev/gpiochip0";
   gpiod_chip *chip;
   gpiod_line *line;
 
   // Open GPIO chip
-  chip = gpiod_chip_open(CHIP_NAME);
+  chip = gpiod_chip_open(GPIO_CHIP);
   if (!chip) {
-    xlog("Failed to open GPIO chip:%s", CHIP_NAME);
+    xlog("Failed to open GPIO chip:%s", GPIO_CHIP);
     return;
   }
 
@@ -899,4 +896,67 @@ void AICamera_setLED(string led_index, string led_color) {
     AICamera_setGPIO(gpio_index1, 0);
     AICamera_setGPIO(gpio_index2, 0);
   }
+}
+
+void monitor_multiple_gpio(int *din_gpios, int count) {
+  struct gpiod_chip *chip;
+  struct gpiod_line *lines[GPIO_COUNT];
+  struct pollfd fds[GPIO_COUNT];
+  int i, ret;
+
+  // Open GPIO chip
+  chip = gpiod_chip_open(GPIO_CHIP);
+  if (!chip) {
+    xlog("Failed to open GPIO chip: %s", GPIO_CHIP);
+    return;
+  }
+
+  // Configure GPIOs for edge detection
+  for (i = 0; i < count; i++) {
+    lines[i] = gpiod_chip_get_line(chip, gpio_nums[i]);
+    if (!lines[i]) {
+      xlog("Failed to get GPIO line %d", gpio_nums[i]);
+      continue;
+    }
+
+    // Request GPIO line for both rising and falling edge events
+    ret = gpiod_line_request_both_edges_events(lines[i], "gpio_interrupt");
+    if (ret < 0) {
+      xlog("Failed to request GPIO %d for edge events", gpio_nums[i]);
+      gpiod_line_release(lines[i]);
+      continue;
+    }
+
+    // Get file descriptor for polling
+    fds[i].fd = gpiod_line_event_get_fd(lines[i]);
+    fds[i].events = POLLIN;
+  }
+
+  xlog("Monitoring GPIOs for events...");
+
+  // Main loop to monitor GPIOs
+  while (1) {
+    ret = poll(fds, count, -1);  // Wait indefinitely for an event
+    if (ret < 0) {
+      xlog("Error in poll");
+      break;
+    }
+
+    // Check which GPIO triggered the event
+    for (i = 0; i < count; i++) {
+      if (fds[i].revents & POLLIN) {
+        struct gpiod_line_event event;
+        gpiod_line_event_read(lines[i], &event);
+
+        xlog("GPIO %d event detected! Type: %s", gpio_nums[i],
+             (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "RISING" : "FALLING");
+      }
+    }
+  }
+
+  // Cleanup
+  for (i = 0; i < count; i++) {
+    gpiod_line_release(lines[i]);
+  }
+  gpiod_chip_close(chip);
 }

@@ -25,6 +25,7 @@
 
 #include <gst/gst.h>
 #include <opencv2/opencv.hpp>
+#include <gpiod.h>
 
 #define DEBUGX
 #ifndef DEBUGX
