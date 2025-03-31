@@ -900,8 +900,8 @@ void AICamera_setLED(string led_index, string led_color) {
 
 void monitor_multiple_gpio(int *din_gpios, int count) {
   struct gpiod_chip *chip;
-  struct gpiod_line *lines[GPIO_COUNT];
-  struct pollfd fds[GPIO_COUNT];
+  struct gpiod_line *lines[DIN_NUM];
+  struct pollfd fds[DIN_NUM];
   int i, ret;
 
   // Open GPIO chip
