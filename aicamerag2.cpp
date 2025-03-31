@@ -913,16 +913,16 @@ void monitor_multiple_gpio(int *din_gpios, int count) {
 
   // Configure GPIOs for edge detection
   for (i = 0; i < count; i++) {
-    lines[i] = gpiod_chip_get_line(chip, gpio_nums[i]);
+    lines[i] = gpiod_chip_get_line(chip, din_gpios[i]);
     if (!lines[i]) {
-      xlog("Failed to get GPIO line %d", gpio_nums[i]);
+      xlog("Failed to get GPIO line %d", din_gpios[i]);
       continue;
     }
 
     // Request GPIO line for both rising and falling edge events
     ret = gpiod_line_request_both_edges_events(lines[i], "gpio_interrupt");
     if (ret < 0) {
-      xlog("Failed to request GPIO %d for edge events", gpio_nums[i]);
+      xlog("Failed to request GPIO %d for edge events", din_gpios[i]);
       gpiod_line_release(lines[i]);
       continue;
     }
@@ -948,7 +948,7 @@ void monitor_multiple_gpio(int *din_gpios, int count) {
         struct gpiod_line_event event;
         gpiod_line_event_read(lines[i], &event);
 
-        xlog("GPIO %d event detected! Type: %s", gpio_nums[i],
+        xlog("GPIO %d event detected! Type: %s", din_gpios[i],
              (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "RISING" : "FALLING");
       }
     }
