@@ -276,9 +276,9 @@ int main(int argc, char* argv[]) {
         }
   
         if (isSameString(segments[0].c_str(), "gst")) {
-          if (isSameString(segments[0].c_str(), "start")) {
+          if (isSameString(segments[1].c_str(), "start")) {
             AICamera_startStreaming();
-          } else if (isSameString(segments[0].c_str(), "stop")) {
+          } else if (isSameString(segments[1].c_str(), "stop")) {
             AICamera_stopStreaming();
           }
 
