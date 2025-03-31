@@ -1,5 +1,7 @@
 #include "aicamerag2.hpp"
 
+int DIN_GPIOs[DIN_NUM] = {1, 2};  // DIN GPIO
+
 std::thread t_aicamera_streaming;
 bool is_aicamera_streaming = false;
 
