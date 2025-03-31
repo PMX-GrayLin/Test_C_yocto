@@ -276,13 +276,19 @@ int main(int argc, char* argv[]) {
         }
   
         if (isSameString(segments[0].c_str(), "gst")) {
-          AICamera_startStreaming();
+          if (isSameString(segments[0].c_str(), "start")) {
+            AICamera_startStreaming();
+          } else if (isSameString(segments[0].c_str(), "stop")) {
+            AICamera_stopStreaming();
+          }
+
         } else if (isSameString(segments[0].c_str(), "ci")) {
+          xlog("capture image");
           std::string path = "";
           if (segments.size() > 1 && !segments[1].empty()) {
             path = "/home/root/primax/" + segments[1];
           } else {
-            path = "/home/root/primax/fw_test_" + getTimeString() + ".png";
+            path = "/home/root/primax/fw_" + getTimeString() + ".png";
           }
           AICamera_setImagePath(path.c_str());
           AICamera_captureImage();
