@@ -282,8 +282,8 @@ int main(int argc, char* argv[]) {
             AICamera_stopStreaming();
           }
 
-        } else if (isSameString(segments[0].c_str(), "ci")) {
-          xlog("capture image");
+        } else if (isSameString(segments[0].c_str(), "tp")) {
+          xlog("take picture");
           std::string path = "";
           if (segments.size() > 1 && !segments[1].empty()) {
             path = "/home/root/primax/" + segments[1];
