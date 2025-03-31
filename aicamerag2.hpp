@@ -5,9 +5,9 @@
 #define AICamreaCSIPath "/dev/csi_cam_preview"
 #define AICamreaUSBPath "/dev/video137"
 
-#define GPIO_CHIP = "/dev/gpiochip0";
-#define DIN_NUM 2                     // Number of DIN to monitor
-int DIN_GPIOs[DIN_NUM] = {1, 2};      // GPIO numbers of DIN
+#define GPIO_CHIP "/dev/gpiochip0";
+#define DIN_NUM 2                 // Number of DIN to monitor
+int DIN_GPIOs[DIN_NUM] = {1, 2};  // GPIO numbers of DIN
 
 typedef enum {
   lc_red,
