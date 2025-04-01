@@ -86,8 +86,8 @@ bool isPathExist(const char* path) {
 std::string getTimeString() {
   std::time_t now = std::time(nullptr);
 
-  setenv("TZ", "UTC-8", 1);  // Set timezone to UTC+8
-  tzset();  // Apply timezone setting
+  setenv("TZ", "UTC-8", 1);   // Set timezone to UTC+8
+  tzset();                    // Apply timezone setting
 
   std::tm* localTime = std::localtime(&now);
 
