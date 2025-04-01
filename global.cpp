@@ -85,7 +85,7 @@ bool isPathExist(const char* path) {
 
 std::string getTimeString() {
   std::time_t now = std::time(nullptr);
-  std::tm* localTime = std::localtime(&now + 8);
+  std::tm* localTime = std::localtime(&now);
 
   std::ostringstream oss;
   oss << std::setw(2) << std::setfill('0') << localTime->tm_hour
