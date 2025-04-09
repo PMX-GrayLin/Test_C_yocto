@@ -182,11 +182,11 @@ bool OTPA8::readTemperature_array(float& ambientTemp, float* objectTemp) {
   printf("\033[3J\033[H\033[2J");
   
   // Parse object temperature (bytes 14-141)
-  float tempArray[64] = { 0.0 };
+  float tempArray[256] = { 0.0 };
   float tempMax = 0.0;
   float multipler = 1.0;
 
-  for (int i = 0; i < 64; ++i) {
+  for (int i = 0; i < 256; ++i) {
     uint8_t objHigh = buffer[13 + 2 * i];  // High byte of pixel i
     uint8_t objLow = buffer[14 + 2 * i];   // Low byte of pixel i
     uint16_t objectRaw = (objHigh << 8) | objLow;
@@ -196,7 +196,7 @@ bool OTPA8::readTemperature_array(float& ambientTemp, float* objectTemp) {
     multipler = getMultipler(tempArray[i]);
     objectTemp[i] = tempArray[i] * multipler;
     
-    if (i % 8 == 0) {
+    if (i % 16 == 0) {
       printf("\n\n");
     }
     printf("%.2f [%02X%02X]\t", objectTemp[i], objHigh, objLow);

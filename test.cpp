@@ -240,6 +240,7 @@ int main(int argc, char* argv[]) {
       xlog("query otpa8 matrix...");
       float ambientTemp = 0.0;
       float objectTemp[64] = { 0.0 };
+      otpa8.readTemperature_array(ambientTemp, objectTemp);
       std::ostringstream response;
       response << "{ \"ambient\": " << ambientTemp << ", \"object\": [";
       for (int i = 0; i < 64; ++i) {
