@@ -9,7 +9,8 @@
 
 #include <linux/i2c-dev.h>
 
-#define OTPA8_I2C_BUS "/dev/i2c-2"
+// #define OTPA8_I2C_BUS "/dev/i2c-2"
+#define OTPA8_I2C_BUS "/dev/i2c-4"
 #define OTPA8_I2C_ADDR 0x68
 
 
