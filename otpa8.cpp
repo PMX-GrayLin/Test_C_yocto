@@ -166,8 +166,8 @@ bool OTPA8::readTemperature_array(float& ambientTemp, float* objectTemp) {
     return false;
   }
 
-  // Read 141 bytes of response from sensor
-  uint8_t buffer[141] = {0};
+  // Read 525 bytes of response from sensor
+  uint8_t buffer[525] = {0};
   if (read(file, buffer, sizeof(buffer)) != sizeof(buffer)) {
     xlog("Failed to read temperature data");
     return false;
