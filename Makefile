@@ -92,4 +92,4 @@ all: ${CPPOBJECTS}
 .PHONY : clean 
 
 clean:
-	rm -rf *.o
+	rm -rf *.o *.exe test
