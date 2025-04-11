@@ -96,8 +96,6 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
     return false;
   }
 
-  // usleep(10000);
-
   // Read 141 bytes of response from sensor
   uint8_t buffer[141] = {0};
   if (read(file, buffer, sizeof(buffer)) != sizeof(buffer)) {
