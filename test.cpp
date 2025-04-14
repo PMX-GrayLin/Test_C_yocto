@@ -237,18 +237,26 @@ int main(int argc, char* argv[]) {
     });
     svr.Get("/temperature_array", [&](const httplib::Request& req, httplib::Response& res) {
       
-      xlog("query otpa8 matrix...");
+      xlog("query otpa16...");
       float ambientTemp = 0.0;
       float objectTemp[256] = { 0.0 };
       otpa8.readTemperature_array(ambientTemp, objectTemp);
       std::ostringstream response;
-      response << "{ \"ambient\": " << ambientTemp << ", \"object\": [";
+      response << "{ \"ambient\": " << std::fixed << std::setprecision(2) << ambientTemp << ", \"object\": [";
       for (int i = 0; i < 256; ++i) {
-          response << objectTemp[i];
-          if (i < 256) response << ", ";
+          response << std::fixed << std::setprecision(2) << objectTemp[i];
+          if (i < 255) response << ", ";  // Don't add comma after the last element
       }
       response << "] }";
       res.set_content(response.str(), "application/json");
+
+      // response << "{ \"ambient\": " << ambientTemp << ", \"object\": [";
+      // for (int i = 0; i < 256; ++i) {
+      //     response << objectTemp[i];
+      //     if (i < 256) response << ", ";
+      // }
+      // response << "] }";
+      // res.set_content(response.str(), "application/json");
     });
     svr.Get(R"(/fw/(.*))", [&](const httplib::Request &req, httplib::Response &res) {
       std::smatch match;
