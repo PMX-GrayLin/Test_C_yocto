@@ -242,21 +242,13 @@ int main(int argc, char* argv[]) {
       float objectTemp[256] = { 0.0 };
       otpa8.readTemperature_array(ambientTemp, objectTemp);
       std::ostringstream response;
-      response << "{ \"ambient\": " << std::fixed << std::setprecision(2) << ambientTemp << ", \"object\": [";
+      response << "{ \"ambient\": " << std::fixed << std::setprecision(1) << ambientTemp << ", \"object\": [";
       for (int i = 0; i < 256; ++i) {
-          response << std::fixed << std::setprecision(2) << objectTemp[i];
+          response << std::fixed << std::setprecision(1) << objectTemp[i];
           if (i < 255) response << ", ";  // Don't add comma after the last element
       }
       response << "] }";
       res.set_content(response.str(), "application/json");
-
-      // response << "{ \"ambient\": " << ambientTemp << ", \"object\": [";
-      // for (int i = 0; i < 256; ++i) {
-      //     response << objectTemp[i];
-      //     if (i < 256) response << ", ";
-      // }
-      // response << "] }";
-      // res.set_content(response.str(), "application/json");
     });
     svr.Get(R"(/fw/(.*))", [&](const httplib::Request &req, httplib::Response &res) {
       std::smatch match;
