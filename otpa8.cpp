@@ -189,7 +189,8 @@ bool OTPA8::readTemperature_array(float& ambientTemp, float* objectTemp) {
     uint8_t objLow = buffer[14 + 2 * i];   // Low byte of pixel i
     uint16_t objectRaw = (objHigh * 256) + objLow;
 
-    tempArray[i] = (static_cast<float>(objectRaw) - 27315.0f) / 100.0f;
+    tempArray[i] = (objectRaw - 27315) / 100.0f;
+    // tempArray[i] = (static_cast<float>(objectRaw) - 27315.0f) / 100.0f;
 
     multipler = getMultipler(tempArray[i]);
     objectTemp[i] = tempArray[i] * multipler;
