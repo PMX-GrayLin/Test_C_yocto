@@ -192,8 +192,9 @@ bool OTPA8::readTemperature_array(float& ambientTemp, float* objectTemp) {
     tempArray[i] = (objectRaw - 27315) / 100.0f;
     // tempArray[i] = (static_cast<float>(objectRaw) - 27315.0f) / 100.0f;
 
-    multipler = getMultipler(tempArray[i]);
-    objectTemp[i] = tempArray[i] * multipler;
+    // multipler = getMultipler(tempArray[i]);
+    // objectTemp[i] = tempArray[i] * multipler;
+    objectTemp[i] = tempArray[i];
     
     if (i % 16 == 0) {
       printf("\n\n");
