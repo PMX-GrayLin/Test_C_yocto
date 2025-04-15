@@ -199,7 +199,13 @@ bool OTPA8::readTemperature_array(float& ambientTemp, float* objectTemp) {
     }
     // printf("%.2f [%02X%02X]\t", objectTemp[i], objHigh, objLow);
     // printf("[%02X%02X]\t", objHigh, objLow);
-    printf("%.1f\t", objectTemp[i]);
+    if (objectTemp[i] == 0.0)
+    {
+      printf("%.1f [%02X%02X]\t", objectTemp[i], objHigh, objLow);
+  } else {
+      printf("%.1f\t", objectTemp[i]);
+    }
+    
   }
   
   // printf("\n\n");
