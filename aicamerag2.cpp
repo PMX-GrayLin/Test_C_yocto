@@ -934,6 +934,10 @@ void ThreadAICameraMonitorDIN() {
 
   // Main loop to monitor GPIOs
   while (isMonitorDIN) {
+    if (!isMonitorDIN) {
+      break;
+    }
+
     ret = poll(fds, DIN_NUM, -1);  // Wait indefinitely for an event
     if (ret < 0) {
       xlog("Error in poll");
