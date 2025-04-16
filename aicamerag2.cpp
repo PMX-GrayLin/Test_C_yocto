@@ -933,7 +933,7 @@ void ThreadAICameraMonitorDIN() {
   xlog("Monitoring GPIOs for events...");
 
   // Main loop to monitor GPIOs
-  while (1) {
+  while (isMonitorDIN) {
     ret = poll(fds, DIN_NUM, -1);  // Wait indefinitely for an event
     if (ret < 0) {
       xlog("Error in poll");
