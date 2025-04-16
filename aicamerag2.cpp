@@ -930,7 +930,7 @@ void ThreadAICameraMonitorDIN() {
     fds[i].events = POLLIN;
   }
 
-  xlog("Monitoring GPIOs for events...");
+  xlog("Thread Monitoring GPIOs for events...start");
 
   // Main loop to monitor GPIOs
   while (isMonitorDIN) {
@@ -951,6 +951,8 @@ void ThreadAICameraMonitorDIN() {
       }
     }
   }
+
+  xlog("Thread Monitoring GPIOs for events...stop");
 
   // Cleanup
   for (i = 0; i < DIN_NUM; i++) {
