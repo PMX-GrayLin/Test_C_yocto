@@ -972,3 +972,22 @@ void AICamera_MonitorDINStart() {
 void AICamera_MonitorDINStop() {
   isMonitorDIN = false;
 }
+
+void AICamera_setDO(string do_num, string onoff) {
+  int gpio_index = 0;
+  bool isON = false;
+
+  if (do_num == 1) {
+    gpio_index = 1;
+  } else if (do_num == 2) {
+    gpio_index = 2;
+  }
+
+  if (isSameString(onoff, "on")) {
+    isON = true;
+  } else if (isSameString(onoff, "off")) {
+    isON = false;
+  }
+
+  AICamera_setGPIO(gpio_index, isON ? 1 : 0);
+}

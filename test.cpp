@@ -210,8 +210,6 @@ int main(int argc, char* argv[]) {
     OTI322 oti322;
     OTPA8 otpa8;
 
-    // oti322.startReading();
-
     // REST API: Get Temperature
     httplib::Server svr;
     // svr.Get("/temperature", [&](const httplib::Request& req, httplib::Response& res) {
@@ -301,6 +299,8 @@ int main(int argc, char* argv[]) {
             xlog("param may missing...");
           }
 
+        } else if (isSameString(segments[0].c_str(), "do")) {
+          AICamera_setDO(segments[1].c_str(), segments[2].c_str());
         }
   
       } else {

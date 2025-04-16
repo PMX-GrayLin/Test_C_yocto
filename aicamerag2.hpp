@@ -117,3 +117,4 @@ void AICamera_setLED(string led_index, string led_color);
 void ThreadAICameraMonitorDIN();
 extern void AICamera_MonitorDINStart();
 extern void AICamera_MonitorDINStop();
+extern void AICamera_setDO(string do_num, string onoff);
