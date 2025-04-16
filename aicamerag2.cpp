@@ -1,6 +1,6 @@
 #include "aicamerag2.hpp"
 
-int DIN_GPIOs[DIN_NUM] = {1, 2};  // DIN GPIO
+int DIN_GPIOs[DIN_NUM] = {0, 1};  // DIN GPIO
 std::thread t_aicamera_monitorDIN;
 bool isMonitorDIN = false;
 
@@ -978,9 +978,9 @@ void AICamera_setDO(string do_num, string onoff) {
   bool isON = false;
 
   if (do_num == "1") {
-    gpio_index = 1;
+    gpio_index = 3;
   } else if (do_num == "2") {
-    gpio_index = 2;
+    gpio_index = 7;
   }
 
   if (isSameString(onoff.c_str(), "on")) {
