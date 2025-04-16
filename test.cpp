@@ -301,8 +301,16 @@ int main(int argc, char* argv[]) {
 
         } else if (isSameString(segments[0].c_str(), "do")) {
           AICamera_setDO(segments[1], segments[2]);
-        }
-  
+        
+        } else if (isSameString(segments[0].c_str(), "di")) {
+          if (isSameString(segments[1].c_str(), "on")) {
+            AICamera_MonitorDINStart();
+          } else if (isSameString(segments[1].c_str(), "off")) {
+            AICamera_MonitorDINStop();
+          }
+
+        }  
+
       } else {
         res.status = 400;  // Bad Request
         res.set_content("{ \"error\": \"Invalid request\" }", "application/json");
