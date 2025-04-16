@@ -300,7 +300,7 @@ int main(int argc, char* argv[]) {
           }
 
         } else if (isSameString(segments[0].c_str(), "do")) {
-          AICamera_setDO(segments[1].c_str(), segments[2].c_str());
+          AICamera_setDO(segments[1], segments[2]);
         }
   
       } else {

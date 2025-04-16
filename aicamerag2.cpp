@@ -983,9 +983,9 @@ void AICamera_setDO(string do_num, string onoff) {
     gpio_index = 2;
   }
 
-  if (isSameString(onoff, "on")) {
+  if (isSameString(onoff.c_str(), "on")) {
     isON = true;
-  } else if (isSameString(onoff, "off")) {
+  } else if (isSameString(onoff.c_str(), "off")) {
     isON = false;
   }
 
