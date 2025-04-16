@@ -147,9 +147,9 @@ public:
           std::thread t(gst_test, 0);
           t.detach();
         } else if (payload == "gst") {
-          AICamera_startStreaming();
+          AICamera_streamingStart();
         } else if (payload == "gstx") {
-          AICamera_stopStreaming();
+          AICamera_streamingStop();
 
         } else if (payload == "tms") {
           xlog("timer start...");
@@ -278,9 +278,9 @@ int main(int argc, char* argv[]) {
   
         if (isSameString(segments[0].c_str(), "gst")) {
           if (isSameString(segments[1].c_str(), "start")) {
-            AICamera_startStreaming();
+            AICamera_streamingStart();
           } else if (isSameString(segments[1].c_str(), "stop")) {
-            AICamera_stopStreaming();
+            AICamera_streamingStop();
           }
 
         } else if (isSameString(segments[0].c_str(), "tp")) {

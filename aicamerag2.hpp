@@ -103,8 +103,8 @@ extern void AICamera_enablePadding(bool enable);
 GstPadProbeReturn AICAMERA_streamingDataCallback(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
 void ThreadAICameraStreaming();
 void ThreadAICameraStreaming_usb();
-extern void AICamera_startStreaming();
-extern void AICamera_stopStreaming();
+extern void AICamera_streamingStart();
+extern void AICamera_streamingStop();
 
 // image processing
 extern void AICAMERA_load_crop_saveImage();
@@ -112,3 +112,8 @@ extern void AICAMERA_load_crop_saveImage();
 // led
 void AICamera_setGPIO(int gpio_num, int value);
 void AICamera_setLED(string led_index, string led_color);
+
+// DIO
+void ThreadAICameraMonitorDIN();
+extern void AICamera_MonitorDINStart();
+extern void AICamera_MonitorDINStop();

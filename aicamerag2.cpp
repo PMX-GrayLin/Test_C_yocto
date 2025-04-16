@@ -1,9 +1,11 @@
 #include "aicamerag2.hpp"
 
 int DIN_GPIOs[DIN_NUM] = {1, 2};  // DIN GPIO
+std::thread t_aicamera_monitorDIN;
+bool isMonitorDIN = false;
 
 std::thread t_aicamera_streaming;
-bool is_aicamera_streaming = false;
+bool isStreaming = false;
 
 bool isCapturePhoto = false;
 bool isCropPhoto = false;
@@ -271,7 +273,7 @@ bool AICamera_isCropImage() {
 }
 
 void AICamera_captureImage() {
-  if (!is_aicamera_streaming) {
+  if (!isStreaming) {
     xlog("do nothing...camera is not streaming");
     return;
   }
@@ -677,7 +679,7 @@ void ThreadAICameraStreaming() {
   }
 
   xlog("pipeline is running...");
-  is_aicamera_streaming = true;
+  isStreaming = true;
 
   // Run the main loop
   gst_loop = g_main_loop_new(nullptr, FALSE);
@@ -689,7 +691,7 @@ void ThreadAICameraStreaming() {
 
   // Clean up
   gst_object_unref(gst_pipeline);
-  is_aicamera_streaming = false;
+  isStreaming = false;
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 
 }
@@ -777,7 +779,7 @@ void ThreadAICameraStreaming_usb() {
   }
 
   xlog("pipeline is running...");
-  is_aicamera_streaming = true;
+  isStreaming = true;
 
   // Run the main loop
   gst_loop = g_main_loop_new(nullptr, FALSE);
@@ -789,18 +791,18 @@ void ThreadAICameraStreaming_usb() {
 
   // Clean up
   gst_object_unref(gst_pipeline);
-  is_aicamera_streaming = false;
+  isStreaming = false;
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 
 }
 
-void AICamera_startStreaming() {
+void AICamera_streamingStart() {
   xlog("");
-  if (is_aicamera_streaming) {
+  if (isStreaming) {
     xlog("thread already running");
     return;
   }
-  is_aicamera_streaming = true;
+  isStreaming = true;
 
   if (AICamrea_isUseCSICamera())
   {
@@ -809,16 +811,10 @@ void AICamera_startStreaming() {
     t_aicamera_streaming = std::thread(ThreadAICameraStreaming_usb);  
   }
   
-// #if defined(USE_USB_CAM)
-//   t_aicamera_streaming = std::thread(ThreadAICameraStreaming_usb);
-// #else
-//   t_aicamera_streaming = std::thread(ThreadAICameraStreaming);
-// #endif
-
   t_aicamera_streaming.detach();
 }
 
-void AICamera_stopStreaming() {
+void AICamera_streamingStop() {
   xlog("");
   if (gst_loop) {
     g_main_loop_quit(gst_loop);
@@ -826,7 +822,7 @@ void AICamera_stopStreaming() {
     gst_loop = nullptr;
 
     // ??
-    is_aicamera_streaming = false;
+    isStreaming = false;
   } else {
     xlog("gst_loop is invalid or already destroyed.");
   }
@@ -900,7 +896,7 @@ void AICamera_setLED(string led_index, string led_color) {
   }
 }
 
-void monitor_multiple_gpio(int *din_gpios, int count) {
+void ThreadAICameraMonitorDIN() {
   struct gpiod_chip *chip;
   struct gpiod_line *lines[DIN_NUM];
   struct pollfd fds[DIN_NUM];
@@ -914,17 +910,17 @@ void monitor_multiple_gpio(int *din_gpios, int count) {
   }
 
   // Configure GPIOs for edge detection
-  for (i = 0; i < count; i++) {
-    lines[i] = gpiod_chip_get_line(chip, din_gpios[i]);
+  for (i = 0; i < DIN_NUM; i++) {
+    lines[i] = gpiod_chip_get_line(chip, DIN_GPIOs[i]);
     if (!lines[i]) {
-      xlog("Failed to get GPIO line %d", din_gpios[i]);
+      xlog("Failed to get GPIO line %d", DIN_GPIOs[i]);
       continue;
     }
 
     // Request GPIO line for both rising and falling edge events
     ret = gpiod_line_request_both_edges_events(lines[i], "gpio_interrupt");
     if (ret < 0) {
-      xlog("Failed to request GPIO %d for edge events", din_gpios[i]);
+      xlog("Failed to request GPIO %d for edge events", DIN_GPIOs[i]);
       gpiod_line_release(lines[i]);
       continue;
     }
@@ -938,27 +934,41 @@ void monitor_multiple_gpio(int *din_gpios, int count) {
 
   // Main loop to monitor GPIOs
   while (1) {
-    ret = poll(fds, count, -1);  // Wait indefinitely for an event
+    ret = poll(fds, DIN_NUM, -1);  // Wait indefinitely for an event
     if (ret < 0) {
       xlog("Error in poll");
       break;
     }
 
     // Check which GPIO triggered the event
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < DIN_NUM; i++) {
       if (fds[i].revents & POLLIN) {
         struct gpiod_line_event event;
         gpiod_line_event_read(lines[i], &event);
 
-        xlog("GPIO %d event detected! Type: %s", din_gpios[i],
+        xlog("GPIO %d event detected! Type: %s", DIN_GPIOs[i],
              (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "RISING" : "FALLING");
       }
     }
   }
 
   // Cleanup
-  for (i = 0; i < count; i++) {
+  for (i = 0; i < DIN_NUM; i++) {
     gpiod_line_release(lines[i]);
   }
   gpiod_chip_close(chip);
+}
+
+void AICamera_MonitorDINStart() {
+  xlog("");
+  if (isMonitorDIN) {
+    xlog("thread already running");
+    return;
+  }
+  isMonitorDIN = true;
+  t_aicamera_monitorDIN = std::thread(ThreadAICameraMonitorDIN);  
+  t_aicamera_monitorDIN.detach();
+}
+void AICamera_MonitorDINStop() {
+  isMonitorDIN = false;
 }
