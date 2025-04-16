@@ -977,9 +977,9 @@ void AICamera_setDO(string do_num, string onoff) {
   int gpio_index = 0;
   bool isON = false;
 
-  if (do_num == 1) {
+  if (do_num == "1") {
     gpio_index = 1;
-  } else if (do_num == 2) {
+  } else if (do_num == "2") {
     gpio_index = 2;
   }
 
