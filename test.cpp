@@ -304,14 +304,23 @@ int main(int argc, char* argv[]) {
         
         } else if (isSameString(segments[0].c_str(), "di")) {
           if (isSameString(segments[1].c_str(), "on")) {
-            AICamera_MonitorDINStart();
+            AICamera_MonitorDIStart();
           } else if (isSameString(segments[1].c_str(), "off")) {
-            AICamera_MonitorDINStop();
+            AICamera_MonitorDIStop();
           }
 
         } else if (isSameString(segments[0].c_str(), "pwm")) {
           AICamera_setPWM(segments[1]);
+        
+        } else if (isSameString(segments[0].c_str(), "dio")) {
+          if (isSameString(segments[1].c_str(), "on")) {
+            AICamera_MonitorDIOStart();
+          } else if (isSameString(segments[1].c_str(), "off")) {
+            AICamera_MonitorDIOStop();
+          }
+
         }  
+
 
       } else {
         res.status = 400;  // Bad Request

@@ -6,7 +6,9 @@
 #define AICamreaUSBPath "/dev/video137"
 
 #define GPIO_CHIP "/dev/gpiochip0"
-#define DIN_NUM 2                 // Number of DIN to monitor
+#define NUM_DI    2                 // Number of DI
+#define NUM_DO    2                 // Number of DO
+#define NUM_DIO   2                 // Number of DIO
 
 typedef enum {
   lc_red,
@@ -20,6 +22,12 @@ typedef enum {
     spf_JPEG,
     spf_PNG,
 } SavedPhotoFormat;
+
+typedef enum {
+  diod_in,
+  diod_out,
+} DIO_Direction;
+
 
 extern bool AICamrea_isUseCSICamera();
 extern std::string AICamrea_getVideoDevice();
@@ -113,11 +121,19 @@ extern void AICAMERA_load_crop_saveImage();
 void AICamera_setGPIO(int gpio_num, int value);
 void AICamera_setLED(string led_index, string led_color);
 
+// DI
+void ThreadAICameraMonitorDI();
+extern void AICamera_MonitorDIStart();
+extern void AICamera_MonitorDIStop();
+
+// DO
+extern void AICamera_setDO(string index_do, string on_off);
+
 // DIO
-void ThreadAICameraMonitorDIN();
-extern void AICamera_MonitorDINStart();
-extern void AICamera_MonitorDINStop();
-extern void AICamera_setDO(string do_num, string onoff);
+void ThreadAICameraMonitorDIO();
+extern void AICamera_MonitorDIOStart();
+extern void AICamera_MonitorDIOStop();
+extern void AICamera_setDIODirection(string dio_index, string in_out);
 
 // PWM 
 void AICamera_writePWMFile(const std::string &path, const std::string &value);

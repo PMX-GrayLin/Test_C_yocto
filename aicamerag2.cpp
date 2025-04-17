@@ -4,12 +4,22 @@
 const std::string path_pwm = "/sys/devices/platform/soc/10048000.pwm/pwm/pwmchip0";
 const std::string pwmTarget = path_pwm + "/pwm1";
 const std::string path_pwmExport = path_pwm + "/export";
-const int pwmPeriod = 200000; // 5 kHz
+const int pwmPeriod = 200000;   // 5 kHz
+
+// DI
+int DI_GPIOs[NUM_DI] = {0, 1};  // DI GPIO
+std::thread t_aicamera_monitorDI;
+bool isMonitorDI = false;
+
+// DO
+int DO_GPIOs[NUM_DO] = {3, 7};  // DO GPIO
 
 // DIO
-int DIN_GPIOs[DIN_NUM] = {0, 1};  // DIN GPIO
-std::thread t_aicamera_monitorDIN;
-bool isMonitorDIN = false;
+int DIO_IN_GPIOs[NUM_DIO] = {2, 6};   // DI GPIO
+int DIO_OUT_GPIOs[NUM_DIO] = {8, 9};  // DO GPIO
+DIO_Direction dioDirection[NUM_DIO] = {diod_in};
+std::thread t_aicamera_monitorDIO;
+bool isMonitorDIO = false;
 
 std::thread t_aicamera_streaming;
 bool isStreaming = false;
@@ -903,10 +913,10 @@ void AICamera_setLED(string led_index, string led_color) {
   }
 }
 
-void ThreadAICameraMonitorDIN() {
+void ThreadAICameraMonitorDI() {
   struct gpiod_chip *chip;
-  struct gpiod_line *lines[DIN_NUM];
-  struct pollfd fds[DIN_NUM];
+  struct gpiod_line *lines[NUM_DI];
+  struct pollfd fds[NUM_DI];
   int i, ret;
 
   // Open GPIO chip
@@ -917,17 +927,17 @@ void ThreadAICameraMonitorDIN() {
   }
 
   // Configure GPIOs for edge detection
-  for (i = 0; i < DIN_NUM; i++) {
-    lines[i] = gpiod_chip_get_line(chip, DIN_GPIOs[i]);
+  for (i = 0; i < NUM_DI; i++) {
+    lines[i] = gpiod_chip_get_line(chip, DI_GPIOs[i]);
     if (!lines[i]) {
-      xlog("Failed to get GPIO line %d", DIN_GPIOs[i]);
+      xlog("Failed to get GPIO line %d", DI_GPIOs[i]);
       continue;
     }
 
     // Request GPIO line for both rising and falling edge events
     ret = gpiod_line_request_both_edges_events(lines[i], "gpio_interrupt");
     if (ret < 0) {
-      xlog("Failed to request GPIO %d for edge events", DIN_GPIOs[i]);
+      xlog("Failed to request GPIO %d for edge events", DI_GPIOs[i]);
       gpiod_line_release(lines[i]);
       continue;
     }
@@ -940,20 +950,20 @@ void ThreadAICameraMonitorDIN() {
   xlog("Thread Monitoring GPIOs for events...start");
 
   // Main loop to monitor GPIOs
-  while (isMonitorDIN) {
-    ret = poll(fds, DIN_NUM, -1);  // Wait indefinitely for an event
+  while (isMonitorDI) {
+    ret = poll(fds, NUM_DI, -1);  // Wait indefinitely for an event
     if (ret < 0) {
       xlog("Error in poll");
       break;
     }
 
     // Check which GPIO triggered the event
-    for (i = 0; i < DIN_NUM; i++) {
+    for (i = 0; i < NUM_DI; i++) {
       if (fds[i].revents & POLLIN) {
         struct gpiod_line_event event;
         gpiod_line_event_read(lines[i], &event);
 
-        xlog("GPIO %d event detected! Type: %s", DIN_GPIOs[i],
+        xlog("GPIO %d event detected! Type: %s", DI_GPIOs[i],
              (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "RISING" : "FALLING");
       }
     }
@@ -962,45 +972,160 @@ void ThreadAICameraMonitorDIN() {
   xlog("Thread Monitoring GPIOs for events...stop");
 
   // Cleanup
-  for (i = 0; i < DIN_NUM; i++) {
+  for (i = 0; i < NUM_DI; i++) {
     gpiod_line_release(lines[i]);
   }
   gpiod_chip_close(chip);
 }
 
-void AICamera_MonitorDINStart() {
+void AICamera_MonitorDIStart() {
   xlog("");
-  if (isMonitorDIN) {
+  if (isMonitorDI) {
     xlog("thread already running");
     return;
   }
-  isMonitorDIN = true;
-  t_aicamera_monitorDIN = std::thread(ThreadAICameraMonitorDIN);  
-  t_aicamera_monitorDIN.detach();
+  isMonitorDI = true;
+  t_aicamera_monitorDI = std::thread(ThreadAICameraMonitorDI);  
+  t_aicamera_monitorDI.detach();
 }
-void AICamera_MonitorDINStop() {
-  isMonitorDIN = false;
+void AICamera_MonitorDIStop() {
+  isMonitorDI = false;
 }
 
-void AICamera_setDO(string do_num, string onoff) {
-  int gpio_index = 0;
+void AICamera_setDO(string index_do, string on_off) {
+  int index_gpio = 0;
   bool isON = false;
 
-  if (do_num == "1") {
-    gpio_index = 3;
-  } else if (do_num == "2") {
-    gpio_index = 7;
+  int index = std::stoi(index_do);
+  if (index == 1 || index == 2) {
+    index_gpio = DO_GPIOs[index - 1];
+  } else {
+    xlog("DO : index should be 1 or 2...");
+    return;
   }
 
-  if (isSameString(onoff.c_str(), "on")) {
+  if (isSameString(on_off.c_str(), "on")) {
     isON = true;
-  } else if (isSameString(onoff.c_str(), "off")) {
+  } else if (isSameString(on_off.c_str(), "off")) {
     isON = false;
+  } else {
+    xlog("DO : input string should be on or off...");
+    return;
   }
 
-  AICamera_setGPIO(gpio_index, isON ? 1 : 0);
+  AICamera_setGPIO(index_gpio, isON ? 1 : 0);
 }
 
+void ThreadAICameraMonitorDIO() {
+  struct gpiod_chip *chip;
+  struct gpiod_line *lines[NUM_DIO];
+  struct pollfd fds[NUM_DIO];
+  int i, ret;
+
+  // Open GPIO chip
+  chip = gpiod_chip_open(GPIO_CHIP);
+  if (!chip) {
+    xlog("Failed to open GPIO chip: %s", GPIO_CHIP);
+    return;
+  }
+
+  // Configure GPIOs for edge detection
+  for (i = 0; i < NUM_DIO; i++) {
+    lines[i] = gpiod_chip_get_line(chip, DIO_GPIOs[i]);
+    if (!lines[i]) {
+      xlog("Failed to get GPIO line %d", DIO_GPIOs[i]);
+      continue;
+    }
+
+    // Request GPIO line for both rising and falling edge events
+    ret = gpiod_line_request_both_edges_events(lines[i], "gpio_interrupt");
+    if (ret < 0) {
+      xlog("Failed to request GPIO %d for edge events", DIO_GPIOs[i]);
+      gpiod_line_release(lines[i]);
+      continue;
+    }
+
+    // Get file descriptor for polling
+    fds[i].fd = gpiod_line_event_get_fd(lines[i]);
+    fds[i].events = POLLIN;
+  }
+
+  xlog("Thread Monitoring GPIOs for events...start");
+
+  // Main loop to monitor GPIOs
+  while (isMonitorDIO) {
+    ret = poll(fds, NUM_DIO, -1);  // Wait indefinitely for an event
+    if (ret < 0) {
+      xlog("Error in poll");
+      break;
+    }
+
+    // Check which GPIO triggered the event
+    for (i = 0; i < NUM_DIO; i++) {
+      if (fds[i].revents & POLLIN) {
+        struct gpiod_line_event event;
+        gpiod_line_event_read(lines[i], &event);
+
+        xlog("GPIO %d event detected! Type: %s", DIO_GPIOs[i],
+             (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "RISING" : "FALLING");
+      }
+    }
+  }
+
+  xlog("Thread Monitoring GPIOs for events...stop");
+
+  // Cleanup
+  for (i = 0; i < NUM_DIO; i++) {
+    gpiod_line_release(lines[i]);
+  }
+  gpiod_chip_close(chip);
+}
+
+void AICamera_MonitorDIOStart() {
+  xlog("");
+  if (isMonitorDIO) {
+    xlog("thread already running");
+    return;
+  }
+  isMonitorDIO = true;
+  t_aicamera_monitorDIO = std::thread(ThreadAICameraMonitorDIO);  
+  t_aicamera_monitorDIO.detach();
+}
+
+void AICamera_MonitorDIOStop() {
+  isMonitorDIO = false;
+}
+
+void AICamera_setDIODirection(string dio_index, string in_out) {
+  int index_gpio_in = 0;
+  int index_gpio_out = 0;
+
+  int index = std::stoi(dio_index);
+  if (index == 1 || index == 2) {
+    index_gpio_in = DIO_IN_GPIOs[index - 1];
+    index_gpio_out = DIO_OUT_GPIOs[index - 1];
+  } else {
+    xlog("DIO : index should be 1 or 2...");
+    return;
+  }
+
+  if (isSameString(in_out.c_str(), "in")) {
+    // set flag
+    dioDirection[index - 1] = diod_in;
+
+    // make gpio out low
+    AICamera_setGPIO(index_gpio_out, 0);
+
+    // start monitor gpio input
+  } else if (isSameString(in_out.c_str(), "out")) {
+    // set flag
+    dioDirection[index - 1] = diod_out;
+
+  } else {
+    xlog("DO : input string should be on or off...");
+    return;
+  }
+}
 
 void AICamera_writePWMFile(const std::string &path, const std::string &value) {
   std::ofstream fs(path);
@@ -1020,7 +1145,7 @@ void AICamera_setPWM(string sPercent) {
     AICamera_writePWMFile(pwmTarget + "/period", std::to_string(pwmPeriod));
   }
 
-  int percent = std::stoi( sPercent );
+  int percent = std::stoi(sPercent);
   if (percent != 0)
   {
     int duty_cycle = pwmPeriod * percent / 100;
