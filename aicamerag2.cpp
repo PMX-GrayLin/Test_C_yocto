@@ -1136,7 +1136,7 @@ void AICamera_setDIODirection(string index_dio, string in_out) {
 void AICamera_setDIOOut(string index_dio, string on_off) {
   int index_gpio = 0;
   bool isON = false;
-  int index = std::stoi(index_do);
+  int index = std::stoi(index_dio);
 
   if (dioDirection[index - 1] != diod_out) {
     xlog("DIO direction should be set first...");
