@@ -1125,7 +1125,7 @@ void AICamera_setDIODirection(string dio_index, string in_out) {
     dioDirection[index - 1] = diod_out;
 
     // stop monitor gpio input
-    AICamera_MonitorDIOStop([index - 1]);
+    AICamera_MonitorDIOStop(index - 1);
 
   } else {
     xlog("DO : input string should be on or off...");
