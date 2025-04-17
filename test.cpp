@@ -314,8 +314,8 @@ int main(int argc, char* argv[]) {
         
         } else if (isSameString(segments[0].c_str(), "dio")) {
           if (isSameString(segments[1].c_str(), "on")) {
-            AICamera_setDIODirection("1", "in")
-            AICamera_setDIODirection("2", "in")
+            AICamera_setDIODirection("1", "in");
+            AICamera_setDIODirection("2", "in");
             AICamera_MonitorDIOStart();
           } else if (isSameString(segments[1].c_str(), "off")) {
             AICamera_MonitorDIOStop();
