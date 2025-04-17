@@ -1031,16 +1031,16 @@ void ThreadAICameraMonitorDIO() {
 
   // Configure GPIOs for edge detection
   for (i = 0; i < NUM_DIO; i++) {
-    lines[i] = gpiod_chip_get_line(chip, DIO_GPIOs[i]);
+    lines[i] = gpiod_chip_get_line(chip, DIO_IN_GPIOs[i]);
     if (!lines[i]) {
-      xlog("Failed to get GPIO line %d", DIO_GPIOs[i]);
+      xlog("Failed to get GPIO line %d", DIO_IN_GPIOs[i]);
       continue;
     }
 
     // Request GPIO line for both rising and falling edge events
     ret = gpiod_line_request_both_edges_events(lines[i], "gpio_interrupt");
     if (ret < 0) {
-      xlog("Failed to request GPIO %d for edge events", DIO_GPIOs[i]);
+      xlog("Failed to request GPIO %d for edge events", DIO_IN_GPIOs[i]);
       gpiod_line_release(lines[i]);
       continue;
     }
@@ -1066,7 +1066,7 @@ void ThreadAICameraMonitorDIO() {
         struct gpiod_line_event event;
         gpiod_line_event_read(lines[i], &event);
 
-        xlog("GPIO %d event detected! Type: %s", DIO_GPIOs[i],
+        xlog("GPIO %d event detected! Type: %s", DIO_IN_GPIOs[i],
              (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "RISING" : "FALLING");
       }
     }
