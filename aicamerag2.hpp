@@ -118,3 +118,7 @@ void ThreadAICameraMonitorDIN();
 extern void AICamera_MonitorDINStart();
 extern void AICamera_MonitorDINStop();
 extern void AICamera_setDO(string do_num, string onoff);
+
+// PWM 
+void AICamera_writePWMFile(const std::string &path, const std::string &value);
+extern void AICAmera_setPWM(string sPercent);

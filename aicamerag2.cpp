@@ -1,5 +1,12 @@
 #include "aicamerag2.hpp"
 
+// PWM
+const std::string path_pwm = "/sys/devices/platform/soc/10048000.pwm/pwm/pwmchip0";
+const std::string pwmTarget = path_pwm + "/pwm1";
+const std::string path_pwmExport = path_pwm + "/export";
+const int pwmPeriod = 200000; // 5 kHz
+
+// DIO
 int DIN_GPIOs[DIN_NUM] = {0, 1};  // DIN GPIO
 std::thread t_aicamera_monitorDIN;
 bool isMonitorDIN = false;
@@ -934,10 +941,6 @@ void ThreadAICameraMonitorDIN() {
 
   // Main loop to monitor GPIOs
   while (isMonitorDIN) {
-    if (!isMonitorDIN) {
-      break;
-    }
-
     ret = poll(fds, DIN_NUM, -1);  // Wait indefinitely for an event
     if (ret < 0) {
       xlog("Error in poll");
@@ -996,4 +999,31 @@ void AICamera_setDO(string do_num, string onoff) {
   }
 
   AICamera_setGPIO(gpio_index, isON ? 1 : 0);
+}
+
+
+void AICamera_writePWMFile(const std::string &path, const std::string &value) {
+  std::ofstream fs(path);
+  if (fs) {
+      fs << value;
+      fs.close();
+  } else {
+      std::cerr << "Failed to write to " << path << std::endl;
+  }
+}
+
+void AICAmera_setPWM(string sPercent) {
+  if (!isPathExist(pwmTarget)) {
+    xlog("PWM init...");
+    AICamera_writePWMFile(path_pwmExport, "1");
+    usleep(500000);  // sleep 0.5s
+    AICamera_writePWMFile(pwmTarget + "/period", std::to_string(pwmPeriod));
+  }
+
+  int percent = std::stoi( sPercent );
+  int duty_cycle = pwmPeriod * percent / 100;
+
+  AICamera_writePWMFile(pwmTarget + "/duty_cycle", std::to_string(duty_cycle));
+  AICamera_writePWMFile(pwmTarget + "/enable", "1");
+
 }
