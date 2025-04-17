@@ -1088,13 +1088,13 @@ void AICamera_MonitorDIOStart(int index_dio) {
     xlog("thread already running");
     return;
   }
-  isMonitorDIO = true;
-  t_aicamera_monitorDIO = std::thread(ThreadAICameraMonitorDIO, index_dio);  
-  t_aicamera_monitorDIO.detach();
+  isMonitorDIO[index_dio] = true;
+  t_aicamera_monitorDIO[index_dio] = std::thread(ThreadAICameraMonitorDIO, index_dio);  
+  t_aicamera_monitorDIO[index_dio].detach();
 }
 
 void AICamera_MonitorDIOStop(int index_dio) {
-  isMonitorDIO = false;
+  isMonitorDIO[index_dio] = false;
 }
 
 void AICamera_setDIODirection(string dio_index, string in_out) {
@@ -1125,7 +1125,7 @@ void AICamera_setDIODirection(string dio_index, string in_out) {
     dioDirection[index - 1] = diod_out;
 
     // stop monitor gpio input
-    AICamera_MonitorDIOStop();
+    AICamera_MonitorDIOStop([index - 1]);
 
   } else {
     xlog("DO : input string should be on or off...");
