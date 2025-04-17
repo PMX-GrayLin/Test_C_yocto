@@ -7,8 +7,7 @@ const std::string path_pwmExport = path_pwm + "/export";
 const int pwmPeriod = 200000;   // 5 kHz
 
 // DI
-// int DI_GPIOs[NUM_DI] = {0, 1};  // DI GPIO
-int DI_GPIOs[NUM_DI] = {0, 1, 2, 6};  // DI GPIO
+int DI_GPIOs[NUM_DI] = {0, 1};  // DI GPIO
 std::thread t_aicamera_monitorDI;
 bool isMonitorDI = false;
 

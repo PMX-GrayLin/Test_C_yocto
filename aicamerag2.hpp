@@ -6,7 +6,7 @@
 #define AICamreaUSBPath "/dev/video137"
 
 #define GPIO_CHIP "/dev/gpiochip0"
-#define NUM_DI    4                 // Number of DI
+#define NUM_DI    2                 // Number of DI
 #define NUM_DO    2                 // Number of DO
 #define NUM_DIO   2                 // Number of DIO
 
