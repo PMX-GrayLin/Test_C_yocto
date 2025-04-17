@@ -1021,9 +1021,13 @@ void AICamera_setPWM(string sPercent) {
   }
 
   int percent = std::stoi( sPercent );
-  int duty_cycle = pwmPeriod * percent / 100;
-
-  AICamera_writePWMFile(pwmTarget + "/duty_cycle", std::to_string(duty_cycle));
-  AICamera_writePWMFile(pwmTarget + "/enable", "1");
+  if (percent != 0)
+  {
+    int duty_cycle = pwmPeriod * percent / 100;
+    AICamera_writePWMFile(pwmTarget + "/duty_cycle", std::to_string(duty_cycle));
+    AICamera_writePWMFile(pwmTarget + "/enable", "1");
+  } else {
+    AICamera_writePWMFile(pwmTarget + "/enable", "0");
+  }
 
 }
