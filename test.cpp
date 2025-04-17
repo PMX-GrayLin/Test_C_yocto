@@ -313,16 +313,12 @@ int main(int argc, char* argv[]) {
           AICamera_setPWM(segments[1]);
         
         } else if (isSameString(segments[0].c_str(), "dio")) {
-          if (isSameString(segments[1].c_str(), "on")) {
+          if (isSameString(segments[1].c_str(), "in")) {
             AICamera_setDIODirection("1", "in");
-            AICamera_setDIODirection("2", "in");
-            AICamera_MonitorDIOStart();
-          } else if (isSameString(segments[1].c_str(), "off")) {
-            AICamera_MonitorDIOStop();
+          } else if (isSameString(segments[1].c_str(), "out")) {
+            AICamera_setDIODirection("1", "out");
           }
-
         }  
-
 
       } else {
         res.status = 400;  // Bad Request
