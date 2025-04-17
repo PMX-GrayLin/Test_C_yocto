@@ -1012,7 +1012,7 @@ void AICamera_writePWMFile(const std::string &path, const std::string &value) {
   }
 }
 
-void AICAmera_setPWM(string sPercent) {
+void AICamera_setPWM(string sPercent) {
   if (!isPathExist(pwmTarget.c_str())) {
     xlog("PWM init...");
     AICamera_writePWMFile(path_pwmExport, "1");

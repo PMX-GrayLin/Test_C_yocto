@@ -309,6 +309,8 @@ int main(int argc, char* argv[]) {
             AICamera_MonitorDINStop();
           }
 
+        } else if (isSameString(segments[0].c_str(), "pwm")) {
+          AICamera_setPWM(segments[1]);
         }  
 
       } else {

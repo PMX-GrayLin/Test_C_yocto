@@ -121,4 +121,4 @@ extern void AICamera_setDO(string do_num, string onoff);
 
 // PWM 
 void AICamera_writePWMFile(const std::string &path, const std::string &value);
-extern void AICAmera_setPWM(string sPercent);
+extern void AICamera_setPWM(string sPercent);
