@@ -1084,7 +1084,7 @@ void ThreadAICameraMonitorDIO(int index_dio) {
 
 void AICamera_MonitorDIOStart(int index_dio) {
   xlog("");
-  if (isMonitorDIO) {
+  if (isMonitorDIO[index_dio]) {
     xlog("thread already running");
     return;
   }
