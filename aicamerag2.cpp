@@ -1016,7 +1016,7 @@ void AICamera_setDO(string index_do, string on_off) {
   AICamera_setGPIO(index_gpio, isON ? 1 : 0);
 }
 
-void ThreadAICameraMonitorDIO(int index_dio) {
+void ThreadAICameraMonitorDIOIn(int index_dio) {
 
   struct gpiod_chip *chip;
   struct gpiod_line *line;
@@ -1082,26 +1082,26 @@ void ThreadAICameraMonitorDIO(int index_dio) {
   gpiod_chip_close(chip);
 }
 
-void AICamera_MonitorDIOStart(int index_dio) {
+void AICamera_MonitorDIOInStart(int index_dio) {
   xlog("");
   if (isMonitorDIO[index_dio]) {
     xlog("thread already running");
     return;
   }
   isMonitorDIO[index_dio] = true;
-  t_aicamera_monitorDIO[index_dio] = std::thread(ThreadAICameraMonitorDIO, index_dio);  
+  t_aicamera_monitorDIO[index_dio] = std::thread(ThreadAICameraMonitorDIOIn, index_dio);  
   t_aicamera_monitorDIO[index_dio].detach();
 }
 
-void AICamera_MonitorDIOStop(int index_dio) {
+void AICamera_MonitorDIOInStop(int index_dio) {
   isMonitorDIO[index_dio] = false;
 }
 
-void AICamera_setDIODirection(string dio_index, string in_out) {
+void AICamera_setDIODirection(string index_dio, string in_out) {
   int index_gpio_in = 0;
   int index_gpio_out = 0;
 
-  int index = std::stoi(dio_index);
+  int index = std::stoi(index_dio);
   if (index == 1 || index == 2) {
     index_gpio_in = DIO_IN_GPIOs[index - 1];
     index_gpio_out = DIO_OUT_GPIOs[index - 1];
@@ -1118,19 +1118,48 @@ void AICamera_setDIODirection(string dio_index, string in_out) {
     AICamera_setGPIO(index_gpio_out, 0);
 
     // start monitor gpio input
-    AICamera_MonitorDIOStart(index - 1);
+    AICamera_MonitorDIOInStart(index - 1);
 
   } else if (isSameString(in_out.c_str(), "out")) {
     // set flag
     dioDirection[index - 1] = diod_out;
 
     // stop monitor gpio input
-    AICamera_MonitorDIOStop(index - 1);
+    AICamera_MonitorDIOInStop(index - 1);
 
   } else {
     xlog("DO : input string should be on or off...");
     return;
   }
+}
+
+void AICamera_setDIOOut(string index_dio, string on_off) {
+  int index_gpio = 0;
+  bool isON = false;
+  int index = std::stoi(index_do);
+
+  if (dioDirection[index - 1] != diod_out) {
+    xlog("DIO direction should be set first...");
+    return;
+  }
+
+  if (index == 1 || index == 2) {
+    index_gpio = DIO_OUT_GPIOs[index - 1];
+  } else {
+    xlog("DO : index should be 1 or 2...");
+    return;
+  }
+
+  if (isSameString(on_off.c_str(), "on")) {
+    isON = true;
+  } else if (isSameString(on_off.c_str(), "off")) {
+    isON = false;
+  } else {
+    xlog("DO : input string should be on or off...");
+    return;
+  }
+
+  AICamera_setGPIO(index_gpio, isON ? 1 : 0);
 }
 
 void AICamera_writePWMFile(const std::string &path, const std::string &value) {

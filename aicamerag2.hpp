@@ -130,10 +130,11 @@ extern void AICamera_MonitorDIStop();
 extern void AICamera_setDO(string index_do, string on_off);
 
 // DIO
-void ThreadAICameraMonitorDIO(int index_dio);
-extern void AICamera_MonitorDIOStart(int index_dio);
-extern void AICamera_MonitorDIOStop(int index_dio);
-extern void AICamera_setDIODirection(string dio_index, string in_out);
+void ThreadAICameraMonitorDIOIn(int index_dio);
+extern void AICamera_MonitorDIOInStart(int index_dio);
+extern void AICamera_MonitorDIOInStop(int index_dio);
+extern void AICamera_setDIODirection(string index_dio, string in_out);
+extern void AICamera_setDIOOut(string index_dio, string on_off);
 
 // PWM 
 void AICamera_writePWMFile(const std::string &path, const std::string &value);
