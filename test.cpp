@@ -307,7 +307,6 @@ int main(int argc, char* argv[]) {
           } else if (isSameString(segments[2].c_str(), "do")) {
             AICamera_setDIOOut(segments[1], segments[3]);
           }
-
         }
 
       } else {
