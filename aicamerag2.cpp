@@ -1129,7 +1129,7 @@ void AICamera_setDIODirection(string index_dio, string di_do) {
     AICamera_MonitorDIOInStop(index - 1);
 
   } else {
-    xlog("DO : input string should be on or off...");
+    xlog("DO : input string should be di or do...");
     return;
   }
 }

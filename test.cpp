@@ -308,14 +308,6 @@ int main(int argc, char* argv[]) {
             AICamera_setDIOOut(segments[1], segments[3]);
           }
 
-          AICamera_setDIODirection(segments[1], "");
-          if (isSameString(segments[1].c_str(), "in")) {
-            AICamera_setDIODirection("1", "in");
-          } else if (isSameString(segments[1].c_str(), "out")) {
-            AICamera_setDIODirection("1", "out");
-          } else if (isSameString(segments[1].c_str(), "o")) {
-            AICamera_setDIOOut("1", segments[2]);
-          }
         }
 
       } else {
