@@ -1097,7 +1097,8 @@ void AICamera_MonitorDIOInStop(int index_dio) {
   isMonitorDIO[index_dio] = false;
 }
 
-void AICamera_setDIODirection(string index_dio, string in_out) {
+void AICamera_setDIODirection(string index_dio, string di_do) {
+  xlog("index:%s, direction:%s", index_dio.c_str(), in_out.c_str());
   int index_gpio_in = 0;
   int index_gpio_out = 0;
 
@@ -1110,7 +1111,7 @@ void AICamera_setDIODirection(string index_dio, string in_out) {
     return;
   }
 
-  if (isSameString(in_out.c_str(), "in")) {
+  if (isSameString(di_do.c_str(), "di")) {
     // set flag
     dioDirection[index - 1] = diod_in;
 
@@ -1120,7 +1121,7 @@ void AICamera_setDIODirection(string index_dio, string in_out) {
     // start monitor gpio input
     AICamera_MonitorDIOInStart(index - 1);
 
-  } else if (isSameString(in_out.c_str(), "out")) {
+  } else if (isSameString(di_do.c_str(), "do")) {
     // set flag
     dioDirection[index - 1] = diod_out;
 

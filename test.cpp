@@ -212,16 +212,6 @@ int main(int argc, char* argv[]) {
 
     // REST API: Get Temperature
     httplib::Server svr;
-    // svr.Get("/temperature", [&](const httplib::Request& req, httplib::Response& res) {
-
-    //   xlog("query oti322...");
-    //   float ambientTemp = 0.0;
-    //   float objectTemp = 0.0;
-    //   oti322.readTemperature(ambientTemp, objectTemp);
-    //   std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
-    //                          ", \"object\": " + std::to_string(objectTemp) + " }";
-    //   res.set_content(response, "application/json");
-    // });
     svr.Get("/temperatures", [&](const httplib::Request& req, httplib::Response& res) {
       
       xlog("query otpa8...");
@@ -231,7 +221,6 @@ int main(int argc, char* argv[]) {
       std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
                              ", \"object\": " + std::to_string(objectTemp) + " }";
       res.set_content(response, "application/json");
-
     });
     svr.Get("/temperature_array", [&](const httplib::Request& req, httplib::Response& res) {
       
@@ -313,6 +302,13 @@ int main(int argc, char* argv[]) {
           AICamera_setPWM(segments[1]);
 
         } else if (isSameString(segments[0].c_str(), "dio")) {
+          if (isSameString(segments[2].c_str(), "set")) {
+            AICamera_setDIODirection(segments[1], segments[3]);
+          } else if (isSameString(segments[2].c_str(), "do")) {
+            AICamera_setDIOOut(segments[1], segments[3]);
+          }
+
+          AICamera_setDIODirection(segments[1], "");
           if (isSameString(segments[1].c_str(), "in")) {
             AICamera_setDIODirection("1", "in");
           } else if (isSameString(segments[1].c_str(), "out")) {

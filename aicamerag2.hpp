@@ -133,7 +133,7 @@ extern void AICamera_setDO(string index_do, string on_off);
 void ThreadAICameraMonitorDIOIn(int index_dio);
 extern void AICamera_MonitorDIOInStart(int index_dio);
 extern void AICamera_MonitorDIOInStop(int index_dio);
-extern void AICamera_setDIODirection(string index_dio, string in_out);
+extern void AICamera_setDIODirection(string index_dio, string di_do);
 extern void AICamera_setDIOOut(string index_dio, string on_off);
 
 // PWM 
