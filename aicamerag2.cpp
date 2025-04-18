@@ -1098,7 +1098,7 @@ void AICamera_MonitorDIOInStop(int index_dio) {
 }
 
 void AICamera_setDIODirection(string index_dio, string di_do) {
-  xlog("index:%s, direction:%s", index_dio.c_str(), in_out.c_str());
+  xlog("index:%s, direction:%s", index_dio.c_str(), di_do.c_str());
   int index_gpio_in = 0;
   int index_gpio_out = 0;
 
