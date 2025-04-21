@@ -908,13 +908,16 @@ void AICamera_streamingStart() {
   }
   isStreaming = true;
 
-  if (AICamrea_isUseCSICamera())
-  {
-    t_aicamera_streaming = std::thread(ThreadAICameraStreaming);
-  } else {
-    t_aicamera_streaming = std::thread(ThreadAICameraStreaming_usb);  
-  }
+  // if (AICamrea_isUseCSICamera())
+  // {
+  //   t_aicamera_streaming = std::thread(ThreadAICameraStreaming);
+  // } else {
+  //   t_aicamera_streaming = std::thread(ThreadAICameraStreaming_usb);  
+  // }
   
+  // test GigE
+  t_aicamera_streaming = std::thread(ThreadAICameraStreaming_GigE);  
+
   t_aicamera_streaming.detach();
 }
 
