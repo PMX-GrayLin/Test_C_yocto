@@ -111,9 +111,9 @@ int main(int argc, char* argv[]) {
 
         } else if (isSameString(segments[0].c_str(), "gige")) {
           if (isSameString(segments[1].c_str(), "start")) {
-            AICamera_streamingStart();
+            AICamera_streamingStart_GigE();
           } else if (isSameString(segments[1].c_str(), "stop")) {
-            AICamera_streamingStop();
+            AICamera_streamingStop_GigE();
           }
 
         } else if (isSameString(segments[0].c_str(), "tp")) {
