@@ -1,4 +1,5 @@
 #include "aicamerag2.hpp"
+#include "mqtt_client.hpp"
 
 // PWM
 const std::string path_pwm = "/sys/devices/platform/soc/10048000.pwm/pwm/pwmchip0";
@@ -964,7 +965,9 @@ void ThreadAICameraMonitorDI() {
         gpiod_line_event_read(lines[i], &event);
 
         xlog("GPIO %d event detected! Type: %s", DI_GPIOs[i],
-             (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "RISING" : "FALLING");
+             (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "rising" : "falling");
+
+        AICamera_publishDINState(i + 1, (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "high" : "low");
       }
     }
   }
@@ -990,6 +993,19 @@ void AICamera_MonitorDIStart() {
 }
 void AICamera_MonitorDIStop() {
   isMonitorDI = false;
+}
+void AICamera_publishDINState(int din_pin, const std::string &pin_state) {
+
+  nlohmann::ordered_json j;
+  // nlohmann::json j;
+  j["cmd"] = "IO_DIN_EVENT_SET_RESP";
+  j["args"]["din_pin"] = std::to_string(din_pin);
+  j["args"]["pin_state"] = pin_state;
+
+  std::string json = j.dump();
+
+  // Call your publish function
+  mqtt_publish((char *)json.c_str(), 0);
 }
 
 void AICamera_setDO(string index_do, string on_off) {
