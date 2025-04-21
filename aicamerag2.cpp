@@ -813,6 +813,37 @@ void ThreadAICameraStreaming_usb() {
 
 }
 
+void AICamera_streamingStart() {
+  xlog("");
+  if (isStreaming) {
+    xlog("thread already running");
+    return;
+  }
+  isStreaming = true;
+
+  if (AICamrea_isUseCSICamera()) {
+    t_aicamera_streaming = std::thread(ThreadAICameraStreaming);
+  } else {
+    t_aicamera_streaming = std::thread(ThreadAICameraStreaming_usb);
+  }
+
+  t_aicamera_streaming.detach();
+}
+
+void AICamera_streamingStop() {
+  xlog("");
+  if (gst_loop) {
+    g_main_loop_quit(gst_loop);
+    g_main_loop_unref(gst_loop);
+    gst_loop = nullptr;
+
+    // ??
+    isStreaming = false;
+  } else {
+    xlog("gst_loop is invalid or already destroyed.");
+  }
+}
+
 void ThreadAICameraStreaming_GigE() {
   xlog("++++ start ++++");
   counterFrame = 0;
@@ -900,28 +931,20 @@ void ThreadAICameraStreaming_GigE() {
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 
-void AICamera_streamingStart() {
+void AICamera_streamingStart_GigE() {
   xlog("");
   if (isStreaming) {
     xlog("thread already running");
     return;
   }
   isStreaming = true;
-
-  // if (AICamrea_isUseCSICamera())
-  // {
-  //   t_aicamera_streaming = std::thread(ThreadAICameraStreaming);
-  // } else {
-  //   t_aicamera_streaming = std::thread(ThreadAICameraStreaming_usb);  
-  // }
   
-  // test GigE
   t_aicamera_streaming = std::thread(ThreadAICameraStreaming_GigE);  
 
   t_aicamera_streaming.detach();
 }
 
-void AICamera_streamingStop() {
+void AICamera_streamingStop_GigE() {
   xlog("");
   if (gst_loop) {
     g_main_loop_quit(gst_loop);

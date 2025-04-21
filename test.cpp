@@ -109,6 +109,13 @@ int main(int argc, char* argv[]) {
             AICamera_streamingStop();
           }
 
+        } else if (isSameString(segments[0].c_str(), "gige")) {
+          if (isSameString(segments[1].c_str(), "start")) {
+            AICamera_streamingStart();
+          } else if (isSameString(segments[1].c_str(), "stop")) {
+            AICamera_streamingStop();
+          }
+
         } else if (isSameString(segments[0].c_str(), "tp")) {
           xlog("take picture");
           std::string path = "";
