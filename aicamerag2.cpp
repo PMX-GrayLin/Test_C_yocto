@@ -813,6 +813,93 @@ void ThreadAICameraStreaming_usb() {
 
 }
 
+void ThreadAICameraStreaming_GigE() {
+  xlog("++++ start ++++");
+  counterFrame = 0;
+  counterImg = 0;
+
+  // Initialize GStreamer
+  gst_init(nullptr, nullptr);
+
+  // Create the pipeline
+  gst_pipeline = gst_pipeline_new("video-pipeline");
+
+  GstElement *source = gst_element_factory_make("aravissrc", "source");
+  GstElement *videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
+  GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
+  GstElement *encoder = gst_element_factory_make("v4l2h264enc", "encoder");
+  GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
+
+  if (!gst_pipeline || !source || !videoconvert || !capsfilter || !encoder || !sink) {
+    xlog("failed to create GStreamer elements");
+    return;
+  }
+
+  // Set camera by ID or name (adjust "id1" if needed)
+  g_object_set(G_OBJECT(source), "camera-name", "id1", nullptr);
+
+  // Define the capabilities: NV12 format
+  GstCaps *caps = gst_caps_new_simple(
+      "video/x-raw",
+      "format", G_TYPE_STRING, "NV12",
+      nullptr);
+  g_object_set(capsfilter, "caps", caps, nullptr);
+  gst_caps_unref(caps);
+
+  // Set encoder properties
+  GstStructure *controls = gst_structure_new(
+      "extra-controls",
+      "video_gop_size", G_TYPE_INT, 30,
+      nullptr);
+  if (!controls) {
+    xlog("Failed to create GstStructure");
+    gst_object_unref(gst_pipeline);
+    return;
+  }
+  g_object_set(G_OBJECT(encoder), "extra-controls", controls, nullptr);
+  gst_structure_free(controls);
+
+  g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf
+  g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
+
+  // Add elements to pipeline
+  gst_bin_add_many(GST_BIN(gst_pipeline), source, videoconvert, capsfilter, encoder, sink, nullptr);
+  if (!gst_element_link_many(source, videoconvert, capsfilter, encoder, sink, nullptr)) {
+    xlog("failed to link elements in the pipeline");
+    gst_object_unref(gst_pipeline);
+    return;
+  }
+
+  // Optional: attach pad probe to monitor frames
+  GstPad *pad = gst_element_get_static_pad(encoder, "sink");
+  if (pad) {
+    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)AICAMERA_streamingDataCallback, nullptr, nullptr);
+    gst_object_unref(pad);
+  }
+
+  // Start streaming
+  GstStateChangeReturn ret = gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
+  if (ret == GST_STATE_CHANGE_FAILURE) {
+    xlog("failed to start the pipeline");
+    gst_object_unref(gst_pipeline);
+    return;
+  }
+
+  xlog("pipeline is running...");
+  isStreaming = true;
+
+  // Main loop
+  gst_loop = g_main_loop_new(nullptr, FALSE);
+  g_main_loop_run(gst_loop);
+
+  // Clean up
+  xlog("Stopping the pipeline...");
+  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
+  gst_object_unref(gst_pipeline);
+  isStreaming = false;
+  xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
+}
+
 void AICamera_streamingStart() {
   xlog("");
   if (isStreaming) {
