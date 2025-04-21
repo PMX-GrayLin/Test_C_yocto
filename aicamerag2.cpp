@@ -1,5 +1,4 @@
 #include "aicamerag2.hpp"
-#include "mqtt_client.hpp"
 
 // PWM
 const std::string path_pwm = "/sys/devices/platform/soc/10048000.pwm/pwm/pwmchip0";
