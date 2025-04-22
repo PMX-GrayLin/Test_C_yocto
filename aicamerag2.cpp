@@ -1060,7 +1060,7 @@ void ThreadAICameraMonitorDI() {
     fds[i].events = POLLIN;
   }
 
-  xlog("Thread Monitoring GPIOs for events...start");
+  xlog("^^^^ Start ^^^^");
 
   // Main loop to monitor GPIOs
   while (isMonitorDI) {
@@ -1082,7 +1082,7 @@ void ThreadAICameraMonitorDI() {
     }
   }
 
-  xlog("Thread Monitoring GPIOs for events...stop");
+  xlog("^^^^ Stop ^^^^");
 
   // Cleanup
   for (i = 0; i < NUM_DI; i++) {
