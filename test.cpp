@@ -120,7 +120,11 @@ int main(int argc, char* argv[]) {
           xlog("take picture");
           std::string path = "";
           if (segments.size() > 1 && !segments[1].empty()) {
-            path = "/home/root/primax/" + segments[1];
+            // path = "/home/root/primax/" + segments[1];
+
+            // replace _ to /, input format ex:  is _home_root_primax_123.png
+            path = segments[1];
+            std::replace(path.begin(), path.end(), '_', '/');
           } else {
             path = "/home/root/primax/fw_" + getTimeString() + ".png";
           }
