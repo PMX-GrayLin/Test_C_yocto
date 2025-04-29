@@ -124,7 +124,15 @@ int main(int argc, char* argv[]) {
 
             // replace _ to /, input format ex:  is _home_root_primax_123.png
             path = segments[1];
-            std::replace(path.begin(), path.end(), '_', '/');
+            const std::string from = "%2F";
+            const std::string to = "/";
+
+            size_t start_pos = 0;
+            while ((start_pos = path.find(from, start_pos)) != std::string::npos) {
+              path.replace(start_pos, from.length(), to);
+              start_pos += to.length();  // Move past the replacement
+            }
+
           } else {
             path = "/home/root/primax/fw_" + getTimeString() + ".png";
           }
