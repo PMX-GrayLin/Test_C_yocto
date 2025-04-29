@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
 
             // replace _ to /, input format ex:  is _home_root_primax_123.png
             path = segments[1];
-            const std::string from = "%252F";
+            const std::string from = "%2F";
             const std::string to = "/";
 
             size_t start_pos = 0;
