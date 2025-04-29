@@ -93,7 +93,7 @@ std::string getTimeString() {
 
   std::ostringstream oss;
   oss << std::setw(2) << std::setfill('0') << localTime->tm_hour
-      << std::setw(2) << std::setfill('0') << localTime->tm_min;
+      << std::setw(2) << std::setfill('0') << localTime->tm_min
       << std::setw(2) << std::setfill('0') << localTime->tm_sec;
 
   return oss.str();
