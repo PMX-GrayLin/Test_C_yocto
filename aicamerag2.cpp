@@ -20,8 +20,8 @@ bool isMonitorTriger = false;
 int DO_GPIOs[NUM_DO] = {3, 7};  // DO GPIO
 
 // DIO
-int DIO_IN_GPIOs[NUM_DIO] = {2, 6};   // DI GPIO
-int DIO_OUT_GPIOs[NUM_DIO] = {8, 9};  // DO GPIO
+int DIO_IN_GPIOs[NUM_DIO] = {2, 6, 12, 13};   // DI GPIO
+int DIO_OUT_GPIOs[NUM_DIO] = {8, 9, 11, 5};  // DO GPIO
 DIO_Direction dioDirection[NUM_DIO] = {diod_in};
 std::thread t_aicamera_monitorDIO[NUM_DIO];
 bool isMonitorDIO[NUM_DIO] = {false};
