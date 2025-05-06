@@ -1194,7 +1194,7 @@ void AICamera_setDO(string index_do, string on_off) {
   bool isON = false;
 
   int index = std::stoi(index_do);
-  if (index == 1 || index == 2) {
+  if (index > 0 && index <= NUM_DO) {
     index_gpio = DO_GPIOs[index - 1];
   } else {
     xlog("DO : index should be 1 or 2...");
@@ -1300,7 +1300,7 @@ void AICamera_setDIODirection(string index_dio, string di_do) {
   int index_gpio_out = 0;
 
   int index = std::stoi(index_dio);
-  if (index == 1 || index == 2) {
+  if (index > 0 && index <= NUM_DIO) {
     index_gpio_in = DIO_IN_GPIOs[index - 1];
     index_gpio_out = DIO_OUT_GPIOs[index - 1];
   } else {
@@ -1341,7 +1341,7 @@ void AICamera_setDIOOut(string index_dio, string on_off) {
     return;
   }
 
-  if (index == 1 || index == 2) {
+  if (index > 0 && index <= NUM_DIO) {
     index_gpio = DIO_OUT_GPIOs[index - 1];
   } else {
     xlog("DO : index should be 1 or 2...");

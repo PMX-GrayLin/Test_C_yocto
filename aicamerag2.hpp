@@ -9,7 +9,9 @@
 #define NUM_DI          2                 // Number of DI
 #define NUM_Triger      2                 // Number of Triger, treat as DI
 #define NUM_DO          2                 // Number of DO
-#define NUM_DIO         2                 // Number of DIO
+
+// ? NUM_DIOm aicamera = 2, visionhb = 4
+#define NUM_DIO         4                 // Number of DIO
 
 typedef enum {
   lc_red,
