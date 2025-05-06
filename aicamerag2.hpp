@@ -5,10 +5,11 @@
 #define AICamreaCSIPath "/dev/csi_cam_preview"
 #define AICamreaUSBPath "/dev/video137"
 
-#define GPIO_CHIP "/dev/gpiochip0"
-#define NUM_DI    2                 // Number of DI
-#define NUM_DO    2                 // Number of DO
-#define NUM_DIO   2                 // Number of DIO
+#define GPIO_CHIP       "/dev/gpiochip0"
+#define NUM_DI          2                 // Number of DI
+#define NUM_Triger      2                 // Number of Triger, treat as DI
+#define NUM_DO          2                 // Number of DO
+#define NUM_DIO         2                 // Number of DIO
 
 typedef enum {
   lc_red,
@@ -128,6 +129,11 @@ void AICamera_setLED(string led_index, string led_color);
 void ThreadAICameraMonitorDI();
 extern void AICamera_MonitorDIStart();
 extern void AICamera_MonitorDIStop();
+
+// Triger
+void ThreadAICameraMonitorTriger();
+extern void AICamera_MonitorTrigerStart();
+extern void AICamera_MonitorTrigerStop();
 
 // DO
 extern void AICamera_setDO(string index_do, string on_off);

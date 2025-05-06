@@ -11,6 +11,11 @@ int DI_GPIOs[NUM_DI] = {0, 1};  // DI GPIO
 std::thread t_aicamera_monitorDI;
 bool isMonitorDI = false;
 
+// Triger
+int Triger_GPIOs[NUM_Triger] = {17, 70};  // Triger GPIO
+std::thread t_aicamera_monitorTriger;
+bool isMonitorTriger = false;
+
 // DO
 int DO_GPIOs[NUM_DO] = {3, 7};  // DO GPIO
 
@@ -1103,6 +1108,85 @@ void AICamera_MonitorDIStart() {
 }
 void AICamera_MonitorDIStop() {
   isMonitorDI = false;
+}
+
+void ThreadAICameraMonitorTriger() {
+  struct gpiod_chip *chip;
+  struct gpiod_line *lines[NUM_Triger];
+  struct pollfd fds[NUM_Triger];
+  int i, ret;
+
+  // Open GPIO chip
+  chip = gpiod_chip_open(GPIO_CHIP);
+  if (!chip) {
+    xlog("Failed to open GPIO chip: %s", GPIO_CHIP);
+    return;
+  }
+
+  // Configure GPIOs for edge detection
+  for (i = 0; i < NUM_Triger; i++) {
+    lines[i] = gpiod_chip_get_line(chip, Triger_GPIOs[i]);
+    if (!lines[i]) {
+      xlog("Failed to get GPIO line %d", Triger_GPIOs[i]);
+      continue;
+    }
+
+    // Request GPIO line for both rising and falling edge events
+    ret = gpiod_line_request_both_edges_events(lines[i], "gpio_interrupt");
+    if (ret < 0) {
+      xlog("Failed to request GPIO %d for edge events", Triger_GPIOs[i]);
+      gpiod_line_release(lines[i]);
+      continue;
+    }
+
+    // Get file descriptor for polling
+    fds[i].fd = gpiod_line_event_get_fd(lines[i]);
+    fds[i].events = POLLIN;
+  }
+
+  xlog("^^^^ Start ^^^^");
+
+  // Main loop to monitor GPIOs
+  while (isMonitorTriger) {
+    ret = poll(fds, NUM_Triger, -1);  // Wait indefinitely for an event
+    if (ret < 0) {
+      xlog("Error in poll");
+      break;
+    }
+
+    // Check which GPIO triggered the event
+    for (i = 0; i < NUM_Triger; i++) {
+      if (fds[i].revents & POLLIN) {
+        struct gpiod_line_event event;
+        gpiod_line_event_read(lines[i], &event);
+
+        xlog("GPIO %d event detected! Type: %s", Triger_GPIOs[i],
+             (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "rising" : "falling");
+      }
+    }
+  }
+
+  xlog("^^^^ Stop ^^^^");
+
+  // Cleanup
+  for (i = 0; i < NUM_Triger; i++) {
+    gpiod_line_release(lines[i]);
+  }
+  gpiod_chip_close(chip);
+}
+
+void AICamera_MonitorTrigerStart() {
+  xlog("");
+  if (isMonitorTriger) {
+    xlog("thread already running");
+    return;
+  }
+  isMonitorTriger = true;
+  t_aicamera_monitorTriger = std::thread(ThreadAICameraMonitorTriger);  
+  t_aicamera_monitorTriger.detach();
+}
+void AICamera_MonitorTrigerStop() {
+  isMonitorTriger = false;
 }
 
 void AICamera_setDO(string index_do, string on_off) {
