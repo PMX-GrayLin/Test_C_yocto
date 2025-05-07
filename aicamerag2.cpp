@@ -1197,7 +1197,7 @@ void AICamera_setDO(string index_do, string on_off) {
   if (index > 0 && index <= NUM_DO) {
     index_gpio = DO_GPIOs[index - 1];
   } else {
-    xlog("DO : index should be 1 or 2...");
+    xlog("index out of range...");
     return;
   }
 
@@ -1206,7 +1206,7 @@ void AICamera_setDO(string index_do, string on_off) {
   } else if (isSameString(on_off.c_str(), "off")) {
     isON = false;
   } else {
-    xlog("DO : input string should be on or off...");
+    xlog("input string should be on or off...");
     return;
   }
 
@@ -1304,7 +1304,7 @@ void AICamera_setDIODirection(string index_dio, string di_do) {
     index_gpio_in = DIO_IN_GPIOs[index - 1];
     index_gpio_out = DIO_OUT_GPIOs[index - 1];
   } else {
-    xlog("DIO : index should be 1 or 2...");
+    xlog("index out of range...");
     return;
   }
 
@@ -1326,7 +1326,7 @@ void AICamera_setDIODirection(string index_dio, string di_do) {
     AICamera_MonitorDIOInStop(index - 1);
 
   } else {
-    xlog("DO : input string should be di or do...");
+    xlog("input string should be di or do...");
     return;
   }
 }
@@ -1337,14 +1337,14 @@ void AICamera_setDIOOut(string index_dio, string on_off) {
   int index = std::stoi(index_dio);
 
   if (dioDirection[index - 1] != diod_out) {
-    xlog("DIO direction should be set first...");
+    xlog("direction should be set first...");
     return;
   }
 
   if (index > 0 && index <= NUM_DIO) {
     index_gpio = DIO_OUT_GPIOs[index - 1];
   } else {
-    xlog("DO : index should be 1 or 2...");
+    xlog("index out of range...");
     return;
   }
 
@@ -1353,7 +1353,7 @@ void AICamera_setDIOOut(string index_dio, string on_off) {
   } else if (isSameString(on_off.c_str(), "off")) {
     isON = false;
   } else {
-    xlog("DO : input string should be on or off...");
+    xlog("input string should be on or off...");
     return;
   }
 
