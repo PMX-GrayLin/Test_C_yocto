@@ -21,6 +21,7 @@ CFLAG += ${INCLUDES_HEADER}
 INCLUDES_LIB += -L$(BB_LIBDIR)
 # INCLUDES += -L$(BB_LIBDIR)/json-c
 INCLUDES_LIB += -L$(BB_LIBDIR)/gstreamer-1.0
+INCLUDES_LIB += -L$(MVCAM_COMMON_RUNENV)/aarch64
 
 # lib
 LINK_LIBS += -ljson-c
@@ -29,6 +30,7 @@ LINK_LIBS += -lglib-2.0
 LINK_LIBS += -lgobject-2.0
 LINK_LIBS += -lmosquitto -lmosquittopp
 LINK_LIBS += -lgpiod
+LINK_LIBS += -lMvCameraControl
 
 OCVLDFLAG +=-lopencv_core 
 OCVLDFLAG +=-lopencv_imgproc
