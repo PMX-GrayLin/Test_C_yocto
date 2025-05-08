@@ -7,6 +7,7 @@
 
 # header dir
 INCLUDES_HEADER += -I$(BB_INCDIR)
+INCLUDES_HEADER += -Iinclude
 INCLUDES_HEADER += -I$(BB_INCDIR)/json-c
 INCLUDES_HEADER += -I$(BB_INCDIR)/gstreamer-1.0
 INCLUDES_HEADER += -I$(BB_INCDIR)/glib-2.0
