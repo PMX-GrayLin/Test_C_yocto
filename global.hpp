@@ -64,4 +64,4 @@ extern bool isPathExist(const char* path);
 extern std::string getTimeString();
 
 
-void aravisTest();
+extern void aravisTest();
