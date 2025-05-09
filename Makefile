@@ -30,6 +30,7 @@ LINK_LIBS += -lglib-2.0
 LINK_LIBS += -lgobject-2.0
 LINK_LIBS += -lmosquitto -lmosquittopp
 LINK_LIBS += -lgpiod
+LINK_LIBS += -llibaravis-0.8
 
 OCVLDFLAG +=-lopencv_core 
 OCVLDFLAG +=-lopencv_imgproc
