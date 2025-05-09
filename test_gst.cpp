@@ -284,7 +284,7 @@ void aravisTest() {
 
   // Create GStreamer pipeline
   GstElement *pipeline = gst_parse_launch(
-      "aravissrc name=src ! videoconvert ! autovideosink", nullptr);
+      "aravissrc camera-name="id1" name=src ! videoconvert ! autovideosink", nullptr);
   GstElement *source = gst_bin_get_by_name(GST_BIN(pipeline), "src");
 
   g_object_set(source, "camera-name", camera_id, nullptr);
@@ -304,7 +304,7 @@ void aravisTest() {
   std::this_thread::sleep_for(std::chrono::seconds(5));
 
   xlog("Stopping pipeline...");
-  
+
   gst_element_set_state(pipeline, GST_STATE_NULL);
 
   g_object_unref(source);
