@@ -312,7 +312,7 @@ void aravisTest() {
 
   gst_element_set_state(pipeline, GST_STATE_NULL);
 
-  g_object_unref(source);
+  // g_object_unref(source);
   g_object_unref(pipeline);
   g_object_unref(camera);
 
