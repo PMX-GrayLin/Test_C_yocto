@@ -252,3 +252,64 @@ void stopPipeline() {
     xlog("Main loop is invalid or already destroyed.");
   }
 }
+
+void aravisTest() {
+  gst_init(nullptr, nullptr);
+  arv_update_device_list();
+
+  guint n_devices = arv_get_n_devices();
+  if (n_devices == 0) {
+    xlog("No camera found!");
+      return;
+  }
+
+  const char *camera_id = arv_get_device_id(0);
+  xlog("Using camera:%s", camera_id);
+
+  GError *error = nullptr;
+  ArvCamera *camera = arv_camera_new(camera_id, &error);
+  if (!camera) {
+    xlog("Failed to create ArvCamera:%s", error->message);
+      g_error_free(error);
+      return;
+  }
+
+  // Set initial exposure
+  arv_camera_set_exposure_time(camera, 5000.0, &error);
+  if (error) {
+    xlog("Failed to set exposure:%s", error->message);
+      g_error_free(error);
+      error = nullptr;
+  }
+
+  // Create GStreamer pipeline
+  GstElement *pipeline = gst_parse_launch(
+      "aravissrc name=src ! videoconvert ! autovideosink", nullptr);
+  GstElement *source = gst_bin_get_by_name(GST_BIN(pipeline), "src");
+
+  g_object_set(source, "camera-name", camera_id, nullptr);
+
+  gst_element_set_state(pipeline, GST_STATE_PLAYING);
+  xlog("Pipeline running... waiting before exposure change...");
+
+  std::this_thread::sleep_for(std::chrono::seconds(5));
+
+  xlog("Setting exposure to 15000 µs...");
+  arv_camera_set_exposure_time(camera, 15000.0, &error);
+  if (error) {
+    xlog("ailed to change exposure:%s", error->message);
+      g_error_free(error);
+  }
+
+  std::this_thread::sleep_for(std::chrono::seconds(5));
+
+  xlog("Stopping pipeline...");
+  
+  gst_element_set_state(pipeline, GST_STATE_NULL);
+
+  g_object_unref(source);
+  g_object_unref(pipeline);
+  g_object_unref(camera);
+
+  return;
+}

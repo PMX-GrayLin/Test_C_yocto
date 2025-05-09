@@ -62,6 +62,3 @@ extern bool isSameString(const char* s1, const char* s2, bool isCaseSensitive = 
 extern bool isPathExist(const char* path);
 
 extern std::string getTimeString();
-
-
-extern void aravisTest();
