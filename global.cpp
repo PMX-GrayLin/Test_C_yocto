@@ -101,14 +101,14 @@ std::string getTimeString() {
 
 void aravisTest() {
   xlog("");
-  
+
   arv_update_device_list();
 
   // Optional: list devices
   guint n_devices = arv_get_n_devices();
   xlog("n_devices:%d", n_devices);
   if (n_devices == 0) {
-    xlog("No camera found!");
-    return -1;
+    xlog("no camera found!");
+    return;
   }
 }
