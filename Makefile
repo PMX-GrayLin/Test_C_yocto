@@ -13,6 +13,7 @@ INCLUDES_HEADER += -I$(BB_INCDIR)/gstreamer-1.0
 INCLUDES_HEADER += -I$(BB_INCDIR)/glib-2.0
 INCLUDES_HEADER += -I$(BB_LIBDIR)/glib-2.0/include
 INCLUDES_HEADER += -I$(BB_INCDIR)/opencv4 -I$(BB_INCDIR)/opencv4/opencv
+INCLUDES_HEADER += -I$(BB_LIBDIR)/aravis-0.8
 
 CFLAG += ${CXXFLAGS}
 CFLAG += ${INCLUDES_HEADER}
@@ -21,9 +22,6 @@ CFLAG += ${INCLUDES_HEADER}
 INCLUDES_LIB += -L$(BB_LIBDIR)
 # INCLUDES += -L$(BB_LIBDIR)/json-c
 INCLUDES_LIB += -L$(BB_LIBDIR)/gstreamer-1.0
-
-# for gige
-INCLUDES_LIB += -L$(BB_LIBDIR)/aravis-0.8/
 
 # lib
 LINK_LIBS += -ljson-c
