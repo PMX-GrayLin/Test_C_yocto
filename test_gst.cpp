@@ -335,7 +335,7 @@ void aravisTest() {
 
   // g_object_unref(source);
   g_object_unref(pipeline);
-  g_object_unref(camera);
+  // g_object_unref(camera);
 
   return;
 }
