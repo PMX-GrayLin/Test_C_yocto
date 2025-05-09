@@ -297,8 +297,11 @@ void aravisTest() {
 
   // Build the pipeline equivalent to:
   // gst-launch-1.0 aravissrc camera-name=id1 ! videoconvert ! autovideosink
+  // const gchar *pipeline_description =
+  //     "aravissrc camera-name=id1 ! videoconvert ! autovideosink";
+
   const gchar *pipeline_description =
-      "aravissrc camera-name=id1 ! videoconvert ! autovideosink";
+      "aravissrc camera-name=id1 ! videoconvert ! video/x-raw,format=NV12 ! v4l2h264enc extra-controls=cid,video_gop_size=30 capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream"
   GstElement *pipeline = gst_parse_launch(pipeline_description, &error);
 
   if (!pipeline) {
