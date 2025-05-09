@@ -22,8 +22,8 @@ INCLUDES_LIB += -L$(BB_LIBDIR)
 # INCLUDES += -L$(BB_LIBDIR)/json-c
 INCLUDES_LIB += -L$(BB_LIBDIR)/gstreamer-1.0
 
-# for gigE
-INCLUDES_LIB += -L$(BB_LIBDIR)/usr/lib
+# for gige
+INCLUDES_LIB += -L$(BB_LIBDIR)/aravis-0.8/
 
 # lib
 LINK_LIBS += -ljson-c
