@@ -254,6 +254,8 @@ void stopPipeline() {
 }
 
 void aravisTest() {
+  GError *error = nullptr;
+
   gst_init(nullptr, nullptr);
   // arv_update_device_list();
 
@@ -266,7 +268,6 @@ void aravisTest() {
   // const char *camera_id = arv_get_device_id(0);
   // xlog("Using camera:%s", camera_id);
 
-  // GError *error = nullptr;
   // ArvCamera *camera = arv_camera_new(camera_id, &error);
   // if (!camera) {
   //   xlog("Failed to create ArvCamera:%s", error->message);
@@ -302,7 +303,7 @@ void aravisTest() {
 
   const gchar *pipeline_description =
       "aravissrc camera-name=id1 ! videoconvert ! video/x-raw,format=NV12 ! v4l2h264enc extra-controls=cid,video_gop_size=30 capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream";
-  GstElement *pipeline = gst_parse_launch(pipeline_description, nullptr);
+  GstElement *pipeline = gst_parse_launch(pipeline_description, &error);
 
   if (!pipeline) {
     xlog("Failed to create pipeline:%s", error->message);
