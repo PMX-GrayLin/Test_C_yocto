@@ -125,6 +125,9 @@ void aravisTest() {
 
   // Set exposure
   arv_camera_set_exposure_time(camera, 5000.0, &error); // 5 ms
-
+  if (error != NULL) {
+    xlog("Failed to set exposure time: %s", error->message);
+    return;
+  }
 
 }
