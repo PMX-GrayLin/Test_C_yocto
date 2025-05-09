@@ -101,6 +101,7 @@ std::string getTimeString() {
 
 void aravisTest() {
   xlog("");
+  GError* error = NULL;
 
   arv_update_device_list();
 
@@ -115,13 +116,15 @@ void aravisTest() {
   const char* camera_id = arv_get_device_id(0);
   xlog("use camera:%s", camera_id);
 
-  // Initialize ArvCamera
-  ArvCamera* camera = arv_camera_new(camera_id);
+  // Create camera
+  ArvCamera* camera = arv_camera_new(camera_id, &error);
   if (!camera) {
     xlog("Failed to create ArvCamera");
     return;
   }
 
-  // Set initial exposure
-  arv_camera_set_exposure_time(camera, 5000.0);  // 5 ms
+  // Set exposure
+  arv_camera_set_exposure_time(camera, 5000.0, &error); // 5 ms
+
+
 }
