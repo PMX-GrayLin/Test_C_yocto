@@ -21,7 +21,9 @@ CFLAG += ${INCLUDES_HEADER}
 INCLUDES_LIB += -L$(BB_LIBDIR)
 # INCLUDES += -L$(BB_LIBDIR)/json-c
 INCLUDES_LIB += -L$(BB_LIBDIR)/gstreamer-1.0
-INCLUDES_LIB += -L$(MVCAM_COMMON_RUNENV)/aarch64
+
+# for gigE
+INCLUDES_LIB += -L$(BB_LIBDIR)/usr/lib
 
 # lib
 LINK_LIBS += -ljson-c

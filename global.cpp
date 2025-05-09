@@ -2,6 +2,8 @@
 
 #include "oti322.hpp"
 
+#include <arv.h>
+
 // test vars
 int testCounter = 0;
 
