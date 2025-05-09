@@ -30,6 +30,9 @@
 #include <opencv2/opencv.hpp>
 #include <gpiod.h>
 
+#include "httplib.h"
+#include <arv.h>
+
 #define DEBUGX
 #ifndef DEBUGX
 #define xlog(...) ((void)0)
@@ -59,3 +62,6 @@ extern bool isSameString(const char* s1, const char* s2, bool isCaseSensitive = 
 extern bool isPathExist(const char* path);
 
 extern std::string getTimeString();
+
+
+void aravisTest();

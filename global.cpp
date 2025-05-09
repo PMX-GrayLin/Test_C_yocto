@@ -2,8 +2,6 @@
 
 #include "oti322.hpp"
 
-#include <arv.h>
-
 // test vars
 int testCounter = 0;
 
@@ -99,4 +97,18 @@ std::string getTimeString() {
       << std::setw(2) << std::setfill('0') << localTime->tm_sec;
 
   return oss.str();
+}
+
+void aravisTest() {
+  xlog("");
+  
+  arv_update_device_list();
+
+  // Optional: list devices
+  guint n_devices = arv_get_n_devices();
+  xlog("n_devices:%d", n_devices);
+  if (n_devices == 0) {
+    xlog("No camera found!");
+    return -1;
+  }
 }

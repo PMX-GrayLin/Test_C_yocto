@@ -5,7 +5,10 @@
 #include "aicamerag2.hpp"
 #include "oti322.hpp"
 #include "otpa8.hpp"
-#include "httplib.h"
+
+void handle_RESTful(std::vector<std::string> segments) {
+
+}
 
 // MQTTClient gClient;
 class MQTTClient : public mosqpp::mosquittopp {
@@ -173,6 +176,8 @@ int main(int argc, char* argv[]) {
             AICamera_setDIOOut(segments[1], segments[3]);
           }
         
+        } else if (isSameString(segments[0].c_str(), "arv")) {
+          aravisTest();
         }
         // handle commands ===============================================
       } else {
