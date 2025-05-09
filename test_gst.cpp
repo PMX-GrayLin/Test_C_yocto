@@ -255,32 +255,32 @@ void stopPipeline() {
 
 void aravisTest() {
   gst_init(nullptr, nullptr);
-  arv_update_device_list();
+  // arv_update_device_list();
 
-  guint n_devices = arv_get_n_devices();
-  if (n_devices == 0) {
-    xlog("No camera found!");
-      return;
-  }
+  // guint n_devices = arv_get_n_devices();
+  // if (n_devices == 0) {
+  //   xlog("No camera found!");
+  //     return;
+  // }
 
-  const char *camera_id = arv_get_device_id(0);
-  xlog("Using camera:%s", camera_id);
+  // const char *camera_id = arv_get_device_id(0);
+  // xlog("Using camera:%s", camera_id);
 
-  GError *error = nullptr;
-  ArvCamera *camera = arv_camera_new(camera_id, &error);
-  if (!camera) {
-    xlog("Failed to create ArvCamera:%s", error->message);
-      g_error_free(error);
-      return;
-  }
+  // GError *error = nullptr;
+  // ArvCamera *camera = arv_camera_new(camera_id, &error);
+  // if (!camera) {
+  //   xlog("Failed to create ArvCamera:%s", error->message);
+  //     g_error_free(error);
+  //     return;
+  // }
 
-  // Set initial exposure
-  arv_camera_set_exposure_time(camera, 5000.0, &error);
-  if (error) {
-    xlog("Failed to set exposure:%s", error->message);
-      g_error_free(error);
-      error = nullptr;
-  }
+  // // Set initial exposure
+  // arv_camera_set_exposure_time(camera, 5000.0, &error);
+  // if (error) {
+  //   xlog("Failed to set exposure:%s", error->message);
+  //     g_error_free(error);
+  //     error = nullptr;
+  // }
   xlog("Setting exposure to 5000 µs...");
   std::this_thread::sleep_for(std::chrono::seconds(5));
 
@@ -320,12 +320,12 @@ void aravisTest() {
 
   std::this_thread::sleep_for(std::chrono::seconds(5));
 
-  xlog("Setting exposure to 15000 µs...");
-  arv_camera_set_exposure_time(camera, 15000.0, &error);
-  if (error) {
-    xlog("Failed to change exposure:%s", error->message);
-      g_error_free(error);
-  }
+  // xlog("Setting exposure to 15000 µs...");
+  // arv_camera_set_exposure_time(camera, 15000.0, &error);
+  // if (error) {
+  //   xlog("Failed to change exposure:%s", error->message);
+  //     g_error_free(error);
+  // }
 
   std::this_thread::sleep_for(std::chrono::seconds(10));
 
