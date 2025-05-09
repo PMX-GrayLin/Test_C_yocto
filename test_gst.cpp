@@ -281,6 +281,8 @@ void aravisTest() {
       g_error_free(error);
       error = nullptr;
   }
+  xlog("Setting exposure to 5000 µs...");
+  std::this_thread::sleep_for(std::chrono::seconds(5));
 
   // // Create GStreamer pipeline
   // GstElement *pipeline = gst_parse_launch(
@@ -290,12 +292,28 @@ void aravisTest() {
   // g_object_set(source, "camera-name", camera_id, nullptr);
 
   // Create GStreamer pipeline
-  GstElement *pipeline = gst_parse_launch(
-      "aravissrc camera-name=id1 ! videoconvert ! autovideosink", nullptr);
+  // GstElement *pipeline = gst_parse_launch(
+  //     "aravissrc camera-name=id1 ! videoconvert ! autovideosink", nullptr);
 
+  // Build the pipeline equivalent to:
+  // gst-launch-1.0 aravissrc camera-name=id1 ! videoconvert ! autovideosink
+  const gchar *pipeline_description =
+      "aravissrc camera-name=id1 ! videoconvert ! autovideosink";
+  GstElement *pipeline = gst_parse_launch(pipeline_description, &error);
 
-  gst_element_set_state(pipeline, GST_STATE_PLAYING);
-  xlog("Pipeline running... waiting before exposure change...");
+  if (!pipeline) {
+    xlog("Failed to create pipeline:%s", error->message);
+    g_error_free(error);
+    return;
+  }
+
+  // Start playing
+  GstStateChangeReturn ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
+  if (ret == GST_STATE_CHANGE_FAILURE) {
+    xlog("Failed to start pipeline.");
+    gst_object_unref(pipeline);
+    return;
+  }
 
   std::this_thread::sleep_for(std::chrono::seconds(5));
 
