@@ -282,12 +282,17 @@ void aravisTest() {
       error = nullptr;
   }
 
+  // // Create GStreamer pipeline
+  // GstElement *pipeline = gst_parse_launch(
+  //     "aravissrc camera-name=id1 name=src ! videoconvert ! autovideosink", nullptr);
+  // GstElement *source = gst_bin_get_by_name(GST_BIN(pipeline), "src");
+
+  // g_object_set(source, "camera-name", camera_id, nullptr);
+
   // Create GStreamer pipeline
   GstElement *pipeline = gst_parse_launch(
-      "aravissrc camera-name=id1 name=src ! videoconvert ! autovideosink", nullptr);
-  GstElement *source = gst_bin_get_by_name(GST_BIN(pipeline), "src");
+      "aravissrc camera-name=id1 ! videoconvert ! autovideosink", nullptr);
 
-  g_object_set(source, "camera-name", camera_id, nullptr);
 
   gst_element_set_state(pipeline, GST_STATE_PLAYING);
   xlog("Pipeline running... waiting before exposure change...");
@@ -297,11 +302,11 @@ void aravisTest() {
   xlog("Setting exposure to 15000 µs...");
   arv_camera_set_exposure_time(camera, 15000.0, &error);
   if (error) {
-    xlog("ailed to change exposure:%s", error->message);
+    xlog("Failed to change exposure:%s", error->message);
       g_error_free(error);
   }
 
-  std::this_thread::sleep_for(std::chrono::seconds(5));
+  std::this_thread::sleep_for(std::chrono::seconds(10));
 
   xlog("Stopping pipeline...");
 
