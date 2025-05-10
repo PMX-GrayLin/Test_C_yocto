@@ -180,7 +180,8 @@ int main(int argc, char* argv[]) {
           aravisTest();
 
         } else if (isSameString(segments[0].c_str(), "gstt")) {
-          gst_test();
+          int testCase = std::stoi(segments[1]);
+          gst_test(testCase);
 
         }
         // handle commands ===============================================
