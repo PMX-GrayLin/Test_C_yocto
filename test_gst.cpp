@@ -269,6 +269,45 @@ void stopPipeline() {
 }
 
 void aravisTest() {
+  GstElement *pipeline, *source;
+
+  pipeline = gst_pipeline_new("test-pipeline");
+  source = gst_element_factory_make("aravissrc", "source");
+  GstElement *sink = gst_element_factory_make("autovideosink", "sink");
+
+  // 修改曝光時間為 5000 微秒
+  g_object_set(source, "exposure", 5000000.0, NULL);
+  g_usleep(30000000);  // 30 秒
+
+  if (!pipeline || !source || !sink) {
+    g_printerr("Not all elements could be created.\n");
+    return;
+  }
+
+  gst_bin_add_many(GST_BIN(pipeline), source, sink, NULL);
+  if (!gst_element_link(source, sink)) {
+    g_printerr("Elements could not be linked.\n");
+    gst_object_unref(pipeline);
+    return;
+  }
+
+  gst_element_set_state(pipeline, GST_STATE_PLAYING);
+
+  // 等待一段時間，讓影像開始串流
+  g_usleep(30000000);  // 30 秒
+
+  // 修改曝光時間為 5000 微秒
+  g_object_set(source, "exposure", 500.0, NULL);
+
+  // 等待一段時間，觀察效果
+  g_usleep(30000000);  // 30 秒
+
+  gst_element_set_state(pipeline, GST_STATE_NULL);
+  gst_object_unref(pipeline);
+  return 0;
+}
+
+void aravisTest2() {
   GstElement *pipeline;
   GstBus *bus;
   GstMessage *msg;
