@@ -269,31 +269,81 @@ void stopPipeline() {
 }
 
 void aravisTest() {
-  GstElement *pipeline, *source;
+  // Initialize GStreamer
+  gst_init(nullptr, nullptr);
 
-  pipeline = gst_pipeline_new("test-pipeline");
-  source = gst_element_factory_make("aravissrc", "source");
-  GstElement *sink = gst_element_factory_make("autovideosink", "sink");
+  // Create the pipeline
+  gst_pipeline = gst_pipeline_new("video-pipeline");
 
-  // 修改曝光時間為 5000 微秒
+  GstElement *source = gst_element_factory_make("aravissrc", "source");
+  GstElement *videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
+  GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
+  GstElement *encoder = gst_element_factory_make("v4l2h264enc", "encoder");
+  GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
+
+  if (!gst_pipeline || !source || !videoconvert || !capsfilter || !encoder || !sink) {
+    xlog("failed to create GStreamer elements");
+    return;
+  }
+
+  // Set camera by ID or name (adjust "id1" if needed)
+  g_object_set(G_OBJECT(source), "camera-name", "id1", nullptr);
+
+  // Define the capabilities: NV12 format
+  GstCaps *caps = gst_caps_new_simple(
+      "video/x-raw",
+      "format", G_TYPE_STRING, "NV12",
+      nullptr);
+  g_object_set(capsfilter, "caps", caps, nullptr);
+  gst_caps_unref(caps);
+
+  // Set encoder properties
+  GstStructure *controls = gst_structure_new(
+      "extra-controls",
+      "video_gop_size", G_TYPE_INT, 30,
+      nullptr);
+  if (!controls) {
+    xlog("Failed to create GstStructure");
+    gst_object_unref(gst_pipeline);
+    return;
+  }
+  g_object_set(G_OBJECT(encoder), "extra-controls", controls, nullptr);
+  gst_structure_free(controls);
+
+  g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf
+  g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
+
+  // Add elements to pipeline
+  gst_bin_add_many(GST_BIN(gst_pipeline), source, videoconvert, capsfilter, encoder, sink, nullptr);
+  if (!gst_element_link_many(source, videoconvert, capsfilter, encoder, sink, nullptr)) {
+    xlog("failed to link elements in the pipeline");
+    gst_object_unref(gst_pipeline);
+    return;
+  }
+
+  // Optional: attach pad probe to monitor frames
+  GstPad *pad = gst_element_get_static_pad(encoder, "sink");
+  if (pad) {
+    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)AICAMERA_streamingDataCallback, nullptr, nullptr);
+    gst_object_unref(pad);
+  }
+
+    // 修改曝光時間為 5000 微秒
   g_object_set(source, "exposure", 5000000.0, NULL);
   g_usleep(30000000);  // 30 秒
 
-  if (!pipeline || !source || !sink) {
-    g_printerr("Not all elements could be created.\n");
+  // Start streaming
+  GstStateChangeReturn ret = gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
+  if (ret == GST_STATE_CHANGE_FAILURE) {
+    xlog("failed to start the pipeline");
+    gst_object_unref(gst_pipeline);
     return;
   }
 
-  gst_bin_add_many(GST_BIN(pipeline), source, sink, NULL);
-  if (!gst_element_link(source, sink)) {
-    g_printerr("Elements could not be linked.\n");
-    gst_object_unref(pipeline);
-    return;
-  }
+  xlog("pipeline is running...");
+  isStreaming = true;
 
-  gst_element_set_state(pipeline, GST_STATE_PLAYING);
-
-  // 等待一段時間，讓影像開始串流
+    // 等待一段時間，讓影像開始串流
   g_usleep(30000000);  // 30 秒
 
   // 修改曝光時間為 5000 微秒
@@ -302,8 +352,18 @@ void aravisTest() {
   // 等待一段時間，觀察效果
   g_usleep(30000000);  // 30 秒
 
-  gst_element_set_state(pipeline, GST_STATE_NULL);
-  gst_object_unref(pipeline);
+
+  // Main loop
+  gst_loop = g_main_loop_new(nullptr, FALSE);
+  g_main_loop_run(gst_loop);
+
+  // Clean up
+  xlog("Stopping the pipeline...");
+  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
+  gst_object_unref(gst_pipeline);
+  isStreaming = false;
+  xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
+
   return;
 }
 
