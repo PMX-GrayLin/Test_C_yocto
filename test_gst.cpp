@@ -304,7 +304,7 @@ void aravisTest() {
 
   gst_element_set_state(pipeline, GST_STATE_NULL);
   gst_object_unref(pipeline);
-  return 0;
+  return;
 }
 
 void aravisTest2() {
