@@ -269,12 +269,10 @@ void stopPipeline() {
 }
 
 void aravisTest() {
-
-  xlog("testCase:%d", testCase);
-
   GstElement *pipeline;
   GstBus *bus;
   GstMessage *msg;
+  GError* error = NULL;
   string pipelineS = "";
 
   // Initialize GStreamer
@@ -299,7 +297,6 @@ void aravisTest() {
   ArvCamera *camera = arv_camera_new(camera_id, &error);
   if (!camera) {
     xlog("Failed to create ArvCamera:%s", error->message);
-      g_error_free(error);
       return;
   }
 
