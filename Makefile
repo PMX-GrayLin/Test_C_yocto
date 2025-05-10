@@ -87,10 +87,10 @@ all: ${CPPOBJECTS}
 # 	${CXX} $(CFLAG) test_gst.cpp -c
 # 	@echo "========== Build test_gst.o end =========="
 
-# aicamerag2.o: 
-# 	@echo "========== Build aicamerag2.o start =========="
-# 	${CXX} $(CFLAG) aicamerag2.cpp -c
-# 	@echo "========== Build aicamerag2.o end =========="
+# aicamera.o: 
+# 	@echo "========== Build aicamera.o start =========="
+# 	${CXX} $(CFLAG) aicamera.cpp -c
+# 	@echo "========== Build aicamera.o end =========="
 
 .PHONY : clean 
 

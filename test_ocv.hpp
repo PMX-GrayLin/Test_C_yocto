@@ -1,6 +1,6 @@
 #pragma once
 
 #include "global.hpp"
-#include "aicamerag2.hpp"
+#include "aicamera.hpp"
 
 void ocv_test(int testCase);

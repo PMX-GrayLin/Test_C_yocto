@@ -2,7 +2,7 @@
 
 #include "test_gst.hpp"
 #include "test_ocv.hpp"
-#include "aicamerag2.hpp"
+#include "aicamera.hpp"
 #include "oti322.hpp"
 #include "otpa8.hpp"
 
@@ -25,17 +25,14 @@ void handle_RESTful(std::vector<std::string> segments) {
     xlog("take picture");
     std::string path = "";
     if (segments.size() > 1 && !segments[1].empty()) {
-      // path = "/home/root/primax/" + segments[1];
 
-      // replace _ to /, input format ex:  is _home_root_primax_123.png
       path = segments[1];
       const std::string from = "%2F";
       const std::string to = "/";
-
       size_t start_pos = 0;
       while ((start_pos = path.find(from, start_pos)) != std::string::npos) {
         path.replace(start_pos, from.length(), to);
-        start_pos += to.length();  // Move past the replacement
+        start_pos += to.length();
       }
 
     } else {
@@ -87,6 +84,11 @@ void handle_RESTful(std::vector<std::string> segments) {
   }
 }
 
+void handle_mqtt(std::string payload) {
+    xlog("MQTT payload:%s", payload.c_str());
+
+}
+
 // MQTTClient gClient;
 class MQTTClient : public mosqpp::mosquittopp {
  public:
@@ -94,7 +96,8 @@ class MQTTClient : public mosqpp::mosquittopp {
 
   void on_message(const struct mosquitto_message* message) override {
     std::string payload((char*)message->payload, message->payloadlen);
-    xlog("MQTT payload:%s", payload.c_str());
+
+    handle_mqtt(payload);
   }
 };
 
@@ -148,7 +151,7 @@ int main(int argc, char* argv[]) {
   
         // Get the matched string (e.g., "1/2/3")
         std::string matched_str = match[1].str();
-        xlog("Matched string: %s", matched_str.c_str());
+        xlog("RESTful string:%s", matched_str.c_str());
   
         // Split the matched string by '/' and store each segment in the vector
         std::stringstream ss(matched_str);
@@ -156,11 +159,11 @@ int main(int argc, char* argv[]) {
         while (std::getline(ss, segment, '/')) {
           segments.push_back(segment);
         }
-        for (const auto& seg : segments) {
-          xlog("Stored segment: %s", seg.c_str());
-        }
+        // for (const auto& seg : segments) {
+        //   xlog("segment:%s", seg.c_str());
+        // }
         for (size_t i = 0; i < segments.size(); ++i) {
-          xlog("Stored segment at index %zu: %s", i, segments[i].c_str());
+          xlog("segment[%zu]:%s", i, segments[i].c_str());
         }
 
         handle_RESTful(segments);

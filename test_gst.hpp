@@ -1,7 +1,7 @@
 #pragma once
 
 #include "global.hpp"
-#include "aicamerag2.hpp"
+#include "aicamera.hpp"
 
 void gst_test(int testCase);
 void gst_test2(int testCase);
