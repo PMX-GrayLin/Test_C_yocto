@@ -329,7 +329,7 @@ void aravisTest() {
   }
 
     // 修改曝光時間為 5000 微秒
-  g_object_set(source, "exposure", 5000000.0, NULL);
+  g_object_set(source, "exposure", 500000.0, NULL);
   g_usleep(30000000);  // 30 秒
 
   // Start streaming
