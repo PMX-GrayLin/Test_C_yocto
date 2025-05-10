@@ -12,7 +12,7 @@ void gst_test(int testCase) {
   GstElement *pipeline;
   GstBus *bus;
   GstMessage *msg;
-  string pipelineS = "";
+  std::string pipelineS = "";
 
   // Initialize GStreamer
   // gst_init(&argc, &argv);
