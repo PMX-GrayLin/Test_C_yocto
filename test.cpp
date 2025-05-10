@@ -178,6 +178,10 @@ int main(int argc, char* argv[]) {
         
         } else if (isSameString(segments[0].c_str(), "arv")) {
           aravisTest();
+
+        } else if (isSameString(segments[0].c_str(), "gstt")) {
+          gst_test();
+
         }
         // handle commands ===============================================
       } else {
