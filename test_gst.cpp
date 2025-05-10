@@ -341,7 +341,6 @@ void aravisTest() {
   }
 
   xlog("pipeline is running...");
-  isStreaming = true;
 
     // 等待一段時間，讓影像開始串流
   g_usleep(30000000);  // 30 秒
@@ -352,7 +351,6 @@ void aravisTest() {
   // 等待一段時間，觀察效果
   g_usleep(30000000);  // 30 秒
 
-
   // Main loop
   gst_loop = g_main_loop_new(nullptr, FALSE);
   g_main_loop_run(gst_loop);
@@ -361,7 +359,6 @@ void aravisTest() {
   xlog("Stopping the pipeline...");
   gst_element_set_state(gst_pipeline, GST_STATE_NULL);
   gst_object_unref(gst_pipeline);
-  isStreaming = false;
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 
   return;
