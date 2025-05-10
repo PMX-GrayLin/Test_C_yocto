@@ -25,7 +25,7 @@ void gst_test(int testCase) {
   if (testCase == 0) {
     // OK
     // gst-launch-1.0 -v v4l2src device=/dev/video47 ! video/x-raw,width=1920,height=1080 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
-    string pipelineS =
+    pipelineS =
         "v4l2src device=" + AICamrea_getVideoDevice() + " " +
         "! video/x-raw,width=2048,height=1536 " +
         "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf "
@@ -33,7 +33,7 @@ void gst_test(int testCase) {
   } else if (testCase == 1) {
     // OK
     // gst-launch-1.0 aravissrc camera-name="id1" ! videoconvert ! video/x-raw,format=NV12 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
-    string pipelineS =
+    pipelineS =
         "aravissrc camera-name=id1 " +
         "! videoconvert " +
         "! video/x-raw,format=NV12 " +
