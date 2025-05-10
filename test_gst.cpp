@@ -12,6 +12,7 @@ void gst_test(int testCase) {
   GstElement *pipeline;
   GstBus *bus;
   GstMessage *msg;
+  string pipelineS = "";
 
   // Initialize GStreamer
   // gst_init(&argc, &argv);
@@ -21,26 +22,27 @@ void gst_test(int testCase) {
   gst_version(&major, &minor, &micro, &nano);
   xlog("%d.%d.%d.%d", major, minor, micro, nano);
 
-  // OK
-  // gst-launch-1.0 -v v4l2src device=/dev/video47 ! video/x-raw,width=1920,height=1080 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
-
-  // Create the pipeline
-
-  // OK
-  // string pipelineS =
-  //     "v4l2src device=" + AICamrea_getVideoDevice() + " " +
-  //     "! video/x-raw,width=2048,height=1536 " +
-  //     "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf "
-  //     "! rtspclientsink location=rtsp://localhost:8554/mystream";
-
-  // OK
-  // gst-launch-1.0 aravissrc camera-name="id1" ! videoconvert ! video/x-raw,format=NV12 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
-  string pipelineS =
-      "aravissrc camera-name=id1 " +
-      "! videoconvert " +
-      "! video/x-raw,format=NV12 " +
-      "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf "
-      "! rtspclientsink location=rtsp://localhost:8554/mystream";
+  if (testCase == 0) {
+    // OK
+    // gst-launch-1.0 -v v4l2src device=/dev/video47 ! video/x-raw,width=1920,height=1080 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
+    string pipelineS =
+        "v4l2src device=" + AICamrea_getVideoDevice() + " " +
+        "! video/x-raw,width=2048,height=1536 " +
+        "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf "
+        "! rtspclientsink location=rtsp://localhost:8554/mystream";
+  } else if (testCase == 1) {
+    // OK
+    // gst-launch-1.0 aravissrc camera-name="id1" ! videoconvert ! video/x-raw,format=NV12 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
+    string pipelineS =
+        "aravissrc camera-name=id1 " +
+        "! videoconvert " +
+        "! video/x-raw,format=NV12 " +
+        "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf "
+        "! rtspclientsink location=rtsp://localhost:8554/mystream";
+  } else {
+    xlog("not a testCase");
+    return;
+  }
 
   xlog("pipeline:%s", pipelineS.c_str());
 
