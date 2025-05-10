@@ -7,7 +7,84 @@
 #include "otpa8.hpp"
 
 void handle_RESTful(std::vector<std::string> segments) {
+  if (isSameString(segments[0].c_str(), "gst")) {
+    if (isSameString(segments[1].c_str(), "start")) {
+      AICamera_streamingStart();
+    } else if (isSameString(segments[1].c_str(), "stop")) {
+      AICamera_streamingStop();
+    }
 
+  } else if (isSameString(segments[0].c_str(), "gige")) {
+    if (isSameString(segments[1].c_str(), "start")) {
+      AICamera_streamingStart_GigE();
+    } else if (isSameString(segments[1].c_str(), "stop")) {
+      AICamera_streamingStop_GigE();
+    }
+
+  } else if (isSameString(segments[0].c_str(), "tp")) {
+    xlog("take picture");
+    std::string path = "";
+    if (segments.size() > 1 && !segments[1].empty()) {
+      // path = "/home/root/primax/" + segments[1];
+
+      // replace _ to /, input format ex:  is _home_root_primax_123.png
+      path = segments[1];
+      const std::string from = "%2F";
+      const std::string to = "/";
+
+      size_t start_pos = 0;
+      while ((start_pos = path.find(from, start_pos)) != std::string::npos) {
+        path.replace(start_pos, from.length(), to);
+        start_pos += to.length();  // Move past the replacement
+      }
+
+    } else {
+      path = "/home/root/primax/fw_" + getTimeString() + ".png";
+    }
+    AICamera_setImagePath(path.c_str());
+    AICamera_captureImage();
+
+  } else if (isSameString(segments[0].c_str(), "led")) {
+    if (segments.size() == 3) {
+      AICamera_setLED(segments[1], segments[2]);
+    } else {
+      xlog("param may missing...");
+    }
+
+  } else if (isSameString(segments[0].c_str(), "do")) {
+    AICamera_setDO(segments[1], segments[2]);
+
+  } else if (isSameString(segments[0].c_str(), "di")) {
+    if (isSameString(segments[1].c_str(), "on")) {
+      AICamera_MonitorDIStart();
+    } else if (isSameString(segments[1].c_str(), "off")) {
+      AICamera_MonitorDIStop();
+    }
+
+  } else if (isSameString(segments[0].c_str(), "triger")) {
+    if (isSameString(segments[1].c_str(), "on")) {
+      AICamera_MonitorTrigerStart();
+    } else if (isSameString(segments[1].c_str(), "off")) {
+      AICamera_MonitorTrigerStop();
+    }
+
+  } else if (isSameString(segments[0].c_str(), "pwm")) {
+    AICamera_setPWM(segments[1]);
+
+  } else if (isSameString(segments[0].c_str(), "dio")) {
+    if (isSameString(segments[2].c_str(), "set")) {
+      AICamera_setDIODirection(segments[1], segments[3]);
+    } else if (isSameString(segments[2].c_str(), "do")) {
+      AICamera_setDIOOut(segments[1], segments[3]);
+    }
+
+  } else if (isSameString(segments[0].c_str(), "arv")) {
+    aravisTest();
+
+  } else if (isSameString(segments[0].c_str(), "gstt")) {
+    int testCase = std::stoi(segments[1]);
+    gst_test(testCase);
+  }
 }
 
 // MQTTClient gClient;
@@ -27,30 +104,10 @@ int main(int argc, char* argv[]) {
     xlog("argv[%d]:%s", i, argv[i]);
   }
 
-//   if (argc < 2) {
-//     xlog("to input more than 1 params...");
-//     return -1;
-//   }
-
-//   if (!strcmp(argv[1], "test")) {
-//     xlog("");
-//   } else if (!strcmp(argv[1], "gst")) {
-//     int testCase = (argv[2] == nullptr) ? 0 : 1;
-//     gst_test(testCase);
-//   } else if (!strcmp(argv[1], "ocv")) {
-//     int testCase = (argv[2] == nullptr) ? 0 : 1;
-//     ocv_test(testCase);
-//   } else if (!strcmp(argv[1], "dev")) {
-//     xlog("getVideoDevice:%s", AICamrea_getVideoDevice().c_str());
-//   }
-
   bool isUseMQTT = false;
   if (!isUseMQTT) {
     xlog("USE RESTful...");
     
-    OTI322 oti322;
-    OTPA8 otpa8;
-
     // REST API: Get Temperature
     httplib::Server svr;
     svr.Get("/temperatures", [&](const httplib::Request& req, httplib::Response& res) {
@@ -58,6 +115,7 @@ int main(int argc, char* argv[]) {
       xlog("query otpa8...");
       float ambientTemp = 0.0;
       float objectTemp = 0.0;
+      OTPA8 otpa8;
       otpa8.readTemperature_max(ambientTemp, objectTemp);
       std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
                              ", \"object\": " + std::to_string(objectTemp) + " }";
@@ -68,6 +126,7 @@ int main(int argc, char* argv[]) {
       xlog("query otpa16...");
       float ambientTemp = 0.0;
       float objectTemp[256] = { 0.0 };
+      OTPA8 otpa8;
       otpa8.readTemperature_array(ambientTemp, objectTemp);
       std::ostringstream response;
       response << "{ \"ambient\": " << std::fixed << std::setprecision(1) << ambientTemp << ", \"object\": [";
@@ -103,88 +162,9 @@ int main(int argc, char* argv[]) {
         for (size_t i = 0; i < segments.size(); ++i) {
           xlog("Stored segment at index %zu: %s", i, segments[i].c_str());
         }
+
+        handle_RESTful(segments);
   
-        // handle commands ===============================================
-        if (isSameString(segments[0].c_str(), "gst")) {
-          if (isSameString(segments[1].c_str(), "start")) {
-            AICamera_streamingStart();
-          } else if (isSameString(segments[1].c_str(), "stop")) {
-            AICamera_streamingStop();
-          }
-
-        } else if (isSameString(segments[0].c_str(), "gige")) {
-          if (isSameString(segments[1].c_str(), "start")) {
-            AICamera_streamingStart_GigE();
-          } else if (isSameString(segments[1].c_str(), "stop")) {
-            AICamera_streamingStop_GigE();
-          }
-
-        } else if (isSameString(segments[0].c_str(), "tp")) {
-          xlog("take picture");
-          std::string path = "";
-          if (segments.size() > 1 && !segments[1].empty()) {
-            // path = "/home/root/primax/" + segments[1];
-
-            // replace _ to /, input format ex:  is _home_root_primax_123.png
-            path = segments[1];
-            const std::string from = "%2F";
-            const std::string to = "/";
-
-            size_t start_pos = 0;
-            while ((start_pos = path.find(from, start_pos)) != std::string::npos) {
-              path.replace(start_pos, from.length(), to);
-              start_pos += to.length();  // Move past the replacement
-            }
-
-          } else {
-            path = "/home/root/primax/fw_" + getTimeString() + ".png";
-          }
-          AICamera_setImagePath(path.c_str());
-          AICamera_captureImage();
-        
-        } else if (isSameString(segments[0].c_str(), "led")) {
-          if (segments.size() == 3) {
-            AICamera_setLED(segments[1], segments[2]);
-          } else {
-            xlog("param may missing...");
-          }
-
-        } else if (isSameString(segments[0].c_str(), "do")) {
-          AICamera_setDO(segments[1], segments[2]);
-        
-        } else if (isSameString(segments[0].c_str(), "di")) {
-          if (isSameString(segments[1].c_str(), "on")) {
-            AICamera_MonitorDIStart();
-          } else if (isSameString(segments[1].c_str(), "off")) {
-            AICamera_MonitorDIStop();
-          }
-
-        } else if (isSameString(segments[0].c_str(), "triger")) {
-          if (isSameString(segments[1].c_str(), "on")) {
-            AICamera_MonitorTrigerStart();
-          } else if (isSameString(segments[1].c_str(), "off")) {
-            AICamera_MonitorTrigerStop();
-          }
-
-        } else if (isSameString(segments[0].c_str(), "pwm")) {
-          AICamera_setPWM(segments[1]);
-
-        } else if (isSameString(segments[0].c_str(), "dio")) {
-          if (isSameString(segments[2].c_str(), "set")) {
-            AICamera_setDIODirection(segments[1], segments[3]);
-          } else if (isSameString(segments[2].c_str(), "do")) {
-            AICamera_setDIOOut(segments[1], segments[3]);
-          }
-        
-        } else if (isSameString(segments[0].c_str(), "arv")) {
-          aravisTest();
-
-        } else if (isSameString(segments[0].c_str(), "gstt")) {
-          int testCase = std::stoi(segments[1]);
-          gst_test(testCase);
-
-        }
-        // handle commands ===============================================
       } else {
         res.status = 400;  // Bad Request
         res.set_content("{ \"error\": \"Invalid request\" }", "application/json");
