@@ -12,7 +12,7 @@ void gst_test(int testCase) {
   GstElement *pipeline;
   GstBus *bus;
   GstMessage *msg;
-  std::string pipelineS = "";
+  string pipelineS = "";
 
   // Initialize GStreamer
   // gst_init(&argc, &argv);
@@ -33,12 +33,14 @@ void gst_test(int testCase) {
   } else if (testCase == 1) {
     // OK
     // gst-launch-1.0 aravissrc camera-name="id1" ! videoconvert ! video/x-raw,format=NV12 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
-    pipelineS =
-        "aravissrc camera-name=id1 " +
-        "! videoconvert " +
-        "! video/x-raw,format=NV12 " +
-        "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf "
-        "! rtspclientsink location=rtsp://localhost:8554/mystream";
+    pipelineS = 
+    R"(
+        aravissrc camera-name=id1
+        ! videoconvert
+        ! video/x-raw,format=NV12
+        ! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf
+        ! rtspclientsink location=rtsp://localhost:8554/mystream
+    )";
   } else {
     xlog("not a testCase");
     return;
