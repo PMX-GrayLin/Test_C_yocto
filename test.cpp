@@ -87,7 +87,7 @@ void handle_RESTful(std::vector<std::string> segments) {
 bool isMQTTRunning = false;
 void thread_mqtt_start() {
   if (!isMQTTRunning) {
-    std::thread(() {
+    std::thread([] {
       xlog("thread_mqtt_start start >>>>");
       isMQTTRunning = true;
 
