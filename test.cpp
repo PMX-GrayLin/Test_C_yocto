@@ -120,17 +120,23 @@ void handle_mqtt(std::string payload) {
   xlog("MQTT payload:%s", payload.c_str());
 }
 
-// MQTTClient gClient;
-class MQTTClient : public mosqpp::mosquittopp {
- public:
-  MQTTClient(const char* id) : mosqpp::mosquittopp(id) {}
+// // MQTTClient gClient;
+// class MQTTClient : public mosqpp::mosquittopp {
+//  public:
+//   MQTTClient(const char* id) : mosqpp::mosquittopp(id) {}
 
-  void on_message(const struct mosquitto_message* message) override {
-    std::string payload((char*)message->payload, message->payloadlen);
+//   void on_message(const struct mosquitto_message* message) override {
+//     std::string payload((char*)message->payload, message->payloadlen);
 
-    handle_mqtt(payload);
-  }
-};
+//     handle_mqtt(payload);
+//   }
+// };
+
+void MQTTClient::on_message(const struct mosquitto_message* message) {
+  std::string payload(static_cast<char*>(message->payload), message->payloadlen);
+
+  handle_mqtt(payload);
+}
 
 int main(int argc, char* argv[]) {
   xlog("");
