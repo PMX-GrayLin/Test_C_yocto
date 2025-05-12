@@ -346,7 +346,7 @@ void aravisTest() {
   g_usleep(30000000);  // 30 秒
 
   // 修改曝光時間為 5000 微秒
-  g_object_set(source, "exposure", 500.0, NULL);
+  g_object_set(source, "exposure", 5000.0, NULL);
 
   // 等待一段時間，觀察效果
   g_usleep(30000000);  // 30 秒
