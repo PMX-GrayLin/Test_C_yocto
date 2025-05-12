@@ -1014,6 +1014,12 @@ void AICamera_setLED(string led_index, string led_color) {
   } else if (led_index == "3") {
     gpio_index1 = 107;
     gpio_index2 = 108;  
+  } else if (led_index == "4") {
+    gpio_index1 = 109;
+    gpio_index2 = 110;  
+  } else if (led_index == "5") {
+    gpio_index1 = 119;
+    gpio_index2 = 120;  
   }
 
   if (isSameString(led_color.c_str(), "red")) {
