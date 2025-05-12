@@ -28,7 +28,6 @@ void startTimer(int ms) {
         // counterTimer++;
         // isSave2Jpeg = true;
 
-        oti322.readTemperature(ambientTemp, objectTemp);
       }
       xlog("timer stop >>>>");
     }).detach();  // Detach to run in the background

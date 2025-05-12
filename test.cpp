@@ -84,9 +84,37 @@ void handle_RESTful(std::vector<std::string> segments) {
   }
 }
 
-void handle_mqtt(std::string payload) {
-    xlog("MQTT payload:%s", payload.c_str());
 
+void thread_mqtt_start() {
+  if (!isMQTTRunning) {
+    std::thread(() {
+      xlog("thread_mqtt_start start >>>>");
+
+      // MQTT loop
+      mosqpp::lib_init();
+      MQTTClient client("my_client");
+
+      client.connect("localhost", 1883);
+      client.subscribe(nullptr, "PX/VBS/Cmd");
+
+      while (true) {
+        client.loop();
+      }
+      mosqpp::lib_cleanup();
+
+      xlog("thread_mqtt_start stop >>>>");
+    }).detach();  // Detach to run in the background
+
+  } else {
+    xlog("thread_mqtt_start already running...");
+  }
+}
+
+void thread_mqtt_stop() {
+}
+
+void handle_mqtt(std::string payload) {
+  xlog("MQTT payload:%s", payload.c_str());
 }
 
 // MQTTClient gClient;

@@ -31,7 +31,7 @@
 #include <gpiod.h>
 
 #include "httplib.h"
-#include <arv.h>
+// #include <arv.h>
 
 #define DEBUGX
 #ifndef DEBUGX
