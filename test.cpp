@@ -132,6 +132,9 @@ void handle_mqtt(std::string payload) {
 //   }
 // };
 
+MQTTClient::MQTTClient(const char* id)
+    : mosqpp::mosquittopp(id) {}
+    
 void MQTTClient::on_message(const struct mosquitto_message* message) {
   std::string payload(static_cast<char*>(message->payload), message->payloadlen);
 
