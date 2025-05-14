@@ -2,8 +2,10 @@
 #CC = g++
 #CFLAGS = -ansi -O -Wall -std=c++11
 #LDFLAGS = -lpthread
-
 # CC = ${CXX}
+
+# APP_NAME=fw_daemon
+APP_NAME=test
 
 # header dir
 INCLUDES_HEADER += -I$(BB_INCDIR)
@@ -20,7 +22,6 @@ CFLAG += ${INCLUDES_HEADER}
 
 # lib dir
 INCLUDES_LIB += -L$(BB_LIBDIR)
-# INCLUDES += -L$(BB_LIBDIR)/json-c
 INCLUDES_LIB += -L$(BB_LIBDIR)/gstreamer-1.0
 
 # lib
@@ -67,31 +68,6 @@ all: ${CPPOBJECTS}
 	@echo "========== Build $< to $@ start =========="
 	$(CXX) $(CFLAG) $< -c
 	@echo "========== Build $< to $@ end =========="
-
-# test.o: 
-# 	@echo "========== Build test.o start =========="
-# 	${CXX} $(CFLAG) test.cpp -c
-# 	@echo "========== Build test.o end =========="
-
-# test_gst.o: 
-# 	@echo "========== Build test_gst.o start =========="
-# 	${CXX} $(CFLAG) test_gst.cpp -c
-# 	@echo "========== Build test_gst.o end =========="
-
-# test_ocv.o: 
-# 	@echo "========== Build test_ocv.o start =========="
-# 	${CXX} $(CFLAG) test_ocv.cpp -c
-# 	@echo "========== Build test_ocv.o end =========="
-
-# test_gst.o: 
-# 	@echo "========== Build test_gst.o start =========="
-# 	${CXX} $(CFLAG) test_gst.cpp -c
-# 	@echo "========== Build test_gst.o end =========="
-
-# aicamera.o: 
-# 	@echo "========== Build aicamera.o start =========="
-# 	${CXX} $(CFLAG) aicamera.cpp -c
-# 	@echo "========== Build aicamera.o end =========="
 
 .PHONY : clean 
 
