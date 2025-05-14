@@ -4,8 +4,8 @@
 #LDFLAGS = -lpthread
 # CC = ${CXX}
 
-# APP_NAME=fw_daemon
-APP_NAME=test
+APP_NAME=fw_daemon
+# APP_NAME=test
 
 # header dir
 INCLUDES_HEADER += -I$(BB_INCDIR)
