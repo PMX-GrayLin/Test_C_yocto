@@ -31,7 +31,7 @@ LINK_LIBS += -lgobject-2.0
 LINK_LIBS += -lmosquitto -lmosquittopp
 LINK_LIBS += -lgpiod
 # LINK_LIBS += -laravis-0.8
-LINK_LIBS += -lft4222 -lftd2xx
+# LINK_LIBS += -lft4222 -lftd2xx
 
 OCVLDFLAG +=-lopencv_core 
 OCVLDFLAG +=-lopencv_imgproc

@@ -30,11 +30,11 @@
 #include <opencv2/opencv.hpp>
 #include <gpiod.h>
 
-#include "httplib.h"
-// #include <arv.h>
+#include "httplib.hpp"
 
-#include "ftd2xx.h"
-#include "libft4222.h"
+// #include <arv.h>
+// #include "ftd2xx.h"
+// #include "libft4222.h"
 
 #define DEBUGX
 #ifndef DEBUGX
