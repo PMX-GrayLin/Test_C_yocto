@@ -129,8 +129,7 @@ void MQTTClient::on_message(const struct mosquitto_message* message) {
   handle_mqtt(payload);
 }
 
-#if defined(#if defined(ENABLE_FTDI)
-)
+#if defined(ENABLE_FTDI)
 
 #define SLAVE_ADDR 0x68
 #define I2C_SPEED_KHZ 400
@@ -193,7 +192,7 @@ void test_ftdi() {
   FT_Close(ftHandle);
 }
 
-#endif // #if defined(ENABLE_FTDI)
+#endif // ENABLE_FTDI
 
 int main(int argc, char* argv[]) {
   xlog("");
