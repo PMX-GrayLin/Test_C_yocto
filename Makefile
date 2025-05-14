@@ -61,7 +61,7 @@ all: ${CPPOBJECTS}
 	@echo ">>>> CFLAG:${CFLAG}"
 	@echo ">>>> LDFLAG:${LDFLAG}"
 	@echo ">>>> "
-	${CXX} $(CFLAG) -o test ${CPPOBJECTS} $(LDFLAG)
+	${CXX} $(CFLAG) -o $(APP_NAME) ${CPPOBJECTS} $(LDFLAG)
 	@echo "========== Build all end =========="
 
 %.o: %.cpp
@@ -72,4 +72,4 @@ all: ${CPPOBJECTS}
 .PHONY : clean 
 
 clean:
-	rm -rf *.o *.exe test
+	rm -rf *.o *.exe $(APP_NAME)
