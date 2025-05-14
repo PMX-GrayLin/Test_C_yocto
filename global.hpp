@@ -25,7 +25,6 @@
 #include <filesystem>
 #include <iomanip>
 
-// yocto test
 #include "json.h"
 #include <mosquittopp.h>
 

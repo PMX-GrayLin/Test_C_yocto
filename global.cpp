@@ -1,7 +1,5 @@
 #include "global.hpp"
 
-#include "oti322.hpp"
-
 // test vars
 int testCounter = 0;
 
