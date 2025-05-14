@@ -33,6 +33,9 @@
 #include "httplib.h"
 // #include <arv.h>
 
+#include "ftd2xx.h"
+#include "libft4222.h"
+
 #define DEBUGX
 #ifndef DEBUGX
 #define xlog(...) ((void)0)
