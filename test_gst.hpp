@@ -8,4 +8,10 @@ void gst_test2(int testCase);
 
 void stopPipeline();
 
+
+#if defined(ENABLE_ARAVIS)
+
 void aravisTest();
+
+#endif // ENABLE_ARAVIS
+

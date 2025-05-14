@@ -120,11 +120,23 @@ void handle_mqtt(std::string payload) {
   xlog("MQTT payload:%s", payload.c_str());
 }
 
+MQTTClient::MQTTClient(const char* id)
+    : mosqpp::mosquittopp(id) {}
+
+void MQTTClient::on_message(const struct mosquitto_message* message) {
+  std::string payload(static_cast<char*>(message->payload), message->payloadlen);
+
+  handle_mqtt(payload);
+}
+
+#if defined(#if defined(ENABLE_FTDI)
+)
+
 #define SLAVE_ADDR 0x68
 #define I2C_SPEED_KHZ 400
 #define READ_LEN 525
 
-void test_ft() {
+void test_ftdi() {
   FT_STATUS ftStatus;
   FT_HANDLE ftHandle = NULL;
   DWORD devCount = 0;
@@ -181,15 +193,7 @@ void test_ft() {
   FT_Close(ftHandle);
 }
 
-
-MQTTClient::MQTTClient(const char* id)
-    : mosqpp::mosquittopp(id) {}
-
-void MQTTClient::on_message(const struct mosquitto_message* message) {
-  std::string payload(static_cast<char*>(message->payload), message->payloadlen);
-
-  handle_mqtt(payload);
-}
+#endif // #if defined(ENABLE_FTDI)
 
 int main(int argc, char* argv[]) {
   xlog("");

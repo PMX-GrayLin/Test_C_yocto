@@ -1,5 +1,8 @@
 #pragma once
 
+// #define ENABLE_ARAVIS
+// #define ENABLE_FTDI
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -32,9 +35,14 @@
 
 #include "httplib.hpp"
 
-// #include <arv.h>
-// #include "ftd2xx.h"
-// #include "libft4222.h"
+#if defined(ENABLE_ARAVIS)
+#include <arv.h>
+#endif
+
+#if defined(ENABLE_FTDI)
+#include "ftd2xx.h"
+#include "libft4222.h"
+#endif
 
 #define DEBUGX
 #ifndef DEBUGX
@@ -44,9 +52,6 @@
 #endif
 
 #define NUM_CAM_USE 2
-#define USE_TOF
-#define DEBUG_TOF
-// #define DEBUG_SPI
 
 using namespace std;
 

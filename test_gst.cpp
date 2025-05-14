@@ -268,6 +268,8 @@ void stopPipeline() {
   }
 }
 
+#if defined(ENABLE_ARAVIS)
+
 void aravisTest() {
   // Initialize GStreamer
   gst_init(nullptr, nullptr);
@@ -364,110 +366,112 @@ void aravisTest() {
   return;
 }
 
-// void aravisTest2() {
-//   GstElement *pipeline;
-//   GstBus *bus;
-//   GstMessage *msg;
-//   GError* error = NULL;
-//   string pipelineS = "";
+void aravisTest2() {
+  GstElement *pipeline;
+  GstBus *bus;
+  GstMessage *msg;
+  GError* error = NULL;
+  string pipelineS = "";
 
-//   // Initialize GStreamer
-//   // gst_init(&argc, &argv);
-//   gst_init(nullptr, nullptr);
+  // Initialize GStreamer
+  // gst_init(&argc, &argv);
+  gst_init(nullptr, nullptr);
 
-//   guint major, minor, micro, nano;
-//   gst_version(&major, &minor, &micro, &nano);
-//   xlog("%d.%d.%d.%d", major, minor, micro, nano);
+  guint major, minor, micro, nano;
+  gst_version(&major, &minor, &micro, &nano);
+  xlog("%d.%d.%d.%d", major, minor, micro, nano);
 
-//   arv_update_device_list();
+  arv_update_device_list();
 
-//   guint n_devices = arv_get_n_devices();
-//   if (n_devices == 0) {
-//     xlog("No camera found!");
-//       return;
-//   }
+  guint n_devices = arv_get_n_devices();
+  if (n_devices == 0) {
+    xlog("No camera found!");
+      return;
+  }
 
-//   const char *camera_id = arv_get_device_id(0);
-//   xlog("Using camera:%s", camera_id);
+  const char *camera_id = arv_get_device_id(0);
+  xlog("Using camera:%s", camera_id);
 
-//   ArvCamera *camera = arv_camera_new(camera_id, &error);
-//   if (!camera) {
-//     xlog("Failed to create ArvCamera:%s", error->message);
-//       return;
-//   }
+  ArvCamera *camera = arv_camera_new(camera_id, &error);
+  if (!camera) {
+    xlog("Failed to create ArvCamera:%s", error->message);
+      return;
+  }
 
-//   // Set initial exposure
-//   arv_camera_set_exposure_time(camera, 5000.0, &error);
-//   if (error) {
-//     xlog("Failed to set exposure:%s", error->message);
-//       g_error_free(error);
-//       error = nullptr;
-//   }
-//   xlog("Setting exposure to 5000 µs...");
-//   std::this_thread::sleep_for(std::chrono::seconds(30));
+  // Set initial exposure
+  arv_camera_set_exposure_time(camera, 5000.0, &error);
+  if (error) {
+    xlog("Failed to set exposure:%s", error->message);
+      g_error_free(error);
+      error = nullptr;
+  }
+  xlog("Setting exposure to 5000 µs...");
+  std::this_thread::sleep_for(std::chrono::seconds(30));
 
-//   // OK
-//   // gst-launch-1.0 aravissrc camera-name="id1" ! videoconvert ! video/x-raw,format=NV12 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
-//   pipelineS =
-//       R"(
-//         aravissrc camera-name=id1
-//         ! videoconvert
-//         ! video/x-raw,format=NV12
-//         ! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf
-//         ! rtspclientsink location=rtsp://localhost:8554/mystream
-//     )";
+  // OK
+  // gst-launch-1.0 aravissrc camera-name="id1" ! videoconvert ! video/x-raw,format=NV12 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
+  pipelineS =
+      R"(
+        aravissrc camera-name=id1
+        ! videoconvert
+        ! video/x-raw,format=NV12
+        ! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf
+        ! rtspclientsink location=rtsp://localhost:8554/mystream
+    )";
 
-//   xlog("pipeline:%s", pipelineS.c_str());
+  xlog("pipeline:%s", pipelineS.c_str());
 
-//   pipeline = gst_parse_launch(pipelineS.c_str(), nullptr);
-//   if (!pipeline) {
-//     xlog("gst_parse_launch fail");
-//     return;
-//   }
+  pipeline = gst_parse_launch(pipelineS.c_str(), nullptr);
+  if (!pipeline) {
+    xlog("gst_parse_launch fail");
+    return;
+  }
 
-//   // Start playing
-//   gst_element_set_state(pipeline, GST_STATE_PLAYING);
-//   xlog("pipeline is running...");
+  // Start playing
+  gst_element_set_state(pipeline, GST_STATE_PLAYING);
+  xlog("pipeline is running...");
 
-//   std::this_thread::sleep_for(std::chrono::seconds(30));
+  std::this_thread::sleep_for(std::chrono::seconds(30));
 
-//   xlog("Setting exposure to 15000 µs...");
-//   arv_camera_set_exposure_time(camera, 15000.0, &error);
-//   if (error) {
-//     xlog("Failed to change exposure:%s", error->message);
-//       g_error_free(error);
-//   }
+  xlog("Setting exposure to 15000 µs...");
+  arv_camera_set_exposure_time(camera, 15000.0, &error);
+  if (error) {
+    xlog("Failed to change exposure:%s", error->message);
+      g_error_free(error);
+  }
 
-//   // Wait until error or EOS
-//   bus = gst_element_get_bus(pipeline);
-//   msg = gst_bus_timed_pop_filtered(
-//       bus,
-//       GST_CLOCK_TIME_NONE,
-//       static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+  // Wait until error or EOS
+  bus = gst_element_get_bus(pipeline);
+  msg = gst_bus_timed_pop_filtered(
+      bus,
+      GST_CLOCK_TIME_NONE,
+      static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 
-//   // Parse message
-//   if (msg) {
-//     GError *err;
-//     gchar *debug_info;
+  // Parse message
+  if (msg) {
+    GError *err;
+    gchar *debug_info;
 
-//     switch (GST_MESSAGE_TYPE(msg)) {
-//       case GST_MESSAGE_ERROR:
-//         gst_message_parse_error(msg, &err, &debug_info);
-//         g_clear_error(&err);
-//         g_free(debug_info);
-//         break;
-//       case GST_MESSAGE_EOS:
-//         break;
-//       default:
-//         break;
-//     }
-//     gst_message_unref(msg);
-//   }
+    switch (GST_MESSAGE_TYPE(msg)) {
+      case GST_MESSAGE_ERROR:
+        gst_message_parse_error(msg, &err, &debug_info);
+        g_clear_error(&err);
+        g_free(debug_info);
+        break;
+      case GST_MESSAGE_EOS:
+        break;
+      default:
+        break;
+    }
+    gst_message_unref(msg);
+  }
 
-//   // Free resources
-//   gst_object_unref(bus);
-//   gst_element_set_state(pipeline, GST_STATE_NULL);
-//   gst_object_unref(pipeline);
+  // Free resources
+  gst_object_unref(bus);
+  gst_element_set_state(pipeline, GST_STATE_NULL);
+  gst_object_unref(pipeline);
 
-//   return;
-// }
+  return;
+}
+
+#endif // ENABLE_ARAVIS
