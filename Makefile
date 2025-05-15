@@ -4,7 +4,6 @@
 #LDFLAGS = -lpthread
 # CC = ${CXX}
 
-# APP_NAME=fw_daemon
 APP_NAME=test
 
 # header dir
