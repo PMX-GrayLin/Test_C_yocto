@@ -8,7 +8,6 @@ bool isSave2Jpeg = false;
 bool isTimerRunning = false;
 int counterTimer = 0;
 
-
 void startTimer(int ms) {
   if (!isTimerRunning) {
     isTimerRunning = true;
@@ -17,14 +16,8 @@ void startTimer(int ms) {
     std::thread([ms]() {
       xlog("timer start >>>>");
 
-      OTI322 oti322;
-      float ambientTemp = 0.0;
-      float objectTemp = 0.0;
-
       while (isTimerRunning) {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-        // counterTimer++;
-        // isSave2Jpeg = true;
 
       }
       xlog("timer stop >>>>");
