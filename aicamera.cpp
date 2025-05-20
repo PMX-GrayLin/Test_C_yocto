@@ -857,20 +857,25 @@ void ThreadAICameraStreaming_GigE() {
   // Initialize GStreamer
   gst_init(nullptr, nullptr);
 
+  // working pipeline
+  //gst-launch-1.0 aravissrc camera-name=id1 ! videoconvert ! video/x-raw,format=NV12 ! queue ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! h264parse config-interval=1 ! rtspclientsink location=rtsp://localhost:8554/mystream
+  
   // Create the pipeline
   gst_pipeline = gst_pipeline_new("video-pipeline");
 
   GstElement *source = gst_element_factory_make("aravissrc", "source");
   GstElement *videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
   GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
+  GstElement *queue = gst_element_factory_make("queue", "queue");
   GstElement *encoder = gst_element_factory_make("v4l2h264enc", "encoder");
+  GstElement *parser = gst_element_factory_make("h264parse", "parser");
   GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
 
-  if (!gst_pipeline || !source || !videoconvert || !capsfilter || !encoder || !sink) {
-    xlog("failed to create GStreamer elements");
+  if (!gst_pipeline || !source || !videoconvert || !capsfilter || !queue || !encoder || !parser || !sink) {
+    xlog("Failed to create GStreamer elements");
     return;
   }
-
+  
   // Set camera by ID or name (adjust "id1" if needed)
   g_object_set(G_OBJECT(source), "camera-name", "id1", nullptr);
 
@@ -894,14 +899,18 @@ void ThreadAICameraStreaming_GigE() {
   }
   g_object_set(G_OBJECT(encoder), "extra-controls", controls, nullptr);
   gst_structure_free(controls);
+  g_object_set(G_OBJECT(encoder), "capture-io-mode", 4, nullptr);  // dmabuf
 
-  g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf
-  g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
+  // Parser settings
+  g_object_set(G_OBJECT(parser), "config-interval", 1, nullptr);
 
-  // Add elements to pipeline
-  gst_bin_add_many(GST_BIN(gst_pipeline), source, videoconvert, capsfilter, encoder, sink, nullptr);
-  if (!gst_element_link_many(source, videoconvert, capsfilter, encoder, sink, nullptr)) {
-    xlog("failed to link elements in the pipeline");
+  // RTSP Sink
+  g_object_set(G_OBJECT(sink), "location", "rtsp://localhost:8554/mystream", nullptr);
+
+  // Build pipeline
+  gst_bin_add_many(GST_BIN(gst_pipeline), source, videoconvert, capsfilter, queue, encoder, parser, sink, nullptr);
+  if (!gst_element_link_many(source, videoconvert, capsfilter, queue, encoder, parser, sink, nullptr)) {
+    xlog("Failed to link GStreamer elements");
     gst_object_unref(gst_pipeline);
     return;
   }
