@@ -41,7 +41,7 @@ double GigE_getExposure_hik() {
 
 void GigE_setExposure_hik(string exposureTimeS) {
   // Exposure time in microseconds
-  double exposureTime = std:stod(exposureTimeS);
+  double exposureTime = std::stod(exposureTimeS);
   g_object_set(G_OBJECT(source_gige_hik), "exposure", exposureTime, NULL);
 }
 
@@ -51,9 +51,7 @@ GstArvAuto GigE_getExposureAuto_hik() {
 
 void GigE_setExposureAuto_hik(GstArvAuto gaa) {
   // Exposure auto mode (0 - off, 1 - once, 2 - continuous)
-  g_object_set(G_OBJECT(source_gige_hik), "exposure-auto", exposureTime, NULL);
-
-
+  g_object_set(G_OBJECT(source_gige_hik), "exposure-auto", gaa, NULL);
 }
 
 void GigE_ThreadStreaming_Hik() {
