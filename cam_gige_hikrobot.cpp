@@ -85,8 +85,8 @@ void GigE_setGain_hik(string gainS) {
   // Gain = 10.0161 dB min:0 max:23.9812
 
   double gain = limitValueInRange(std::stod(gainS), 0.0, 23.9);
-  xlog("set gain:%f", exposureTime);
-  g_object_set(G_OBJECT(source_gige_hik), "gain", exposureTime, NULL);
+  xlog("set gain:%f", gain);
+  g_object_set(G_OBJECT(source_gige_hik), "gain", gain, NULL);
 }
 
 GstArvAuto GigE_getGainAuto_hik() {
