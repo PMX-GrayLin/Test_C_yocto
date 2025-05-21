@@ -7,10 +7,6 @@ static GstElement *source_gige_hik = nullptr;
 std::thread t_streaming_gige_hik;
 bool isStreaming_gige_hik = false;
 
-bool isCapturePhoto = false;
-bool isCropPhoto = false;
-bool isPaddingPhoto = false;
-
 // Callback to handle incoming buffer data
 GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
   AICAMERA_saveImage(pad, info);
