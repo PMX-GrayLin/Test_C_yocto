@@ -4,6 +4,19 @@ static GstElement *pipeline_gige_hik = nullptr;
 static GMainLoop *loop_gige_hik = nullptr;
 static GstElement *source_gige_hik = nullptr;
 
+std::thread t_streaming_gige_hik;
+bool isStreaming_gige_hik = false;
+
+bool isCapturePhoto = false;
+bool isCropPhoto = false;
+bool isPaddingPhoto = false;
+
+// Callback to handle incoming buffer data
+GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+  AICAMERA_saveImage(pad, info);
+  return GST_PAD_PROBE_OK;
+}
+
 void ThreadCamStreaming_GigE() {
     xlog("++++ start ++++");
   
@@ -71,7 +84,7 @@ void ThreadCamStreaming_GigE() {
     // Optional: attach pad probe to monitor frames
     GstPad *pad = gst_element_get_static_pad(encoder, "sink");
     if (pad) {
-      gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)AICAMERA_streamingDataCallback, nullptr, nullptr);
+      gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)streamingDataCallback_gige_hik, nullptr, nullptr);
       gst_object_unref(pad);
     }
   
@@ -84,7 +97,7 @@ void ThreadCamStreaming_GigE() {
     }
   
     xlog("pipeline is running...");
-    isStreaming = true;
+    isStreaming_gige_hik = true;
   
     // Main loop
     loop_gige_hik = g_main_loop_new(nullptr, FALSE);
@@ -94,21 +107,21 @@ void ThreadCamStreaming_GigE() {
     xlog("Stopping the pipeline...");
     gst_element_set_state(pipeline_gige_hik, GST_STATE_NULL);
     gst_object_unref(pipeline_gige_hik);
-    isStreaming = false;
+    isStreaming_gige_hik = false;
     xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
   }
   
   void CamStreamingStart_GigE() {
     xlog("");
-    if (isStreaming) {
+    if (isStreaming_gige_hik) {
       xlog("thread already running");
       return;
     }
-    isStreaming = true;
+    isStreaming_gige_hik = true;
     
-    t_aicamera_streaming = std::thread(ThreadCamStreaming_GigE);  
+    t_streaming_gige_hik = std::thread(ThreadCamStreaming_GigE);  
   
-    t_aicamera_streaming.detach();
+    t_streaming_gige_hik.detach();
   }
   
   void CamStreamingStop_GigE() {
@@ -118,8 +131,7 @@ void ThreadCamStreaming_GigE() {
       g_main_loop_unref(loop_gige_hik);
       loop_gige_hik = nullptr;
   
-      // ??
-      isStreaming = false;
+      isStreaming_gige_hik = false;
     } else {
       xlog("loop_gige_hik is invalid or already destroyed.");
     }
