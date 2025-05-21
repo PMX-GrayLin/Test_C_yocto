@@ -3,6 +3,7 @@
 #include "test_gst.hpp"
 #include "test_ocv.hpp"
 #include "aicamera.hpp"
+#include "cam_gige_hikrobot.hpp"
 #include "oti322.hpp"
 #include "otpa8.hpp"
 
