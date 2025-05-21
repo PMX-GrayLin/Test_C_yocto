@@ -12,13 +12,15 @@ static GstElement *source_gige_hik = nullptr;
 std::thread t_streaming_gige_hik;
 bool isStreaming_gige_hik = false;
 
+struct GigeControlParams gigeControlParams = { 0 };
+
 // Callback to handle incoming buffer data
 GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
   AICAMERA_saveImage(pad, info);
   return GST_PAD_PROBE_OK;
 }
 
-double GigE_getExposure_hik() {
+void GigE_getSettings_hik() {
   // Get the current values
   double exposure, gain;
   int exposure_auto, gain_auto;
@@ -27,16 +29,21 @@ double GigE_getExposure_hik() {
   g_object_get(G_OBJECT(source_gige_hik), "gain", &gain, NULL);
   g_object_get(G_OBJECT(source_gige_hik), "exposure-auto", &exposure_auto, NULL);
   g_object_get(G_OBJECT(source_gige_hik), "gain-auto", &gain_auto, NULL);
-
-  // g_object_set(G_OBJECT(source_gige_hik), "gain", 10.0, NULL);         // Gain in dB
-  // g_object_set(G_OBJECT(source_gige_hik), "gain-auto", 2, NULL);       // Gain auto mode (0 - off, 1 - once, 2 - continuous)
-
   xlog("exposure_auto:%d", exposure_auto);
   xlog("exposure:%f", exposure);
   xlog("gain_auto:%d", gain_auto);
   xlog("gain:%f", gain);
 
-  return exposure;
+  gigeControlParams.exposure_auto = exposure_auto;
+  gigeControlParams.exposure = exposure;
+  gigeControlParams.gain_auto = gain_auto;
+  gigeControlParams.gain = gain;
+
+}
+
+double GigE_getExposure_hik() {
+  GigE_getSettings_hik();
+  return gigeControlParams.exposure;
 }
 
 void GigE_setExposure_hik(string exposureTimeS) {
@@ -44,19 +51,35 @@ void GigE_setExposure_hik(string exposureTimeS) {
   // Hikrobot-MV-CS060-10GM-PRO-K44474092 (192.168.11.22)
   // ExposureTime = 15000 min:25 max:2.49985e+06
 
+  // ?? max value may incorrect, cause gige cam to crash...
+
   double exposureTime = limitValueInRange(std::stod(exposureTimeS), 25.0, 2490000.0);
-  xlog("exposureTime:%f", exposureTime);
+  xlog("set exposureTime:%f", exposureTime);
   g_object_set(G_OBJECT(source_gige_hik), "exposure", exposureTime, NULL);
 }
 
 GstArvAuto GigE_getExposureAuto_hik() {
-  return gaa_off;
+  GigE_getSettings_hik();
+  return gigeControlParams.exposure_auto;
 }
 
-void GigE_setExposureAuto_hik(GstArvAuto gaa) {
+void GigE_setExposureAuto_hik(string gstArvAutoS) {
   // Exposure auto mode (0 - off, 1 - once, 2 - continuous)
+  GstArvAuto gaa = gaa_off;
+  if (isSameString(gstArvAutoS.c_str(), "off") || isSameString(gstArvAutoS.c_str(), "0")) {
+    gaa = gaa_off;
+  } else if (isSameString(gstArvAutoS.c_str(), "once") || isSameString(gstArvAutoS.c_str(), "1")) {
+    gaa = gaa_once;
+  } else if (isSameString(gstArvAutoS.c_str(), "cont") || isSameString(gstArvAutoS.c_str(), "2")) {
+    gaa = gaa_continuous;
+  }
+  xlog("set exposure-auto:%f", gaa);
   g_object_set(G_OBJECT(source_gige_hik), "exposure-auto", gaa, NULL);
 }
+
+  // g_object_set(G_OBJECT(source_gige_hik), "gain", 10.0, NULL);         // Gain in dB
+  // g_object_set(G_OBJECT(source_gige_hik), "gain-auto", 2, NULL);       // Gain auto mode (0 - off, 1 - once, 2 - continuous)
+
 
 void GigE_ThreadStreaming_Hik() {
   xlog("++++ start ++++");

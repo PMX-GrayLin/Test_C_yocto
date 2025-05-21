@@ -27,7 +27,7 @@ void handle_RESTful(std::vector<std::string> segments) {
 
     } else if (isSameString(segments[1].c_str(), "get")) {
       if (isSameString(segments[2].c_str(), "exposure")) {
-        GigE_getExposure_hik();
+        GigE_getSettings_hik();
       }
 
     }

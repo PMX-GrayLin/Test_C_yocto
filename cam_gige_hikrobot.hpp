@@ -4,21 +4,29 @@
 #include "global.hpp"
 
 typedef enum {
-    ugc_hikrobot = 0,
-    ugc_brand_x,
-    ugc_brand_y,
-  } UsedGigeCam;
+  ugc_hikrobot = 0,
+  ugc_brand_x,
+  ugc_brand_y,
+} UsedGigeCam;
 
 typedef enum {
-    gaa_off = 0,
-    gaa_once,
-    gaa_continuous,
-  } GstArvAuto;
-  
-extern double GigE_getExposure_hik();
+  gaa_off = 0,
+  gaa_once,
+  gaa_continuous,
+} GstArvAuto;
+
+struct GigeControlParams {
+  double exposure;    // Exposure time (e.g., in microseconds)
+  double gain;        // Gain value (e.g., in dB)
+  int exposure_auto;  // Auto exposure mode: 0=off, 1=once, 2=continuous
+  int gain_auto;      // Auto gain mode: 0=off, 1=once, 2=continuous
+};
+
+extern void GigE_getSettings_hik();
+extern double GigE_getExposure_hik()
 extern void GigE_setExposure_hik(string exposureTimeS);
 extern GstArvAuto GigE_getExposureAuto_hik();
-extern void GigE_setExposureAuto_hik(GstArvAuto gaa);
+extern void GigE_setExposureAuto_hik(string gstArvAutoS);
 
 void GigE_ThreadStreaming_Hik();
 extern void GigE_StreamingStart_Hik();
