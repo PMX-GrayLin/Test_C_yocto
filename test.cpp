@@ -23,13 +23,22 @@ void handle_RESTful(std::vector<std::string> segments) {
     } else if (isSameString(segments[1].c_str(), "set")) {
       if (isSameString(segments[2].c_str(), "exposure")) {
         GigE_setExposure_hik(segments[3]);
+      } else if (isSameString(segments[2].c_str(), "exposure-auto")) {
+        GigE_setExposureAuto_hik(segments[3]);
+      } else if (isSameString(segments[2].c_str(), "gain")) {
+        GigE_setGain_hik(segments[3]);
+      } else if (isSameString(segments[2].c_str(), "gain-auto")) {
+        GigE_setGainAuto_hik(segments[3]);
       }
 
     } else if (isSameString(segments[1].c_str(), "get")) {
+      GigE_getSettings_hik();
       if (isSameString(segments[2].c_str(), "exposure")) {
-        GigE_getSettings_hik();
+        //
+      } else if (isSameString(segments[2].c_str(), "exposure-auto")) {
+      } else if (isSameString(segments[2].c_str(), "gain")) {
+      } else if (isSameString(segments[2].c_str(), "gain-auto")) {
       }
-
     }
 
   } else if (isSameString(segments[0].c_str(), "tp")) {

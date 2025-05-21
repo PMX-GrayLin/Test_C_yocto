@@ -42,7 +42,6 @@ void GigE_getSettings_hik() {
 }
 
 double GigE_getExposure_hik() {
-  GigE_getSettings_hik();
   return gigeControlParams.exposure;
 }
 
@@ -59,7 +58,6 @@ void GigE_setExposure_hik(string exposureTimeS) {
 }
 
 GstArvAuto GigE_getExposureAuto_hik() {
-  GigE_getSettings_hik();
   return (GstArvAuto)gigeControlParams.exposure_auto;
 }
 
@@ -77,9 +75,37 @@ void GigE_setExposureAuto_hik(string gstArvAutoS) {
   g_object_set(G_OBJECT(source_gige_hik), "exposure-auto", gaa, NULL);
 }
 
-  // g_object_set(G_OBJECT(source_gige_hik), "gain", 10.0, NULL);         // Gain in dB
-  // g_object_set(G_OBJECT(source_gige_hik), "gain-auto", 2, NULL);       // Gain auto mode (0 - off, 1 - once, 2 - continuous)
+double GigE_getGain_hik() {
+  return gigeControlParams.gain;
+}
 
+void GigE_setGain_hik(string gainS) {
+  // # arv-tool-0.8 control Gain
+  // Hikrobot-MV-CS060-10GM-PRO-K44474092 (192.168.11.22)
+  // Gain = 10.0161 dB min:0 max:23.9812
+
+  double gain = limitValueInRange(std::stod(gainS), 0.0, 23.9);
+  xlog("set gain:%f", exposureTime);
+  g_object_set(G_OBJECT(source_gige_hik), "gain", exposureTime, NULL);
+}
+
+GstArvAuto GigE_getGainAuto_hik() {
+  return (GstArvAuto)gigeControlParams.gain_auto;
+}
+
+void GigE_setGainAuto_hik(string gstArvAutoS) {
+  // Gain auto mode (0 - off, 1 - once, 2 - continuous)
+  GstArvAuto gaa = gaa_off;
+  if (isSameString(gstArvAutoS.c_str(), "off") || isSameString(gstArvAutoS.c_str(), "0")) {
+    gaa = gaa_off;
+  } else if (isSameString(gstArvAutoS.c_str(), "once") || isSameString(gstArvAutoS.c_str(), "1")) {
+    gaa = gaa_once;
+  } else if (isSameString(gstArvAutoS.c_str(), "cont") || isSameString(gstArvAutoS.c_str(), "2")) {
+    gaa = gaa_continuous;
+  }
+  xlog("set gain-auto:%d", gaa);
+  g_object_set(G_OBJECT(source_gige_hik), "gain-auto", gaa, NULL);
+}
 
 void GigE_ThreadStreaming_Hik() {
   xlog("++++ start ++++");

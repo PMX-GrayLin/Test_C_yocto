@@ -23,10 +23,17 @@ struct GigeControlParams {
 };
 
 extern void GigE_getSettings_hik();
+
 extern double GigE_getExposure_hik();
 extern void GigE_setExposure_hik(string exposureTimeS);
 extern GstArvAuto GigE_getExposureAuto_hik();
 extern void GigE_setExposureAuto_hik(string gstArvAutoS);
+
+extern double GigE_getGain_hik();
+extern void GigE_setGain_hik(string gainS);
+extern GstArvAuto GigE_getGainAuto_hik();
+extern void GigE_setGainAuto_hik(string gstArvAutoS);
+
 
 void GigE_ThreadStreaming_Hik();
 extern void GigE_StreamingStart_Hik();
