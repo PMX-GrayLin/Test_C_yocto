@@ -50,14 +50,15 @@ void GigE_setExposure_hik(string exposureTimeS) {
     xlog("exposure min:%f", double_spec->minimum);
     xlog("exposure max:%f", double_spec->maximum);
     xlog("exposure default:%f", double_spec->default_value);
+    // Exposure time in microseconds
+    double exposureTime = limitValueInRange(std::stod(exposureTimeS), double_spec->minimum, double_spec->maximum);
+    xlog("exposureTime:%f", exposureTime);
+    g_object_set(G_OBJECT(source_gige_hik), "exposure", exposureTime, NULL);
+
   } else {
     xlog("exposure property not found or not a double");
   }
 
-  // Exposure time in microseconds
-  double exposureTime = limitValueInRange(std::stod(exposureTimeS), double_spec->minimum, double_spec->maximum);
-  xlog("exposureTime:%f", exposureTime);
-  g_object_set(G_OBJECT(source_gige_hik), "exposure", exposureTime, NULL);
 }
 
 GstArvAuto GigE_getExposureAuto_hik() {
