@@ -16,9 +16,9 @@ void handle_RESTful(std::vector<std::string> segments) {
 
   } else if (isSameString(segments[0].c_str(), "gige")) {
     if (isSameString(segments[1].c_str(), "start")) {
-      AICamera_streamingStart_GigE();
+      CamStreamingStart_GigE();
     } else if (isSameString(segments[1].c_str(), "stop")) {
-      AICamera_streamingStop_GigE();
+      CamStreamingStop_GigE();
     }
 
   } else if (isSameString(segments[0].c_str(), "tp")) {

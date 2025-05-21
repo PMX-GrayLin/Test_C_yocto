@@ -1,10 +1,10 @@
 #include "test_gst.hpp"
 
-volatile int counterFrame = 0;
-int counterImg = 0;
+static volatile int counterFrame = 0;
+static int counterImg = 0;
 
-GstElement *gst_pipeline = nullptr;
-GMainLoop *gst_loop = nullptr;
+static GstElement *gst_pipeline = nullptr;
+static GMainLoop *gst_loop = nullptr;
 
 void gst_test(int testCase) {
   xlog("testCase:%d", testCase);
