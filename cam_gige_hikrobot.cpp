@@ -1,5 +1,8 @@
 #include "cam_gige_hikrobot.hpp"
 
+// temp
+#include "aicamera.hpp"
+
 static GstElement *pipeline_gige_hik = nullptr;
 static GMainLoop *loop_gige_hik = nullptr;
 static GstElement *source_gige_hik = nullptr;
