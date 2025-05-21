@@ -66,6 +66,7 @@ extern int AICamera_getFocusAuto();
 extern void AICamera_setFocusAuto(bool enable);  
 // IOCTLS ===========
 
+extern void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info);
 extern void AICamera_setImagePath(const string& imagePath);
 extern void AICamera_setCropImagePath(const string& imagePath);
 extern void AICamera_setInputImagePath(const string& imagePath);
