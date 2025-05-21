@@ -9,12 +9,12 @@ APP_NAME=test
 # header dir
 INCLUDES_HEADER += -I$(BB_INCDIR)
 INCLUDES_HEADER += -Iinclude
+INCLUDES_HEADER += -Iost
 INCLUDES_HEADER += -I$(BB_INCDIR)/json-c
 INCLUDES_HEADER += -I$(BB_INCDIR)/gstreamer-1.0
 INCLUDES_HEADER += -I$(BB_INCDIR)/glib-2.0
 INCLUDES_HEADER += -I$(BB_LIBDIR)/glib-2.0/include
 INCLUDES_HEADER += -I$(BB_INCDIR)/opencv4 -I$(BB_INCDIR)/opencv4/opencv
-# INCLUDES_HEADER += -I$(BB_INCDIR)/aravis-0.8
 
 CFLAG += ${CXXFLAGS}
 CFLAG += ${INCLUDES_HEADER}
@@ -30,7 +30,6 @@ LINK_LIBS += -lglib-2.0
 LINK_LIBS += -lgobject-2.0
 LINK_LIBS += -lmosquitto -lmosquittopp
 LINK_LIBS += -lgpiod
-# LINK_LIBS += -laravis-0.8
 # LINK_LIBS += -lft4222 -lftd2xx
 
 OCVLDFLAG +=-lopencv_core 
