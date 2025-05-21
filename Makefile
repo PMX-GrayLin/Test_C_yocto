@@ -21,8 +21,8 @@ CFLAG += ${CXXFLAGS}
 CFLAG += ${INCLUDES_HEADER}
 
 # lib dir
+INCLUDES_LIB += -L.
 INCLUDES_LIB += -L$(BB_LIBDIR)
-INCLUDES_LIB += -Lost
 INCLUDES_LIB += -L$(BB_LIBDIR)/gstreamer-1.0
 
 # lib
