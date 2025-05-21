@@ -55,6 +55,10 @@ LDFLAG += ${OCVLDFLAG}
 CPPSOURCEFILES = $(wildcard *.cpp) $(wildcard ost/*.cpp)
 CPPOBJECTS = $(patsubst %.cpp,%.o,$(CPPSOURCEFILES))
 
+# Compilation rule for ost/ files
+ost/%.o: ost/%.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES_HEADER) -c $< -o $@
+	
 all: ${CPPOBJECTS}
 	@echo "========== Build all start =========="
 	@echo ">>>> CXX:${CXX}"
