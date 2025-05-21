@@ -60,7 +60,7 @@ void GigE_setExposure_hik(string exposureTimeS) {
 
 GstArvAuto GigE_getExposureAuto_hik() {
   GigE_getSettings_hik();
-  return gigeControlParams.exposure_auto;
+  return (GstArvAuto)gigeControlParams.exposure_auto;
 }
 
 void GigE_setExposureAuto_hik(string gstArvAutoS) {
@@ -73,7 +73,7 @@ void GigE_setExposureAuto_hik(string gstArvAutoS) {
   } else if (isSameString(gstArvAutoS.c_str(), "cont") || isSameString(gstArvAutoS.c_str(), "2")) {
     gaa = gaa_continuous;
   }
-  xlog("set exposure-auto:%f", gaa);
+  xlog("set exposure-auto:%d", gaa);
   g_object_set(G_OBJECT(source_gige_hik), "exposure-auto", gaa, NULL);
 }
 
