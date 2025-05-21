@@ -21,7 +21,6 @@ CFLAG += ${CXXFLAGS}
 CFLAG += ${INCLUDES_HEADER}
 
 # lib dir
-INCLUDES_LIB += -L.
 INCLUDES_LIB += -L$(BB_LIBDIR)
 INCLUDES_LIB += -L$(BB_LIBDIR)/gstreamer-1.0
 
@@ -55,10 +54,10 @@ LDFLAG += ${OCVLDFLAG}
 CPPSOURCEFILES = $(wildcard *.cpp) $(wildcard ost/*.cpp)
 CPPOBJECTS = $(patsubst %.cpp,%.o,$(CPPSOURCEFILES))
 
-# Compilation rule for ost/ files
+# for ost/
 ost/%.o: ost/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES_HEADER) -c $< -o $@
-	
+
 all: ${CPPOBJECTS}
 	@echo "========== Build all start =========="
 	@echo ">>>> CXX:${CXX}"
