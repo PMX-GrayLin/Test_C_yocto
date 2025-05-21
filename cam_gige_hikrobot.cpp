@@ -129,6 +129,33 @@ void GigE_ThreadStreaming_Hik() {
     gst_object_unref(pad);
   }
 
+  // Add bus watch to handle errors and EOS
+  GstBus *bus = gst_element_get_bus(pipeline_gige_hik);
+  gst_bus_add_watch(bus, [](GstBus *, GstMessage *msg, gpointer user_data) -> gboolean {
+      switch (GST_MESSAGE_TYPE(msg)) {
+        case GST_MESSAGE_ERROR: {
+          GError *err;
+          gchar *dbg;
+          gst_message_parse_error(msg, &err, &dbg);
+          xlog("Pipeline error: %s", err->message);
+          g_error_free(err);
+          g_free(dbg);
+  
+          GMainLoop *loop = static_cast<GMainLoop *>(user_data);
+          g_main_loop_quit(loop);
+          break;
+        }
+  
+        case GST_MESSAGE_EOS:
+          xlog("Received EOS, stopping...");
+          g_main_loop_quit(static_cast<GMainLoop *>(user_data));
+          break;
+  
+        default:
+          break;
+      }
+      return TRUE; }, nullptr);
+
   // Start streaming
   GstStateChangeReturn ret = gst_element_set_state(pipeline_gige_hik, GST_STATE_PLAYING);
   if (ret == GST_STATE_CHANGE_FAILURE) {
@@ -142,13 +169,21 @@ void GigE_ThreadStreaming_Hik() {
 
   // Main loop
   loop_gige_hik = g_main_loop_new(nullptr, FALSE);
+  gst_bus_set_sync_handler(bus, nullptr, nullptr, nullptr);
+  gst_object_unref(bus);
   g_main_loop_run(loop_gige_hik);
 
   // Clean up
   xlog("Stopping the pipeline...");
   gst_element_set_state(pipeline_gige_hik, GST_STATE_NULL);
   gst_object_unref(pipeline_gige_hik);
-  isStreaming_gige_hik = false;
+  // isStreaming_gige_hik = false;
+  
+  if (loop_gige_hik) {
+    g_main_loop_unref(loop_gige_hik);
+    loop_gige_hik = nullptr;
+  }
+
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 
@@ -160,21 +195,47 @@ void GigE_ThreadStreaming_Hik() {
     }
     isStreaming_gige_hik = true;
     
-    t_streaming_gige_hik = std::thread(GigE_ThreadStreaming_Hik);  
-  
-    t_streaming_gige_hik.detach();
+    // t_streaming_gige_hik = std::thread(GigE_ThreadStreaming_Hik);  
+    // t_streaming_gige_hik.detach();
+
+    t_streaming_gige_hik = std::thread([] {
+      try {
+        GigE_ThreadStreaming_Hik();
+      } catch (const std::exception &e) {
+        xlog("Exception in streaming thread: %s", e.what());
+      } catch (...) {
+        xlog("Unknown exception in streaming thread");
+      }
+    });
+
   }
   
   void GigE_StreamingStop_Hik() {
     xlog("");
-    if (loop_gige_hik) {
-      g_main_loop_quit(loop_gige_hik);
-      g_main_loop_unref(loop_gige_hik);
-      loop_gige_hik = nullptr;
+    // if (loop_gige_hik) {
+    //   g_main_loop_quit(loop_gige_hik);
+    //   g_main_loop_unref(loop_gige_hik);
+    //   loop_gige_hik = nullptr;
   
-      isStreaming_gige_hik = false;
-    } else {
-      xlog("loop_gige_hik is invalid or already destroyed.");
+    //   isStreaming_gige_hik = false;
+    // } else {
+    //   xlog("loop_gige_hik is invalid or already destroyed.");
+    // }
+
+    if (!isStreaming_gige_hik) {
+      xlog("Streaming not running");
+      return;
     }
+  
+    if (loop_gige_hik) {
+      g_main_loop_quit(loop_gige_hik);  // Unref should only happen in the thread
+    }
+  
+    // Optional: wait for thread to finish (if needed)
+    if (t_streaming_gige_hik.joinable()) {
+      t_streaming_gige_hik.join();
+    }
+  
+    isStreaming_gige_hik = false;
   }
   
