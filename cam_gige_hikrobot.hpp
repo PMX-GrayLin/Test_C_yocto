@@ -17,7 +17,7 @@ typedef enum {
   
 extern double GigE_getExposure_hik();
 extern void GigE_setExposure_hik(string exposureTimeS);
-extern double GigE_getExposureAuto_hik();
+extern GstArvAuto GigE_getExposureAuto_hik();
 extern void GigE_setExposureAuto_hik(GstArvAuto gaa);
 
 void GigE_ThreadStreaming_Hik();
