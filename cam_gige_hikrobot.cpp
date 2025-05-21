@@ -40,8 +40,23 @@ double GigE_getExposure_hik() {
 }
 
 void GigE_setExposure_hik(string exposureTimeS) {
+  // Get GObject class for aravissrc
+  GObjectClass *klass = G_OBJECT_GET_CLASS(source_gige_hik);
+
+  // Find the "exposure" property
+  GParamSpec *pspec = g_object_class_find_property(klass, "exposure");
+  if (pspec && G_IS_PARAM_SPEC_DOUBLE(pspec)) {
+    GParamSpecDouble *double_spec = G_PARAM_SPEC_DOUBLE(pspec);
+    xlog("exposure min:%f", double_spec->minimum);
+    xlog("exposure max:%f", double_spec->maxinum);
+    xlog("exposure default:%f", double_spec->default_value);
+  } else {
+    xlog("exposure property not found or not a double");
+  }
+
   // Exposure time in microseconds
-  double exposureTime = std::stod(exposureTimeS);
+  double exposureTime = limitValueInRange(std::stod(exposureTimeS), double_spec->minimum, double_spec->maxinum);
+  xlog("exposureTime:%f", exposureTime);
   g_object_set(G_OBJECT(source_gige_hik), "exposure", exposureTime, NULL);
 }
 

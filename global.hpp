@@ -65,7 +65,9 @@ extern void printBuffer(const uint8_t* buffer, size_t len);
 extern void printArray_float(const float* buffer, size_t len);
 extern void printArray_forUI(const float* buffer, size_t len);
 
+
 extern bool isSameString(const char* s1, const char* s2, bool isCaseSensitive = false);
 extern bool isPathExist(const char* path);
+double limitValueInRange(double input, double rangeMin, double rangeMax);
 
 extern std::string getTimeString();

@@ -73,6 +73,16 @@ bool isPathExist(const char* path) {
   return (stat(path, &buffer) == 0);
 }
 
+double limitValueInRange(double input, double rangeMin, double rangeMax) {
+  if (input > rangeMax) {
+    return rangeMax;
+  } else if (input < rangeMin) {
+    return rangeMin;
+  } else {
+    return input;
+  }
+}
+
 std::string getTimeString() {
   std::time_t now = std::time(nullptr);
 
