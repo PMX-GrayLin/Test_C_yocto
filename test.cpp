@@ -17,9 +17,19 @@ void handle_RESTful(std::vector<std::string> segments) {
 
   } else if (isSameString(segments[0].c_str(), "gige")) {
     if (isSameString(segments[1].c_str(), "start")) {
-      CamStreamingStart_GigE();
+      GigE_StreamingStart_Hik();
     } else if (isSameString(segments[1].c_str(), "stop")) {
-      CamStreamingStop_GigE();
+      GigE_StreamingStop_Hik();
+    } else if (isSameString(segments[1].c_str(), "set")) {
+      if (isSameString(segments[2].c_str(), "exposure")) {
+        GigE_setExposure_hik(segments[3]);
+      }
+
+    } else if (isSameString(segments[1].c_str(), "get")) {
+      if (isSameString(segments[2].c_str(), "exposure")) {
+        GigE_getExposure_hik();
+      }
+
     }
 
   } else if (isSameString(segments[0].c_str(), "tp")) {
