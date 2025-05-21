@@ -40,25 +40,13 @@ double GigE_getExposure_hik() {
 }
 
 void GigE_setExposure_hik(string exposureTimeS) {
-  // Get GObject class for aravissrc
-  GObjectClass *klass = G_OBJECT_GET_CLASS(source_gige_hik);
+  // # arv-tool-0.8 control ExposureTime
+  // Hikrobot-MV-CS060-10GM-PRO-K44474092 (192.168.11.22)
+  // ExposureTime = 15000 min:25 max:2.49985e+06
 
-  // Find the "exposure" property
-  GParamSpec *pspec = g_object_class_find_property(klass, "exposure");
-  if (pspec && G_IS_PARAM_SPEC_DOUBLE(pspec)) {
-    GParamSpecDouble *double_spec = G_PARAM_SPEC_DOUBLE(pspec);
-    xlog("exposure min:%f", double_spec->minimum);
-    xlog("exposure max:%f", double_spec->maximum);
-    xlog("exposure default:%f", double_spec->default_value);
-    // Exposure time in microseconds
-    double exposureTime = limitValueInRange(std::stod(exposureTimeS), double_spec->minimum, double_spec->maximum);
-    xlog("exposureTime:%f", exposureTime);
-    g_object_set(G_OBJECT(source_gige_hik), "exposure", exposureTime, NULL);
-
-  } else {
-    xlog("exposure property not found or not a double");
-  }
-
+  double exposureTime = limitValueInRange(std::stod(exposureTimeS), 25.0, 2490000.0);
+  xlog("exposureTime:%f", exposureTime);
+  g_object_set(G_OBJECT(source_gige_hik), "exposure", exposureTime, NULL);
 }
 
 GstArvAuto GigE_getExposureAuto_hik() {
