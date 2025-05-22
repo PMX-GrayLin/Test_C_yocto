@@ -316,6 +316,7 @@ void GigE_ThreadStreaming_Hik() {
     }
   
     if (loop_gige_hik) {
+      xlog("g_main_loop_quit");
       g_main_loop_quit(loop_gige_hik);  // Unref should only happen in the thread
     }
   
