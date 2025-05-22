@@ -249,6 +249,7 @@ void GigE_ThreadStreaming_Hik() {
     xlog("failed to start the pipeline");
     gst_element_set_state(pipeline_gige_hik, GST_STATE_NULL);
     gst_object_unref(pipeline_gige_hik);
+    isStreaming_gige_hik = false;
     return;
   }
 
