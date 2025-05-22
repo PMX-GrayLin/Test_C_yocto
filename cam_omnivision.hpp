@@ -1,4 +1,5 @@
-// cis for camera image sensor
+// AI Camera Plus embeded CIS ( Camera Image Sensor )
+// OG05b10
 
 #pragma once
 

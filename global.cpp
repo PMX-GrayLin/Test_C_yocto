@@ -3,8 +3,6 @@
 // test vars
 int testCounter = 0;
 
-bool isSave2Jpeg = false;
-
 bool isTimerRunning = false;
 int counterTimer = 0;
 

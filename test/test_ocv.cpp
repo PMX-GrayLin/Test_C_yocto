@@ -1,6 +1,6 @@
 #include "test_ocv.hpp"
 
-void ocv_test(int testCase) {
+void test_ocv(int testCase) {
   xlog("testCase:%d", testCase);
 
   // OK

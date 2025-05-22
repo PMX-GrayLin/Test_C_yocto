@@ -6,7 +6,7 @@ static int counterImg = 0;
 static GstElement *gst_pipeline = nullptr;
 static GMainLoop *gst_loop = nullptr;
 
-void gst_test(int testCase) {
+void test_gst(int testCase) {
   xlog("testCase:%d", testCase);
 
   GstElement *pipeline;
@@ -163,7 +163,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
   return GST_PAD_PROBE_OK;
 }
 
-void gst_test2(int testCase) {
+void test_gst2(int testCase) {
   xlog("testCase:%d", testCase);
   counterFrame = 0;
   counterImg = 0;
@@ -258,7 +258,7 @@ void gst_test2(int testCase) {
   xlog("Pipeline stopped and resources cleaned up.");
 }
 
-void stopPipeline() {
+void test_gst_stopPipeline() {
   if (gst_loop) {
     g_main_loop_quit(gst_loop);
     g_main_loop_unref(gst_loop);

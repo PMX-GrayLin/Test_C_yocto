@@ -1,12 +1,11 @@
 #pragma once
 
 #include "global.hpp"
-#include "aicamera.hpp"
 
-void gst_test(int testCase);
-void gst_test2(int testCase);
+void test_gst(int testCase);
+void test_gst2(int testCase);
 
-void stopPipeline();
+void test_gst_stopPipeline();
 
 
 // #if defined(ENABLE_ARAVIS)

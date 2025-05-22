@@ -1,13 +1,14 @@
 #include "test.hpp"
 
-#include "test_gst.hpp"
-#include "test_ocv.hpp"
+// #include "test_gst.hpp"
+// #include "test_ocv.hpp"
 #include "aicamera.hpp"
 #include "cam_gige_hikrobot.hpp"
 #include "oti322.hpp"
 #include "otpa8.hpp"
 
 void handle_RESTful(std::vector<std::string> segments) {
+
   if (isSameString(segments[0].c_str(), "gst")) {
     if (isSameString(segments[1].c_str(), "start")) {
       AICamera_streamingStart();
@@ -79,9 +80,10 @@ void handle_RESTful(std::vector<std::string> segments) {
 
 // #endif  // ENABLE_ARAVIS
 
-  } else if (isSameString(segments[0].c_str(), "gstt")) {
-    int testCase = std::stoi(segments[1]);
-    gst_test(testCase);
+  // } else if (isSameString(segments[0].c_str(), "gstt")) {
+  //   int testCase = std::stoi(segments[1]);
+  //   test_gst(testCase);
+
   }
 }
 
