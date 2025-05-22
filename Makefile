@@ -51,7 +51,7 @@ LDFLAG += ${INCLUDES_LIB}
 LDFLAG += ${LINK_LIBS}
 LDFLAG += ${OCVLDFLAG}
 
-CPPSOURCEFILES = $(wildcard *.cpp) $(wildcard ost/*.cpp)
+CPPSOURCEFILES = $(wildcard *.cpp) $(wildcard ost/*.cpp) $(wildcard test/*.cpp)
 CPPOBJECTS = $(patsubst %.cpp,%.o,$(CPPSOURCEFILES))
 
 # for ost/
