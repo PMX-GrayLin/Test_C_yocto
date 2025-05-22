@@ -1,9 +1,4 @@
 
-#CC = g++
-#CFLAGS = -ansi -O -Wall -std=c++11
-#LDFLAGS = -lpthread
-# CC = ${CXX}
-
 APP_NAME=test
 
 # header dir

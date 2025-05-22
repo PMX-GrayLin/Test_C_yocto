@@ -187,7 +187,7 @@ void test_gst2(int testCase) {
   }
 
   // Set properties for the elements
-  xlog("AICamrea_getVideoDevice:%s", AICamrea_getVideoDevice().c_str());
+  xlog("AICamrea_getVideoDevice:%s", AICamreaCISPath);
   g_object_set(G_OBJECT(source), "device", AICamrea_getVideoDevice().c_str(), nullptr);
 
   // Create a GstStructure for extra-controls

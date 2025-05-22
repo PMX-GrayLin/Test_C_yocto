@@ -2,7 +2,7 @@
 
 #include "global.hpp"
 
-#define AICamreaCSIPath "/dev/csi_cam_preview"
+#define AICamreaCISPath "/dev/csi_cam_preview"
 #define AICamreaUSBPath "/dev/video137"
 
 #define GPIO_CHIP       "/dev/gpiochip0"

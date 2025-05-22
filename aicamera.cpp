@@ -47,7 +47,7 @@ static GMainLoop *gst_loop = nullptr;
 namespace fs = std::filesystem;
 
 bool AICamrea_isUseCSICamera() {
-  if (isPathExist(AICamreaCSIPath)) {
+  if (isPathExist(AICamreaCISPath)) {
     xlog("path /dev/csi_cam_preview exist");
     return true;
   } else {
@@ -62,7 +62,7 @@ std::string AICamrea_getVideoDevice() {
   bool isUseCSICamera = AICamrea_isUseCSICamera();
 
   if (isUseCSICamera) {
-    videoPath = AICamreaCSIPath;
+    videoPath = AICamreaCISPath;
   } else {
     videoPath = AICamreaUSBPath;
   }
