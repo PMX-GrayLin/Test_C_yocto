@@ -2,6 +2,7 @@
 
 // #define ENABLE_ARAVIS
 // #define ENABLE_FTDI
+// #define ENABLE_OST
 
 #include <stdlib.h>
 #include <stdio.h>

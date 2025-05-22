@@ -13,8 +13,12 @@ INCLUDES_HEADER += -I$(BB_INCDIR)/glib-2.0
 INCLUDES_HEADER += -I$(BB_LIBDIR)/glib-2.0/include
 INCLUDES_HEADER += -I$(BB_INCDIR)/opencv4 -I$(BB_INCDIR)/opencv4/opencv
 
+# add define to enable/disable functions
+DEFINES += -DENABLE_OST
+
 CFLAG += ${CXXFLAGS}
 CFLAG += ${INCLUDES_HEADER}
+CFLAG += ${DEFINES}
 
 # lib dir
 INCLUDES_LIB += -L$(BB_LIBDIR)
@@ -47,7 +51,15 @@ LDFLAG += ${INCLUDES_LIB}
 LDFLAG += ${LINK_LIBS}
 LDFLAG += ${OCVLDFLAG}
 
-CPPSOURCEFILES = $(wildcard *.cpp) $(wildcard ost/*.cpp) $(wildcard temp/*.cpp)
+# CPPSOURCEFILES = $(wildcard *.cpp) $(wildcard ost/*.cpp) $(wildcard temp/*.cpp)
+CPPSOURCEFILES = $(wildcard *.cpp)
+
+ifeq ($(ENABLE_OST),1)
+    CPPSOURCEFILES += $(wildcard ost/*.cpp)
+else
+# CPPSOURCEFILES = $(wildcard ost/*.cpp)
+
+CPPSOURCEFILES = $(wildcard temp/*.cpp)
 CPPOBJECTS = $(patsubst %.cpp,%.o,$(CPPSOURCEFILES))
 
 %.o: %.cpp
