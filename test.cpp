@@ -17,7 +17,7 @@ void handle_RESTful(std::vector<std::string> segments) {
 
   } else if (isSameString(segments[0].c_str(), "gige")) {
 
-    Gige_handle_RESTful(segments)
+    Gige_handle_RESTful_hik(segments);
 
   } else if (isSameString(segments[0].c_str(), "tp")) {
     xlog("take picture");

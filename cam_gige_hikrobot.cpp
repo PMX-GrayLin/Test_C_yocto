@@ -20,14 +20,14 @@ GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *i
   return GST_PAD_PROBE_OK;
 }
 
-void Gige_handle_RESTful(std::vector<std::string> segments) {
+void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
 
   if (isSameString(segments[1].c_str(), "start")) {
     GigE_StreamingStart_Hik();
 
   } else if (isSameString(segments[1].c_str(), "stop")) {
     GigE_StreamingStop_Hik();
-    
+
   } else if (isSameString(segments[1].c_str(), "set")) {
     if (isSameString(segments[2].c_str(), "exposure")) {
       GigE_setExposure_hik(segments[3]);
