@@ -1,4 +1,5 @@
 #include "test_ocv.hpp"
+#include "aicamera.hpp"
 
 void test_ocv(int testCase) {
   xlog("testCase:%d", testCase);
