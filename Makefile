@@ -56,7 +56,7 @@ CPPSOURCEFILES = $(wildcard *.cpp)
 
 ifeq ($(ENABLE_OST),1)
     CPPSOURCEFILES += $(wildcard ost/*.cpp)
-else
+endif
 # CPPSOURCEFILES = $(wildcard ost/*.cpp)
 
 CPPSOURCEFILES = $(wildcard temp/*.cpp)
