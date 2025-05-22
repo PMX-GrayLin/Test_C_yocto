@@ -14,7 +14,11 @@ INCLUDES_HEADER += -I$(BB_LIBDIR)/glib-2.0/include
 INCLUDES_HEADER += -I$(BB_INCDIR)/opencv4 -I$(BB_INCDIR)/opencv4/opencv
 
 # add define to enable/disable functions
-DEFINES += -DENABLE_OST
+ENABLE_OST = 1
+ifeq ($(ENABLE_OST),1)
+	DEFINES += -DENABLE_OST
+endif
+
 
 CFLAG += ${CXXFLAGS}
 CFLAG += ${INCLUDES_HEADER}
