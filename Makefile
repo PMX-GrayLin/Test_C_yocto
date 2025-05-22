@@ -60,19 +60,20 @@ ost/%.o: ost/%.cpp
 	$(CXX) $(CFLAG) -c $< -o $@
 	@echo "========== Build $< to $@ end =========="
 
-all: ${CPPOBJECTS}
+all: $(APP_NAME)
+$(APP_NAME): ${CPPOBJECTS}
 	@echo "========== Build all start =========="
 	@echo ">>>> CXX:${CXX}"
 	@echo ">>>> CFLAG:${CFLAG}"
 	@echo ">>>> LDFLAG:${LDFLAG}"
 	@echo ">>>> "
-	${CXX} $(CFLAG) -o $(APP_NAME) ${CPPOBJECTS} $(LDFLAG)
+	${CXX} -o $@ ${CPPOBJECTS} $(LDFLAG)
 	@echo "========== Build all end =========="
-
 
 .PHONY : clean 
 
 clean:
 	rm -rf *.o *.exe $(APP_NAME)
 
-#${CXX} -o $@ ${CPPOBJECTS} $(LDFLAG)
+# all: ${CPPOBJECTS}
+# ${CXX} $(CFLAG) -o $(APP_NAME) ${CPPOBJECTS} $(LDFLAG)
