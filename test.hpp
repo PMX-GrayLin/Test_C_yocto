@@ -18,11 +18,11 @@ void thread_mqtt_start();
 void thread_mqtt_stop();
 void handle_mqtt(std::string payload);
 
-#if defined(ENABLE_FTDI)
+// #if defined(ENABLE_FTDI)
 
-void test_ftdi();
+// void test_ftdi();
 
-#endif // ENABLE_FTDI
+// #endif // ENABLE_FTDI
 
 
 

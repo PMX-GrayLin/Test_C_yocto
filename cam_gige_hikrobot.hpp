@@ -24,6 +24,8 @@ struct GigeControlParams {
   int gain_auto;      // Auto gain mode: 0=off, 1=once, 2=continuous
 };
 
+extern void Gige_handle_RESTful(std::vector<std::string> segments);
+
 extern void GigE_getSettings_hik();
 
 extern double GigE_getExposure_hik();

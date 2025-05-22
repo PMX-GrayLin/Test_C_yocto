@@ -20,6 +20,39 @@ GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *i
   return GST_PAD_PROBE_OK;
 }
 
+void Gige_handle_RESTful(std::vector<std::string> segments) {
+
+  if (isSameString(segments[1].c_str(), "start")) {
+    GigE_StreamingStart_Hik();
+
+  } else if (isSameString(segments[1].c_str(), "stop")) {
+    GigE_StreamingStop_Hik();
+    
+  } else if (isSameString(segments[1].c_str(), "set")) {
+    if (isSameString(segments[2].c_str(), "exposure")) {
+      GigE_setExposure_hik(segments[3]);
+    } else if (isSameString(segments[2].c_str(), "exposure-auto")) {
+      GigE_setExposureAuto_hik(segments[3]);
+    } else if (isSameString(segments[2].c_str(), "gain")) {
+      GigE_setGain_hik(segments[3]);
+    } else if (isSameString(segments[2].c_str(), "gain-auto")) {
+      GigE_setGainAuto_hik(segments[3]);
+    }
+
+  } else if (isSameString(segments[1].c_str(), "get")) {
+    GigE_getSettings_hik();
+    if (isSameString(segments[2].c_str(), "exposure")) {
+      //
+    } else if (isSameString(segments[2].c_str(), "exposure-auto")) {
+      //
+    } else if (isSameString(segments[2].c_str(), "gain")) {
+      //
+    } else if (isSameString(segments[2].c_str(), "gain-auto")) {
+      //
+    }
+  }
+}
+
 void GigE_getSettings_hik() {
   // Get the current values
   double exposure, gain;
