@@ -51,7 +51,7 @@ CPPOBJECTS = $(patsubst %.cpp,%.o,$(CPPSOURCEFILES))
 
 # for ost/
 ost/%.o: ost/%.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES_HEADER) -c $< -o $@
+	$(CXX) $(CFLAG) -c $< -o $@
 
 all: ${CPPOBJECTS}
 	@echo "========== Build all start =========="

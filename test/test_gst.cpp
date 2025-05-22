@@ -1,4 +1,5 @@
 #include "test_gst.hpp"
+#include "aicamera.hpp"
 
 static volatile int counterFrame = 0;
 static int counterImg = 0;
@@ -187,7 +188,7 @@ void test_gst2(int testCase) {
   }
 
   // Set properties for the elements
-  xlog("AICamrea_getVideoDevice:%s", AICamreaCISPath);
+  xlog("AICamrea_getVideoDevice:%s", AICamrea_getVideoDevice().c_str());
   g_object_set(G_OBJECT(source), "device", AICamrea_getVideoDevice().c_str(), nullptr);
 
   // Create a GstStructure for extra-controls
