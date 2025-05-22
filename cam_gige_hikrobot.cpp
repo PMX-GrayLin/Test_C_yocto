@@ -282,18 +282,18 @@ void GigE_ThreadStreaming_Hik() {
     }
     isStreaming_gige_hik = true;
     
-    // t_streaming_gige_hik = std::thread(GigE_ThreadStreaming_Hik);  
-    // t_streaming_gige_hik.detach();
+    t_streaming_gige_hik = std::thread(GigE_ThreadStreaming_Hik);  
+    t_streaming_gige_hik.detach();
 
-    t_streaming_gige_hik = std::thread([] {
-      try {
-        GigE_ThreadStreaming_Hik();
-      } catch (const std::exception &e) {
-        xlog("Exception in streaming thread: %s", e.what());
-      } catch (...) {
-        xlog("Unknown exception in streaming thread");
-      }
-    });
+    // t_streaming_gige_hik = std::thread([] {
+    //   try {
+    //     GigE_ThreadStreaming_Hik();
+    //   } catch (const std::exception &e) {
+    //     xlog("Exception in streaming thread: %s", e.what());
+    //   } catch (...) {
+    //     xlog("Unknown exception in streaming thread");
+    //   }
+    // });
 
   }
   
