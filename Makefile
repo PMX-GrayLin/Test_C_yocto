@@ -68,7 +68,6 @@ $(APP_NAME): ${CPPOBJECTS}
 	@echo ">>>> CFLAG:${CFLAG}"
 	@echo ">>>> LDFLAG:${LDFLAG}"
 	@echo ">>>> "
-	${CXX} $(CFLAG) -o $(APP_NAME) ${CPPOBJECTS} $(LDFLAG)
 	${CXX} -o $@ ${CPPOBJECTS} $(LDFLAG)
 	@echo "========== Build all end =========="
 
@@ -77,3 +76,5 @@ $(APP_NAME): ${CPPOBJECTS}
 
 clean:
 	rm -rf *.o *.exe $(APP_NAME)
+
+# ${CXX} $(CFLAG) -o $(APP_NAME) ${CPPOBJECTS} $(LDFLAG)
