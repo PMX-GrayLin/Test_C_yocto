@@ -1,5 +1,6 @@
 
 APP_NAME=test
+# APP_NAME=fw_daemon
 
 # header dir
 INCLUDES_HEADER += -I$(BB_INCDIR)
@@ -74,6 +75,3 @@ $(APP_NAME): ${CPPOBJECTS}
 
 clean:
 	rm -rf *.o *.exe $(APP_NAME)
-
-# all: ${CPPOBJECTS}
-# ${CXX} $(CFLAG) -o $(APP_NAME) ${CPPOBJECTS} $(LDFLAG)
