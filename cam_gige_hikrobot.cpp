@@ -224,12 +224,18 @@ void GigE_ThreadStreaming_Hik() {
   
           // GMainLoop *loop = static_cast<GMainLoop *>(user_data);
           // g_main_loop_quit(loop);
+
+          // ?? to stop streaming
+          GigE_StreamingStop_Hik();
           break;
         }
   
         case GST_MESSAGE_EOS:
           xlog("Received EOS, stopping...");
           // g_main_loop_quit(static_cast<GMainLoop *>(user_data));
+
+          // ?? to stop streaming
+          GigE_StreamingStop_Hik();
           break;
   
         default:
