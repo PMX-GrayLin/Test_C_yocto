@@ -59,11 +59,12 @@ LDFLAG += ${OCVLDFLAG}
 CPPSOURCEFILES = $(wildcard *.cpp)
 
 # ifeq ($(ENABLE_OST),1)
-    CPPSOURCEFILES += $(wildcard ost/*.cpp)
+	CPPSOURCEFILES += $(wildcard ost/*.cpp)
 # endif
 # CPPSOURCEFILES = $(wildcard ost/*.cpp)
 
-CPPSOURCEFILES = $(wildcard temp/*.cpp)
+CPPSOURCEFILES += $(wildcard temp/*.cpp)
+
 CPPOBJECTS = $(patsubst %.cpp,%.o,$(CPPSOURCEFILES))
 
 %.o: %.cpp
