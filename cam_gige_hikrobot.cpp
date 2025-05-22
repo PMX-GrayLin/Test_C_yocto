@@ -222,14 +222,14 @@ void GigE_ThreadStreaming_Hik() {
           g_error_free(err);
           g_free(dbg);
   
-          GMainLoop *loop = static_cast<GMainLoop *>(user_data);
-          g_main_loop_quit(loop);
+          // GMainLoop *loop = static_cast<GMainLoop *>(user_data);
+          // g_main_loop_quit(loop);
           break;
         }
   
         case GST_MESSAGE_EOS:
           xlog("Received EOS, stopping...");
-          g_main_loop_quit(static_cast<GMainLoop *>(user_data));
+          // g_main_loop_quit(static_cast<GMainLoop *>(user_data));
           break;
   
         default:
