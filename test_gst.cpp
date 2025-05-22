@@ -268,210 +268,210 @@ void stopPipeline() {
   }
 }
 
-#if defined(ENABLE_ARAVIS)
+// #if defined(ENABLE_ARAVIS)
 
-void aravisTest() {
-  // Initialize GStreamer
-  gst_init(nullptr, nullptr);
+// void aravisTest() {
+//   // Initialize GStreamer
+//   gst_init(nullptr, nullptr);
 
-  // Create the pipeline
-  gst_pipeline = gst_pipeline_new("video-pipeline");
+//   // Create the pipeline
+//   gst_pipeline = gst_pipeline_new("video-pipeline");
 
-  GstElement *source = gst_element_factory_make("aravissrc", "source");
-  GstElement *videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
-  GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
-  GstElement *encoder = gst_element_factory_make("v4l2h264enc", "encoder");
-  GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
+//   GstElement *source = gst_element_factory_make("aravissrc", "source");
+//   GstElement *videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
+//   GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
+//   GstElement *encoder = gst_element_factory_make("v4l2h264enc", "encoder");
+//   GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
 
-  if (!gst_pipeline || !source || !videoconvert || !capsfilter || !encoder || !sink) {
-    xlog("failed to create GStreamer elements");
-    return;
-  }
+//   if (!gst_pipeline || !source || !videoconvert || !capsfilter || !encoder || !sink) {
+//     xlog("failed to create GStreamer elements");
+//     return;
+//   }
 
-  // Set camera by ID or name (adjust "id1" if needed)
-  g_object_set(G_OBJECT(source), "camera-name", "id1", nullptr);
+//   // Set camera by ID or name (adjust "id1" if needed)
+//   g_object_set(G_OBJECT(source), "camera-name", "id1", nullptr);
 
-  // Define the capabilities: NV12 format
-  GstCaps *caps = gst_caps_new_simple(
-      "video/x-raw",
-      "format", G_TYPE_STRING, "NV12",
-      nullptr);
-  g_object_set(capsfilter, "caps", caps, nullptr);
-  gst_caps_unref(caps);
+//   // Define the capabilities: NV12 format
+//   GstCaps *caps = gst_caps_new_simple(
+//       "video/x-raw",
+//       "format", G_TYPE_STRING, "NV12",
+//       nullptr);
+//   g_object_set(capsfilter, "caps", caps, nullptr);
+//   gst_caps_unref(caps);
 
-  // Set encoder properties
-  GstStructure *controls = gst_structure_new(
-      "extra-controls",
-      "video_gop_size", G_TYPE_INT, 30,
-      nullptr);
-  if (!controls) {
-    xlog("Failed to create GstStructure");
-    gst_object_unref(gst_pipeline);
-    return;
-  }
-  g_object_set(G_OBJECT(encoder), "extra-controls", controls, nullptr);
-  gst_structure_free(controls);
+//   // Set encoder properties
+//   GstStructure *controls = gst_structure_new(
+//       "extra-controls",
+//       "video_gop_size", G_TYPE_INT, 30,
+//       nullptr);
+//   if (!controls) {
+//     xlog("Failed to create GstStructure");
+//     gst_object_unref(gst_pipeline);
+//     return;
+//   }
+//   g_object_set(G_OBJECT(encoder), "extra-controls", controls, nullptr);
+//   gst_structure_free(controls);
 
-  g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf
-  g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
+//   g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf
+//   g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
 
-  // Add elements to pipeline
-  gst_bin_add_many(GST_BIN(gst_pipeline), source, videoconvert, capsfilter, encoder, sink, nullptr);
-  if (!gst_element_link_many(source, videoconvert, capsfilter, encoder, sink, nullptr)) {
-    xlog("failed to link elements in the pipeline");
-    gst_object_unref(gst_pipeline);
-    return;
-  }
+//   // Add elements to pipeline
+//   gst_bin_add_many(GST_BIN(gst_pipeline), source, videoconvert, capsfilter, encoder, sink, nullptr);
+//   if (!gst_element_link_many(source, videoconvert, capsfilter, encoder, sink, nullptr)) {
+//     xlog("failed to link elements in the pipeline");
+//     gst_object_unref(gst_pipeline);
+//     return;
+//   }
 
-  // Optional: attach pad probe to monitor frames
-  GstPad *pad = gst_element_get_static_pad(encoder, "sink");
-  if (pad) {
-    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)AICAMERA_streamingDataCallback, nullptr, nullptr);
-    gst_object_unref(pad);
-  }
+//   // Optional: attach pad probe to monitor frames
+//   GstPad *pad = gst_element_get_static_pad(encoder, "sink");
+//   if (pad) {
+//     gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)AICAMERA_streamingDataCallback, nullptr, nullptr);
+//     gst_object_unref(pad);
+//   }
 
-    // 修改曝光時間為 5000 微秒
-  g_object_set(source, "exposure", 500000.0, NULL);
-  g_usleep(30000000);  // 30 秒
+//     // 修改曝光時間為 5000 微秒
+//   g_object_set(source, "exposure", 500000.0, NULL);
+//   g_usleep(30000000);  // 30 秒
 
-  // Start streaming
-  GstStateChangeReturn ret = gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
-  if (ret == GST_STATE_CHANGE_FAILURE) {
-    xlog("failed to start the pipeline");
-    gst_object_unref(gst_pipeline);
-    return;
-  }
+//   // Start streaming
+//   GstStateChangeReturn ret = gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
+//   if (ret == GST_STATE_CHANGE_FAILURE) {
+//     xlog("failed to start the pipeline");
+//     gst_object_unref(gst_pipeline);
+//     return;
+//   }
 
-  xlog("pipeline is running...");
+//   xlog("pipeline is running...");
 
-    // 等待一段時間，讓影像開始串流
-  g_usleep(30000000);  // 30 秒
+//     // 等待一段時間，讓影像開始串流
+//   g_usleep(30000000);  // 30 秒
 
-  // 修改曝光時間為 5000 微秒
-  g_object_set(source, "exposure", 5000.0, NULL);
+//   // 修改曝光時間為 5000 微秒
+//   g_object_set(source, "exposure", 5000.0, NULL);
 
-  // 等待一段時間，觀察效果
-  g_usleep(30000000);  // 30 秒
+//   // 等待一段時間，觀察效果
+//   g_usleep(30000000);  // 30 秒
 
-  // Main loop
-  gst_loop = g_main_loop_new(nullptr, FALSE);
-  g_main_loop_run(gst_loop);
+//   // Main loop
+//   gst_loop = g_main_loop_new(nullptr, FALSE);
+//   g_main_loop_run(gst_loop);
 
-  // Clean up
-  xlog("Stopping the pipeline...");
-  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
-  gst_object_unref(gst_pipeline);
-  xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
+//   // Clean up
+//   xlog("Stopping the pipeline...");
+//   gst_element_set_state(gst_pipeline, GST_STATE_NULL);
+//   gst_object_unref(gst_pipeline);
+//   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 
-  return;
-}
+//   return;
+// }
 
-void aravisTest2() {
-  GstElement *pipeline;
-  GstBus *bus;
-  GstMessage *msg;
-  GError* error = NULL;
-  string pipelineS = "";
+// void aravisTest2() {
+//   GstElement *pipeline;
+//   GstBus *bus;
+//   GstMessage *msg;
+//   GError* error = NULL;
+//   string pipelineS = "";
 
-  // Initialize GStreamer
-  // gst_init(&argc, &argv);
-  gst_init(nullptr, nullptr);
+//   // Initialize GStreamer
+//   // gst_init(&argc, &argv);
+//   gst_init(nullptr, nullptr);
 
-  guint major, minor, micro, nano;
-  gst_version(&major, &minor, &micro, &nano);
-  xlog("%d.%d.%d.%d", major, minor, micro, nano);
+//   guint major, minor, micro, nano;
+//   gst_version(&major, &minor, &micro, &nano);
+//   xlog("%d.%d.%d.%d", major, minor, micro, nano);
 
-  arv_update_device_list();
+//   arv_update_device_list();
 
-  guint n_devices = arv_get_n_devices();
-  if (n_devices == 0) {
-    xlog("No camera found!");
-      return;
-  }
+//   guint n_devices = arv_get_n_devices();
+//   if (n_devices == 0) {
+//     xlog("No camera found!");
+//       return;
+//   }
 
-  const char *camera_id = arv_get_device_id(0);
-  xlog("Using camera:%s", camera_id);
+//   const char *camera_id = arv_get_device_id(0);
+//   xlog("Using camera:%s", camera_id);
 
-  ArvCamera *camera = arv_camera_new(camera_id, &error);
-  if (!camera) {
-    xlog("Failed to create ArvCamera:%s", error->message);
-      return;
-  }
+//   ArvCamera *camera = arv_camera_new(camera_id, &error);
+//   if (!camera) {
+//     xlog("Failed to create ArvCamera:%s", error->message);
+//       return;
+//   }
 
-  // Set initial exposure
-  arv_camera_set_exposure_time(camera, 5000.0, &error);
-  if (error) {
-    xlog("Failed to set exposure:%s", error->message);
-      g_error_free(error);
-      error = nullptr;
-  }
-  xlog("Setting exposure to 5000 µs...");
-  std::this_thread::sleep_for(std::chrono::seconds(30));
+//   // Set initial exposure
+//   arv_camera_set_exposure_time(camera, 5000.0, &error);
+//   if (error) {
+//     xlog("Failed to set exposure:%s", error->message);
+//       g_error_free(error);
+//       error = nullptr;
+//   }
+//   xlog("Setting exposure to 5000 µs...");
+//   std::this_thread::sleep_for(std::chrono::seconds(30));
 
-  // OK
-  // gst-launch-1.0 aravissrc camera-name="id1" ! videoconvert ! video/x-raw,format=NV12 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
-  pipelineS =
-      R"(
-        aravissrc camera-name=id1
-        ! videoconvert
-        ! video/x-raw,format=NV12
-        ! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf
-        ! rtspclientsink location=rtsp://localhost:8554/mystream
-    )";
+//   // OK
+//   // gst-launch-1.0 aravissrc camera-name="id1" ! videoconvert ! video/x-raw,format=NV12 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
+//   pipelineS =
+//       R"(
+//         aravissrc camera-name=id1
+//         ! videoconvert
+//         ! video/x-raw,format=NV12
+//         ! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf
+//         ! rtspclientsink location=rtsp://localhost:8554/mystream
+//     )";
 
-  xlog("pipeline:%s", pipelineS.c_str());
+//   xlog("pipeline:%s", pipelineS.c_str());
 
-  pipeline = gst_parse_launch(pipelineS.c_str(), nullptr);
-  if (!pipeline) {
-    xlog("gst_parse_launch fail");
-    return;
-  }
+//   pipeline = gst_parse_launch(pipelineS.c_str(), nullptr);
+//   if (!pipeline) {
+//     xlog("gst_parse_launch fail");
+//     return;
+//   }
 
-  // Start playing
-  gst_element_set_state(pipeline, GST_STATE_PLAYING);
-  xlog("pipeline is running...");
+//   // Start playing
+//   gst_element_set_state(pipeline, GST_STATE_PLAYING);
+//   xlog("pipeline is running...");
 
-  std::this_thread::sleep_for(std::chrono::seconds(30));
+//   std::this_thread::sleep_for(std::chrono::seconds(30));
 
-  xlog("Setting exposure to 15000 µs...");
-  arv_camera_set_exposure_time(camera, 15000.0, &error);
-  if (error) {
-    xlog("Failed to change exposure:%s", error->message);
-      g_error_free(error);
-  }
+//   xlog("Setting exposure to 15000 µs...");
+//   arv_camera_set_exposure_time(camera, 15000.0, &error);
+//   if (error) {
+//     xlog("Failed to change exposure:%s", error->message);
+//       g_error_free(error);
+//   }
 
-  // Wait until error or EOS
-  bus = gst_element_get_bus(pipeline);
-  msg = gst_bus_timed_pop_filtered(
-      bus,
-      GST_CLOCK_TIME_NONE,
-      static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+//   // Wait until error or EOS
+//   bus = gst_element_get_bus(pipeline);
+//   msg = gst_bus_timed_pop_filtered(
+//       bus,
+//       GST_CLOCK_TIME_NONE,
+//       static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 
-  // Parse message
-  if (msg) {
-    GError *err;
-    gchar *debug_info;
+//   // Parse message
+//   if (msg) {
+//     GError *err;
+//     gchar *debug_info;
 
-    switch (GST_MESSAGE_TYPE(msg)) {
-      case GST_MESSAGE_ERROR:
-        gst_message_parse_error(msg, &err, &debug_info);
-        g_clear_error(&err);
-        g_free(debug_info);
-        break;
-      case GST_MESSAGE_EOS:
-        break;
-      default:
-        break;
-    }
-    gst_message_unref(msg);
-  }
+//     switch (GST_MESSAGE_TYPE(msg)) {
+//       case GST_MESSAGE_ERROR:
+//         gst_message_parse_error(msg, &err, &debug_info);
+//         g_clear_error(&err);
+//         g_free(debug_info);
+//         break;
+//       case GST_MESSAGE_EOS:
+//         break;
+//       default:
+//         break;
+//     }
+//     gst_message_unref(msg);
+//   }
 
-  // Free resources
-  gst_object_unref(bus);
-  gst_element_set_state(pipeline, GST_STATE_NULL);
-  gst_object_unref(pipeline);
+//   // Free resources
+//   gst_object_unref(bus);
+//   gst_element_set_state(pipeline, GST_STATE_NULL);
+//   gst_object_unref(pipeline);
 
-  return;
-}
+//   return;
+// }
 
-#endif // ENABLE_ARAVIS
+// #endif // ENABLE_ARAVIS

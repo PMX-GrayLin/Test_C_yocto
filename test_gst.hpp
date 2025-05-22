@@ -9,9 +9,9 @@ void gst_test2(int testCase);
 void stopPipeline();
 
 
-#if defined(ENABLE_ARAVIS)
+// #if defined(ENABLE_ARAVIS)
 
-void aravisTest();
+// void aravisTest();
 
-#endif // ENABLE_ARAVIS
+// #endif // ENABLE_ARAVIS
 

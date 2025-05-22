@@ -94,12 +94,12 @@ void handle_RESTful(std::vector<std::string> segments) {
       AICamera_setDIOOut(segments[1], segments[3]);
     }
 
-#if defined(ENABLE_ARAVIS)
+// #if defined(ENABLE_ARAVIS)
 
-  } else if (isSameString(segments[0].c_str(), "arv")) {
-    aravisTest();
+//   } else if (isSameString(segments[0].c_str(), "arv")) {
+//     aravisTest();
 
-#endif  // ENABLE_ARAVIS
+// #endif  // ENABLE_ARAVIS
 
   } else if (isSameString(segments[0].c_str(), "gstt")) {
     int testCase = std::stoi(segments[1]);

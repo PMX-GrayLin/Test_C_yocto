@@ -38,7 +38,6 @@ void GigE_getSettings_hik() {
   gigeControlParams.exposure = exposure;
   gigeControlParams.gain_auto = gain_auto;
   gigeControlParams.gain = gain;
-
 }
 
 double GigE_getExposure_hik() {

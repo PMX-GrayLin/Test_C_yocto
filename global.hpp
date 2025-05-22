@@ -34,9 +34,9 @@
 
 #include "httplib.hpp"
 
-#if defined(ENABLE_ARAVIS)
-#include <arv.h>
-#endif
+// #if defined(ENABLE_ARAVIS)
+// #include <arv.h>
+// #endif
 
 #if defined(ENABLE_FTDI)
 #include "ftd2xx.h"
