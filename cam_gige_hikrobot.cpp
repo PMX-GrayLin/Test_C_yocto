@@ -264,13 +264,12 @@ void GigE_ThreadStreaming_Hik() {
   xlog("Stopping the pipeline...");
   gst_element_set_state(pipeline_gige_hik, GST_STATE_NULL);
   gst_object_unref(pipeline_gige_hik);
-  // isStreaming_gige_hik = false;
-  
   if (loop_gige_hik) {
     g_main_loop_unref(loop_gige_hik);
     loop_gige_hik = nullptr;
   }
 
+  isStreaming_gige_hik = false;
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 
@@ -323,6 +322,7 @@ void GigE_ThreadStreaming_Hik() {
     //   t_streaming_gige_hik.join();
     // }
   
+    xlog("");
     isStreaming_gige_hik = false;
   }
   
