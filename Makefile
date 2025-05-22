@@ -49,23 +49,29 @@ LDFLAG += ${OCVLDFLAG}
 CPPSOURCEFILES = $(wildcard *.cpp) $(wildcard ost/*.cpp) $(wildcard test/*.cpp)
 CPPOBJECTS = $(patsubst %.cpp,%.o,$(CPPSOURCEFILES))
 
+%.o: %.cpp
+	@echo "========== Build $< to $@ start =========="
+	$(CXX) $(CFLAG) -c $< -o $@
+	@echo "========== Build $< to $@ end =========="
+
 # for ost/
 ost/%.o: ost/%.cpp
+	@echo "========== Build $< to $@ start =========="
 	$(CXX) $(CFLAG) -c $< -o $@
+	@echo "========== Build $< to $@ end =========="
 
-all: ${CPPOBJECTS}
+all: $(APP_NAME)
+
+$(APP_NAME): ${CPPOBJECTS}
 	@echo "========== Build all start =========="
 	@echo ">>>> CXX:${CXX}"
 	@echo ">>>> CFLAG:${CFLAG}"
 	@echo ">>>> LDFLAG:${LDFLAG}"
 	@echo ">>>> "
 	${CXX} $(CFLAG) -o $(APP_NAME) ${CPPOBJECTS} $(LDFLAG)
+	${CXX} -o $@ ${CPPOBJECTS} $(LDFLAG)
 	@echo "========== Build all end =========="
 
-%.o: %.cpp
-	@echo "========== Build $< to $@ start =========="
-	$(CXX) $(CFLAG) $< -c
-	@echo "========== Build $< to $@ end =========="
 
 .PHONY : clean 
 
