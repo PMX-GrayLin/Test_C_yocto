@@ -247,6 +247,7 @@ void GigE_ThreadStreaming_Hik() {
   GstStateChangeReturn ret = gst_element_set_state(pipeline_gige_hik, GST_STATE_PLAYING);
   if (ret == GST_STATE_CHANGE_FAILURE) {
     xlog("failed to start the pipeline");
+    gst_element_set_state(pipeline_gige_hik, GST_STATE_NULL);
     gst_object_unref(pipeline_gige_hik);
     return;
   }
