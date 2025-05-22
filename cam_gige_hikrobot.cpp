@@ -319,9 +319,9 @@ void GigE_ThreadStreaming_Hik() {
     }
   
     // Optional: wait for thread to finish (if needed)
-    if (t_streaming_gige_hik.joinable()) {
-      t_streaming_gige_hik.join();
-    }
+    // if (t_streaming_gige_hik.joinable()) {
+    //   t_streaming_gige_hik.join();
+    // }
   
     isStreaming_gige_hik = false;
   }
