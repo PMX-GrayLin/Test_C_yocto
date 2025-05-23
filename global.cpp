@@ -99,7 +99,7 @@ std::string getTimeString() {
 
 std::string get_parent_directory(const std::string& path) {
   char* dup = strdup(path.c_str());
-  std::string dir = dirname(dup);  // modifies in place
+  std::string dir = dirname(dup);
   free(dup);
   return dir;
 }
