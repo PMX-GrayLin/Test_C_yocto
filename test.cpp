@@ -4,8 +4,11 @@
 // #include "test_ocv.hpp"
 #include "aicamera.hpp"
 #include "cam_gige_hikrobot.hpp"
+
+#if defined(ENABLE_OST)
 #include "oti322.hpp"
 #include "otpa8.hpp"
+#endif
 
 void handle_RESTful(std::vector<std::string> segments) {
 
@@ -237,7 +240,7 @@ int main(int argc, char* argv[]) {
       response << "] }";
       res.set_content(response.str(), "application/json");
     });
-    
+
 #endif  // ENABLE_OST
 
     svr.Get(R"(/fw/(.*))", [&](const httplib::Request &req, httplib::Response &res) {
