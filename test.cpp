@@ -1,13 +1,16 @@
 #include "test.hpp"
 
-// #include "test_gst.hpp"
-// #include "test_ocv.hpp"
 #include "aicamera.hpp"
 #include "cam_gige_hikrobot.hpp"
 
 #if defined(ENABLE_OST)
 #include "oti322.hpp"
 #include "otpa8.hpp"
+#endif
+
+#if defined(ENABLE_TestCode)
+#include "test_gst.hpp"
+#include "test_ocv.hpp"
 #endif
 
 void handle_RESTful(std::vector<std::string> segments) {
@@ -76,16 +79,13 @@ void handle_RESTful(std::vector<std::string> segments) {
       AICamera_setDIOOut(segments[1], segments[3]);
     }
 
-// #if defined(ENABLE_ARAVIS)
 
-//   } else if (isSameString(segments[0].c_str(), "arv")) {
-//     aravisTest();
+#if defined(ENABLE_TestCode)
 
-// #endif  // ENABLE_ARAVIS
-
-  // } else if (isSameString(segments[0].c_str(), "gstt")) {
-  //   int testCase = std::stoi(segments[1]);
-  //   test_gst(testCase);
+  } else if (isSameString(segments[0].c_str(), "gstt")) {
+    int testCase = std::stoi(segments[1]);
+    test_gst(testCase);
+#endif
 
   }
 }

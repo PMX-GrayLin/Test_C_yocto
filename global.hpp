@@ -1,8 +1,9 @@
 #pragma once
 
-// #define ENABLE_ARAVIS
+// ========== enable / disable functions ==========
 // #define ENABLE_FTDI
-// #define ENABLE_OST
+
+// ========== enable / disable functions ==========
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -22,7 +23,7 @@
 #include <algorithm>
 #include <thread>
 #include <chrono>
-#include <regex>
+// #include <regex>
 #include <filesystem>
 #include <iomanip>
 
@@ -34,10 +35,6 @@
 #include <gpiod.h>
 
 #include "httplib.hpp"
-
-// #if defined(ENABLE_ARAVIS)
-// #include <arv.h>
-// #endif
 
 // #if defined(ENABLE_FTDI)
 // #include "ftd2xx.h"
