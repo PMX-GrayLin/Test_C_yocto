@@ -209,8 +209,10 @@ int main(int argc, char* argv[]) {
     
     // REST API: Get Temperature
     httplib::Server svr;
+
+#if defined(ENABLE_OST)
+
     svr.Get("/temperatures", [&](const httplib::Request& req, httplib::Response& res) {
-      
       xlog("query otpa8...");
       float ambientTemp = 0.0;
       float objectTemp = 0.0;
@@ -221,21 +223,23 @@ int main(int argc, char* argv[]) {
       res.set_content(response, "application/json");
     });
     svr.Get("/temperature_array", [&](const httplib::Request& req, httplib::Response& res) {
-      
       xlog("query otpa16...");
       float ambientTemp = 0.0;
-      float objectTemp[256] = { 0.0 };
+      float objectTemp[256] = {0.0};
       OTPA8 otpa8;
       otpa8.readTemperature_array(ambientTemp, objectTemp);
       std::ostringstream response;
       response << "{ \"ambient\": " << std::fixed << std::setprecision(1) << ambientTemp << ", \"object\": [";
       for (int i = 0; i < 256; ++i) {
-          response << std::fixed << std::setprecision(1) << objectTemp[i];
-          if (i < 255) response << ", ";  // Don't add comma after the last element
+        response << std::fixed << std::setprecision(1) << objectTemp[i];
+        if (i < 255) response << ", ";  // Don't add comma after the last element
       }
       response << "] }";
       res.set_content(response.str(), "application/json");
     });
+    
+#endif  // ENABLE_OST
+
     svr.Get(R"(/fw/(.*))", [&](const httplib::Request &req, httplib::Response &res) {
       std::smatch match;
       std::regex regex(R"(/fw/(.*))");

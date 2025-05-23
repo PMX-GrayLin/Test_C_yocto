@@ -898,11 +898,11 @@ void AICamera_setLED(string led_index, string led_color) {
     gpio_index1 = 81;
     gpio_index2 = 82;  
   } else if (led_index == "3") {
-    gpio_index1 = 107;
-    gpio_index2 = 108;  
+    gpio_index1 = 114;
+    gpio_index2 = 115;  
   } else if (led_index == "4") {
-    gpio_index1 = 109;
-    gpio_index2 = 110;  
+    gpio_index1 = 116;
+    gpio_index2 = 117;  
   } else if (led_index == "5") {
     gpio_index1 = 119;
     gpio_index2 = 120;  
