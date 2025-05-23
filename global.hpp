@@ -66,4 +66,6 @@ extern bool isPathExist(const char* path);
 double limitValueInRange(double input, double rangeMin, double rangeMax);
 
 extern std::string getTimeString();
+
+std::string get_parent_directory(const std::string& path);
 extern std::string exec_command(const std::string& cmd);

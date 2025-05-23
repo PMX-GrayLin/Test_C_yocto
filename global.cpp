@@ -97,6 +97,13 @@ std::string getTimeString() {
   return oss.str();
 }
 
+std::string get_parent_directory(const std::string& path) {
+  char* dup = strdup(path.c_str());
+  std::string dir = dirname(dup);  // modifies in place
+  free(dup);
+  return dir;
+}
+
 std::string exec_command(const std::string& cmd) {
   xlog("cmd:%s", cmd.c_str());
   std::array<char, 128> buffer;
