@@ -15,10 +15,15 @@ INCLUDES_HEADER += -I$(BB_INCDIR)/opencv4 -I$(BB_INCDIR)/opencv4/opencv
 
 # add define to enable/disable functions
 ENABLE_OST = 0
+ENABLE_TestCode = 0
+
 ifeq ($(ENABLE_OST),1)
 	DEFINES += -DENABLE_OST
 endif
 
+ifeq ($(ENABLE_TestCode),1)
+	DEFINES += -DENABLE_TestCode
+endif
 
 CFLAG += ${CXXFLAGS}
 CFLAG += ${INCLUDES_HEADER}
@@ -60,8 +65,9 @@ CPPSOURCEFILES = $(wildcard *.cpp)
 ifeq ($(ENABLE_OST),1)
 	CPPSOURCEFILES += $(wildcard ost/*.cpp)
 endif
-CPPSOURCEFILES += $(wildcard temp/*.cpp)
-
+ifeq ($(ENABLE_TestCode),1)
+	CPPSOURCEFILES += $(wildcard temp/*.cpp)
+endif
 CPPOBJECTS = $(patsubst %.cpp,%.o,$(CPPSOURCEFILES))
 
 %.o: %.cpp
