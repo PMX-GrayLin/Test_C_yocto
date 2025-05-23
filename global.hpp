@@ -66,3 +66,4 @@ extern bool isPathExist(const char* path);
 double limitValueInRange(double input, double rangeMin, double rangeMax);
 
 extern std::string getTimeString();
+extern std::string exec_command(const std::string& cmd);

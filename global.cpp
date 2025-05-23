@@ -96,3 +96,23 @@ std::string getTimeString() {
 
   return oss.str();
 }
+
+std::string exec_command(const std::string& cmd) {
+  xlog("cmd:%s", cmd.c_str());
+  std::array<char, 128> buffer;
+  std::string result;
+
+  // Open pipe to file
+  std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
+  if (!pipe) {
+    xlog("popen fail");
+  }
+
+  // Read till end of process:
+  while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+    result += buffer.data();
+  }
+
+  xlog("result:%s", result.c_str());
+  return result;
+}
