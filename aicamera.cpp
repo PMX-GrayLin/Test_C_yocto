@@ -433,7 +433,10 @@ void AICAMERA_threadSaveCropImage(const std::string path, const cv::Mat &frameBu
       // bool isPadding = true;
 
       // Extract directory from the full path
-      std::string directory = fs::path(path).parent_path().string();
+
+      // ??
+      // std::string directory = fs::path(path).parent_path().string();
+      std::string directory = get_parent_directory(path);
       xlog("Raw path: [%s]", path.c_str());
       xlog("Parent directory: [%s]", directory.c_str());
       if (!isPathExist(directory.c_str())) {
