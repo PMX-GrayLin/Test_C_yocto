@@ -400,7 +400,8 @@ void AICAMERA_threadSaveImage(const std::string path, const cv::Mat &frameBuffer
       xlog("Parent directory: [%s]", directory.c_str());
       if (!isPathExist(directory.c_str())) {
         xlog("Directory does not exist, creating: %s", directory.c_str());
-        fs::create_directories(directory);
+        // ??
+        // create_directories(directory);
       }
 
       // Check if frameBuffer is valid
@@ -437,7 +438,8 @@ void AICAMERA_threadSaveCropImage(const std::string path, const cv::Mat &frameBu
       xlog("Parent directory: [%s]", directory.c_str());
       if (!isPathExist(directory.c_str())) {
         xlog("Directory does not exist, creating: %s", directory.c_str());
-        fs::create_directories(directory);
+        // ??
+        // create_directories(directory);
       }
 
       // Check if frameBuffer is valid
