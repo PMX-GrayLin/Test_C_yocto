@@ -1,7 +1,10 @@
 #include "test.hpp"
 
 #include "aicamera.hpp"
+
+#if defined(ENABLE_Gige)
 #include "cam_gige_hikrobot.hpp"
+#endif
 
 #if defined(ENABLE_OST)
 #include "oti322.hpp"
@@ -22,9 +25,13 @@ void handle_RESTful(std::vector<std::string> segments) {
       AICamera_streamingStop();
     }
 
-  } else if (isSameString(segments[0].c_str(), "gige")) {
+#if defined(ENABLE_Gige)
 
-    Gige_handle_RESTful_hik(segments);
+} else if (isSameString(segments[0].c_str(), "gige")) {
+  
+  Gige_handle_RESTful_hik(segments);
+
+#endif
 
   } else if (isSameString(segments[0].c_str(), "tp")) {
     xlog("take picture");
