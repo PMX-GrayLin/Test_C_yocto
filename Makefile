@@ -2,32 +2,37 @@
 APP_NAME=test
 # APP_NAME=fw_daemon
 
-# header dir
-INCLUDES_HEADER += -I$(BB_INCDIR)
-INCLUDES_HEADER += -I.
-INCLUDES_HEADER += -Iinclude
-INCLUDES_HEADER += -Iost
-INCLUDES_HEADER += -I$(BB_INCDIR)/json-c
-INCLUDES_HEADER += -I$(BB_INCDIR)/gstreamer-1.0
-INCLUDES_HEADER += -I$(BB_INCDIR)/glib-2.0
-INCLUDES_HEADER += -I$(BB_LIBDIR)/glib-2.0/include
-INCLUDES_HEADER += -I$(BB_INCDIR)/opencv4 -I$(BB_INCDIR)/opencv4/opencv
-
 # add define to enable/disable functions
-ENABLE_OST = 0
-ENABLE_TestCode = 0
+ENABLE_Gige ?= 1
+ENABLE_OST = 1
+ENABLE_TestCode = 1
 
+ifeq ($(ENABLE_Gige),1)
+DEFINES += -ENABLE_Gige
+INCLUDES_HEADERs += -Icam_gige
+endif
 ifeq ($(ENABLE_OST),1)
-	DEFINES += -DENABLE_OST
+DEFINES += -DENABLE_OST
+INCLUDES_HEADERs += -Iost
+endif
+ifeq ($(ENABLE_TestCode),1)
+DEFINES += -DENABLE_TestCode
+INCLUDES_HEADERs += -temp
 endif
 
-ifeq ($(ENABLE_TestCode),1)
-	DEFINES += -DENABLE_TestCode
-endif
+# header dir
+INCLUDES_HEADERs += -I$(BB_INCDIR)
+INCLUDES_HEADERs += -I.
+INCLUDES_HEADERs += -Iinclude
+INCLUDES_HEADERs += -I$(BB_INCDIR)/json-c
+INCLUDES_HEADERs += -I$(BB_INCDIR)/gstreamer-1.0
+INCLUDES_HEADERs += -I$(BB_INCDIR)/glib-2.0
+INCLUDES_HEADERs += -I$(BB_LIBDIR)/glib-2.0/include
+INCLUDES_HEADERs += -I$(BB_INCDIR)/opencv4 -I$(BB_INCDIR)/opencv4/opencv
 
 CFLAG += ${CXXFLAGS}
-CFLAG += ${INCLUDES_HEADER}
 CFLAG += ${DEFINES}
+CFLAG += ${INCLUDES_HEADERs}
 
 # lib dir
 INCLUDES_LIB += -L$(BB_LIBDIR)
@@ -60,8 +65,12 @@ LDFLAG += ${INCLUDES_LIB}
 LDFLAG += ${LINK_LIBS}
 LDFLAG += ${OCVLDFLAG}
 
+# add source files
 # CPPSOURCEFILES = $(wildcard *.cpp) $(wildcard ost/*.cpp) $(wildcard temp/*.cpp)
 CPPSOURCEFILES = $(wildcard *.cpp)
+ifeq ($(ENABLE_Gige),1)
+	CPPSOURCEFILES += $(wildcard cam_gige/*.cpp)
+endif
 ifeq ($(ENABLE_OST),1)
 	CPPSOURCEFILES += $(wildcard ost/*.cpp)
 endif
