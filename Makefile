@@ -8,7 +8,7 @@ ENABLE_OST = 1
 ENABLE_TestCode = 1
 
 ifeq ($(ENABLE_Gige),1)
-DEFINES += -ENABLE_Gige
+DEFINES += -DENABLE_Gige
 INCLUDES_HEADERs += -Icam_gige
 endif
 ifeq ($(ENABLE_OST),1)
@@ -17,7 +17,7 @@ INCLUDES_HEADERs += -Iost
 endif
 ifeq ($(ENABLE_TestCode),1)
 DEFINES += -DENABLE_TestCode
-INCLUDES_HEADERs += -temp
+INCLUDES_HEADERs += -Itemp
 endif
 
 # header dir
