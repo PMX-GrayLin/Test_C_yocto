@@ -73,6 +73,9 @@ LDFLAG += ${OCVLDFLAG}
 # add source files
 # CPPSOURCEFILES = $(wildcard *.cpp) $(wildcard ost/*.cpp) $(wildcard temp/*.cpp)
 CPPSOURCEFILES = $(wildcard *.cpp)
+ifeq ($(ENABLE_CIS),1)
+	CPPSOURCEFILES += $(wildcard cam_omnivision/*.cpp)
+endif
 ifeq ($(ENABLE_Gige),1)
 	CPPSOURCEFILES += $(wildcard cam_gige/*.cpp)
 endif
