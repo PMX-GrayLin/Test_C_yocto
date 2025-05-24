@@ -1,6 +1,6 @@
 #include "test.hpp"
 
-#include "aicamera.hpp"
+#include "cam_omnivision.hpp"
 
 #if defined(ENABLE_Gige)
 #include "cam_gige_hikrobot.hpp"

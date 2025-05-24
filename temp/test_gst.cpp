@@ -1,5 +1,5 @@
 #include "test_gst.hpp"
-#include "aicamera.hpp"
+#include "cam_omnivision.hpp"
 
 static volatile int counterFrame = 0;
 static int counterImg = 0;

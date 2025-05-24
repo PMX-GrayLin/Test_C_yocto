@@ -1,7 +1,7 @@
 #include "cam_gige_hikrobot.hpp"
 
-// temp
-#include "aicamera.hpp"
+// ?? temp
+#include "cam_omnivision.hpp"
 
 UsedGigeCam usedGigeCam = ugc_hikrobot;
 
