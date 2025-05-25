@@ -1,5 +1,7 @@
 #include "global.hpp"
 
+#include <iostream>
+
 // test vars
 int testCounter = 0;
 
