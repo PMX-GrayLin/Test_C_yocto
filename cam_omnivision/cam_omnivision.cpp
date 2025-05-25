@@ -1,4 +1,5 @@
 #include "cam_omnivision.hpp"
+
 #include <gst/gst.h>
 
 // apply only used header
