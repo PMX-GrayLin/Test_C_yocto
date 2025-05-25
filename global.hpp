@@ -12,7 +12,6 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <poll.h>
-// #include <string.h>
 
 // C++ Standard Library headers 
 #include <string>
@@ -21,7 +20,6 @@
 // C++ Standard Library headers, heavy
 #include <thread>
 #include <chrono>
-// #include <algorithm>
 
 // #if defined(ENABLE_FTDI)
 // #include "ftd2xx.h"
