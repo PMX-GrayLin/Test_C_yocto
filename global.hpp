@@ -20,7 +20,7 @@
 #include <cstring>
 // #include <iostream>
 // #include <fstream>
-#include <vector>
+// #include <vector>
 // #include <iomanip>
 
 // C++ Standard Library headers, heavy
