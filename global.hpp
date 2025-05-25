@@ -42,8 +42,6 @@
 #define xlog(fmt, ...) printf("%s:%d, " fmt "\n\r", __func__, __LINE__, ##__VA_ARGS__)
 #endif
 
-#define NUM_CAM_USE 2
-
 using namespace std;
 
 extern int testCounter;
