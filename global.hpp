@@ -21,10 +21,6 @@
 #include <thread>
 #include <chrono>
 
-// #if defined(ENABLE_FTDI)
-// #include "ftd2xx.h"
-// #include "libft4222.h"
-// #endif
 
 #define DEBUGX
 #ifndef DEBUGX

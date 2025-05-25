@@ -17,6 +17,10 @@
 #include "test_ocv.hpp"
 #endif
 
+// #if defined(ENABLE_FTDI)
+// #include "ftd2xx.h"
+// #include "libft4222.h"
+// #endif
 
 void handle_RESTful(std::vector<std::string> segments) {
 
