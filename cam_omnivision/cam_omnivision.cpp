@@ -4,6 +4,8 @@
 #include <sys/ioctl.h>        // For ioctl()
 #include <fcntl.h>            // For open()
 
+#include <iomanip>
+
 #include <gst/gst.h>
 
 // apply only used header
