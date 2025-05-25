@@ -87,7 +87,6 @@ extern void AICamera_enableCrop(bool enable);
 extern void AICamera_enablePadding(bool enable);
 
 // Streaming
-GstPadProbeReturn AICAMERA_streamingDataCallback(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
 void ThreadAICameraStreaming();
 void ThreadAICameraStreaming_usb();
 extern void AICamera_streamingStart();

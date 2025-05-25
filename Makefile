@@ -5,8 +5,8 @@ APP_NAME=test
 # add define to enable/disable functions
 ENABLE_Gige ?= 1
 ENABLE_CIS ?= 1
-ENABLE_OST = 0
-ENABLE_TestCode = 0
+ENABLE_OST = 1
+ENABLE_TestCode = 1
 
 ifeq ($(ENABLE_CIS),1)
 DEFINES += -DENABLE_CIS
