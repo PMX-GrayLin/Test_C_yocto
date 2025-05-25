@@ -12,9 +12,9 @@
 #include <sys/stat.h>
 #include <poll.h>
 
-#include <linux/videodev2.h>  // For V4L2 definitions
-#include <sys/ioctl.h>        // For ioctl()
-#include <fcntl.h>            // For open()
+// #include <linux/videodev2.h>  // For V4L2 definitions
+// #include <sys/ioctl.h>        // For ioctl()
+// #include <fcntl.h>            // For open()
 
 #include <string>
 #include <iostream>
@@ -28,9 +28,6 @@
 
 #include "json.h"
 #include <mosquittopp.h>
-
-#include <gpiod.h>
-
 #include "httplib.hpp"
 
 // #if defined(ENABLE_FTDI)

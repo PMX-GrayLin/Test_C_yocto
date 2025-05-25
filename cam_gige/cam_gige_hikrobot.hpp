@@ -19,8 +19,8 @@ typedef enum {
 } GstArvAuto;
 
 struct GigeControlParams {
-  double exposure;    // Exposure time (e.g., in microseconds)
-  double gain;        // Gain value (e.g., in dB)
+  double exposure;    // Exposure time (in microseconds)
+  double gain;        // Gain value (in dB)
   int exposure_auto;  // Auto exposure mode: 0=off, 1=once, 2=continuous
   int gain_auto;      // Auto gain mode: 0=off, 1=once, 2=continuous
 };
@@ -28,7 +28,6 @@ struct GigeControlParams {
 extern void Gige_handle_RESTful_hik(std::vector<std::string> segments);
 
 extern void GigE_getSettings_hik();
-
 extern double GigE_getExposure_hik();
 extern void GigE_setExposure_hik(string exposureTimeS);
 extern GstArvAuto GigE_getExposureAuto_hik();

@@ -1,5 +1,7 @@
 #include "device.hpp"
 
+#include <gpiod.h>
+
 // PWM
 const std::string path_pwm = "/sys/devices/platform/soc/10048000.pwm/pwm/pwmchip0";
 const std::string pwmTarget = path_pwm + "/pwm1";

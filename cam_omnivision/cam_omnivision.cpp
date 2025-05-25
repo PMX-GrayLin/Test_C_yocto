@@ -1,5 +1,9 @@
 #include "cam_omnivision.hpp"
 
+#include <linux/videodev2.h>  // For V4L2 definitions
+#include <sys/ioctl.h>        // For ioctl()
+#include <fcntl.h>            // For open()
+
 #include <gst/gst.h>
 
 // apply only used header
