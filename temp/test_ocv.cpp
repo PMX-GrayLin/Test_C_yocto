@@ -1,4 +1,11 @@
 #include "test_ocv.hpp"
+
+// apply only used header
+// #include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
+
 #include "cam_omnivision.hpp"
 
 void test_ocv(int testCase) {

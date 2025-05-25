@@ -1,4 +1,6 @@
 #include "test_gst.hpp"
+#include <gst/gst.h>
+
 #include "cam_omnivision.hpp"
 
 static volatile int counterFrame = 0;

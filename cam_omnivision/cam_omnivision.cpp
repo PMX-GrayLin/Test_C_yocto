@@ -1,4 +1,11 @@
 #include "cam_omnivision.hpp"
+#include <gst/gst.h>
+
+// apply only used header
+// #include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
 
 // PWM
 const std::string path_pwm = "/sys/devices/platform/soc/10048000.pwm/pwm/pwmchip0";

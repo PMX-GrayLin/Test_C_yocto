@@ -29,8 +29,6 @@
 #include "json.h"
 #include <mosquittopp.h>
 
-#include <gst/gst.h>
-#include <opencv2/opencv.hpp>
 #include <gpiod.h>
 
 #include "httplib.hpp"
