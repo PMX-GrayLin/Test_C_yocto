@@ -54,16 +54,16 @@ LINK_LIBS += -lgpiod
 
 OCVLDFLAG +=-lopencv_core 
 OCVLDFLAG +=-lopencv_imgproc
-OCVLDFLAG +=-lopencv_features2d
-OCVLDFLAG +=-lopencv_video 
-OCVLDFLAG +=-lopencv_videoio 
 OCVLDFLAG +=-lopencv_imgcodecs 
-OCVLDFLAG +=-lopencv_objdetect 
-OCVLDFLAG +=-lopencv_highgui 
-OCVLDFLAG +=-lopencv_photo 
-OCVLDFLAG +=-lopencv_flann
-OCVLDFLAG +=-lopencv_ml
-OCVLDFLAG +=-lopencv_dnn
+# OCVLDFLAG +=-lopencv_features2d
+# OCVLDFLAG +=-lopencv_video 
+# OCVLDFLAG +=-lopencv_videoio 
+# OCVLDFLAG +=-lopencv_objdetect 
+# OCVLDFLAG +=-lopencv_highgui 
+# OCVLDFLAG +=-lopencv_photo 
+# OCVLDFLAG +=-lopencv_flann
+# OCVLDFLAG +=-lopencv_ml
+# OCVLDFLAG +=-lopencv_dnn
 
 LDFLAG += ${LDFLAGS}
 LDFLAG += ${INCLUDES_LIB}
