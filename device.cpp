@@ -1,5 +1,6 @@
 #include "device.hpp"
 
+#include <fstream>
 #include <gpiod.h>
 
 // PWM
