@@ -1,5 +1,6 @@
 #include "test.hpp"
 
+#include "device.hpp"
 #include "cam_omnivision.hpp"
 
 #if defined(ENABLE_Gige)

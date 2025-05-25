@@ -16,12 +16,6 @@
 // ? NUM_DIOm aicamera = 2, visionhb = 4
 #define NUM_DIO         4                 // Number of DIO
 
-typedef enum {
-  lc_red,
-  lc_green,
-  lc_orange,
-  lc_off,
-} LEDColor;
 
 typedef enum {
     spf_BMP,
@@ -29,13 +23,8 @@ typedef enum {
     spf_PNG,
 } SavedPhotoFormat;
 
-typedef enum {
-  diod_in,
-  diod_out,
-} DIO_Direction;
 
-
-extern bool AICamrea_isUseCSICamera();
+extern bool AICamrea_isUseCISCamera();
 extern std::string AICamrea_getVideoDevice();
 
 
@@ -86,30 +75,3 @@ extern void AICamera_streamingStop();
 // image processing
 extern void AICAMERA_load_crop_saveImage();
 
-// led
-void AICamera_setGPIO(int gpio_num, int value);
-void AICamera_setLED(string led_index, string led_color);
-
-// DI
-void ThreadAICameraMonitorDI();
-extern void AICamera_MonitorDIStart();
-extern void AICamera_MonitorDIStop();
-
-// Triger
-void ThreadAICameraMonitorTriger();
-extern void AICamera_MonitorTrigerStart();
-extern void AICamera_MonitorTrigerStop();
-
-// DO
-extern void AICamera_setDO(string index_do, string on_off);
-
-// DIO
-void ThreadAICameraMonitorDIOIn(int index_dio);
-extern void AICamera_MonitorDIOInStart(int index_dio);
-extern void AICamera_MonitorDIOInStop(int index_dio);
-extern void AICamera_setDIODirection(string index_dio, string di_do);
-extern void AICamera_setDIOOut(string index_dio, string on_off);
-
-// PWM 
-void AICamera_writePWMFile(const std::string &path, const std::string &value);
-extern void AICamera_setPWM(string sPercent);
