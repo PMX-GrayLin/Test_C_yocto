@@ -1,14 +1,8 @@
 #include "cam_gige_hikrobot.hpp"
-#include <gst/gst.h>
 
 // ?? temp
 #include "cam_omnivision.hpp"
 
-// apply only used header
-// #include <opencv2/opencv.hpp>
-#include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/imgcodecs.hpp>
 
 UsedGigeCam usedGigeCam = ugc_hikrobot;
 
