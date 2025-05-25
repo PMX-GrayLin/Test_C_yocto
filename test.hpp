@@ -2,6 +2,9 @@
 
 #include "global.hpp"
 
+#include "httplib.hpp"
+#include <mosquittopp.h>
+
 // RESTful
 void handle_RESTful(std::vector<std::string> segments);
 

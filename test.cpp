@@ -17,8 +17,6 @@
 #include "test_ocv.hpp"
 #endif
 
-#include "httplib.hpp"
-#include <mosquittopp.h>
 
 void handle_RESTful(std::vector<std::string> segments) {
 
