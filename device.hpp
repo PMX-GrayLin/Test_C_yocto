@@ -18,9 +18,33 @@ typedef enum {
 } LEDColor;
 
 typedef enum {
+  ledgp_1_red = 79,
+  ledgp_1_green = 80,
+  ledgp_2_red = 79,
+  ledgp_2_green = 81,
+  ledgp_3_red = 114,
+  ledgp_3_green = 115,
+  ledgp_4_red = 116,
+  ledgp_4_green = 117,
+  ledgp_5_red = 119,
+  ledgp_5_green = 120,
+} LED_GPIO_PIN;
+
+typedef enum {
+  digp_1 = 0,
+  digp_2 = 1,
+} DI_GPIO_PIN;
+
+typedef enum {
+  tgp_1 = 17,
+  tgp_2 = 70,
+} Triger_GPIO_PIN;
+
+typedef enum {
   diod_in,
   diod_out,
 } DIO_Direction;
+
 
 // PWM 
 void AICamera_writePWMFile(const std::string &path, const std::string &value);

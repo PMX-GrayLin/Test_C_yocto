@@ -7,12 +7,12 @@ const std::string path_pwmExport = path_pwm + "/export";
 const int pwmPeriod = 200000;   // 5 kHz
 
 // DI
-int DI_GPIOs[NUM_DI] = {0, 1};  // DI GPIO
+int DI_GPIOs[NUM_DI] = {digp_1, digp_2};  // DI GPIO
 std::thread t_aicamera_monitorDI;
 bool isMonitorDI = false;
 
 // Triger
-int Triger_GPIOs[NUM_Triger] = {17, 70};  // Triger GPIO
+int Triger_GPIOs[NUM_Triger] = {tgp_1, tgp_1};  // Triger GPIO
 std::thread t_aicamera_monitorTriger;
 bool isMonitorTriger = false;
 
@@ -100,20 +100,20 @@ void AICamera_setLED(string led_index, string led_color) {
   int gpio_index2 = 0;
 
   if (led_index == "1") {
-    gpio_index1 = 79;
-    gpio_index2 = 80;  
+    gpio_index1 = ledgp_1_red;
+    gpio_index2 = ledgp_1_green;  
   } else if (led_index == "2") {
-    gpio_index1 = 81;
-    gpio_index2 = 82;  
+    gpio_index1 = ledgp_2_red;
+    gpio_index2 = ledgp_2_green;  
   } else if (led_index == "3") {
-    gpio_index1 = 114;
-    gpio_index2 = 115;  
+    gpio_index1 = ledgp_3_red;
+    gpio_index2 = ledgp_3_green;  
   } else if (led_index == "4") {
-    gpio_index1 = 116;
-    gpio_index2 = 117;  
+    gpio_index1 = ledgp_4_red;
+    gpio_index2 = ledgp_4_green;  
   } else if (led_index == "5") {
-    gpio_index1 = 119;
-    gpio_index2 = 120;  
+    gpio_index1 = ledgp_5_red;
+    gpio_index2 = ledgp_5_green;  
   }
 
   if (isSameString(led_color.c_str(), "red")) {
