@@ -97,12 +97,6 @@ std::string getTimeString() {
   return oss.str();
 }
 
-// std::string get_parent_directory(const std::string& path) {
-//   char* dup = strdup(path.c_str());
-//   std::string dir = dirname(dup);
-//   free(dup);
-//   return dir;
-// }
 std::string get_parent_directory(const std::string& path) {
     std::string temp = path;                 // Make a mutable copy
     char* path_buf = temp.data();            // Get modifiable char* from std::string

@@ -21,16 +21,15 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <libgen.h>
 #include <iomanip>
 
 // C++ Standard Library headers, heavy
 #include <thread>
 #include <chrono>
-#include <algorithm>
+// #include <algorithm>
 
-//
-// #include "json.h"
+// POSIX header
+#include <libgen.h>
 
 // #if defined(ENABLE_FTDI)
 // #include "ftd2xx.h"
