@@ -5,6 +5,7 @@
 
 // ========== enable / disable functions ==========
 
+// C headers
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -12,23 +13,21 @@
 #include <sys/stat.h>
 #include <poll.h>
 
-// #include <linux/videodev2.h>  // For V4L2 definitions
-// #include <sys/ioctl.h>        // For ioctl()
-// #include <fcntl.h>            // For open()
-
+// C++ Standard Library headers 
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <algorithm>
-#include <thread>
-#include <chrono>
 #include <libgen.h>
 #include <iomanip>
 
-#include "json.h"
-#include <mosquittopp.h>
-#include "httplib.hpp"
+// C++ Standard Library headers, heavy
+#include <thread>
+#include <chrono>
+#include <algorithm>
+
+//
+// #include "json.h"
 
 // #if defined(ENABLE_FTDI)
 // #include "ftd2xx.h"

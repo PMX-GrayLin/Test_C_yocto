@@ -17,6 +17,9 @@
 #include "test_ocv.hpp"
 #endif
 
+#include "httplib.hpp"
+#include <mosquittopp.h>
+
 void handle_RESTful(std::vector<std::string> segments) {
 
   if (isSameString(segments[0].c_str(), "gst")) {
