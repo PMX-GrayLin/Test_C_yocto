@@ -29,7 +29,7 @@
 // #include <algorithm>
 
 // POSIX header
-#include <libgen.h>
+// #include <libgen.h>
 
 // #if defined(ENABLE_FTDI)
 // #include "ftd2xx.h"

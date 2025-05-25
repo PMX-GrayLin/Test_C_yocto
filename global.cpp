@@ -5,6 +5,9 @@
 #include <iomanip>
 #include <algorithm>
 
+// POSIX header
+#include <libgen.h>
+
 // test vars
 int testCounter = 0;
 
