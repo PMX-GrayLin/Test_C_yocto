@@ -12,24 +12,16 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <poll.h>
-#include <string.h>
-// #include <strings.h>
+// #include <string.h>
 
 // C++ Standard Library headers 
 #include <string>
 #include <cstring>
-// #include <iostream>
-// #include <fstream>
-// #include <vector>
-// #include <iomanip>
 
 // C++ Standard Library headers, heavy
 #include <thread>
 #include <chrono>
 // #include <algorithm>
-
-// POSIX header
-// #include <libgen.h>
 
 // #if defined(ENABLE_FTDI)
 // #include "ftd2xx.h"
