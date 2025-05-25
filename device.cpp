@@ -7,7 +7,7 @@ const std::string path_pwmExport = path_pwm + "/export";
 const int pwmPeriod = 200000;   // 5 kHz
 
 // DI
-int DI_GPIOs[NUM_DI] = {digp_1, digp_2};  // DI GPIO
+int DI_GPIOs[NUM_DI] = {digp_1, digp_2};        // DI GPIO
 std::thread t_aicamera_monitorDI;
 bool isMonitorDI = false;
 
@@ -17,11 +17,11 @@ std::thread t_aicamera_monitorTriger;
 bool isMonitorTriger = false;
 
 // DO
-int DO_GPIOs[NUM_DO] = {3, 7};  // DO GPIO
+int DO_GPIOs[NUM_DO] = {dogp_1, dogp_2};        // DO GPIO
 
 // DIO
-int DIO_IN_GPIOs[NUM_DIO] = {2, 6, 12, 13};   // DI GPIO
-int DIO_OUT_GPIOs[NUM_DIO] = {8, 9, 11, 5};  // DO GPIO
+int DIO_IN_GPIOs[NUM_DIO] = {diodigp_1, diodigp_2, diodigp_3, diodigp_4};       // DI GPIO
+int DIO_OUT_GPIOs[NUM_DIO] = {diodogp_1, diodogp_2, diodogp_3, diodogp_4};      // DO GPIO
 DIO_Direction dioDirection[NUM_DIO] = {diod_in};
 std::thread t_aicamera_monitorDIO[NUM_DIO];
 bool isMonitorDIO[NUM_DIO] = {false};

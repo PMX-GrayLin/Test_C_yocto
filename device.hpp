@@ -41,9 +41,27 @@ typedef enum {
 } Triger_GPIO_PIN;
 
 typedef enum {
+  dogp_1 = 3,
+  dogp_2 = 7,
+} DO_GPIO_PIN;
+
+typedef enum {
   diod_in,
   diod_out,
 } DIO_Direction;
+
+typedef enum {
+  diodigp_1 = 2,
+  diodigp_2 = 6,
+  diodigp_3 = 12,
+  diodigp_4 = 13,
+} DIO_DI_GPIO_PIN;
+typedef enum {
+  diodogp_1 = 8,
+  diodogp_2 = 9,
+  diodogp_3 = 11,
+  diodogp_4 = 5,
+} DIO_DO_GPIO_PIN;
 
 
 // PWM 
