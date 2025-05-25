@@ -8,25 +8,14 @@
 #define AICamreaCISPath "/dev/csi_cam_preview"
 #define AICamreaUSBPath "/dev/video137"
 
-#define GPIO_CHIP       "/dev/gpiochip0"
-#define NUM_DI          2                 // Number of DI
-#define NUM_Triger      2                 // Number of Triger, treat as DI
-#define NUM_DO          2                 // Number of DO
-
-// ? NUM_DIOm aicamera = 2, visionhb = 4
-#define NUM_DIO         4                 // Number of DIO
-
-
 typedef enum {
     spf_BMP,
     spf_JPEG,
     spf_PNG,
 } SavedPhotoFormat;
 
-
 extern bool AICamrea_isUseCISCamera();
 extern std::string AICamrea_getVideoDevice();
-
 
 int ioctl_get_value(int control_ID);
 int ioctl_set_value(int control_ID, int value);
