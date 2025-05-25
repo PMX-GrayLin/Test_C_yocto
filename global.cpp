@@ -1,7 +1,9 @@
 #include "global.hpp"
 
+#include <cctype>
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 
 // test vars
 int testCounter = 0;
@@ -62,12 +64,29 @@ void printArray_forUI(const float* buffer, size_t len) {
 }
 
 bool isSameString(const char* s1, const char* s2, bool isCaseSensitive) {
-  if (s1 == NULL || s2 == NULL) {
-    return false;  // Handle NULL pointers safely
+  if (s1 == nullptr || s2 == nullptr) {
+    return false;
   }
 
-  return isCaseSensitive ? strcmp(s1, s2) == 0 : strcasecmp(s1, s2) == 0;
+  if (isCaseSensitive) {
+    return std::strcmp(s1, s2) == 0;
+  } else {
+    std::string str1(s1), str2(s2);
+    if (str1.size() != str2.size()) {
+      return false;
+    }
+    return std::equal(str1.begin(), str1.end(), str2.begin(), [](char a, char b) {
+      return std::tolower(static_cast<unsigned char>(a)) == std::tolower(static_cast<unsigned char>(b));
+    });
+  }
 }
+// bool isSameString(const char* s1, const char* s2, bool isCaseSensitive) {
+//   if (s1 == NULL || s2 == NULL) {
+//     return false;  // Handle NULL pointers safely
+//   }
+
+//   return isCaseSensitive ? strcmp(s1, s2) == 0 : strcasecmp(s1, s2) == 0;
+// }
 
 bool isPathExist(const char* path) {
   struct stat buffer;

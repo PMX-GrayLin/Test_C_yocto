@@ -13,7 +13,7 @@
 #include <sys/stat.h>
 #include <poll.h>
 #include <string.h>
-#include <strings.h>
+// #include <strings.h>
 
 // C++ Standard Library headers 
 #include <string>
