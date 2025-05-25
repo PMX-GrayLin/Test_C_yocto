@@ -2,6 +2,7 @@
 #pragma once
 
 #include "global.hpp"
+#include "global2.hpp"
 
 typedef enum {
   ugc_hikrobot = 0,
