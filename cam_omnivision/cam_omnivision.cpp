@@ -867,7 +867,7 @@ void AICamera_streamingStart() {
   }
   isStreaming = true;
 
-  if (AICamrea_isUseCSICamera())
+  if (AICamrea_isUseCISCamera())
   {
     t_aicamera_streaming = std::thread(ThreadAICameraStreaming);
   } else {
