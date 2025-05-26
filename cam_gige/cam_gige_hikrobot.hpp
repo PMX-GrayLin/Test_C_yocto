@@ -3,6 +3,8 @@
 
 #include "global.hpp"
 
+#include <vector>
+
 typedef enum {
   ugc_hikrobot = 0,
   ugc_basler,

@@ -1,5 +1,7 @@
 #include "test.hpp"
 
+#include <vector>
+
 #include "device.hpp"
 #include "cam_omnivision.hpp"
 
