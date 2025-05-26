@@ -3,6 +3,13 @@
 // ?? temp
 #include "cam_omnivision.hpp"
 
+#include <gst/gst.h>
+
+// apply only used header
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
+
 extern void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info);
 
 UsedGigeCam usedGigeCam = ugc_hikrobot;
