@@ -59,7 +59,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   } else if (isSameString(segments[1].c_str(), "tp")) {
     xlog("take picture");
     std::string path = "";
-    if (segments.size() > 1 && !segments[2].empty()) {
+    if (segments.size() > 2 && !segments[2].empty()) {
       path = segments[2];
       const std::string from = "%2F";
       const std::string to = "/";
