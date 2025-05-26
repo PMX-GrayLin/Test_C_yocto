@@ -100,7 +100,7 @@ void saveCropedImage(GstCaps *caps, GstMapInfo map, string filePathName, cv::Rec
 
   // Check if frameBuffer is valid
   if (bgr_frame.empty()) {
-    xlog("Frame buffer is empty. Cannot save image to %s", path.c_str());
+    xlog("Frame buffer is empty. Cannot save image to %s", filePathName.c_str());
     return;
   }
 
@@ -115,7 +115,7 @@ void saveCropedImage(GstCaps *caps, GstMapInfo map, string filePathName, cv::Rec
 
   if (isCrop) {
     // Crop the region of interest (ROI)
-    cv::Mat croppedImage = frameBuffer(roi);
+    cv::Mat croppedImage = bgr_frame(roi);
 
     // Create a black canvas of the target size
     int squqareSize = (croppedImage.cols > croppedImage.rows) ? croppedImage.cols : croppedImage.rows;
@@ -143,9 +143,6 @@ void saveCropedImage(GstCaps *caps, GstMapInfo map, string filePathName, cv::Rec
     } else {
       xlog("Failed crop to save frame to %s", filePathName.c_str());
     }
-
-    cv::Rect reset_roi(0, 0, 0, 0);
-    AICamera_setCropROI(reset_roi);
 
   } else {
     // save the image
