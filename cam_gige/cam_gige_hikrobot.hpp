@@ -29,6 +29,7 @@ struct GigeControlParams {
 extern void Gige_handle_RESTful_hik(std::vector<std::string> segments);
 
 extern void GigE_getSettings_hik();
+
 extern double GigE_getExposure_hik();
 extern void GigE_setExposure_hik(string exposureTimeS);
 extern GstArvAuto GigE_getExposureAuto_hik();
