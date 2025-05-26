@@ -71,8 +71,8 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else {
       path = "/home/root/primax/fw_" + getTimeString() + ".png";
     }
-    GigE_setImagePath(path.c_str());
-    AICamera_captureImage();
+    GigE_setImagePath_hik(path.c_str());
+    GigE_captureImage_hik();
 
   }
 }
