@@ -1,12 +1,5 @@
 #include "image_utils.hpp"
 
-// #include <gst/gst.h>
-
-// apply only used header
-// #include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/imgcodecs.hpp>
-
 void saveImage(GstCaps *caps, GstMapInfo map, string filePathName) {
 
   // Get the structure of the first capability (format)
