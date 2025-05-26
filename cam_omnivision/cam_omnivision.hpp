@@ -5,6 +5,8 @@
 
 #include "global.hpp"
 
+#include <vector>
+
 #define AICamreaCISPath "/dev/csi_cam_preview"
 #define AICamreaUSBPath "/dev/video137"
 
@@ -13,6 +15,8 @@ typedef enum {
     spf_JPEG,
     spf_PNG,
 } SavedPhotoFormat;
+
+extern void CIS_handle_RESTful(std::vector<std::string> segments);
 
 extern bool AICamrea_isUseCISCamera();
 extern std::string AICamrea_getVideoDevice();

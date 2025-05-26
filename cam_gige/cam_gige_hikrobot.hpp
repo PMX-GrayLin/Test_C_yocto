@@ -40,6 +40,9 @@ extern void GigE_setGain_hik(string gainS);
 extern GstArvAuto GigE_getGainAuto_hik();
 extern void GigE_setGainAuto_hik(string gstArvAutoS);
 
+void GigE_setImagePath_hik(const string& imagePath);
+void GigE_captureImage_hik();
+
 void GigE_ThreadStreaming_Hik();
 extern void GigE_StreamingStart_Hik();
 extern void GigE_StreamingStop_Hik();

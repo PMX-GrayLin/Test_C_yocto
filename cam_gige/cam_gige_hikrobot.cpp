@@ -10,6 +10,8 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 
+#include "image_utils.hpp"
+
 extern void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info);
 
 UsedGigeCam usedGigeCam = ugc_hikrobot;
@@ -23,11 +25,8 @@ bool isStreaming_gige_hik = false;
 
 struct GigeControlParams gigeControlParams = { 0 };
 
-// Callback to handle incoming buffer data
-GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
-  AICAMERA_saveImage(pad, info);
-  return GST_PAD_PROBE_OK;
-}
+bool isCapturePhoto_hik = false;
+std::string pathName_savedImage_hik = "";
 
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
 
@@ -59,7 +58,69 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else if (isSameString(segments[2].c_str(), "gain-auto")) {
       //
     }
+
+  } else if (isSameString(segments[1].c_str(), "tp")) {
+    xlog("take picture");
+    std::string path = "";
+    if (segments.size() > 1 && !segments[2].empty()) {
+      path = segments[2];
+      const std::string from = "%2F";
+      const std::string to = "/";
+      size_t start_pos = 0;
+      while ((start_pos = path.find(from, start_pos)) != std::string::npos) {
+        path.replace(start_pos, from.length(), to);
+        start_pos += to.length();
+      }
+    } else {
+      path = "/home/root/primax/fw_" + getTimeString() + ".png";
+    }
+    GigE_setImagePath(path.c_str());
+    AICamera_captureImage();
+
   }
+}
+
+void GigE_saveImage_hik(GstPad *pad, GstPadProbeInfo *info) {
+  if (isCapturePhoto_hik) {
+    xlog("");
+    isCapturePhoto_hik = false;
+
+    GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
+    if (buffer == nullptr) {
+      xlog("Failed to get buffer");
+      return;
+    }
+
+    // Get the capabilities of the pad to understand the format
+    GstCaps *caps = gst_pad_get_current_caps(pad);
+    if (!caps) {
+      xlog("Failed to get caps");
+      gst_caps_unref(caps);
+      return;
+    }
+    // Print the entire caps for debugging
+    // xlog("caps: %s", gst_caps_to_string(caps));
+
+    // Map the buffer to access its data
+    GstMapInfo map;
+    if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+      xlog("Failed to map buffer");
+      gst_caps_unref(caps);
+      return;
+    }
+
+    saveImage(caps, map, pathName_savedImage_hik);
+
+    // Cleanup
+    gst_buffer_unmap(buffer, &map);
+    gst_caps_unref(caps);
+  }
+}
+
+// Callback to handle incoming buffer data
+GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+  GigE_saveImage_hik(pad, info);
+  return GST_PAD_PROBE_OK;
 }
 
 void GigE_getSettings_hik() {
@@ -146,6 +207,20 @@ void GigE_setGainAuto_hik(string gstArvAutoS) {
   }
   xlog("set gain-auto:%d", gaa);
   g_object_set(G_OBJECT(source_gige_hik), "gain-auto", gaa, NULL);
+}
+
+void GigE_setImagePath_hik(const string& imagePath) {
+  pathName_savedImage_hik = imagePath;
+  xlog("pathName_savedImage_hik:%s", pathName_savedImage_hik.c_str());
+}
+
+void GigE_captureImage_hik() {
+  if (!isStreaming_gige_hik) {
+    xlog("do nothing...camera is not streaming");
+    return;
+  }
+  xlog("");
+  isCapturePhoto_hik = true;
 }
 
 void GigE_ThreadStreaming_Hik() {

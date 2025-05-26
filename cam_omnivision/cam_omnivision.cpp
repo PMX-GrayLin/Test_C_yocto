@@ -33,6 +33,14 @@ static GMainLoop *gst_loop = nullptr;
 
 namespace fs = std::filesystem;
 
+void CIS_handle_RESTful(std::vector<std::string> segments) {
+  if (isSameString(segments[1].c_str(), "start")) {
+    AICamera_streamingStart();
+  } else if (isSameString(segments[1].c_str(), "stop")) {
+    AICamera_streamingStop();
+  }
+}
+
 bool AICamrea_isUseCISCamera() {
   if (isPathExist(AICamreaCISPath)) {
     xlog("path /dev/csi_cam_preview exist");

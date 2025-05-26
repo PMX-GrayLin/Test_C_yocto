@@ -62,14 +62,11 @@ void handle_RESTful(std::vector<std::string> segments) {
       AICamera_setDIOOut(segments[1], segments[3]);
     }
 
-#if defined(ENABLE_Gige)
+#if defined(ENABLE_CIS)
 
   } else if (isSameString(segments[0].c_str(), "gst")) {
-    if (isSameString(segments[1].c_str(), "start")) {
-      AICamera_streamingStart();
-    } else if (isSameString(segments[1].c_str(), "stop")) {
-      AICamera_streamingStop();
-    }
+    
+    CIS_handle_RESTful(segments);
 
 #endif
 
@@ -80,24 +77,24 @@ void handle_RESTful(std::vector<std::string> segments) {
 
 #endif
 
-  // } else if (isSameString(segments[0].c_str(), "tp")) {
-  //   xlog("take picture");
-  //   std::string path = "";
-  //   if (segments.size() > 1 && !segments[1].empty()) {
-  //     path = segments[1];
-  //     const std::string from = "%2F";
-  //     const std::string to = "/";
-  //     size_t start_pos = 0;
-  //     while ((start_pos = path.find(from, start_pos)) != std::string::npos) {
-  //       path.replace(start_pos, from.length(), to);
-  //       start_pos += to.length();
-  //     }
+  } else if (isSameString(segments[0].c_str(), "tp")) {
+    xlog("take picture");
+    std::string path = "";
+    if (segments.size() > 1 && !segments[1].empty()) {
+      path = segments[1];
+      const std::string from = "%2F";
+      const std::string to = "/";
+      size_t start_pos = 0;
+      while ((start_pos = path.find(from, start_pos)) != std::string::npos) {
+        path.replace(start_pos, from.length(), to);
+        start_pos += to.length();
+      }
 
-  //   } else {
-  //     path = "/home/root/primax/fw_" + getTimeString() + ".png";
-  //   }
-  //   AICamera_setImagePath(path.c_str());
-  //   AICamera_captureImage();
+    } else {
+      path = "/home/root/primax/fw_" + getTimeString() + ".png";
+    }
+    AICamera_setImagePath(path.c_str());
+    AICamera_captureImage();
 
 #if defined(ENABLE_TestCode)
 
