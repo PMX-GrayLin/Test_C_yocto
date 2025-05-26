@@ -36,7 +36,7 @@ void AICamera_writePWMFile(const std::string &path, const std::string &value) {
       fs << value;
       fs.close();
   } else {
-    xlog("Failed to write to %s", path);
+    xlog("Failed to write to %s", path.c_str());
   }
 }
 
