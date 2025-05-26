@@ -1,8 +1,5 @@
 #include "cam_gige_hikrobot.hpp"
 
-// ?? temp
-#include "cam_omnivision.hpp"
-
 #include <gst/gst.h>
 
 // apply only used header
