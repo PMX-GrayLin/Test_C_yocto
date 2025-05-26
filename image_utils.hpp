@@ -11,3 +11,4 @@
 
 extern void saveImage(GstCaps *caps, GstMapInfo map, string filePathName);
 extern void saveCropedImage(GstCaps *caps, GstMapInfo map, string filePathName, cv::Rect roi);
+extern void saveCropedImage(std::string inputFilePathName, string outputFilePathName, cv::Rect roi, bool isPadding = false);
