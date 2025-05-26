@@ -4,7 +4,7 @@ APP_NAME=test
 
 # add define to enable/disable functions
 ENABLE_Gige ?= 1
-ENABLE_CIS ?= 1
+ENABLE_CIS ?= 0
 ENABLE_OST = 0
 ENABLE_TestCode = 0
 
