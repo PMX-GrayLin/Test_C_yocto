@@ -60,6 +60,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     xlog("take picture");
     std::string path = "";
     if (segments.size() > 2 && !segments[2].empty()) {
+      //ex: curl http://localhost:8765/fw/gige/tp/%252Fhome%252Froot%252Fprimax%252F12345.png
       path = segments[2];
       const std::string from = "%2F";
       const std::string to = "/";

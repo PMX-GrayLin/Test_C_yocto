@@ -77,25 +77,6 @@ void handle_RESTful(std::vector<std::string> segments) {
 
 #endif
 
-  // } else if (isSameString(segments[0].c_str(), "tp")) {
-  //   xlog("take picture");
-  //   std::string path = "";
-  //   if (segments.size() > 1 && !segments[1].empty()) {
-  //     path = segments[1];
-  //     const std::string from = "%2F";
-  //     const std::string to = "/";
-  //     size_t start_pos = 0;
-  //     while ((start_pos = path.find(from, start_pos)) != std::string::npos) {
-  //       path.replace(start_pos, from.length(), to);
-  //       start_pos += to.length();
-  //     }
-
-  //   } else {
-  //     path = "/home/root/primax/fw_" + getTimeString() + ".png";
-  //   }
-  //   AICamera_setImagePath(path.c_str());
-  //   AICamera_captureImage();
-
 #if defined(ENABLE_TestCode)
 
   } else if (isSameString(segments[0].c_str(), "gstt")) {

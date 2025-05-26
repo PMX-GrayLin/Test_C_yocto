@@ -38,6 +38,26 @@ void CIS_handle_RESTful(std::vector<std::string> segments) {
     AICamera_streamingStart();
   } else if (isSameString(segments[1].c_str(), "stop")) {
     AICamera_streamingStop();
+
+  } else if (isSameString(segments[1].c_str(), "tp")) {
+    xlog("take picture");
+    std::string path = "";
+    if (segments.size() > 2 && !segments[2].empty()) {
+      //ex: curl http://localhost:8765/fw/gige/tp/%252Fhome%252Froot%252Fprimax%252F12345.png
+      path = segments[2];
+      const std::string from = "%2F";
+      const std::string to = "/";
+      size_t start_pos = 0;
+      while ((start_pos = path.find(from, start_pos)) != std::string::npos) {
+        path.replace(start_pos, from.length(), to);
+        start_pos += to.length();
+      }
+
+    } else {
+      path = "/home/root/primax/fw_" + getTimeString() + ".png";
+    }
+    AICamera_setImagePath(path.c_str());
+    AICamera_captureImage();
   }
 }
 
