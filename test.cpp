@@ -83,7 +83,13 @@ void handle_RESTful(std::vector<std::string> segments) {
     int testCase = std::stoi(segments[1]);
     test_gst(testCase);
 #endif
+
+  } else if (isSameString(segments[0].c_str(), "cmd")) {
+    hostname
+    exec_command("hostname");
+
   }
+
 }
 
 bool isMQTTRunning = false;
