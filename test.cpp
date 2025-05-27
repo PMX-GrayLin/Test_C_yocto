@@ -53,7 +53,7 @@ void handle_RESTful(std::vector<std::string> segments) {
     }
 
   } else if (isSameString(segments[0].c_str(), "pwm")) {
-    AICamera_setPWM(segments[1]);
+    AICamera_setPWM(segments[1], segments[2]);
 
   } else if (isSameString(segments[0].c_str(), "dio")) {
     if (isSameString(segments[2].c_str(), "set")) {
