@@ -85,7 +85,6 @@ void handle_RESTful(std::vector<std::string> segments) {
 #endif
 
   } else if (isSameString(segments[0].c_str(), "cmd")) {
-    hostname
     exec_command("hostname");
 
   }
