@@ -66,7 +66,7 @@ typedef enum {
 
 // PWM 
 void AICamera_writePWMFile(const std::string &path, const std::string &value);
-extern void AICamera_setPWM(string sPercent);
+extern void AICamera_setPWM(const std::string &pwmIndex, const std::string &sPercent);
 
 // led
 void AICamera_setGPIO(int gpio_num, int value);

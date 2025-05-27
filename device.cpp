@@ -40,24 +40,45 @@ void AICamera_writePWMFile(const std::string &path, const std::string &value) {
   }
 }
 
-void AICamera_setPWM(string sPercent) {
-  if (!isPathExist(pwmTarget.c_str())) {
-    xlog("PWM init...");
-    AICamera_writePWMFile(path_pwmExport, "1");
+// void AICamera_setPWM(string sPercent) {
+//   if (!isPathExist(pwmTarget.c_str())) {
+//     xlog("PWM init...");
+//     AICamera_writePWMFile(path_pwmExport, "1");
+//     usleep(500000);  // sleep 0.5s
+//     AICamera_writePWMFile(pwmTarget + "/period", std::to_string(pwmPeriod));
+//   }
+
+//   int percent = std::stoi(sPercent);
+//   if (percent != 0)
+//   {
+//     int duty_cycle = pwmPeriod * percent / 100;
+//     AICamera_writePWMFile(pwmTarget + "/duty_cycle", std::to_string(duty_cycle));
+//     AICamera_writePWMFile(pwmTarget + "/enable", "1");
+//   } else {
+//     AICamera_writePWMFile(pwmTarget + "/enable", "0");
+//   }
+// }
+
+void AICamera_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
+  std::string pwmTarget = path_pwm + "/pwm" + pwmIndex;
+  std::string path_pwmExport = path_pwm + "/export";
+
+  // Export the PWM channel if not already present
+  if (!isPathExist(pwmTarget)) {
+    xlog("PWM init... pwm" + pwmIndex);
+    AICamera_writePWMFile(path_pwmExport, pwmIndex);
     usleep(500000);  // sleep 0.5s
     AICamera_writePWMFile(pwmTarget + "/period", std::to_string(pwmPeriod));
   }
 
   int percent = std::stoi(sPercent);
-  if (percent != 0)
-  {
+  if (percent != 0) {
     int duty_cycle = pwmPeriod * percent / 100;
     AICamera_writePWMFile(pwmTarget + "/duty_cycle", std::to_string(duty_cycle));
     AICamera_writePWMFile(pwmTarget + "/enable", "1");
   } else {
     AICamera_writePWMFile(pwmTarget + "/enable", "0");
   }
-
 }
 
 void AICamera_setGPIO(int gpio_num, int value) {
