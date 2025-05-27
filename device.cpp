@@ -65,7 +65,7 @@ void AICamera_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
 
   // Export the PWM channel if not already present
   if (!isPathExist(pwmTarget)) {
-    xlog("PWM init... pwm%s", pwmIndex);
+    xlog("PWM init... pwm%s", pwmIndex.c_str());
     AICamera_writePWMFile(path_pwmExport, pwmIndex);
     usleep(500000);  // sleep 0.5s
     AICamera_writePWMFile(pwmTarget + "/period", std::to_string(pwmPeriod));
