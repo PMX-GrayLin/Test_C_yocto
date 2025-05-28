@@ -62,7 +62,7 @@ void AICamera_writePWMFile(const std::string &path, const std::string &value) {
 void AICamera_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
   std::string pwmTarget = path_pwm + "/pwm" + pwmIndex;
   std::string path_pwmExport = path_pwm + "/export";
-  xlog("pwmTarget:%s, percent:%s", pwmTarget.c_str(), sPercent);
+  xlog("pwmTarget:%s, percent:%s", pwmTarget.c_str(), sPercent.c_str());
 
   // Export the PWM channel if not already present
   if (!isPathExist(pwmTarget.c_str())) {
