@@ -60,14 +60,26 @@ void AICamera_writePWMFile(const std::string &path, const std::string &value) {
 // }
 
 void AICamera_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
-  std::string pwmTarget = path_pwm + "/pwm" + pwmIndex;
+  // actual is pwm0 & pwm1
+  // Map logical index to actual hardware index
+  std::string actualPwmIndex;
+  if (pwmIndex == "1") {
+    actualPwmIndex = "0";
+  } else if (pwmIndex == "2") {
+    actualPwmIndex = "1";
+  } else {
+    xlog("Invalid pwmIndex: %s", pwmIndex.c_str());
+    return;
+  }
+
+  std::string pwmTarget = path_pwm + "/pwm" + actualPwmIndex;
   std::string path_pwmExport = path_pwm + "/export";
   xlog("pwmTarget:%s, percent:%s", pwmTarget.c_str(), sPercent.c_str());
 
   // Export the PWM channel if not already present
   if (!isPathExist(pwmTarget.c_str())) {
-    xlog("PWM init... pwm%s", pwmIndex.c_str());
-    AICamera_writePWMFile(path_pwmExport, pwmIndex);
+    xlog("PWM init... pwm%s", actualPwmIndex.c_str());
+    AICamera_writePWMFile(path_pwmExport, actualPwmIndex);
     usleep(500000);  // sleep 0.5s
     AICamera_writePWMFile(pwmTarget + "/period", std::to_string(pwmPeriod));
   }
