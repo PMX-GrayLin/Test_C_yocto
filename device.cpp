@@ -30,8 +30,11 @@ DIO_Direction dioDirection[NUM_DIO] = {diod_in};
 std::thread t_aicamera_monitorDIO[NUM_DIO];
 bool isMonitorDIO[NUM_DIO] = {false};
 
+void FW_getProduct() {
+  product = exec_command("fw_printenv | grep '^product=' | cut -d '=' -f2");
+}
 
-void AICamera_writePWMFile(const std::string &path, const std::string &value) {
+void FW_writePWMFile(const std::string &path, const std::string &value) {
   std::ofstream fs(path);
   if (fs) {
       fs << value;
@@ -41,26 +44,7 @@ void AICamera_writePWMFile(const std::string &path, const std::string &value) {
   }
 }
 
-// void AICamera_setPWM(string sPercent) {
-//   if (!isPathExist(pwmTarget.c_str())) {
-//     xlog("PWM init...");
-//     AICamera_writePWMFile(path_pwmExport, "1");
-//     usleep(500000);  // sleep 0.5s
-//     AICamera_writePWMFile(pwmTarget + "/period", std::to_string(pwmPeriod));
-//   }
-
-//   int percent = std::stoi(sPercent);
-//   if (percent != 0)
-//   {
-//     int duty_cycle = pwmPeriod * percent / 100;
-//     AICamera_writePWMFile(pwmTarget + "/duty_cycle", std::to_string(duty_cycle));
-//     AICamera_writePWMFile(pwmTarget + "/enable", "1");
-//   } else {
-//     AICamera_writePWMFile(pwmTarget + "/enable", "0");
-//   }
-// }
-
-void AICamera_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
+void FW_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
   // actual is pwm0 & pwm1
   // Map logical index to actual hardware index
   std::string actualPwmIndex;
@@ -80,23 +64,24 @@ void AICamera_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
   // Export the PWM channel if not already present
   if (!isPathExist(pwmTarget.c_str())) {
     xlog("PWM init... pwm%s", actualPwmIndex.c_str());
-    AICamera_writePWMFile(path_pwmExport, actualPwmIndex);
+    FW_writePWMFile(path_pwmExport, actualPwmIndex);
     usleep(500000);  // sleep 0.5s
-    AICamera_writePWMFile(pwmTarget + "/period", std::to_string(pwmPeriod));
+    FW_writePWMFile(pwmTarget + "/period", std::to_string(pwmPeriod));
   }
 
   int percent = std::stoi(sPercent);
   if (percent != 0) {
     int duty_cycle = pwmPeriod * percent / 100;
-    AICamera_writePWMFile(pwmTarget + "/duty_cycle", std::to_string(duty_cycle));
-    AICamera_writePWMFile(pwmTarget + "/enable", "1");
+    FW_writePWMFile(pwmTarget + "/duty_cycle", std::to_string(duty_cycle));
+    FW_writePWMFile(pwmTarget + "/enable", "1");
   } else {
-    AICamera_writePWMFile(pwmTarget + "/enable", "0");
+    FW_writePWMFile(pwmTarget + "/enable", "0");
   }
 }
 
-void AICamera_setGPIO(int gpio_num, int value) {
+void FW_setGPIO(int gpio_num, int value) {
   // xlog("gpiod version:%s", gpiod_version_string());
+  xlog("gpio:%d, value:%d", gpio_num, value);
 
   gpiod_chip *chip;
   gpiod_line *line;
@@ -133,7 +118,7 @@ void AICamera_setGPIO(int gpio_num, int value) {
   gpiod_chip_close(chip);
 }
 
-void AICamera_setLED(string led_index, string led_color) {
+void FW_setLED(string led_index, string led_color) {
   int gpio_index1 = 0;
   int gpio_index2 = 0;
 
@@ -155,17 +140,17 @@ void AICamera_setLED(string led_index, string led_color) {
   }
 
   if (isSameString(led_color.c_str(), "red")) {
-    AICamera_setGPIO(gpio_index1, 1);
-    AICamera_setGPIO(gpio_index2, 0);
+    FW_setGPIO(gpio_index1, 1);
+    FW_setGPIO(gpio_index2, 0);
   } else if (isSameString(led_color.c_str(), "green")) {
-    AICamera_setGPIO(gpio_index1, 0);
-    AICamera_setGPIO(gpio_index2, 1);;
+    FW_setGPIO(gpio_index1, 0);
+    FW_setGPIO(gpio_index2, 1);;
   } else if (isSameString(led_color.c_str(), "orange")) {
-    AICamera_setGPIO(gpio_index1, 1);
-    AICamera_setGPIO(gpio_index2, 1);
+    FW_setGPIO(gpio_index1, 1);
+    FW_setGPIO(gpio_index2, 1);
   } else if (isSameString(led_color.c_str(), "off")) {
-    AICamera_setGPIO(gpio_index1, 0);
-    AICamera_setGPIO(gpio_index2, 0);
+    FW_setGPIO(gpio_index1, 0);
+    FW_setGPIO(gpio_index2, 0);
   }
 }
 
@@ -348,7 +333,7 @@ void AICamera_setDO(string index_do, string on_off) {
     return;
   }
 
-  AICamera_setGPIO(index_gpio, isON ? 1 : 0);
+  FW_setGPIO(index_gpio, isON ? 1 : 0);
 }
 
 void ThreadAICameraMonitorDIOIn(int index_dio) {
@@ -451,7 +436,7 @@ void AICamera_setDIODirection(string index_dio, string di_do) {
     dioDirection[index - 1] = diod_in;
 
     // make gpio out low
-    AICamera_setGPIO(index_gpio_out, 0);
+    FW_setGPIO(index_gpio_out, 0);
 
     // start monitor gpio input
     AICamera_MonitorDIOInStart(index - 1);
@@ -495,6 +480,6 @@ void AICamera_setDIOOut(string index_dio, string on_off) {
     return;
   }
 
-  AICamera_setGPIO(index_gpio, isON ? 1 : 0);
+  FW_setGPIO(index_gpio, isON ? 1 : 0);
 }
 

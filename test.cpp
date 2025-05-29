@@ -30,7 +30,7 @@
 void handle_RESTful(std::vector<std::string> segments) {
   if (isSameString(segments[0].c_str(), "led")) {
     if (segments.size() == 3) {
-      AICamera_setLED(segments[1], segments[2]);
+      FW_setLED(segments[1], segments[2]);
     } else {
       xlog("param may missing...");
     }
@@ -53,7 +53,7 @@ void handle_RESTful(std::vector<std::string> segments) {
     }
 
   } else if (isSameString(segments[0].c_str(), "pwm")) {
-    AICamera_setPWM(segments[1], segments[2]);
+    FW_setPWM(segments[1], segments[2]);
 
   } else if (isSameString(segments[0].c_str(), "dio")) {
     if (isSameString(segments[2].c_str(), "set")) {
@@ -61,6 +61,11 @@ void handle_RESTful(std::vector<std::string> segments) {
     } else if (isSameString(segments[2].c_str(), "do")) {
       AICamera_setDIOOut(segments[1], segments[3]);
     }
+
+  } else if (isSameString(segments[0].c_str(), "gpio")) {
+    int gpio_num = stoi(segments[1]);
+    int gpio_vaue = (segments[2] == "1") ? 1 : 0 ;
+    FW_setGPIO(gpio_num, gpio_vaue);
 
 #if defined(ENABLE_CIS)
 

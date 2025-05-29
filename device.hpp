@@ -65,13 +65,16 @@ typedef enum {
 
 extern std::string product;
 
+void FW_getProduct();
+
 // PWM 
-void AICamera_writePWMFile(const std::string &path, const std::string &value);
-extern void AICamera_setPWM(const std::string &pwmIndex, const std::string &sPercent);
+void FW_writePWMFile(const std::string &path, const std::string &value);
+extern void FW_setPWM(const std::string &pwmIndex, const std::string &sPercent);
+
+void FW_setGPIO(int gpio_num, int value);
 
 // led
-void AICamera_setGPIO(int gpio_num, int value);
-void AICamera_setLED(string led_index, string led_color);
+void FW_setLED(string led_index, string led_color);
 
 // DI
 void ThreadAICameraMonitorDI();
