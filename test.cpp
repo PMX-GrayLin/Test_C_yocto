@@ -85,10 +85,15 @@ void handle_RESTful(std::vector<std::string> segments) {
 #endif
 
   } else if (isSameString(segments[0].c_str(), "cmd")) {
-    exec_command("hostname");
+    exec_command(segments[1]);
 
+  } else if (isSameString(segments[0].c_str(), "info")) {
+    // some information functions
+
+  } else if (isSameString(segments[0].c_str(), "tf")) {
+    // test functions
+    xlog("time:%s", getTimeString().c_str());
   }
-
 }
 
 bool isMQTTRunning = false;
