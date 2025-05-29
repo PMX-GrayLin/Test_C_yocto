@@ -3,6 +3,9 @@
 #include <fstream>
 #include <gpiod.h>
 
+// ai_camera_plus or vision_hub_plus 
+std::string product = "ai_camera_plus"
+
 // PWM
 const std::string path_pwm = "/sys/devices/platform/soc/10048000.pwm/pwm/pwmchip0";
 const std::string pwmTarget = path_pwm + "/pwm1";

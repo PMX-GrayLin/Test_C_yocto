@@ -63,6 +63,7 @@ typedef enum {
   diodogp_4 = 5,
 } DIO_DO_GPIO_PIN;
 
+extern std::string product;
 
 // PWM 
 void AICamera_writePWMFile(const std::string &path, const std::string &value);

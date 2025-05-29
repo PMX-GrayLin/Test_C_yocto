@@ -92,7 +92,11 @@ void handle_RESTful(std::vector<std::string> segments) {
 
   } else if (isSameString(segments[0].c_str(), "tf")) {
     // test functions
-    xlog("time:%s", getTimeString().c_str());
+
+    // xlog("time:%s", getTimeString().c_str());
+    
+    product = exec_command("fw_printenv | grep '^product=' | cut -d '=' -f2");
+    xlog("product:%s", product.c_str());
   }
 }
 
