@@ -1,6 +1,7 @@
 #pragma once
 
 #include "global.hpp"
+#include <poll.h>
 
 #define GPIO_CHIP       "/dev/gpiochip0"
 #define NUM_DI          2                 // Number of DI
