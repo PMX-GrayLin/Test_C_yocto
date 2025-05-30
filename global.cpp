@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <sys/stat.h>
 
 // POSIX header
 #include <libgen.h>
