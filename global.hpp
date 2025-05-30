@@ -8,9 +8,8 @@
 // C headers
 #include <stdlib.h>
 #include <stdio.h>
-// #include <assert.h>
 #include <unistd.h>
-#include <sys/stat.h>
+// #include <sys/stat.h>
 #include <poll.h>
 
 // C++ Standard Library headers 
