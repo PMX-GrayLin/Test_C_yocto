@@ -17,9 +17,9 @@
 #include <string>
 #include <cstring>
 
-// C++ Standard Library headers, heavy
+// C++ Standard Library headers, heavier
 #include <thread>
-#include <chrono>
+// #include <chrono>
 
 
 #define DEBUGX
