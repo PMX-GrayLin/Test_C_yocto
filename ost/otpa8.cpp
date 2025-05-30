@@ -144,10 +144,6 @@ bool OTPA8::readTemperature_max(float& ambientTemp, float& objectTemp) {
   // printf("multipler:%.2f", multipler);
   // printf("\n\n");
 
-  // check
-  // printArray_float(tempArray, 64);
-  // printArray_forUI(tempArray, 64);
-
   // Log the results
   // printf("ambientTemp: %.2f, maxTemp: %.2f, multipler:%.2f, originTemp:%.2f\n", ambientTemp, objectTemp, multipler, tempMax);
   // xlog("ambientTemp: %.2f, objectTemp: %.2f", ambientTemp, objectTemp);
@@ -212,10 +208,6 @@ bool OTPA8::readTemperature_array(float& ambientTemp, float* objectTemp) {
   // printf("\n\n");
   // printf("multipler:%.2f", multipler);
   // printf("\n\n");
-
-  // check
-  // printArray_float(tempArray, 64);
-  // printArray_forUI(tempArray, 64);
 
   // Log the results
   // printf("ambientTemp: %.2f, maxTemp: %.2f, multipler:%.2f, originTemp:%.2f\n", ambientTemp, objectTemp, multipler, tempMax);

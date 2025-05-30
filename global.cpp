@@ -47,26 +47,6 @@ void printBuffer(const uint8_t* buffer, size_t len) {
   printf("\n\r");
 }
 
-void printArray_float(const float* buffer, size_t len) {
-  printf("len:%ld: ", len);
-  for (size_t i = 0; i < len; i++) {
-    printf("%.3f ", buffer[i]);
-  }
-  printf("\n\r");
-}
-
-void printArray_forUI(const float* buffer, size_t len) {
-  // printf("len:%d: ", len);
-  printf("\033[3J\033[H\033[2J");
-  for (size_t i = 0; i < len; i++) {
-    if (i % 8 == 0) {
-      printf("\n\n");
-    }
-    printf("%.3f \t", buffer[i]);
-  }
-  printf("\n\n\r");
-}
-
 bool isSameString(const char* s1, const char* s2, bool isCaseSensitive) {
   if (s1 == nullptr || s2 == nullptr) {
     return false;
