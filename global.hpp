@@ -28,16 +28,16 @@ using namespace std;
 
 extern int testCounter;
 
-extern void startTimer(int ms);
-extern void stopTimer();
+void startTimer(int ms);
+void stopTimer();
 
-extern void printBuffer(const uint8_t* buffer, size_t len);
+void printBuffer(const uint8_t* buffer, size_t len);
 
 bool isSameString(const char* s1, const char* s2, bool isCaseSensitive = false);
 bool isPathExist(const char* path);
+
 double limitValueInRange(double input, double rangeMin, double rangeMax);
 
 std::string getTimeString();
-
 std::string get_parent_directory(const std::string& path);
 std::string exec_command(const std::string& cmd);
