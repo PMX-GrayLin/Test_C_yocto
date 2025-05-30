@@ -154,7 +154,7 @@ void FW_setLED(string led_index, string led_color) {
   }
 }
 
-void ThreadAICameraMonitorDI() {
+void Thread_FWMonitorDI() {
   struct gpiod_chip *chip;
   struct gpiod_line *lines[NUM_DI];
   struct pollfd fds[NUM_DI];
@@ -219,21 +219,21 @@ void ThreadAICameraMonitorDI() {
   gpiod_chip_close(chip);
 }
 
-void AICamera_MonitorDIStart() {
+void FW_MonitorDIStart() {
   xlog("");
   if (isMonitorDI) {
     xlog("thread already running");
     return;
   }
   isMonitorDI = true;
-  t_aicamera_monitorDI = std::thread(ThreadAICameraMonitorDI);  
+  t_aicamera_monitorDI = std::thread(Thread_FWMonitorDI);  
   t_aicamera_monitorDI.detach();
 }
-void AICamera_MonitorDIStop() {
+void FW_MonitorDIStop() {
   isMonitorDI = false;
 }
 
-void ThreadAICameraMonitorTriger() {
+void Thread_FWMonitorTriger() {
   struct gpiod_chip *chip;
   struct gpiod_line *lines[NUM_Triger];
   struct pollfd fds[NUM_Triger];
@@ -298,21 +298,21 @@ void ThreadAICameraMonitorTriger() {
   gpiod_chip_close(chip);
 }
 
-void AICamera_MonitorTrigerStart() {
+void FW_MonitorTrigerStart() {
   xlog("");
   if (isMonitorTriger) {
     xlog("thread already running");
     return;
   }
   isMonitorTriger = true;
-  t_aicamera_monitorTriger = std::thread(ThreadAICameraMonitorTriger);  
+  t_aicamera_monitorTriger = std::thread(Thread_FWMonitorTriger);  
   t_aicamera_monitorTriger.detach();
 }
-void AICamera_MonitorTrigerStop() {
+void FW_MonitorTrigerStop() {
   isMonitorTriger = false;
 }
 
-void AICamera_setDO(string index_do, string on_off) {
+void FW_setDO(string index_do, string on_off) {
   int index_gpio = 0;
   bool isON = false;
 
@@ -336,7 +336,7 @@ void AICamera_setDO(string index_do, string on_off) {
   FW_setGPIO(index_gpio, isON ? 1 : 0);
 }
 
-void ThreadAICameraMonitorDIOIn(int index_dio) {
+void Thread_FWMonitorDIOIn(int index_dio) {
 
   struct gpiod_chip *chip;
   struct gpiod_line *line;
@@ -402,22 +402,22 @@ void ThreadAICameraMonitorDIOIn(int index_dio) {
   gpiod_chip_close(chip);
 }
 
-void AICamera_MonitorDIOInStart(int index_dio) {
+void FW_MonitorDIOInStart(int index_dio) {
   xlog("");
   if (isMonitorDIO[index_dio]) {
     xlog("thread already running");
     return;
   }
   isMonitorDIO[index_dio] = true;
-  t_aicamera_monitorDIO[index_dio] = std::thread(ThreadAICameraMonitorDIOIn, index_dio);  
+  t_aicamera_monitorDIO[index_dio] = std::thread(Thread_FWMonitorDIOIn, index_dio);  
   t_aicamera_monitorDIO[index_dio].detach();
 }
 
-void AICamera_MonitorDIOInStop(int index_dio) {
+void FW_MonitorDIOInStop(int index_dio) {
   isMonitorDIO[index_dio] = false;
 }
 
-void AICamera_setDIODirection(string index_dio, string di_do) {
+void FW_setDIODirection(string index_dio, string di_do) {
   xlog("index:%s, direction:%s", index_dio.c_str(), di_do.c_str());
   int index_gpio_in = 0;
   int index_gpio_out = 0;
@@ -439,14 +439,14 @@ void AICamera_setDIODirection(string index_dio, string di_do) {
     FW_setGPIO(index_gpio_out, 0);
 
     // start monitor gpio input
-    AICamera_MonitorDIOInStart(index - 1);
+    FW_MonitorDIOInStart(index - 1);
 
   } else if (isSameString(di_do.c_str(), "do")) {
     // set flag
     dioDirection[index - 1] = diod_out;
 
     // stop monitor gpio input
-    AICamera_MonitorDIOInStop(index - 1);
+    FW_MonitorDIOInStop(index - 1);
 
   } else {
     xlog("input string should be di or do...");
@@ -454,7 +454,7 @@ void AICamera_setDIODirection(string index_dio, string di_do) {
   }
 }
 
-void AICamera_setDIOOut(string index_dio, string on_off) {
+void FW_setDIOOut(string index_dio, string on_off) {
   int index_gpio = 0;
   bool isON = false;
   int index = std::stoi(index_dio);

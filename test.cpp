@@ -36,20 +36,20 @@ void handle_RESTful(std::vector<std::string> segments) {
     }
 
   } else if (isSameString(segments[0].c_str(), "do")) {
-    AICamera_setDO(segments[1], segments[2]);
+    FW_setDO(segments[1], segments[2]);
 
   } else if (isSameString(segments[0].c_str(), "di")) {
     if (isSameString(segments[1].c_str(), "on")) {
-      AICamera_MonitorDIStart();
+      FW_MonitorDIStart();
     } else if (isSameString(segments[1].c_str(), "off")) {
-      AICamera_MonitorDIStop();
+      FW_MonitorDIStop();
     }
 
   } else if (isSameString(segments[0].c_str(), "triger")) {
     if (isSameString(segments[1].c_str(), "on")) {
-      AICamera_MonitorTrigerStart();
+      FW_MonitorTrigerStart();
     } else if (isSameString(segments[1].c_str(), "off")) {
-      AICamera_MonitorTrigerStop();
+      FW_MonitorTrigerStop();
     }
 
   } else if (isSameString(segments[0].c_str(), "pwm")) {
@@ -57,9 +57,9 @@ void handle_RESTful(std::vector<std::string> segments) {
 
   } else if (isSameString(segments[0].c_str(), "dio")) {
     if (isSameString(segments[2].c_str(), "set")) {
-      AICamera_setDIODirection(segments[1], segments[3]);
+      FW_setDIODirection(segments[1], segments[3]);
     } else if (isSameString(segments[2].c_str(), "do")) {
-      AICamera_setDIOOut(segments[1], segments[3]);
+      FW_setDIOOut(segments[1], segments[3]);
     }
 
   } else if (isSameString(segments[0].c_str(), "gpio")) {
@@ -87,6 +87,7 @@ void handle_RESTful(std::vector<std::string> segments) {
   } else if (isSameString(segments[0].c_str(), "gstt")) {
     int testCase = std::stoi(segments[1]);
     test_gst(testCase);
+    
 #endif
 
   } else if (isSameString(segments[0].c_str(), "cmd")) {

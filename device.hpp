@@ -77,22 +77,22 @@ void FW_setGPIO(int gpio_num, int value);
 void FW_setLED(string led_index, string led_color);
 
 // DI
-void ThreadAICameraMonitorDI();
-extern void AICamera_MonitorDIStart();
-extern void AICamera_MonitorDIStop();
+void Thread_FWMonitorDI();
+extern void FW_MonitorDIStart();
+extern void FW_MonitorDIStop();
 
 // Triger
-void ThreadAICameraMonitorTriger();
-extern void AICamera_MonitorTrigerStart();
-extern void AICamera_MonitorTrigerStop();
+void Thread_FWMonitorTriger();
+extern void FW_MonitorTrigerStart();
+extern void FW_MonitorTrigerStop();
 
 // DO
-extern void AICamera_setDO(string index_do, string on_off);
+extern void FW_setDO(string index_do, string on_off);
 
 // DIO
-void ThreadAICameraMonitorDIOIn(int index_dio);
-extern void AICamera_MonitorDIOInStart(int index_dio);
-extern void AICamera_MonitorDIOInStop(int index_dio);
-extern void AICamera_setDIODirection(string index_dio, string di_do);
-extern void AICamera_setDIOOut(string index_dio, string on_off);
+void Thread_FWMonitorDIOIn(int index_dio);
+extern void FW_MonitorDIOInStart(int index_dio);
+extern void FW_MonitorDIOInStop(int index_dio);
+extern void FW_setDIODirection(string index_dio, string di_do);
+extern void FW_setDIOOut(string index_dio, string on_off);
 
