@@ -26,10 +26,6 @@ using namespace std;
 #define xlog(fmt, ...) printf("%s:%d, " fmt "\n\r", __func__, __LINE__, ##__VA_ARGS__)
 #endif
 
-inline void xlog(const std::string& msg) {
-    printf("%s:%d, %s\n\r", __func__, __LINE__, msg.c_str());
-}
-
 extern int testCounter;
 
 void startTimer(int ms);
