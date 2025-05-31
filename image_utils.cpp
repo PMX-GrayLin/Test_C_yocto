@@ -1,6 +1,6 @@
 #include "image_utils.hpp"
 
-#include "global.hpp"
+#include <gst/gst.h>
 
 // apply only used header
 #include <opencv2/core.hpp>

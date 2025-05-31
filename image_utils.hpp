@@ -1,6 +1,6 @@
 #pragma once
 
-#include <gst/gst.h>
+#include "global.hpp"
 
 struct SimpleRect {
     int x;
