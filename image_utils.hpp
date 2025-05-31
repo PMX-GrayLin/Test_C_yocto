@@ -2,13 +2,6 @@
 
 #include <gst/gst.h>
 
-#include "global.hpp"
-
-// apply only used header
-#include <opencv2/core.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/imgproc.hpp>
-
 struct SimpleRect {
     int x;
     int y;
