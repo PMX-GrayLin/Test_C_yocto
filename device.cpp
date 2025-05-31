@@ -139,16 +139,16 @@ void FW_setLED(string led_index, string led_color) {
     gpio_index2 = ledgp_5_green;  
   }
 
-  if (isSameString(led_color.c_str(), "red")) {
+  if (isSameString(led_color, "red")) {
     FW_setGPIO(gpio_index1, 1);
     FW_setGPIO(gpio_index2, 0);
-  } else if (isSameString(led_color.c_str(), "green")) {
+  } else if (isSameString(led_color, "green")) {
     FW_setGPIO(gpio_index1, 0);
     FW_setGPIO(gpio_index2, 1);;
-  } else if (isSameString(led_color.c_str(), "orange")) {
+  } else if (isSameString(led_color, "orange")) {
     FW_setGPIO(gpio_index1, 1);
     FW_setGPIO(gpio_index2, 1);
-  } else if (isSameString(led_color.c_str(), "off")) {
+  } else if (isSameString(led_color, "off")) {
     FW_setGPIO(gpio_index1, 0);
     FW_setGPIO(gpio_index2, 0);
   }
