@@ -7,10 +7,6 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
-// void imgu_saveImage(void *v_caps, void *v_map, const std::string &filePathName) {
-  // GstCaps *caps = static_cast<GstCaps *>(v_caps);
-  // GstMapInfo *map = static_cast<GstMapInfo *>(v_map);
-
 void imgu_saveImage(void *v_pad /* GstPad* */, void *v_info /* GstPadProbeInfo */, const std::string &filePathName) {
   GstPad *pad = static_cast<GstPad *>(v_pad);
   GstPadProbeInfo *info = static_cast<GstPadProbeInfo *>(v_info);
@@ -92,65 +88,34 @@ void imgu_saveImage_thread(void *v_pad, void *v_info, const std::string &filePat
   GstPad *pad = static_cast<GstPad *>(v_pad);
   GstPadProbeInfo *info = static_cast<GstPadProbeInfo *>(v_info);
 
+  // Get the buffer from the probe info
   GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
   if (!buffer) {
-    xlog("imgu_saveImage_thread: buffer is null");
+    xlog("No buffer in probe info");
     return;
   }
 
-  // Copy the buffer data (map)
-  GstMapInfo map;
-  if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-    xlog("imgu_saveImage_thread: failed to map buffer");
+  // Deep copy the buffer so it can be safely used in a detached thread
+  GstBuffer *copied_buffer = gst_buffer_copy_deep(buffer);
+  if (!copied_buffer) {
+    xlog("Failed to copy buffer");
     return;
   }
 
-  // Allocate and copy buffer data
-  guint8 *copied_data = (guint8 *)malloc(map.size);
-  if (!copied_data) {
-    xlog("imgu_saveImage_thread: malloc failed");
-    gst_buffer_unmap(buffer, &map);
-    return;
-  }
-  memcpy(copied_data, map.data, map.size);
-  gst_buffer_unmap(buffer, &map);
+  // Launch thread using copied buffer and pad
+  std::thread([pad, copied_buffer, filePathName]() {
+    // Create a temporary GstPadProbeInfo-like struct
+    GstPadProbeInfo fake_info = {};
+    GST_PAD_PROBE_INFO_DATA(&fake_info) = copied_buffer;
 
-  // Create dummy info with copied data (only what imgu_saveImage needs)
-  struct ThreadProbeInfo {
-    GstMapInfo map;
-    ~ThreadProbeInfo() {
-      if (map.data) free(map.data);
-    }
-  };
+    // Use fake_info to call the image save function
+    imgu_saveImage((void *)pad, (void *)&fake_info, filePathName);
 
-  auto *thread_info = new ThreadProbeInfo();
-  thread_info->map.memory = nullptr;  // optional
-  thread_info->map.size = map.size;
-  thread_info->map.data = copied_data;
-
-  // Launch the thread
-  std::thread([pad, thread_info, filePathName]() {
-    imgu_saveImage((void *)pad, (void *)&(thread_info->map), filePathName);
-    delete thread_info;  // free copied data here
+    // Cleanup
+    gst_buffer_unref(copied_buffer);
   }).detach();
 }
 
-// void imgu_saveImage_thread(void *v_caps, void *v_map, const std::string &filePathName) {
-//   GstCaps *caps = static_cast<GstCaps *>(v_caps);
-//   GstMapInfo *map = static_cast<GstMapInfo *>(v_map);
-
-//   // Copy map data
-//   GstMapInfo copiedMap = *map;
-//   copiedMap.data = (guint8 *)malloc(map->size);
-//   memcpy(copiedMap.data, map->data, map->size);
-
-//   // Launch the thread
-//   std::thread t([=]() {
-//     imgu_saveImage((void *)caps, (void *)&copiedMap, filePathName);
-//     free(copiedMap.data);  // Clean up manually
-//   });
-//   t.detach();  // Or .join() depending on use case
-// }
 
 void imgu_saveCropedImage(void *v_caps, void *v_map, const std::string &filePathName, SimpleRect roi) {
   GstCaps *caps = static_cast<GstCaps *>(v_caps);
