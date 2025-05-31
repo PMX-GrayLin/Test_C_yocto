@@ -9,11 +9,9 @@ struct SimpleRect {
     int height;
 };
 
-// void imgu_saveImage(GstCaps *caps, GstMapInfo map, string filePathName);
-void imgu_saveImage(void* v_caps /* GstCaps* */, void* v_map /* GstMapInfo */, const string& filePathName);
-// void imgu_saveCropedImage(GstCaps *caps, GstMapInfo map, const string& filePathName, cv::Rect roi);
-void imgu_saveCropedImage(void* v_caps /* GstCaps* */, void* v_map /* GstMapInfo */, const string& filePathName, SimpleRect roi);
-void imgu_saveCropedImage(const string& inputFilePathName, const string& outputFilePathName, SimpleRect roi, bool isPadding = false);
+void imgu_saveImage(void* v_caps /* GstCaps* */, void* v_map /* GstMapInfo */, const std::string& filePathName);
+void imgu_saveCropedImage(void* v_caps /* GstCaps* */, void* v_map /* GstMapInfo */, const std::string& filePathName, SimpleRect roi);
+void imgu_saveCropedImage(const std::string& inputFilePathName, const std::string& outputFilePathName, SimpleRect roi, bool isPadding = false);
 
 // demo
-void imgu_Thread_saveImage(GstCaps* caps, GstMapInfo map, string filePathName);
+// void imgu_Thread_saveImage(GstCaps* caps, GstMapInfo map, string filePathName);
