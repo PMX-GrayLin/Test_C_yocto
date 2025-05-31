@@ -375,7 +375,7 @@ void imgu_Thread_saveImage(GstCaps *caps, GstMapInfo map, string filePathName) {
 
   // Launch the thread
   std::thread t([=]() {
-    imgu_saveImage(caps, copiedMap, filePathName);
+    imgu_saveImage(caps, &copiedMap, filePathName);
     free(copiedMap.data);  // Clean up manually
   });
   t.detach();  // Or .join() depending on use case
