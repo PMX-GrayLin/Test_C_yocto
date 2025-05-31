@@ -165,11 +165,11 @@ GstArvAuto GigE_getExposureAuto_hik() {
 void GigE_setExposureAuto_hik(string gstArvAutoS) {
   // Exposure auto mode (0 - off, 1 - once, 2 - continuous)
   GstArvAuto gaa = gaa_off;
-  if (isSameString(gstArvAutoS.c_str(), "off") || isSameString(gstArvAutoS.c_str(), "0")) {
+  if (isSameString(gstArvAutoS, "off") || isSameString(gstArvAutoS, "0")) {
     gaa = gaa_off;
-  } else if (isSameString(gstArvAutoS.c_str(), "once") || isSameString(gstArvAutoS.c_str(), "1")) {
+  } else if (isSameString(gstArvAutoS, "once") || isSameString(gstArvAutoS, "1")) {
     gaa = gaa_once;
-  } else if (isSameString(gstArvAutoS.c_str(), "cont") || isSameString(gstArvAutoS.c_str(), "2")) {
+  } else if (isSameString(gstArvAutoS, "cont") || isSameString(gstArvAutoS, "2")) {
     gaa = gaa_continuous;
   }
   xlog("set exposure-auto:%d", gaa);
@@ -197,11 +197,11 @@ GstArvAuto GigE_getGainAuto_hik() {
 void GigE_setGainAuto_hik(string gstArvAutoS) {
   // Gain auto mode (0 - off, 1 - once, 2 - continuous)
   GstArvAuto gaa = gaa_off;
-  if (isSameString(gstArvAutoS.c_str(), "off") || isSameString(gstArvAutoS.c_str(), "0")) {
+  if (isSameString(gstArvAutoS, "off") || isSameString(gstArvAutoS, "0")) {
     gaa = gaa_off;
-  } else if (isSameString(gstArvAutoS.c_str(), "once") || isSameString(gstArvAutoS.c_str(), "1")) {
+  } else if (isSameString(gstArvAutoS, "once") || isSameString(gstArvAutoS, "1")) {
     gaa = gaa_once;
-  } else if (isSameString(gstArvAutoS.c_str(), "cont") || isSameString(gstArvAutoS.c_str(), "2")) {
+  } else if (isSameString(gstArvAutoS, "cont") || isSameString(gstArvAutoS, "2")) {
     gaa = gaa_continuous;
   }
   xlog("set gain-auto:%d", gaa);
