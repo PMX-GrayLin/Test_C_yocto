@@ -34,12 +34,12 @@ static GMainLoop *gst_loop = nullptr;
 namespace fs = std::filesystem;
 
 void CIS_handle_RESTful(std::vector<std::string> segments) {
-  if (isSameString(segments[1].c_str(), "start")) {
+  if (isSameString(segments[1], "start")) {
     AICamera_streamingStart();
-  } else if (isSameString(segments[1].c_str(), "stop")) {
+  } else if (isSameString(segments[1], "stop")) {
     AICamera_streamingStop();
 
-  } else if (isSameString(segments[1].c_str(), "tp")) {
+  } else if (isSameString(segments[1], "tp")) {
     xlog("take picture");
     std::string path = "";
     if (segments.size() > 2 && !segments[2].empty()) {

@@ -27,36 +27,36 @@ std::string pathName_savedImage_hik = "";
 
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
 
-  if (isSameString(segments[1].c_str(), "start")) {
+  if (isSameString(segments[1], "start")) {
     GigE_StreamingStart_Hik();
 
-  } else if (isSameString(segments[1].c_str(), "stop")) {
+  } else if (isSameString(segments[1], "stop")) {
     GigE_StreamingStop_Hik();
 
-  } else if (isSameString(segments[1].c_str(), "set")) {
-    if (isSameString(segments[2].c_str(), "exposure")) {
+  } else if (isSameString(segments[1], "set")) {
+    if (isSameString(segments[2], "exposure")) {
       GigE_setExposure_hik(segments[3]);
-    } else if (isSameString(segments[2].c_str(), "exposure-auto")) {
+    } else if (isSameString(segments[2], "exposure-auto")) {
       GigE_setExposureAuto_hik(segments[3]);
-    } else if (isSameString(segments[2].c_str(), "gain")) {
+    } else if (isSameString(segments[2], "gain")) {
       GigE_setGain_hik(segments[3]);
-    } else if (isSameString(segments[2].c_str(), "gain-auto")) {
+    } else if (isSameString(segments[2], "gain-auto")) {
       GigE_setGainAuto_hik(segments[3]);
     }
 
-  } else if (isSameString(segments[1].c_str(), "get")) {
+  } else if (isSameString(segments[1], "get")) {
     GigE_getSettings_hik();
-    if (isSameString(segments[2].c_str(), "exposure")) {
+    if (isSameString(segments[2], "exposure")) {
       //
-    } else if (isSameString(segments[2].c_str(), "exposure-auto")) {
+    } else if (isSameString(segments[2], "exposure-auto")) {
       //
-    } else if (isSameString(segments[2].c_str(), "gain")) {
+    } else if (isSameString(segments[2], "gain")) {
       //
-    } else if (isSameString(segments[2].c_str(), "gain-auto")) {
+    } else if (isSameString(segments[2], "gain-auto")) {
       //
     }
 
-  } else if (isSameString(segments[1].c_str(), "tp")) {
+  } else if (isSameString(segments[1], "tp")) {
     xlog("take picture");
     std::string path = "";
     if (segments.size() > 2 && !segments[2].empty()) {

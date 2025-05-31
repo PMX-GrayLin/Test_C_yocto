@@ -28,48 +28,48 @@
 // #endif
 
 void handle_RESTful(std::vector<std::string> segments) {
-  if (isSameString(segments[0].c_str(), "led")) {
+  if (isSameString(segments[0], "led")) {
     if (segments.size() == 3) {
       FW_setLED(segments[1], segments[2]);
     } else {
       xlog("param may missing...");
     }
 
-  } else if (isSameString(segments[0].c_str(), "do")) {
+  } else if (isSameString(segments[0], "do")) {
     FW_setDO(segments[1], segments[2]);
 
-  } else if (isSameString(segments[0].c_str(), "di")) {
-    if (isSameString(segments[1].c_str(), "on")) {
+  } else if (isSameString(segments[0], "di")) {
+    if (isSameString(segments[1], "on")) {
       FW_MonitorDIStart();
-    } else if (isSameString(segments[1].c_str(), "off")) {
+    } else if (isSameString(segments[1], "off")) {
       FW_MonitorDIStop();
     }
 
-  } else if (isSameString(segments[0].c_str(), "triger")) {
-    if (isSameString(segments[1].c_str(), "on")) {
+  } else if (isSameString(segments[0], "triger")) {
+    if (isSameString(segments[1], "on")) {
       FW_MonitorTrigerStart();
-    } else if (isSameString(segments[1].c_str(), "off")) {
+    } else if (isSameString(segments[1], "off")) {
       FW_MonitorTrigerStop();
     }
 
-  } else if (isSameString(segments[0].c_str(), "pwm")) {
+  } else if (isSameString(segments[0], "pwm")) {
     FW_setPWM(segments[1], segments[2]);
 
-  } else if (isSameString(segments[0].c_str(), "dio")) {
-    if (isSameString(segments[2].c_str(), "set")) {
+  } else if (isSameString(segments[0], "dio")) {
+    if (isSameString(segments[2], "set")) {
       FW_setDIODirection(segments[1], segments[3]);
-    } else if (isSameString(segments[2].c_str(), "do")) {
+    } else if (isSameString(segments[2], "do")) {
       FW_setDIOOut(segments[1], segments[3]);
     }
 
-  } else if (isSameString(segments[0].c_str(), "gpio")) {
+  } else if (isSameString(segments[0], "gpio")) {
     int gpio_num = stoi(segments[1]);
     int gpio_vaue = (segments[2] == "1") ? 1 : 0 ;
     FW_setGPIO(gpio_num, gpio_vaue);
 
 #if defined(ENABLE_CIS)
 
-  } else if (isSameString(segments[0].c_str(), "gst")) {
+  } else if (isSameString(segments[0], "gst")) {
     
     CIS_handle_RESTful(segments);
 
@@ -77,26 +77,26 @@ void handle_RESTful(std::vector<std::string> segments) {
 
 #if defined(ENABLE_Gige)
 
-  } else if (isSameString(segments[0].c_str(), "gige")) {
+  } else if (isSameString(segments[0], "gige")) {
     Gige_handle_RESTful_hik(segments);
 
 #endif
 
 #if defined(ENABLE_TestCode)
 
-  } else if (isSameString(segments[0].c_str(), "gstt")) {
+  } else if (isSameString(segments[0], "gstt")) {
     int testCase = std::stoi(segments[1]);
     test_gst(testCase);
     
 #endif
 
-  } else if (isSameString(segments[0].c_str(), "cmd")) {
+  } else if (isSameString(segments[0], "cmd")) {
     exec_command(segments[1]);
 
-  } else if (isSameString(segments[0].c_str(), "info")) {
+  } else if (isSameString(segments[0], "info")) {
     // some information functions
 
-  } else if (isSameString(segments[0].c_str(), "tf")) {
+  } else if (isSameString(segments[0], "tf")) {
     // test functions
 
     // xlog("time:%s", getTimeString().c_str());
@@ -151,70 +151,70 @@ void MQTTClient::on_message(const struct mosquitto_message* message) {
   handle_mqtt(payload);
 }
 
-// #if defined(ENABLE_FTDI)
+#if defined(ENABLE_FTDI)
 
-// #define SLAVE_ADDR 0x68
-// #define I2C_SPEED_KHZ 400
-// #define READ_LEN 525
+#define SLAVE_ADDR 0x68
+#define I2C_SPEED_KHZ 400
+#define READ_LEN 525
 
-// void test_ftdi() {
-//   FT_STATUS ftStatus;
-//   FT_HANDLE ftHandle = NULL;
-//   DWORD devCount = 0;
+void test_ftdi() {
+  FT_STATUS ftStatus;
+  FT_HANDLE ftHandle = NULL;
+  DWORD devCount = 0;
 
-//   // Initialize D2XX
-//   ftStatus = FT_CreateDeviceInfoList(&devCount);
-//   if (ftStatus != FT_OK || devCount == 0) {
-//       fprintf(stderr, "No FTDI devices found\n");
-//       return;
-//   }
+  // Initialize D2XX
+  ftStatus = FT_CreateDeviceInfoList(&devCount);
+  if (ftStatus != FT_OK || devCount == 0) {
+      fprintf(stderr, "No FTDI devices found\n");
+      return;
+  }
 
-//   // Open first FTDI device
-//   ftStatus = FT_Open(0, &ftHandle);
-//   if (ftStatus != FT_OK) {
-//       fprintf(stderr, "FT_Open failed\n");
-//       return;
-//   }
+  // Open first FTDI device
+  ftStatus = FT_Open(0, &ftHandle);
+  if (ftStatus != FT_OK) {
+      fprintf(stderr, "FT_Open failed\n");
+      return;
+  }
 
-//   // Initialize as I2C Master
-//   ftStatus = FT4222_I2CMaster_Init(ftHandle, I2C_SPEED_KHZ);
-//   if (ftStatus != FT_OK) {
-//       fprintf(stderr, "FT4222_I2CMaster_Init failed\n");
-//       FT_Close(ftHandle);
-//       return;
-//   }
+  // Initialize as I2C Master
+  ftStatus = FT4222_I2CMaster_Init(ftHandle, I2C_SPEED_KHZ);
+  if (ftStatus != FT_OK) {
+      fprintf(stderr, "FT4222_I2CMaster_Init failed\n");
+      FT_Close(ftHandle);
+      return;
+  }
 
-//   // Write two bytes: register 0x4E and offset 0x00
-//   uint8_t writeBuf[2] = { 0x4E, 0x00 };
-//   uint16_t bytesWritten = 0;
-//   ftStatus = FT4222_I2CMaster_Write(ftHandle, SLAVE_ADDR, writeBuf, 2, &bytesWritten);
-//   if (ftStatus != FT_OK || bytesWritten != 2) {
-//       fprintf(stderr, "I2C write failed\n");
-//       FT_Close(ftHandle);
-//       return;
-//   }
+  // Write two bytes: register 0x4E and offset 0x00
+  uint8_t writeBuf[2] = { 0x4E, 0x00 };
+  uint16_t bytesWritten = 0;
+  ftStatus = FT4222_I2CMaster_Write(ftHandle, SLAVE_ADDR, writeBuf, 2, &bytesWritten);
+  if (ftStatus != FT_OK || bytesWritten != 2) {
+      fprintf(stderr, "I2C write failed\n");
+      FT_Close(ftHandle);
+      return;
+  }
 
-//   // Read 525 bytes from device
-//   uint8_t readBuf[READ_LEN] = {0};
-//   uint16_t bytesRead = 0;
-//   ftStatus = FT4222_I2CMaster_Read(ftHandle, SLAVE_ADDR, readBuf, READ_LEN, &bytesRead);
-//   if (ftStatus != FT_OK || bytesRead != READ_LEN) {
-//       fprintf(stderr, "I2C read failed\n");
-//       FT_Close(ftHandle);
-//       return;
-//   }
+  // Read 525 bytes from device
+  uint8_t readBuf[READ_LEN] = {0};
+  uint16_t bytesRead = 0;
+  ftStatus = FT4222_I2CMaster_Read(ftHandle, SLAVE_ADDR, readBuf, READ_LEN, &bytesRead);
+  if (ftStatus != FT_OK || bytesRead != READ_LEN) {
+      fprintf(stderr, "I2C read failed\n");
+      FT_Close(ftHandle);
+      return;
+  }
 
-//   // Print data
-//   for (int i = 0; i < READ_LEN; i++) {
-//       printf("%02X ", readBuf[i]);
-//       if ((i + 1) % 16 == 0) printf("\n");
-//   }
-//   printf("\n");
+  // Print data
+  for (int i = 0; i < READ_LEN; i++) {
+      printf("%02X ", readBuf[i]);
+      if ((i + 1) % 16 == 0) printf("\n");
+  }
+  printf("\n");
 
-//   FT_Close(ftHandle);
-// }
+  FT_Close(ftHandle);
+}
 
-// #endif // ENABLE_FTDI
+#endif // ENABLE_FTDI
 
 int main(int argc, char* argv[]) {
   xlog("Compiled at %s %s" , __DATE__, __TIME__);

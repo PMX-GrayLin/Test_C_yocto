@@ -324,9 +324,9 @@ void FW_setDO(string index_do, string on_off) {
     return;
   }
 
-  if (isSameString(on_off.c_str(), "on")) {
+  if (isSameString(on_off, "on")) {
     isON = true;
-  } else if (isSameString(on_off.c_str(), "off")) {
+  } else if (isSameString(on_off, "off")) {
     isON = false;
   } else {
     xlog("input string should be on or off...");
@@ -431,7 +431,7 @@ void FW_setDIODirection(string index_dio, string di_do) {
     return;
   }
 
-  if (isSameString(di_do.c_str(), "di")) {
+  if (isSameString(di_do, "di")) {
     // set flag
     dioDirection[index - 1] = diod_in;
 
@@ -441,7 +441,7 @@ void FW_setDIODirection(string index_dio, string di_do) {
     // start monitor gpio input
     FW_MonitorDIOInStart(index - 1);
 
-  } else if (isSameString(di_do.c_str(), "do")) {
+  } else if (isSameString(di_do, "do")) {
     // set flag
     dioDirection[index - 1] = diod_out;
 
@@ -471,9 +471,9 @@ void FW_setDIOOut(string index_dio, string on_off) {
     return;
   }
 
-  if (isSameString(on_off.c_str(), "on")) {
+  if (isSameString(on_off, "on")) {
     isON = true;
-  } else if (isSameString(on_off.c_str(), "off")) {
+  } else if (isSameString(on_off, "off")) {
     isON = false;
   } else {
     xlog("input string should be on or off...");
