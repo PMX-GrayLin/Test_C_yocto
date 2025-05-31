@@ -53,7 +53,7 @@
 //   }
 // }
 
-void imgu_saveImage(void *v_caps, void *v_map, const std::string &filePathName) {
+void imgu_saveImage(void *v_caps, void *v_map, const string &filePathName) {
   GstCaps *caps = static_cast<GstCaps *>(v_caps);
   GstMapInfo *map = static_cast<GstMapInfo *>(v_map);
 
@@ -108,7 +108,7 @@ void imgu_saveImage(void *v_caps, void *v_map, const std::string &filePathName) 
   }
 }
 
-// void imgu_saveCropedImage(GstCaps *caps, GstMapInfo map, const std::string &filePathName, cv::Rect roi) {
+// void imgu_saveCropedImage(GstCaps *caps, GstMapInfo map, const string &filePathName, cv::Rect cv_roi) {
 //   // Get the structure of the first capability (format)
 //   GstStructure *str = gst_caps_get_structure(caps, 0);
 //   const gchar *format = gst_structure_get_string(str, "format");
@@ -154,16 +154,16 @@ void imgu_saveImage(void *v_caps, void *v_map, const std::string &filePathName) 
 
 //   // Validate ROI dimensions
 //   bool isCrop = true;
-//   if (roi.x < 0 || roi.y < 0 || roi.width == 0 || roi.height == 0 ||
-//       roi.x + roi.width > bgr_frame.cols ||
-//       roi.y + roi.height > bgr_frame.rows) {
+//   if (cv_roi.x < 0 || cv_roi.y < 0 || cv_roi.width == 0 || cv_roi.height == 0 ||
+//       cv_roi.x + cv_roi.width > bgr_frame.cols ||
+//       cv_roi.y + cv_roi.height > bgr_frame.rows) {
 //     xlog("ROI not correct... not crop");
 //     isCrop = false;
 //   }
 
 //   if (isCrop) {
 //     // Crop the region of interest (ROI)
-//     cv::Mat croppedImage = bgr_frame(roi);
+//     cv::Mat croppedImage = bgr_frame(cv_roi);
 
 //     // Create a black canvas of the target size
 //     int squqareSize = (croppedImage.cols > croppedImage.rows) ? croppedImage.cols : croppedImage.rows;
@@ -202,9 +202,10 @@ void imgu_saveImage(void *v_caps, void *v_map, const std::string &filePathName) 
 //   }
 // }
 
-void imgu_saveCropedImage(void *v_caps, void *v_map, const std::string &filePathName, cv::Rect roi) {
+void imgu_saveCropedImage(void *v_caps, void *v_map, const string &filePathName, SimpleRect roi) {
   GstCaps *caps = static_cast<GstCaps *>(v_caps);
   GstMapInfo *map = static_cast<GstMapInfo *>(v_map);
+  cv::Rect cv_roi(roi.x, roi.y, roi.width, roi.height);
 
   // Get the structure of the first capability (format)
   GstStructure *str = gst_caps_get_structure(caps, 0);
@@ -251,16 +252,16 @@ void imgu_saveCropedImage(void *v_caps, void *v_map, const std::string &filePath
 
   // Validate ROI dimensions
   bool isCrop = true;
-  if (roi.x < 0 || roi.y < 0 || roi.width == 0 || roi.height == 0 ||
-      roi.x + roi.width > bgr_frame.cols ||
-      roi.y + roi.height > bgr_frame.rows) {
+  if (cv_roi.x < 0 || cv_roi.y < 0 || cv_roi.width == 0 || cv_roi.height == 0 ||
+      cv_roi.x + cv_roi.width > bgr_frame.cols ||
+      cv_roi.y + cv_roi.height > bgr_frame.rows) {
     xlog("ROI not correct... not crop");
     isCrop = false;
   }
 
   if (isCrop) {
     // Crop the region of interest (ROI)
-    cv::Mat croppedImage = bgr_frame(roi);
+    cv::Mat croppedImage = bgr_frame(cv_roi);
 
     // Create a black canvas of the target size
     int squqareSize = (croppedImage.cols > croppedImage.rows) ? croppedImage.cols : croppedImage.rows;
@@ -299,7 +300,10 @@ void imgu_saveCropedImage(void *v_caps, void *v_map, const std::string &filePath
   }
 }
 
-void imgu_saveCropedImage(const std::string &inputFilePathName, const std::string &outputFilePathName, cv::Rect roi, bool isPadding) {
+void imgu_saveCropedImage(const string &inputFilePathName, const string &outputFilePathName, SimpleRect roi, bool isPadding) {
+
+  cv::Rect cv_roi(roi.x, roi.y, roi.width, roi.height);
+
   // Load the image
   cv::Mat image = cv::imread(inputFilePathName);
   if (image.empty()) {
@@ -309,16 +313,16 @@ void imgu_saveCropedImage(const std::string &inputFilePathName, const std::strin
 
   // Validate ROI dimensions
   bool isCrop = true;
-  if (roi.x < 0 || roi.y < 0 || roi.width == 0 || roi.height == 0 ||
-      roi.x + roi.width > image.cols ||
-      roi.y + roi.height > image.rows) {
+  if (cv_roi.x < 0 || cv_roi.y < 0 || cv_roi.width == 0 || cv_roi.height == 0 ||
+      cv_roi.x + cv_roi.width > image.cols ||
+      cv_roi.y + cv_roi.height > image.rows) {
     xlog("ROI not correct... not crop");
     isCrop = false;
   }
 
   if (isCrop) {
     // Crop the region of interest (ROI)
-    cv::Mat croppedImage = image(roi);
+    cv::Mat croppedImage = image(cv_roi);
 
     if (isPadding) {
       // Create a black canvas of the target size
