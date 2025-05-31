@@ -56,7 +56,7 @@ void imgu_saveImage(void *v_pad /* GstPad* */, void *v_info /* GstPadProbeInfo *
     // xlog("Video dimensions: %dx%d", width, height);
 
     // Convert NV12 to BGR
-    cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map->data);
+    cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
     bgr_frame.create(height, width, CV_8UC3);
     cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
 
@@ -67,7 +67,7 @@ void imgu_saveImage(void *v_pad /* GstPad* */, void *v_info /* GstPadProbeInfo *
     }
 
     // Convert I420 to BGR
-    cv::Mat i420_frame(height + height / 2, width, CV_8UC1, map->data);
+    cv::Mat i420_frame(height + height / 2, width, CV_8UC1, map.data);
     bgr_frame.create(height, width, CV_8UC3);
     cv::cvtColor(i420_frame, bgr_frame, cv::COLOR_YUV2BGR_I420);
 

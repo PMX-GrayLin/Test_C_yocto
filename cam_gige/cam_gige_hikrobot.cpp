@@ -83,6 +83,8 @@ void GigE_saveImage_hik(GstPad *pad, GstPadProbeInfo *info) {
     xlog("");
     isCapturePhoto_hik = false;
 
+    imgu_saveImage((void*)pad, (void*)info, pathName_savedImage_hik);
+
     // GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
     // if (buffer == nullptr) {
     //   xlog("Failed to get buffer");
@@ -107,7 +109,7 @@ void GigE_saveImage_hik(GstPad *pad, GstPadProbeInfo *info) {
     //   return;
     // }
 
-    imgu_saveImage((void*)caps, (void*)&map, pathName_savedImage_hik);
+    // imgu_saveImage((void*)caps, (void*)&map, pathName_savedImage_hik);
 
     // // Cleanup
     // gst_buffer_unmap(buffer, &map);
