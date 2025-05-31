@@ -25,11 +25,28 @@ void imgu_saveImage(void *v_pad /* GstPad* */, void *v_info /* GstPadProbeInfo *
   GstCaps *caps = gst_pad_get_current_caps(pad);
   if (!caps) {
     xlog("Failed to get caps");
-    gst_caps_unref(caps);
     return;
   }
   // Print the entire caps for debugging
   // xlog("caps: %s", gst_caps_to_string(caps));
+
+  // Get the structure of the first capability (format)
+  GstStructure *str = gst_caps_get_structure(caps, 0);
+  const gchar *format = gst_structure_get_string(str, "format");
+  if (!format) {
+    xlog("Failed to get format from caps");
+    gst_caps_unref(caps);
+    return;
+  }
+  // xlog("format:%s", format);
+
+  int width = 0, height = 0;
+  if (!gst_structure_get_int(str, "width", &width) ||
+      !gst_structure_get_int(str, "height", &height)) {
+    xlog("Failed to get video dimensions");
+    gst_caps_unref(caps);
+    return;
+  }
 
   // Map the buffer to access its data
   GstMapInfo map;
@@ -39,54 +56,31 @@ void imgu_saveImage(void *v_pad /* GstPad* */, void *v_info /* GstPadProbeInfo *
     return;
   }
 
-  // Get the structure of the first capability (format)
-  GstStructure *str = gst_caps_get_structure(caps, 0);
-  const gchar *format = gst_structure_get_string(str, "format");
-  xlog("format:%s", format);
-
-  int width = 0, height = 0;
+  // Prepare cv::Mat
   cv::Mat bgr_frame;
-
-  // Only proceed if the format is NV12
-  if (format && g_strcmp0(format, "NV12") == 0) {
-    if (!gst_structure_get_int(str, "width", &width) ||
-        !gst_structure_get_int(str, "height", &height)) {
-      xlog("Failed to get video dimensions");
-    }
-    // xlog("Video dimensions: %dx%d", width, height);
-
-    // Convert NV12 to BGR
+  if (g_strcmp0(format, "NV12") == 0) {
     cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
     bgr_frame.create(height, width, CV_8UC3);
     cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
-
-  } else if (format && g_strcmp0(format, "I420") == 0) {
-    if (!gst_structure_get_int(str, "width", &width) ||
-        !gst_structure_get_int(str, "height", &height)) {
-      xlog("Failed to get video dimensions");
-    }
-
-    // Convert I420 to BGR
+  } else if (g_strcmp0(format, "I420") == 0) {
     cv::Mat i420_frame(height + height / 2, width, CV_8UC1, map.data);
     bgr_frame.create(height, width, CV_8UC3);
     cv::cvtColor(i420_frame, bgr_frame, cv::COLOR_YUV2BGR_I420);
-
   } else {
-    xlog("Unsupported format: %s", format ? format : "NULL");
+    xlog("Unsupported format: %s", format);
+    gst_buffer_unmap(buffer, &map);
+    gst_caps_unref(caps);
     return;
   }
 
-  // Check if bgr_frame is valid
   if (bgr_frame.empty()) {
     xlog("bgr_frame is empty. Cannot save image to %s", filePathName.c_str());
-    return;
-  }
-
-  // save the image
-  if (cv::imwrite(filePathName, bgr_frame)) {
-    xlog("Saved frame to %s", filePathName.c_str());
   } else {
-    xlog("Failed to save frame to %s", filePathName.c_str());
+    if (cv::imwrite(filePathName, bgr_frame)) {
+      xlog("Saved frame to %s", filePathName.c_str());
+    } else {
+      xlog("Failed to save frame to %s", filePathName.c_str());
+    }
   }
 
   // Cleanup
