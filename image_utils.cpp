@@ -202,7 +202,7 @@ void imgu_saveImage(void *v_caps, void *v_map, const std::string &filePathName) 
 //   }
 // }
 
-void imgu_saveCropedImage(GstCaps *v_caps, GstMapInfo v_map, const std::string &filePathName, cv::Rect roi) {
+void imgu_saveCropedImage(void *v_caps, void *v_map, const std::string &filePathName, cv::Rect roi) {
   GstCaps *caps = static_cast<GstCaps *>(v_caps);
   GstMapInfo *map = static_cast<GstMapInfo *>(v_map);
 
@@ -375,7 +375,7 @@ void imgu_Thread_saveImage(GstCaps *caps, GstMapInfo map, string filePathName) {
 
   // Launch the thread
   std::thread t([=]() {
-    imgu_saveImage((void*)caps, (void*)&copiedMap, filePathName);
+    imgu_saveImage((void *)caps, (void *)&copiedMap, filePathName);
     free(copiedMap.data);  // Clean up manually
   });
   t.detach();  // Or .join() depending on use case
