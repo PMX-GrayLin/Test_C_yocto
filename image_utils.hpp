@@ -14,5 +14,3 @@ void imgu_saveImage_thread(void* v_caps /* GstCaps* */, void* v_map /* GstMapInf
 void imgu_saveCropedImage(void* v_caps /* GstCaps* */, void* v_map /* GstMapInfo */, const std::string& filePathName, SimpleRect roi);
 void imgu_saveCropedImage(const std::string& inputFilePathName, const std::string& outputFilePathName, SimpleRect roi, bool isPadding = false);
 
-// demo
-// void imgu_Thread_saveImage(GstCaps* caps, GstMapInfo map, string filePathName);

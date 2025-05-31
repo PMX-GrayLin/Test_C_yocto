@@ -34,6 +34,8 @@ void stopTimer();
 void printBuffer(const uint8_t* buffer, size_t len);
 
 bool isSameString(const char* s1, const char* s2, bool isCaseSensitive = false);
+bool isSameString(const std::string& s1, const std::string& s2, bool isCaseSensitive = false);
+
 bool isPathExist(const char* path);
 
 double limitValueInRange(double input, double rangeMin, double rangeMax);

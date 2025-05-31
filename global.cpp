@@ -64,13 +64,10 @@ bool isSameString(const char* s1, const char* s2, bool isCaseSensitive) {
     });
   }
 }
-// bool isSameString(const char* s1, const char* s2, bool isCaseSensitive) {
-//   if (s1 == NULL || s2 == NULL) {
-//     return false;  // Handle NULL pointers safely
-//   }
 
-//   return isCaseSensitive ? strcmp(s1, s2) == 0 : strcasecmp(s1, s2) == 0;
-// }
+bool isSameString(const std::string& s1, const std::string& s2, bool isCaseSensitive) {
+  return isSameString(s1.c_str(), s2.c_str(), isCaseSensitive);;
+}
 
 bool isPathExist(const char* path) {
   struct stat buffer;

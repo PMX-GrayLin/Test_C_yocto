@@ -248,16 +248,3 @@ void imgu_saveCropedImage(const std::string &inputFilePathName, const std::strin
   }
 }
 
-// void imgu_Thread_saveImage(GstCaps *caps, GstMapInfo map, string filePathName) {
-//   // Copy map data
-//   GstMapInfo copiedMap = map;
-//   copiedMap.data = (guint8 *)malloc(map.size);
-//   memcpy(copiedMap.data, map.data, map.size);
-
-//   // Launch the thread
-//   std::thread t([=]() {
-//     imgu_saveImage((void *)caps, (void *)&copiedMap, filePathName);
-//     free(copiedMap.data);  // Clean up manually
-//   });
-//   t.detach();  // Or .join() depending on use case
-// }
