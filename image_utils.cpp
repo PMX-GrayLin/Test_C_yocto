@@ -7,9 +7,37 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
-void imgu_saveImage(void *v_caps, void *v_map, const std::string &filePathName) {
-  GstCaps *caps = static_cast<GstCaps *>(v_caps);
-  GstMapInfo *map = static_cast<GstMapInfo *>(v_map);
+// void imgu_saveImage(void *v_caps, void *v_map, const std::string &filePathName) {
+  // GstCaps *caps = static_cast<GstCaps *>(v_caps);
+  // GstMapInfo *map = static_cast<GstMapInfo *>(v_map);
+
+void imgu_saveImage(void *v_pad /* GstPad* */, void *v_info /* GstPadProbeInfo */, const std::string &filePathName) {
+  GstPad *pad = static_cast<GstPad *>(v_pad);
+  GstPadProbeInfo *info = static_cast<GstPadProbeInfo *>(v_info);
+
+  GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
+  if (buffer == nullptr) {
+    xlog("Failed to get buffer");
+    return;
+  }
+
+  // Get the capabilities of the pad to understand the format
+  GstCaps *caps = gst_pad_get_current_caps(pad);
+  if (!caps) {
+    xlog("Failed to get caps");
+    gst_caps_unref(caps);
+    return;
+  }
+  // Print the entire caps for debugging
+  // xlog("caps: %s", gst_caps_to_string(caps));
+
+  // Map the buffer to access its data
+  GstMapInfo map;
+  if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+    xlog("Failed to map buffer");
+    gst_caps_unref(caps);
+    return;
+  }
 
   // Get the structure of the first capability (format)
   GstStructure *str = gst_caps_get_structure(caps, 0);
@@ -60,6 +88,10 @@ void imgu_saveImage(void *v_caps, void *v_map, const std::string &filePathName) 
   } else {
     xlog("Failed to save frame to %s", filePathName.c_str());
   }
+
+  // Cleanup
+  gst_buffer_unmap(buffer, &map);
+  gst_caps_unref(caps);
 }
 
 void imgu_saveImage_thread(void *v_caps, void *v_map, const std::string &filePathName) {
