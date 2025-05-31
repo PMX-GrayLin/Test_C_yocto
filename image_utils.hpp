@@ -9,9 +9,10 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 
-void saveImage(GstCaps *caps, GstMapInfo map, string filePathName);
-void saveCropedImage(GstCaps *caps, GstMapInfo map, string filePathName, cv::Rect roi);
-void saveCropedImage(std::string inputFilePathName, string outputFilePathName, cv::Rect roi, bool isPadding = false);
+void imgu_saveImage(GstCaps *caps, GstMapInfo map, string filePathName);
+void imgu_saveImage(void* v_caps /* GstCaps */, void* v_map /* GstMapInfo */, const std::string& filePathName);
+void imgu_saveCropedImage(GstCaps *caps, GstMapInfo map, string filePathName, cv::Rect roi);
+void imgu_saveCropedImage(std::string inputFilePathName, string outputFilePathName, cv::Rect roi, bool isPadding = false);
 
 // demo
-void Thread_saveImage(GstCaps *caps, GstMapInfo map, string filePathName);
+void imgu_Thread_saveImage(GstCaps *caps, GstMapInfo map, string filePathName);

@@ -1,6 +1,6 @@
 #include "image_utils.hpp"
 
-void saveImage(GstCaps *caps, GstMapInfo map, string filePathName) {
+void imgu_saveImage(GstCaps *caps, GstMapInfo map, string filePathName) {
 
   // Get the structure of the first capability (format)
   GstStructure *str = gst_caps_get_structure(caps, 0);
@@ -53,7 +53,62 @@ void saveImage(GstCaps *caps, GstMapInfo map, string filePathName) {
   }
 }
 
-void saveCropedImage(GstCaps *caps, GstMapInfo map, string filePathName, cv::Rect roi) {
+void imgu_saveImage(void *v_caps, void *v_map, const std::string &filePathName) {
+  GstCaps *caps = static_cast<GstCaps *>(v_caps);
+  GstMapInfo *map = static_cast<GstMapInfo *>(v_map);
+
+  // Get the structure of the first capability (format)
+  GstStructure *str = gst_caps_get_structure(caps, 0);
+  const gchar *format = gst_structure_get_string(str, "format");
+  xlog("format:%s", format);
+
+  int width = 0, height = 0;
+  cv::Mat bgr_frame;
+
+  // Only proceed if the format is NV12
+  if (format && g_strcmp0(format, "NV12") == 0) {
+    if (!gst_structure_get_int(str, "width", &width) ||
+        !gst_structure_get_int(str, "height", &height)) {
+      xlog("Failed to get video dimensions");
+    }
+    // xlog("Video dimensions: %dx%d", width, height);
+
+    // Convert NV12 to BGR
+    cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map->data);
+    bgr_frame.create(height, width, CV_8UC3);
+    cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
+
+  } else if (format && g_strcmp0(format, "I420") == 0) {
+    if (!gst_structure_get_int(str, "width", &width) ||
+        !gst_structure_get_int(str, "height", &height)) {
+      xlog("Failed to get video dimensions");
+    }
+
+    // Convert I420 to BGR
+    cv::Mat i420_frame(height + height / 2, width, CV_8UC1, map->data);
+    bgr_frame.create(height, width, CV_8UC3);
+    cv::cvtColor(i420_frame, bgr_frame, cv::COLOR_YUV2BGR_I420);
+
+  } else {
+    xlog("Unsupported format: %s", format ? format : "NULL");
+    return;
+  }
+
+  // Check if bgr_frame is valid
+  if (bgr_frame.empty()) {
+    xlog("bgr_frame is empty. Cannot save image to %s", filePathName.c_str());
+    return;
+  }
+
+  // save the image
+  if (cv::imwrite(filePathName, bgr_frame)) {
+    xlog("Saved frame to %s", filePathName.c_str());
+  } else {
+    xlog("Failed to save frame to %s", filePathName.c_str());
+  }
+}
+
+void imgu_saveCropedImage(GstCaps *caps, GstMapInfo map, string filePathName, cv::Rect roi) {
   // Get the structure of the first capability (format)
   GstStructure *str = gst_caps_get_structure(caps, 0);
   const gchar *format = gst_structure_get_string(str, "format");
@@ -147,7 +202,7 @@ void saveCropedImage(GstCaps *caps, GstMapInfo map, string filePathName, cv::Rec
   }
 }
 
-void saveCropedImage(std::string inputFilePathName, string outputFilePathName, cv::Rect roi, bool isPadding) {
+void imgu_saveCropedImage(std::string inputFilePathName, string outputFilePathName, cv::Rect roi, bool isPadding) {
   // Load the image
   cv::Mat image = cv::imread(inputFilePathName);
   if (image.empty()) {
@@ -215,7 +270,7 @@ void saveCropedImage(std::string inputFilePathName, string outputFilePathName, c
   }
 }
 
-void Thread_saveImage(GstCaps *caps, GstMapInfo map, string filePathName) {
+void imgu_Thread_saveImage(GstCaps *caps, GstMapInfo map, string filePathName) {
   // Copy map data
   GstMapInfo copiedMap = map;
   copiedMap.data = (guint8 *)malloc(map.size);
@@ -223,7 +278,7 @@ void Thread_saveImage(GstCaps *caps, GstMapInfo map, string filePathName) {
 
   // Launch the thread
   std::thread t([=]() {
-    saveImage(caps, copiedMap, filePathName);
+    imgu_saveImage(caps, copiedMap, filePathName);
     free(copiedMap.data);  // Clean up manually
   });
   t.detach();  // Or .join() depending on use case
