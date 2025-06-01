@@ -9,7 +9,7 @@ struct SimpleRect {
     int height;
 };
 
-// save whole image or the ROI of it
+// save whole image or the cropped image
 void imgu_saveImage(
     void* v_pad /* GstPad* */,
     void* v_info /* GstPadProbeInfo */,
@@ -24,7 +24,10 @@ void imgu_saveImage_thread(
     const SimpleRect roi = {0, 0, 0, 0}
 );
 
-void imgu_saveCropedImage(void* v_caps /* GstCaps* */, void* v_map /* GstMapInfo */, const std::string& filePathName, SimpleRect roi);
-
-void imgu_saveCropedImage(const std::string& inputFilePathName, const std::string& outputFilePathName, SimpleRect roi, bool isPadding = false);
+void imgu_saveCropedImage(
+    const std::string& inputFilePathName,
+    const std::string& outputFilePathName,
+    SimpleRect roi,
+    bool isPadding = false
+);
 
