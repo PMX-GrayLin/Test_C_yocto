@@ -15,6 +15,7 @@ void imgu_saveImage(
 {
   GstPad *pad = static_cast<GstPad *>(v_pad);
   GstPadProbeInfo *info = static_cast<GstPadProbeInfo *>(v_info);
+  cv::Rect cv_roi(roi.x, roi.y, roi.width, roi.height);
 
   GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
   if (buffer == nullptr) {
