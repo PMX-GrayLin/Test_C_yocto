@@ -84,36 +84,6 @@ void GigE_saveImage_hik(GstPad *pad, GstPadProbeInfo *info) {
     isCapturePhoto_hik = false;
 
     imgu_saveImage((void*)pad, (void*)info, pathName_savedImage_hik);
-
-    // GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
-    // if (buffer == nullptr) {
-    //   xlog("Failed to get buffer");
-    //   return;
-    // }
-
-    // // Get the capabilities of the pad to understand the format
-    // GstCaps *caps = gst_pad_get_current_caps(pad);
-    // if (!caps) {
-    //   xlog("Failed to get caps");
-    //   gst_caps_unref(caps);
-    //   return;
-    // }
-    // // Print the entire caps for debugging
-    // // xlog("caps: %s", gst_caps_to_string(caps));
-
-    // // Map the buffer to access its data
-    // GstMapInfo map;
-    // if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-    //   xlog("Failed to map buffer");
-    //   gst_caps_unref(caps);
-    //   return;
-    // }
-
-    // imgu_saveImage((void*)caps, (void*)&map, pathName_savedImage_hik);
-
-    // // Cleanup
-    // gst_buffer_unmap(buffer, &map);
-    // gst_caps_unref(caps);
   }
 }
 

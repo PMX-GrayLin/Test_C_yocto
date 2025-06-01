@@ -541,7 +541,6 @@ void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info) {
     GstCaps *caps = gst_pad_get_current_caps(pad);
     if (!caps) {
       xlog("Failed to get caps");
-      gst_caps_unref(caps);
       return;
     }
     // Print the entire caps for debugging

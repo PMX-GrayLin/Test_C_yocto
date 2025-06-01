@@ -109,7 +109,6 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
       GstCaps *caps = gst_pad_get_current_caps(pad);
       if (!caps) {
         xlog("Failed to get caps");
-        gst_caps_unref(caps);
         return GST_PAD_PROBE_PASS;
       }
       // Print the entire caps for debugging

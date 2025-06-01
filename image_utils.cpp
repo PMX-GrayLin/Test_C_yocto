@@ -7,7 +7,12 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
-void imgu_saveImage(void *v_pad /* GstPad* */, void *v_info /* GstPadProbeInfo */, const std::string &filePathName) {
+void imgu_saveImage(
+  void *v_pad /* GstPad* */,
+  void *v_info /* GstPadProbeInfo */,
+  const std::string &filePathName,
+  const SimpleRect roi) 
+{
   GstPad *pad = static_cast<GstPad *>(v_pad);
   GstPadProbeInfo *info = static_cast<GstPadProbeInfo *>(v_info);
 
@@ -72,11 +77,57 @@ void imgu_saveImage(void *v_pad /* GstPad* */, void *v_info /* GstPadProbeInfo *
   if (bgr_frame.empty()) {
     xlog("bgr_frame is empty. Cannot save image to %s", filePathName.c_str());
   } else {
-    if (cv::imwrite(filePathName, bgr_frame)) {
-      xlog("Saved frame to %s", filePathName.c_str());
-    } else {
-      xlog("Failed to save frame to %s", filePathName.c_str());
+
+    // save whole image or the ROI of it
+
+    // Validate ROI dimensions
+    bool isCrop = true;
+    if (cv_roi.x < 0 || cv_roi.y < 0 || cv_roi.width == 0 || cv_roi.height == 0 ||
+        cv_roi.x + cv_roi.width > bgr_frame.cols ||
+        cv_roi.y + cv_roi.height > bgr_frame.rows) {
+      xlog("ROI not correct...");
+      isCrop = false;
     }
+
+    if (isCrop) {
+      // Crop the region of interest (ROI)
+      cv::Mat croppedImage = bgr_frame(cv_roi);
+
+      // Create a black canvas of the target size
+      int squqareSize = (croppedImage.cols > croppedImage.rows) ? croppedImage.cols : croppedImage.rows;
+      cv::Size paddingSize(squqareSize, squqareSize);
+      cv::Mat paddedImage = cv::Mat::zeros(paddingSize, croppedImage.type());
+
+      // Calculate offsets to center the cropped image
+      int offsetX = (paddedImage.cols - croppedImage.cols) / 2;
+      int offsetY = (paddedImage.rows - croppedImage.rows) / 2;
+      // Check if offsets are valid
+      if (offsetX < 0 || offsetY < 0) {
+        xlog("Error: Cropped image is larger than the padding canvas!");
+        return;
+      }
+
+      // Define the ROI on the black canvas where the cropped image will be placed
+      cv::Rect roi_padding(offsetX, offsetY, croppedImage.cols, croppedImage.rows);
+
+      // Copy the cropped image onto the black canvas
+      croppedImage.copyTo(paddedImage(roi_padding));
+
+      // Attempt to save the image
+      if (cv::imwrite(filePathName, paddedImage)) {
+        xlog("Saved crop frame to %s", filePathName.c_str());
+      } else {
+        xlog("Failed crop to save frame to %s", filePathName.c_str());
+      }
+
+    } else {
+      if (cv::imwrite(filePathName, bgr_frame)) {
+        xlog("Saved frame to %s", filePathName.c_str());
+      } else {
+        xlog("Failed to save frame to %s", filePathName.c_str());
+      }
+    }
+
   }
 
   // Cleanup
