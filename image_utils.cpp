@@ -78,9 +78,7 @@ void imgu_saveImage(
   if (bgr_frame.empty()) {
     xlog("bgr_frame is empty. Cannot save image to %s", filePathName.c_str());
   } else {
-
-    // save whole image or the ROI of it
-
+    
     // Validate ROI dimensions
     bool isCrop = true;
     if (cv_roi.x < 0 || cv_roi.y < 0 || cv_roi.width == 0 || cv_roi.height == 0 ||
@@ -136,7 +134,12 @@ void imgu_saveImage(
   gst_caps_unref(caps);
 }
 
-void imgu_saveImage_thread(void *v_pad, void *v_info, const std::string &filePathName) {
+void imgu_saveImage_thread(
+  void *v_pad, 
+  void *v_info, 
+  const std::string &filePathName,
+  const SimpleRect roi) 
+{
   GstPad *pad = static_cast<GstPad *>(v_pad);
   GstPadProbeInfo *info = static_cast<GstPadProbeInfo *>(v_info);
 
@@ -155,13 +158,13 @@ void imgu_saveImage_thread(void *v_pad, void *v_info, const std::string &filePat
   }
 
   // Launch thread using copied buffer and pad
-  std::thread([pad, copied_buffer, filePathName]() {
+  std::thread([pad, copied_buffer, filePathName, roi]() {
     // Create a temporary GstPadProbeInfo-like struct
     GstPadProbeInfo fake_info = {};
     GST_PAD_PROBE_INFO_DATA(&fake_info) = copied_buffer;
 
     // Use fake_info to call the image save function
-    imgu_saveImage((void *)pad, (void *)&fake_info, filePathName);
+    imgu_saveImage((void *)pad, (void *)&fake_info, filePathName, roi);
 
     // Cleanup
     gst_buffer_unref(copied_buffer);
