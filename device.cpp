@@ -5,11 +5,15 @@
 #include <poll.h>
 #include <chrono>
 
-#define DEBOUNCE_INTERVAL_MS 30
+#define DEBOUNCE_TIME_MS 30
 
-GPIO_LEVEl gpio_level_last[NUM_DI] = { gpiol_unknown, gpiol_unknown} ;
-GPIO_LEVEl gpio_level_new[NUM_DI] = { gpiol_unknown, gpiol_unknown};
-uint64_t last_event_time[NUM_DI] = {0};
+GPIO_LEVEl DI_gpio_level_last[NUM_DI] = {gpiol_unknown, gpiol_unknown};
+GPIO_LEVEl DI_gpio_level_new[NUM_DI] = {gpiol_unknown, gpiol_unknown};
+uint64_t DI_last_event_time[NUM_DI] = {0};
+
+GPIO_LEVEl Triger_gpio_level_last[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
+GPIO_LEVEl Triger_gpio_level_new[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
+uint64_t DTriger_last_event_time[NUM_Triger] = {0};
 
 // ai_camera_plus or vision_hub_plus 
 std::string product = "ai_camera_plus";
@@ -211,8 +215,6 @@ void Thread_FWMonitorDI() {
       break;
     }
 
-    // if (!is_debounce_okay()) return;
-
     // Check which GPIO triggered the event
     for (i = 0; i < NUM_DI; i++) {
       if (fds[i].revents & POLLIN) {
@@ -224,21 +226,21 @@ void Thread_FWMonitorDI() {
 
         // Debounce per line
         uint64_t now = get_current_millis();
-        if (now - last_event_time[i] < DEBOUNCE_INTERVAL_MS) {
+        if (now - DI_last_event_time[i] < DEBOUNCE_TIME_MS) {
           continue;
         }
-        last_event_time[i] = now;
+        DI_last_event_time[i] = now;
 
-        gpio_level_new[i] = (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? gpiol_high : gpiol_low;
+        DI_gpio_level_new[i] = (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? gpiol_high : gpiol_low;
 
-        if (gpio_level_new[i] != gpio_level_last[i]) {
-          gpio_level_last[i] = gpio_level_new[i];
+        if (DI_gpio_level_new[i] != DI_gpio_level_last[i]) {
+          DI_gpio_level_last[i] = DI_gpio_level_new[i];
 
           xlog("GPIO %d event detected! Type: %s", DI_GPIOs[i],
                (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "rising" : "falling");
 
           string restfuls = "di/" + std::to_string(i+1) + "/status/" + ((event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "high" : "low");
-          sendRESTFul(restfuls, 9876);
+          sendRESTFul(restfuls);
         }
       }
     }
@@ -315,10 +317,29 @@ void Thread_FWMonitorTriger() {
     for (i = 0; i < NUM_Triger; i++) {
       if (fds[i].revents & POLLIN) {
         struct gpiod_line_event event;
-        gpiod_line_event_read(lines[i], &event);
+        if (gpiod_line_event_read(lines[i], &event) < 0) {
+            xlog("Failed to read GPIO event on line %d", Triger_GPIOs[i]);
+            continue;
+        }
+
+        // Debounce per line
+        uint64_t now = get_current_millis();
+        if (now - Triger_last_event_time[i] < DEBOUNCE_TIME_MS) {
+          continue;
+        }
+        Triger_last_event_time[i] = now;
+
+        Triger_gpio_level_new[i] = (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? gpiol_high : gpiol_low;
+
+        if (Triger_gpio_level_new[i] != Triger_gpio_level_last[i]) {
+          Triger_gpio_level_last[i] = Triger_gpio_level_new[i];
 
         xlog("GPIO %d event detected! Type: %s", Triger_GPIOs[i],
              (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "rising" : "falling");
+
+          string restfuls = "triger/" + std::to_string(i+1) + "/status/" + ((event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "high" : "low");
+          sendRESTFul(restfuls);
+        }
       }
     }
   }
