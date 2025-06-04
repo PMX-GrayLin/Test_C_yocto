@@ -13,7 +13,7 @@ uint64_t DI_last_event_time[NUM_DI] = {0};
 
 GPIO_LEVEl Triger_gpio_level_last[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
 GPIO_LEVEl Triger_gpio_level_new[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
-uint64_t DTriger_last_event_time[NUM_Triger] = {0};
+uint64_t Triger_last_event_time[NUM_Triger] = {0};
 
 // ai_camera_plus or vision_hub_plus 
 std::string product = "ai_camera_plus";
