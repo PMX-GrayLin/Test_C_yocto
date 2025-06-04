@@ -134,7 +134,10 @@ void sendRESTFul(const std::string& content, int port) {
     std::string url = "http://localhost:" + std::to_string(port)  + "/fw/" + content;
     xlog("url:%s", url.c_str());
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 500L);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 100L);
+    // Don't wait for the response body
+    curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
+
     CURLcode res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
       xlog("curl_easy_perform() failed:%s", curl_easy_strerror(res));
