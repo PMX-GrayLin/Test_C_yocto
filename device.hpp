@@ -1,7 +1,6 @@
 #pragma once
 
 #include "global.hpp"
-#include <poll.h>
 
 #define GPIO_CHIP       "/dev/gpiochip0"
 #define NUM_DI          2                 // Number of DI
@@ -10,6 +9,7 @@
 
 // ? NUM_DIOm aicamera = 2, visionhb = 4
 #define NUM_DIO         4                 // Number of DIO
+
 
 typedef enum {
   lc_red,
@@ -63,6 +63,12 @@ typedef enum {
   diodogp_3 = 11,
   diodogp_4 = 5,
 } DIO_DO_GPIO_PIN;
+
+typedef enum {
+    gpiol_unknown,
+    gpiol_low,
+    gpiol_high
+} GPIO_LEVEl;
 
 extern std::string product;
 

@@ -2,6 +2,14 @@
 
 #include <fstream>
 #include <gpiod.h>
+#include <poll.h>
+#include <time.h>
+
+#define DEBOUNCE_INTERVAL_MS 50
+
+GPIO_LEVEl gpio_level_last[NUM_DI] = { gpiol_unknown, gpiol_unknown} ;
+GPIO_LEVEl gpio_level_new[NUM_DI] = { gpiol_unknown, gpiol_unknown};
+struct timespec last_event_time = {0, 0};
 
 // ai_camera_plus or vision_hub_plus 
 std::string product = "ai_camera_plus";
@@ -154,6 +162,21 @@ void FW_setLED(string led_index, string led_color) {
   }
 }
 
+bool is_debounce_okay() {
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+
+    long diff_ms = (now.tv_sec - last_event_time.tv_sec) * 1000 +
+                   (now.tv_nsec - last_event_time.tv_nsec) / 1000000;
+
+    if (diff_ms > DEBOUNCE_INTERVAL_MS) {
+        last_event_time = now;
+        return true;
+    }
+
+    return false;
+}
+
 void Thread_FWMonitorDI() {
   struct gpiod_chip *chip;
   struct gpiod_line *lines[NUM_DI];
@@ -198,14 +221,22 @@ void Thread_FWMonitorDI() {
       break;
     }
 
+    if (!is_debounce_okay()) return;
+
     // Check which GPIO triggered the event
     for (i = 0; i < NUM_DI; i++) {
       if (fds[i].revents & POLLIN) {
         struct gpiod_line_event event;
         gpiod_line_event_read(lines[i], &event);
 
-        xlog("GPIO %d event detected! Type: %s", DI_GPIOs[i],
-             (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "rising" : "falling");
+        gpio_level_new[i] = (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? gpiol_high : gpiol_low;
+
+        if (gpio_level_new[i] != gpio_level_last[i]) {
+          gpio_level_last[i] = gpio_level_new[i];
+
+          xlog("GPIO %d event detected! Type: %s", DI_GPIOs[i],
+               (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "rising" : "falling");
+        }
       }
     }
   }
