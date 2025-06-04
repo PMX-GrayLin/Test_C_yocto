@@ -50,6 +50,7 @@ LINK_LIBS += -lglib-2.0
 LINK_LIBS += -lgobject-2.0
 LINK_LIBS += -lmosquitto -lmosquittopp
 LINK_LIBS += -lgpiod
+LINK_LIBS += -lcurl
 # LINK_LIBS += -lft4222 -lftd2xx
 
 OCVLDFLAG +=-lopencv_core 
