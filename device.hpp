@@ -21,8 +21,8 @@ typedef enum {
 typedef enum {
   ledgp_1_red = 79,
   ledgp_1_green = 80,
-  ledgp_2_red = 79,
-  ledgp_2_green = 81,
+  ledgp_2_red = 81,
+  ledgp_2_green = 82,
   ledgp_3_red = 114,
   ledgp_3_green = 115,
   ledgp_4_red = 116,
