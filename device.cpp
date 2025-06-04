@@ -231,15 +231,11 @@ void Thread_FWMonitorDI() {
         }
 
         DI_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
-        // DI_gpio_level_new[i] = (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? gpiol_high : gpiol_low;
 
         if (DI_gpio_level_new[i] != DI_gpio_level_last[i]) {
           DI_gpio_level_last[i] = DI_gpio_level_new[i];
           DI_last_event_time[i] = now;
-
-          // xlog("GPIO %d event detected! Type: %s", DI_GPIOs[i],
-          //      (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "rising" : "falling");
-          xlog("GPIO %d event detected! status:%s", DI_GPIOs[i], (DI_gpio_level_last[i] == gpiol_high) ? "high" : "low");
+          // xlog("GPIO %d event detected! status:%s", DI_GPIOs[i], (DI_gpio_level_last[i] == gpiol_high) ? "high" : "low");
 
           string restfuls = "di/" + std::to_string(i+1) + "/status/" + ((DI_gpio_level_last[i] == gpiol_high) ? "high" : "low");
           sendRESTFulAsync(restfuls);
@@ -329,17 +325,13 @@ void Thread_FWMonitorTriger() {
         if (now - Triger_last_event_time[i] < DEBOUNCE_TIME_MS) {
           continue;
         }
-        Triger_last_event_time[i] = now;
 
         Triger_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
-        // Triger_gpio_level_new[i] = (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? gpiol_high : gpiol_low;
 
         if (Triger_gpio_level_new[i] != Triger_gpio_level_last[i]) {
           Triger_gpio_level_last[i] = Triger_gpio_level_new[i];
-
-          // xlog("GPIO %d event detected! Type: %s", Triger_GPIOs[i],
-              //  (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "rising" : "falling");
-          xlog("GPIO %d event detected! status:%s", Triger_GPIOs[i], (Triger_gpio_level_last[i] == gpiol_high) ? "high" : "low");
+          Triger_last_event_time[i] = now;
+          // xlog("GPIO %d event detected! status:%s", Triger_GPIOs[i], (Triger_gpio_level_last[i] == gpiol_high) ? "high" : "low");
 
           string restfuls = "triger/" + std::to_string(i+1) + "/status/" + ((Triger_gpio_level_last[i] == gpiol_high) ? "high" : "low");
           sendRESTFul(restfuls);
