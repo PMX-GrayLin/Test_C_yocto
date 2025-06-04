@@ -5,7 +5,7 @@
 #include <poll.h>
 #include <chrono>
 
-#define DEBOUNCE_TIME_MS 10
+#define DEBOUNCE_TIME_MS 20
 
 GPIO_LEVEl DI_gpio_level_last[NUM_DI] = {gpiol_unknown, gpiol_unknown};
 GPIO_LEVEl DI_gpio_level_new[NUM_DI] = {gpiol_unknown, gpiol_unknown};
