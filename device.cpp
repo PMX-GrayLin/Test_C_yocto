@@ -221,13 +221,23 @@ void Thread_FWMonitorDI() {
       break;
     }
 
-    if (!is_debounce_okay()) return;
+    // if (!is_debounce_okay()) return;
 
     // Check which GPIO triggered the event
     for (i = 0; i < NUM_DI; i++) {
       if (fds[i].revents & POLLIN) {
         struct gpiod_line_event event;
-        gpiod_line_event_read(lines[i], &event);
+        if (gpiod_line_event_read(lines[i], &event) < 0) {
+            xlog("Failed to read GPIO event on line %d", DI_GPIOs[i]);
+            continue;
+        }
+
+        // Debounce per line
+        uint64_t now = get_current_millis();
+        if (now - last_event_time[i] < DEBOUNCE_INTERVAL_MS) {
+          continue;
+        }
+        last_event_time[i] = now;
 
         gpio_level_new[i] = (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? gpiol_high : gpiol_low;
 
