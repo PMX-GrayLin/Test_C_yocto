@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <sys/stat.h>
+#include <curl/curl.h>
 
 // POSIX header
 #include <libgen.h>

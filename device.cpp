@@ -3,10 +3,9 @@
 #include <fstream>
 #include <gpiod.h>
 #include <poll.h>
-// #include <time.h>
 #include <chrono>
 
-#define DEBOUNCE_INTERVAL_MS 20
+#define DEBOUNCE_INTERVAL_MS 30
 
 GPIO_LEVEl gpio_level_last[NUM_DI] = { gpiol_unknown, gpiol_unknown} ;
 GPIO_LEVEl gpio_level_new[NUM_DI] = { gpiol_unknown, gpiol_unknown};
@@ -162,21 +161,6 @@ void FW_setLED(string led_index, string led_color) {
     FW_setGPIO(gpio_index2, 0);
   }
 }
-
-// bool is_debounce_okay() {
-//     struct timespec now;
-//     clock_gettime(CLOCK_MONOTONIC, &now);
-
-//     long diff_ms = (now.tv_sec - last_event_time.tv_sec) * 1000 +
-//                    (now.tv_nsec - last_event_time.tv_nsec) / 1000000;
-
-//     if (diff_ms > DEBOUNCE_INTERVAL_MS) {
-//         last_event_time = now;
-//         return true;
-//     }
-
-//     return false;
-// }
 
 uint64_t get_current_millis() {
     auto now = std::chrono::steady_clock::now();
