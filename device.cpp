@@ -28,7 +28,7 @@ std::thread t_aicamera_monitorDI;
 bool isMonitorDI = false;
 
 // Triger
-int Triger_GPIOs[NUM_Triger] = {tgp_1, tgp_1};  // Triger GPIO
+int Triger_GPIOs[NUM_Triger] = {tgp_1, tgp_2};  // Triger GPIO
 std::thread t_aicamera_monitorTriger;
 bool isMonitorTriger = false;
 
