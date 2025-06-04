@@ -146,7 +146,7 @@ void sendRESTFul(const std::string& content, int port) {
   }
 }
 
-void sendRESTFulAsync(const std::string& content, int port = 7654) {
+void sendRESTFulAsync(const std::string& content, int port) {
   std::thread([content, port]() {
     sendRESTFul(content, port);
   }).detach();  // Detach so it runs independently
