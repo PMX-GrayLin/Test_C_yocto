@@ -3,13 +3,14 @@
 #include <fstream>
 #include <gpiod.h>
 #include <poll.h>
-#include <time.h>
+// #include <time.h>
+#include <chrono>
 
 #define DEBOUNCE_INTERVAL_MS 20
 
 GPIO_LEVEl gpio_level_last[NUM_DI] = { gpiol_unknown, gpiol_unknown} ;
 GPIO_LEVEl gpio_level_new[NUM_DI] = { gpiol_unknown, gpiol_unknown};
-struct timespec last_event_time = {0, 0};
+uint64_t last_event_time[NUM_DI] = {0};
 
 // ai_camera_plus or vision_hub_plus 
 std::string product = "ai_camera_plus";
@@ -175,6 +176,11 @@ bool is_debounce_okay() {
     }
 
     return false;
+}
+
+uint64_t get_current_millis() {
+    auto now = std::chrono::steady_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 }
 
 void Thread_FWMonitorDI() {
