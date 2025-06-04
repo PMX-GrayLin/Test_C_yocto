@@ -239,9 +239,9 @@ void Thread_FWMonitorDI() {
 
           // xlog("GPIO %d event detected! Type: %s", DI_GPIOs[i],
           //      (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "rising" : "falling");
-          xlog("GPIO %d event detected! status:%s", DI_GPIOs[i], (DI_gpio_level_new[i] == 1) ? "high" : "low");
+          xlog("GPIO %d event detected! status:%s", DI_GPIOs[i], (DI_gpio_level_new[i] == gpiol_high) ? "high" : "low");
 
-          string restfuls = "di/" + std::to_string(i+1) + "/status/" + ((event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "high" : "low");
+          string restfuls = "di/" + std::to_string(i+1) + "/status/" + ((Triger_gpio_level_new[i] == gpiol_high) ? "high" : "low");
           sendRESTFulAsync(restfuls);
         }
       }
@@ -339,9 +339,9 @@ void Thread_FWMonitorTriger() {
 
           // xlog("GPIO %d event detected! Type: %s", Triger_GPIOs[i],
               //  (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "rising" : "falling");
-          xlog("GPIO %d event detected! status:%s", Triger_GPIOs[i], (Triger_gpio_level_new[i] == 1) ? "high" : "low");
+          xlog("GPIO %d event detected! status:%s", Triger_GPIOs[i], (Triger_gpio_level_new[i] == gpiol_high) ? "high" : "low");
 
-          string restfuls = "triger/" + std::to_string(i+1) + "/status/" + ((event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "high" : "low");
+          string restfuls = "triger/" + std::to_string(i+1) + "/status/" + ((Triger_gpio_level_new[i] == gpiol_high) ? "high" : "low");
           sendRESTFul(restfuls);
         }
       }
