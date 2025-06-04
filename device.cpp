@@ -229,18 +229,19 @@ void Thread_FWMonitorDI() {
         if (now - DI_last_event_time[i] < DEBOUNCE_TIME_MS) {
           continue;
         }
-        DI_last_event_time[i] = now;
 
-        DI_gpio_level_new[i] = (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? gpiol_high : gpiol_low;
+        DI_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
+        // DI_gpio_level_new[i] = (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? gpiol_high : gpiol_low;
 
         if (DI_gpio_level_new[i] != DI_gpio_level_last[i]) {
           DI_gpio_level_last[i] = DI_gpio_level_new[i];
+          DI_last_event_time[i] = now;
 
           xlog("GPIO %d event detected! Type: %s", DI_GPIOs[i],
                (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "rising" : "falling");
 
           string restfuls = "di/" + std::to_string(i+1) + "/status/" + ((event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "high" : "low");
-          sendRESTFul(restfuls);
+          sendRESTFulAsync(restfuls);
         }
       }
     }

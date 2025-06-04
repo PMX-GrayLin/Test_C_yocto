@@ -145,3 +145,9 @@ void sendRESTFul(const std::string& content, int port) {
     curl_easy_cleanup(curl);
   }
 }
+
+void sendRESTFulAsync(const std::string& content, int port = 7654) {
+  std::thread([content, port]() {
+    sendRESTFul(content, port);
+  }).detach();  // Detach so it runs independently
+}
