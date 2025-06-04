@@ -203,6 +203,12 @@ void Thread_FWMonitorDI() {
     // Get file descriptor for polling
     fds[i].fd = gpiod_line_event_get_fd(lines[i]);
     fds[i].events = POLLIN;
+
+    // get init value & update to App
+    DI_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
+    string restfuls = "triger/" + std::to_string(i + 1) + "/status/" + ((DI_gpio_level_new[i] == gpiol_high) ? "high" : "low");
+    sendRESTFul(restfuls);
+
   }
 
   xlog("^^^^ Start ^^^^");
@@ -299,6 +305,11 @@ void Thread_FWMonitorTriger() {
     // Get file descriptor for polling
     fds[i].fd = gpiod_line_event_get_fd(lines[i]);
     fds[i].events = POLLIN;
+
+    // get init value & update to App
+    Triger_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
+    string restfuls = "triger/" + std::to_string(i + 1) + "/status/" + ((Triger_gpio_level_last[i] == gpiol_high) ? "high" : "low");
+    sendRESTFul(restfuls);
   }
 
   xlog("^^^^ Start ^^^^");
