@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "device.hpp"
+#include "mqttx.hpp"
 
 #if defined(ENABLE_CIS)
 #include "cam_omnivision.hpp"
