@@ -12,6 +12,17 @@ class MQTTClient : public mosqpp::mosquittopp {
   void on_message(const struct mosquitto_message* message) override;
 };
 
+class MQTTClient : public mosqpp::mosquittopp {
+ public:
+  MQTTClient(const std::string& client_id);
+  void on_connect(int rc) override;
+  void on_disconnect(int rc) override;
+  void send_message(const std::string& topic, const std::string& message);
+  void on_message(const struct mosquitto_message* message) override;
+
+ private:
+  bool connected = false;
+};
+
 void thread_mqtt_start();
 void thread_mqtt_stop();
-void handle_mqtt(std::string payload);
