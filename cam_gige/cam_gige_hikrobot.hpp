@@ -5,6 +5,8 @@
 
 #include <vector>
 
+#define NUM_GigE 2
+
 typedef enum {
   ugc_hikrobot = 0,
   ugc_basler,

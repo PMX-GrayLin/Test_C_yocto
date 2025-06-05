@@ -42,6 +42,9 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
       GigE_setGain_hik(segments[3]);
     } else if (isSameString(segments[2], "gain-auto")) {
       GigE_setGainAuto_hik(segments[3]);
+    } else if (isSameString(segments[2], "resolution")) {
+      // should set before streaming start
+
     }
 
   } else if (isSameString(segments[1], "get")) {
@@ -225,8 +228,8 @@ void GigE_ThreadStreaming_Hik() {
   // Define the capabilities: NV12 format
   GstCaps *caps = gst_caps_new_simple(
       "video/x-raw",
-      "width", G_TYPE_INT, 1536,
-      "height", G_TYPE_INT, 1024,
+      "width", G_TYPE_INT, 3072,
+      "height", G_TYPE_INT, 2048,
       "format", G_TYPE_STRING, "NV12",
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
