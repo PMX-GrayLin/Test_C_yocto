@@ -21,6 +21,7 @@ void MQTTClient::on_connect(int rc) {
 void MQTTClient::on_disconnect(int rc) {
   xlog("MQTT disconnected, rc:%d", rc);
   connected = false;
+  instance = nullptr;
 }
 
 void MQTTClient::send_message(const std::string &topic, const std::string &message) {
