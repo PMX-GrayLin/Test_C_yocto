@@ -6,14 +6,6 @@
 
 class MQTTClient : public mosqpp::mosquittopp {
  public:
-  explicit MQTTClient(const char* id);
-
- protected:
-  void on_message(const struct mosquitto_message* message) override;
-};
-
-class MQTTClient : public mosqpp::mosquittopp {
- public:
   MQTTClient(const std::string& client_id);
   void on_connect(int rc) override;
   void on_disconnect(int rc) override;
