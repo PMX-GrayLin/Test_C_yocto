@@ -222,8 +222,10 @@ int main(int argc, char* argv[]) {
     xlog("argv[%d]:%s", i, argv[i]);
   }
 
-  bool isUseMQTT = false;
-  if (!isUseMQTT) {
+  thread_mqtt_start();
+  
+  // bool isUseMQTT = false;
+  // if (!isUseMQTT) {
     xlog("USE RESTful...");
     
     // REST API: Get Temperature
@@ -294,21 +296,21 @@ int main(int argc, char* argv[]) {
     });
     svr.listen("0.0.0.0", 8765);
 
-  } else {
-    xlog("USE MQTT...");
+  // } else {
+  //   xlog("USE MQTT...");
 
-    // MQTT loop
-    mosqpp::lib_init();
-    MQTTClient client("my_client");
+  //   // MQTT loop
+  //   mosqpp::lib_init();
+  //   MQTTClient client("my_client");
 
-    client.connect("localhost", 1883);
-    client.subscribe(nullptr, "PX/VBS/Cmd");
+  //   client.connect("localhost", 1883);
+  //   client.subscribe(nullptr, "PX/VBS/Cmd");
 
-    while (true) {
-      client.loop();
-    }
-    mosqpp::lib_cleanup();
-  }
+  //   while (true) {
+  //     client.loop();
+  //   }
+  //   mosqpp::lib_cleanup();
+  // }
 
   return 0;
 }
