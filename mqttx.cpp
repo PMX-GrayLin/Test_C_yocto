@@ -2,9 +2,11 @@
 
 bool isMQTTRunning = false;
 
+MQTTClient* MQTTClient::instance = nullptr;
+
 MQTTClient::MQTTClient(const std::string &client_id)
     : mosquittopp(client_id.c_str()) {
-  // You can also set options here (e.g., username/password)
+  instance = this;  // Save self
 }
 
 void MQTTClient::on_connect(int rc) {
@@ -38,6 +40,16 @@ void MQTTClient::send_message(const std::string &topic, const std::string &messa
 void MQTTClient::on_message(const struct mosquitto_message *message) {
   std::string payload(static_cast<char *>(message->payload), message->payloadlen);
   xlog("MQTT payload:%s", payload.c_str());
+}
+
+void MQTTClient::send_message_static(const std::string &topic, const std::string &message) {
+  if (!instance) {
+    xlog("instance null");
+    return;
+  }
+
+  instance->loop();  // Keep connection alive
+  instance->send(topic, message);
 }
 
 void thread_mqtt_start() {
