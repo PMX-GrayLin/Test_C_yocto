@@ -205,7 +205,7 @@ void Thread_FWMonitorDI() {
     fds[i].events = POLLIN;
 
     // get init value & update to App
-    sendRESTful_DI(i+1, (gpiod_line_get_value(lines[i]) == 1));
+    sendRESTful_DI(i, (gpiod_line_get_value(lines[i]) == 1));
   }
 
   xlog("^^^^ Start ^^^^");
@@ -240,7 +240,7 @@ void Thread_FWMonitorDI() {
           DI_last_event_time[i] = now;
           // xlog("GPIO %d event detected! status:%s", DI_GPIOs[i], (DI_gpio_level_last[i] == gpiol_high) ? "high" : "low");
 
-          sendRESTful_DI(i+1, DI_gpio_level_last[i] == gpiol_high);
+          sendRESTful_DI(i, DI_gpio_level_last[i] == gpiol_high);
         }
       }
     }
@@ -303,7 +303,7 @@ void Thread_FWMonitorTriger() {
     fds[i].events = POLLIN;
 
     // get init value & update to App
-    sendRESTful_DI(i+1, (gpiod_line_get_value(lines[i]) == 1));
+    sendRESTful_DI(i, (gpiod_line_get_value(lines[i]) == 1));
   }
 
   xlog("^^^^ Start ^^^^");
@@ -338,7 +338,7 @@ void Thread_FWMonitorTriger() {
           Triger_last_event_time[i] = now;
           // xlog("GPIO %d event detected! status:%s", Triger_GPIOs[i], (Triger_gpio_level_last[i] == gpiol_high) ? "high" : "low");
 
-          sendRESTful_DI(i+1, (Triger_gpio_level_last[i] == gpiol_high));
+          sendRESTful_DI(i, (Triger_gpio_level_last[i] == gpiol_high));
         }
       }
     }

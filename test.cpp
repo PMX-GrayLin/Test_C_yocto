@@ -77,7 +77,7 @@ void handle_RESTful(std::vector<std::string> segments) {
 
 #if defined(ENABLE_Gige)
 
-  } else if (isSameString(segments[0], "gige")) {
+  } else if (isSameString(segments[0], "gige") || isSameString(segments[0], "gige1")) {
     Gige_handle_RESTful_hik(segments);
 
 #endif

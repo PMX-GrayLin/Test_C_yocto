@@ -8,6 +8,7 @@
 #include <opencv2/imgcodecs.hpp>
 
 #include "image_utils.hpp"
+#include "restfulx.hpp"
 
 extern void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info);
 
@@ -54,6 +55,8 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
       //
     } else if (isSameString(segments[2], "gain-auto")) {
       //
+    } else if (isSameString(segments[2], "isStreaming")) {
+      sendRESTful_streamingStatus(0, isStreaming_gige_hik);
     }
 
   } else if (isSameString(segments[1], "tp")) {
@@ -311,6 +314,7 @@ void GigE_ThreadStreaming_Hik() {
 
   xlog("pipeline is running...");
   isStreaming_gige_hik = true;
+  sendRESTful_streamingStatus(0, isStreaming_gige_hik);
 
   // Main loop
   loop_gige_hik = g_main_loop_new(nullptr, FALSE);
@@ -328,6 +332,7 @@ void GigE_ThreadStreaming_Hik() {
   }
 
   isStreaming_gige_hik = false;
+  sendRESTful_streamingStatus(0, isStreaming_gige_hik);
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 
@@ -342,30 +347,9 @@ void GigE_ThreadStreaming_Hik() {
     t_streaming_gige_hik = std::thread(GigE_ThreadStreaming_Hik);  
     t_streaming_gige_hik.detach();
 
-    // t_streaming_gige_hik = std::thread([] {
-    //   try {
-    //     GigE_ThreadStreaming_Hik();
-    //   } catch (const std::exception &e) {
-    //     xlog("Exception in streaming thread: %s", e.what());
-    //   } catch (...) {
-    //     xlog("Unknown exception in streaming thread");
-    //   }
-    // });
-
   }
   
   void GigE_StreamingStop_Hik() {
-    xlog("");
-    // if (loop_gige_hik) {
-    //   g_main_loop_quit(loop_gige_hik);
-    //   g_main_loop_unref(loop_gige_hik);
-    //   loop_gige_hik = nullptr;
-  
-    //   isStreaming_gige_hik = false;
-    // } else {
-    //   xlog("loop_gige_hik is invalid or already destroyed.");
-    // }
-
     if (!isStreaming_gige_hik) {
       xlog("Streaming not running");
       return;
@@ -375,13 +359,7 @@ void GigE_ThreadStreaming_Hik() {
       xlog("g_main_loop_quit");
       g_main_loop_quit(loop_gige_hik);  // Unref should only happen in the thread
     }
-  
-    // Optional: wait for thread to finish (if needed)
-    // if (t_streaming_gige_hik.joinable()) {
-    //   t_streaming_gige_hik.join();
-    // }
-  
-    xlog("");
+    
     isStreaming_gige_hik = false;
   }
   

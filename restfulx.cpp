@@ -3,6 +3,20 @@
 
 #include <curl/curl.h>
 
+void sendRESTful_streamingStatus(int index, bool isStreaming, int port) {
+  string content_fixed = "http://localhost:" + std::to_string(port) + "/fw/";
+  string content_rest = "gige" + std::to_string(index + 1) + "/isStreaming/" + (isStreaming ? "true" : "false");
+  string url = content_fixed + content_rest;
+  sendRESTFulAsync(url);
+}
+
+void sendRESTful_DI(int index, bool isLevelHigh, int port) {
+  string content_fixed = "http://localhost:" + std::to_string(port) + "/fw/";
+  string content_rest = "di/" + std::to_string(index + 1) + "/status/" + (isLevelHigh ? "high" : "low");
+  string url = content_fixed + content_rest;
+  sendRESTFulAsync(url);
+}
+
 void sendRESTFul(const std::string& url, int port) {
   CURL* curl = curl_easy_init();
   if (curl) {
@@ -27,9 +41,3 @@ void sendRESTFulAsync(const std::string& url, int port) {
   }).detach();  // Detach so it runs independently
 }
 
-void sendRESTful_DI(int index, bool isLevelHigh, int port) {
-    string content_fixed = "http://localhost:" + std::to_string(port)  + "/fw/";
-    string content_rest = "di/" + std::to_string(index) + "/status/" + (isLevelHigh ? "high" : "low");
-    string url = content_fixed + content_rest;
-    sendRESTFulAsync(url);
-}
