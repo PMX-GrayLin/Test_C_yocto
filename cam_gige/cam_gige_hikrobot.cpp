@@ -228,8 +228,8 @@ void GigE_ThreadStreaming_Hik() {
   // Define the capabilities: NV12 format
   GstCaps *caps = gst_caps_new_simple(
       "video/x-raw",
-      "width", G_TYPE_INT, 3072,
-      "height", G_TYPE_INT, 2048,
+      // "width", G_TYPE_INT, 3072,
+      // "height", G_TYPE_INT, 2048,
       "format", G_TYPE_STRING, "NV12",
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
