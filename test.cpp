@@ -90,6 +90,13 @@ void handle_RESTful(std::vector<std::string> segments) {
     
 #endif
 
+  } else if (isSameString(segments[0], "mqtt")) {
+    if (isSameString(segments[1], "start")) {
+      thread_mqtt_start();
+    } else if (isSameString(segments[1], "stop")) {
+      thread_mqtt_stop();
+    }
+
   } else if (isSameString(segments[0], "cmd")) {
     exec_command(segments[1]);
 
@@ -121,9 +128,7 @@ void thread_mqtt_start() {
       client.subscribe(nullptr, "PX/VBS/Cmd");
 
       while (true) {
-        xlog("");
-        client.loop();
-        xlog("");
+        client.loop();  // This triggers on_message()
       }
       mosqpp::lib_cleanup();
 
@@ -136,6 +141,7 @@ void thread_mqtt_start() {
 }
 
 void thread_mqtt_stop() {
+  isMQTTRunning = false;
 }
 
 void handle_mqtt(std::string payload) {
@@ -217,100 +223,77 @@ void test_ftdi() {
 #endif // ENABLE_FTDI
 
 int main(int argc, char* argv[]) {
-  xlog("Compiled at %s %s" , __DATE__, __TIME__);
+  xlog("Compiled at %s %s", __DATE__, __TIME__);
   for (int i = 0; i < argc; ++i) {
     xlog("argv[%d]:%s", i, argv[i]);
   }
 
-  thread_mqtt_start();
-  
-  // bool isUseMQTT = false;
-  // if (!isUseMQTT) {
-    xlog("USE RESTful...");
-    
-    // REST API: Get Temperature
-    httplib::Server svr;
+  httplib::Server svr;
 
 #if defined(ENABLE_OST)
 
-    svr.Get("/temperatures", [&](const httplib::Request& req, httplib::Response& res) {
-      xlog("query otpa8...");
-      float ambientTemp = 0.0;
-      float objectTemp = 0.0;
-      OTPA8 otpa8;
-      otpa8.readTemperature_max(ambientTemp, objectTemp);
-      std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
-                             ", \"object\": " + std::to_string(objectTemp) + " }";
-      res.set_content(response, "application/json");
-    });
-    svr.Get("/temperature_array", [&](const httplib::Request& req, httplib::Response& res) {
-      xlog("query otpa16...");
-      float ambientTemp = 0.0;
-      float objectTemp[256] = {0.0};
-      OTPA8 otpa8;
-      otpa8.readTemperature_array(ambientTemp, objectTemp);
-      std::ostringstream response;
-      response << "{ \"ambient\": " << std::fixed << std::setprecision(1) << ambientTemp << ", \"object\": [";
-      for (int i = 0; i < 256; ++i) {
-        response << std::fixed << std::setprecision(1) << objectTemp[i];
-        if (i < 255) response << ", ";  // Don't add comma after the last element
-      }
-      response << "] }";
-      res.set_content(response.str(), "application/json");
-    });
+  svr.Get("/temperatures", [&](const httplib::Request& req, httplib::Response& res) {
+    xlog("query otpa8...");
+    float ambientTemp = 0.0;
+    float objectTemp = 0.0;
+    OTPA8 otpa8;
+    otpa8.readTemperature_max(ambientTemp, objectTemp);
+    std::string response = "{ \"ambient\": " + std::to_string(ambientTemp) +
+                           ", \"object\": " + std::to_string(objectTemp) + " }";
+    res.set_content(response, "application/json");
+  });
+  svr.Get("/temperature_array", [&](const httplib::Request& req, httplib::Response& res) {
+    xlog("query otpa16...");
+    float ambientTemp = 0.0;
+    float objectTemp[256] = {0.0};
+    OTPA8 otpa8;
+    otpa8.readTemperature_array(ambientTemp, objectTemp);
+    std::ostringstream response;
+    response << "{ \"ambient\": " << std::fixed << std::setprecision(1) << ambientTemp << ", \"object\": [";
+    for (int i = 0; i < 256; ++i) {
+      response << std::fixed << std::setprecision(1) << objectTemp[i];
+      if (i < 255) response << ", ";  // Don't add comma after the last element
+    }
+    response << "] }";
+    res.set_content(response.str(), "application/json");
+  });
 
 #endif  // ENABLE_OST
 
-    svr.Get(R"(/fw/(.*))", [&](const httplib::Request &req, httplib::Response &res) {
-      std::smatch match;
-      std::regex regex(R"(/fw/(.*))");
-  
-      xlog("req.path:%s", req.path.c_str());
-      if (std::regex_match(req.path, match, regex)) {
-        // Create a dynamic array (vector) to store path segments
-        std::vector<std::string> segments;
-  
-        // Get the matched string (e.g., "1/2/3")
-        std::string matched_str = match[1].str();
-        xlog("RESTful string:%s", matched_str.c_str());
-  
-        // Split the matched string by '/' and store each segment in the vector
-        std::stringstream ss(matched_str);
-        std::string segment;
-        while (std::getline(ss, segment, '/')) {
-          segments.push_back(segment);
-        }
-        // for (const auto& seg : segments) {
-        //   xlog("segment:%s", seg.c_str());
-        // }
-        for (size_t i = 0; i < segments.size(); ++i) {
-          xlog("segment[%zu]:%s", i, segments[i].c_str());
-        }
+  svr.Get(R"(/fw/(.*))", [&](const httplib::Request& req, httplib::Response& res) {
+    std::smatch match;
+    std::regex regex(R"(/fw/(.*))");
 
-        handle_RESTful(segments);
-  
-      } else {
-        res.status = 400;  // Bad Request
-        res.set_content("{ \"error\": \"Invalid request\" }", "application/json");
+    xlog("req.path:%s", req.path.c_str());
+    if (std::regex_match(req.path, match, regex)) {
+      // Create a dynamic array (vector) to store path segments
+      std::vector<std::string> segments;
+
+      // Get the matched string (e.g., "1/2/3")
+      std::string matched_str = match[1].str();
+      xlog("RESTful string:%s", matched_str.c_str());
+
+      // Split the matched string by '/' and store each segment in the vector
+      std::stringstream ss(matched_str);
+      std::string segment;
+      while (std::getline(ss, segment, '/')) {
+        segments.push_back(segment);
       }
-    });
-    svr.listen("0.0.0.0", 8765);
+      // for (const auto& seg : segments) {
+      //   xlog("segment:%s", seg.c_str());
+      // }
+      for (size_t i = 0; i < segments.size(); ++i) {
+        xlog("segment[%zu]:%s", i, segments[i].c_str());
+      }
 
-  // } else {
-  //   xlog("USE MQTT...");
+      handle_RESTful(segments);
 
-  //   // MQTT loop
-  //   mosqpp::lib_init();
-  //   MQTTClient client("my_client");
-
-  //   client.connect("localhost", 1883);
-  //   client.subscribe(nullptr, "PX/VBS/Cmd");
-
-  //   while (true) {
-  //     client.loop();
-  //   }
-  //   mosqpp::lib_cleanup();
-  // }
+    } else {
+      res.status = 400;  // Bad Request
+      res.set_content("{ \"error\": \"Invalid request\" }", "application/json");
+    }
+  });
+  svr.listen("0.0.0.0", 8765);
 
   return 0;
 }
