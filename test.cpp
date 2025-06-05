@@ -97,7 +97,7 @@ void handle_RESTful(std::vector<std::string> segments) {
     } else if (isSameString(segments[1], "stop")) {
       thread_mqtt_stop();
     } else if (isSameString(segments[1], "send")) {
-      MQTTClient::send_message_static("topic123, message123");
+      MQTTClient::send_message_static("topic123", "message123");
     }
 
   } else if (isSameString(segments[0], "cmd")) {
