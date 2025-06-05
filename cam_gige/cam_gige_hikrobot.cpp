@@ -2,13 +2,13 @@
 
 #include <gst/gst.h>
 
-#include "image_utils.hpp"
-#include "restfulx.hpp"
-
 // apply only used header
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
+
+#include "image_utils.hpp"
+#include "restfulx.hpp"
 
 extern void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info);
 
@@ -279,19 +279,13 @@ void GigE_ThreadStreaming_Hik() {
           g_error_free(err);
           g_free(dbg);
   
-          // GMainLoop *loop = static_cast<GMainLoop *>(user_data);
-          // g_main_loop_quit(loop);
-
-          // ?? to stop streaming
           GigE_StreamingStop_Hik();
           break;
         }
   
         case GST_MESSAGE_EOS:
           xlog("Received EOS, stopping...");
-          // g_main_loop_quit(static_cast<GMainLoop *>(user_data));
 
-          // ?? to stop streaming
           GigE_StreamingStop_Hik();
           break;
   
