@@ -1,4 +1,6 @@
 #include "cam_gige_hikrobot.hpp"
+#include "image_utils.hpp"
+#include "restfulx.hpp"
 
 #include <gst/gst.h>
 
@@ -7,8 +9,6 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 
-#include "image_utils.hpp"
-#include "restfulx.hpp"
 
 extern void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info);
 
