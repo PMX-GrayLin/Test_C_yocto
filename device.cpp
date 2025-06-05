@@ -5,6 +5,8 @@
 #include <poll.h>
 #include <chrono>
 
+#include "restfulx.hpp"
+
 #define DEBOUNCE_TIME_MS 20
 
 // ai_camera_plus or vision_hub_plus 
