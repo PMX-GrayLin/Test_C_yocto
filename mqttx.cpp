@@ -33,7 +33,7 @@ void MQTTClient::send_message(const std::string &topic, const std::string &messa
   if (ret != MOSQ_ERR_SUCCESS) {
     xlog("Failed to publish, ret:%d", ret);
   } else {
-    xlog("topic:%s, message:%s", topic, message);
+    xlog("topic:%s, message:%s", topic.c_str(), message.c_str());
   }
 }
 
@@ -48,8 +48,8 @@ void MQTTClient::send_message_static(const std::string &topic, const std::string
     return;
   }
 
-  instance->loop();  // Keep connection alive
-  instance->send(topic, message);
+  // instance->loop();  // Keep connection alive
+  instance->send_message(topic, message);
 }
 
 void thread_mqtt_start() {
