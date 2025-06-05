@@ -7,14 +7,6 @@
 
 #define DEBOUNCE_TIME_MS 20
 
-GPIO_LEVEl DI_gpio_level_last[NUM_DI] = {gpiol_unknown, gpiol_unknown};
-GPIO_LEVEl DI_gpio_level_new[NUM_DI] = {gpiol_unknown, gpiol_unknown};
-uint64_t DI_last_event_time[NUM_DI] = {0};
-
-GPIO_LEVEl Triger_gpio_level_last[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
-GPIO_LEVEl Triger_gpio_level_new[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
-uint64_t Triger_last_event_time[NUM_Triger] = {0};
-
 // ai_camera_plus or vision_hub_plus 
 std::string product = "ai_camera_plus";
 
@@ -26,11 +18,17 @@ const int pwmPeriod = 200000;                   // 5 kHz
 int DI_GPIOs[NUM_DI] = {digp_1, digp_2};        // DI GPIO
 std::thread t_aicamera_monitorDI;
 bool isMonitorDI = false;
+GPIO_LEVEl DI_gpio_level_last[NUM_DI] = {gpiol_unknown, gpiol_unknown};
+GPIO_LEVEl DI_gpio_level_new[NUM_DI] = {gpiol_unknown, gpiol_unknown};
+uint64_t DI_last_event_time[NUM_DI] = {0};
 
 // Triger
 int Triger_GPIOs[NUM_Triger] = {tgp_1, tgp_2};  // Triger GPIO
 std::thread t_aicamera_monitorTriger;
 bool isMonitorTriger = false;
+GPIO_LEVEl Triger_gpio_level_last[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
+GPIO_LEVEl Triger_gpio_level_new[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
+uint64_t Triger_last_event_time[NUM_Triger] = {0};
 
 // DO
 int DO_GPIOs[NUM_DO] = {dogp_1, dogp_2};        // DO GPIO
@@ -205,9 +203,7 @@ void Thread_FWMonitorDI() {
     fds[i].events = POLLIN;
 
     // get init value & update to App
-    string restfuls = "triger/" + std::to_string(i + 1) + "/status/" + ((gpiod_line_get_value(lines[i]) == 1) ? "high" : "low");
-    sendRESTFul(restfuls);
-
+    sendRESTful_DI(i+1, (gpiod_line_get_value(lines[i]) == 1));
   }
 
   xlog("^^^^ Start ^^^^");
@@ -242,8 +238,7 @@ void Thread_FWMonitorDI() {
           DI_last_event_time[i] = now;
           // xlog("GPIO %d event detected! status:%s", DI_GPIOs[i], (DI_gpio_level_last[i] == gpiol_high) ? "high" : "low");
 
-          string restfuls = "di/" + std::to_string(i+1) + "/status/" + ((DI_gpio_level_last[i] == gpiol_high) ? "high" : "low");
-          sendRESTFulAsync(restfuls);
+          sendRESTful_DI(i+1, DI_gpio_level_last[i] == gpiol_high);
         }
       }
     }
@@ -306,8 +301,7 @@ void Thread_FWMonitorTriger() {
     fds[i].events = POLLIN;
 
     // get init value & update to App
-    string restfuls = "triger/" + std::to_string(i + 1) + "/status/" + ((gpiod_line_get_value(lines[i]) == 1) ? "high" : "low");
-    sendRESTFul(restfuls);
+    sendRESTful_DI(i+1, (gpiod_line_get_value(lines[i]) == 1));
   }
 
   xlog("^^^^ Start ^^^^");
@@ -342,8 +336,7 @@ void Thread_FWMonitorTriger() {
           Triger_last_event_time[i] = now;
           // xlog("GPIO %d event detected! status:%s", Triger_GPIOs[i], (Triger_gpio_level_last[i] == gpiol_high) ? "high" : "low");
 
-          string restfuls = "triger/" + std::to_string(i+1) + "/status/" + ((Triger_gpio_level_last[i] == gpiol_high) ? "high" : "low");
-          sendRESTFul(restfuls);
+          sendRESTful_DI(i+1, (Triger_gpio_level_last[i] == gpiol_high));
         }
       }
     }

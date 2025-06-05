@@ -5,7 +5,6 @@
 #include <iomanip>
 #include <algorithm>
 #include <sys/stat.h>
-#include <curl/curl.h>
 
 // POSIX header
 #include <libgen.h>
@@ -128,26 +127,3 @@ std::string exec_command(const std::string& cmd) {
   return result;
 }
 
-void sendRESTFul(const std::string& content, int port) {
-  CURL* curl = curl_easy_init();
-  if (curl) {
-    std::string url = "http://localhost:" + std::to_string(port)  + "/fw/" + content;
-    xlog("url:%s", url.c_str());
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 100L);
-    // Don't wait for the response body
-    curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
-
-    CURLcode res = curl_easy_perform(curl);
-    if (res != CURLE_OK) {
-      xlog("curl_easy_perform() failed:%s", curl_easy_strerror(res));
-    }
-    curl_easy_cleanup(curl);
-  }
-}
-
-void sendRESTFulAsync(const std::string& content, int port) {
-  std::thread([content, port]() {
-    sendRESTFul(content, port);
-  }).detach();  // Detach so it runs independently
-}

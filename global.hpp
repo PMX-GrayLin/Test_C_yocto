@@ -43,5 +43,3 @@ std::string getTimeString();
 std::string get_parent_directory(const std::string& path);
 std::string exec_command(const std::string& cmd);
 
-void sendRESTFul(const std::string&  content, int port = 7654);
-void sendRESTFulAsync(const std::string& content, int port = 7654);
