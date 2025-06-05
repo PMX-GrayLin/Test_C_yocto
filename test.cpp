@@ -129,6 +129,7 @@ void thread_mqtt_start() {
 
       while (true) {
         client.loop();  // This triggers on_message()
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
       }
       mosqpp::lib_cleanup();
 
