@@ -1,14 +1,14 @@
 #include "cam_gige_hikrobot.hpp"
-#include "image_utils.hpp"
-#include "restfulx.hpp"
 
 #include <gst/gst.h>
 
+#include "image_utils.hpp"
+#include "restfulx.hpp"
+
 // apply only used header
 #include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
-
+#include <opencv2/imgproc.hpp>
 
 extern void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info);
 
@@ -21,13 +21,12 @@ static GstElement *source_gige_hik = nullptr;
 std::thread t_streaming_gige_hik;
 bool isStreaming_gige_hik = false;
 
-struct GigeControlParams gigeControlParams = { 0 };
+struct GigeControlParams gigeControlParams = {0};
 
 bool isCapturePhoto_hik = false;
 std::string pathName_savedImage_hik = "";
 
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
-
   if (isSameString(segments[1], "start")) {
     GigE_StreamingStart_Hik();
 
@@ -63,7 +62,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     xlog("take picture");
     std::string path = "";
     if (segments.size() > 2 && !segments[2].empty()) {
-      //ex: curl http://localhost:8765/fw/gige/tp/%252Fhome%252Froot%252Fprimax%252F12345.png
+      // ex: curl http://localhost:8765/fw/gige/tp/%252Fhome%252Froot%252Fprimax%252F12345.png
       path = segments[2];
       const std::string from = "%2F";
       const std::string to = "/";
@@ -77,7 +76,6 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     }
     GigE_setImagePath_hik(path.c_str());
     GigE_captureImage_hik();
-
   }
 }
 
@@ -86,7 +84,7 @@ void GigE_saveImage_hik(GstPad *pad, GstPadProbeInfo *info) {
     xlog("");
     isCapturePhoto_hik = false;
 
-    imgu_saveImage((void*)pad, (void*)info, pathName_savedImage_hik);
+    imgu_saveImage((void *)pad, (void *)info, pathName_savedImage_hik);
   }
 }
 
@@ -182,7 +180,7 @@ void GigE_setGainAuto_hik(string gstArvAutoS) {
   g_object_set(G_OBJECT(source_gige_hik), "gain-auto", gaa, NULL);
 }
 
-void GigE_setImagePath_hik(const string& imagePath) {
+void GigE_setImagePath_hik(const string &imagePath) {
   pathName_savedImage_hik = imagePath;
   xlog("pathName_savedImage_hik:%s", pathName_savedImage_hik.c_str());
 }
@@ -336,30 +334,28 @@ void GigE_ThreadStreaming_Hik() {
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 
-  void GigE_StreamingStart_Hik() {
-    xlog("");
-    if (isStreaming_gige_hik) {
-      xlog("thread already running");
-      return;
-    }
-    isStreaming_gige_hik = true;
-    
-    t_streaming_gige_hik = std::thread(GigE_ThreadStreaming_Hik);  
-    t_streaming_gige_hik.detach();
+void GigE_StreamingStart_Hik() {
+  xlog("");
+  if (isStreaming_gige_hik) {
+    xlog("thread already running");
+    return;
+  }
+  isStreaming_gige_hik = true;
 
+  t_streaming_gige_hik = std::thread(GigE_ThreadStreaming_Hik);
+  t_streaming_gige_hik.detach();
+}
+
+void GigE_StreamingStop_Hik() {
+  if (!isStreaming_gige_hik) {
+    xlog("Streaming not running");
+    return;
   }
-  
-  void GigE_StreamingStop_Hik() {
-    if (!isStreaming_gige_hik) {
-      xlog("Streaming not running");
-      return;
-    }
-  
-    if (loop_gige_hik) {
-      xlog("g_main_loop_quit");
-      g_main_loop_quit(loop_gige_hik);  // Unref should only happen in the thread
-    }
-    
-    isStreaming_gige_hik = false;
+
+  if (loop_gige_hik) {
+    xlog("g_main_loop_quit");
+    g_main_loop_quit(loop_gige_hik);  // Unref should only happen in the thread
   }
-  
+
+  isStreaming_gige_hik = false;
+}
