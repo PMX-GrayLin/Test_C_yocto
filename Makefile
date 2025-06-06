@@ -1,6 +1,6 @@
 
-APP_NAME=test
-# APP_NAME=fw_daemon
+# APP_NAME=test
+APP_NAME=fw_daemon
 
 # add define to enable/disable functions
 ENABLE_Gige ?= 1
