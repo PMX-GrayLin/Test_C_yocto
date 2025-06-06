@@ -1,7 +1,5 @@
 #include "test.hpp"
 
-#include <vector>
-
 #include "device.hpp"
 #include "httplib.hpp"
 #include "mqttx.hpp"

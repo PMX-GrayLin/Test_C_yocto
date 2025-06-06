@@ -2,6 +2,8 @@
 
 #include "global.hpp"
 
+#include <vector>
+
 // RESTful
 void handle_RESTful(std::vector<std::string> segments);
 
