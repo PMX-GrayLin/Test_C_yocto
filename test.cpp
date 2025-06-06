@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "device.hpp"
+#include "httplib.hpp"
 #include "mqttx.hpp"
 
 #if defined(ENABLE_CIS)
@@ -63,7 +64,7 @@ void handle_RESTful(std::vector<std::string> segments) {
       FW_setDIOOut(segments[1], segments[3]);
     }
 
-  } else if (segments.size() >= 3 && isSameString(segments[0].c_str(), "gpio")) {
+  } else if (segments.size() >= 3 && isSameString(segments[0], "gpio")) {
     int gpio_num = stoi(segments[1]);
     int gpio_vaue = (segments[2] == "1") ? 1 : 0 ;
     FW_setGPIO(gpio_num, gpio_vaue);
