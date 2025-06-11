@@ -1,5 +1,6 @@
 // AI Camera Plus embeded CIS ( Camera Image Sensor )
 // OG05b10
+// AICP for AI Camera Plus
 
 #pragma once
 
