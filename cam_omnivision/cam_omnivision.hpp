@@ -17,11 +17,12 @@ typedef enum {
     spf_PNG,
 } SavedPhotoFormat;
 
-extern void CIS_handle_RESTful(std::vector<std::string> segments);
+extern void AICP_handle_RESTful(std::vector<std::string> segments);
 
 extern bool AICP_isUseCISCamera();
 extern std::string AICP_getVideoDevice();
 
+// IOCTLS ===========
 int ioctl_get_value(int control_ID);
 int ioctl_set_value(int control_ID, int value);
 extern int AICP_getBrightness();
@@ -61,8 +62,8 @@ extern void AICP_enableCrop(bool enable);
 extern void AICP_enablePadding(bool enable);
 
 // Streaming
-void ThreadAICameraStreaming();
-void ThreadAICameraStreaming_usb();
+void Thread_AICPStreaming();
+void Thread_AICPStreaming_usb();
 extern void AICP_streamingStart();
 extern void AICP_streamingStop();
 

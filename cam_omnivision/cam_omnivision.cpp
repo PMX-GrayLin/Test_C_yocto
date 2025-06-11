@@ -33,7 +33,7 @@ static GMainLoop *gst_loop = nullptr;
 
 namespace fs = std::filesystem;
 
-void CIS_handle_RESTful(std::vector<std::string> segments) {
+void AICP_handle_RESTful(std::vector<std::string> segments) {
   if (isSameString(segments[1], "start")) {
     AICP_streamingStart();
   } else if (isSameString(segments[1], "stop")) {
@@ -642,7 +642,7 @@ GstPadProbeReturn AICP_streamingDataCallback(GstPad *pad, GstPadProbeInfo *info,
   return GST_PAD_PROBE_OK;
 }
 
-void ThreadAICameraStreaming() {
+void Thread_AICPStreaming() {
   xlog("++++ start ++++");
   counterFrame = 0;
   counterImg = 0;
@@ -786,7 +786,7 @@ void ThreadAICameraStreaming() {
 
 }
 
-void ThreadAICameraStreaming_usb() {
+void Thread_AICPStreaming_usb() {
   xlog("++++ start ++++");
   counterFrame = 0;
   counterImg = 0;
@@ -896,9 +896,9 @@ void AICP_streamingStart() {
 
   if (AICP_isUseCISCamera())
   {
-    t_aicamera_streaming = std::thread(ThreadAICameraStreaming);
+    t_aicamera_streaming = std::thread(Thread_AICPStreaming);
   } else {
-    t_aicamera_streaming = std::thread(ThreadAICameraStreaming_usb);  
+    t_aicamera_streaming = std::thread(Thread_AICPStreaming_usb);  
   }
   
   t_aicamera_streaming.detach();

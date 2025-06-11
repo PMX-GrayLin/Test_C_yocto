@@ -71,7 +71,7 @@ void handle_RESTful(std::vector<std::string> segments) {
 
   } else if (isSameString(segments[0], "gst")) {
     
-    CIS_handle_RESTful(segments);
+    AICP_handle_RESTful(segments);
 
 #endif
 
