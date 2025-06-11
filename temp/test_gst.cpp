@@ -29,7 +29,7 @@ void test_gst(int testCase) {
     // OK
     // gst-launch-1.0 -v v4l2src device=/dev/video47 ! video/x-raw,width=1920,height=1080 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
     pipelineS =
-        "v4l2src device=" + AICamrea_getVideoDevice() + " " +
+        "v4l2src device=" + AICP_getVideoDevice() + " " +
         "! video/x-raw,width=2048,height=1536 " +
         "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf "
         "! rtspclientsink location=rtsp://localhost:8554/mystream";
@@ -189,8 +189,8 @@ void test_gst2(int testCase) {
   }
 
   // Set properties for the elements
-  xlog("AICamrea_getVideoDevice:%s", AICamrea_getVideoDevice().c_str());
-  g_object_set(G_OBJECT(source), "device", AICamrea_getVideoDevice().c_str(), nullptr);
+  xlog("AICP_getVideoDevice:%s", AICP_getVideoDevice().c_str());
+  g_object_set(G_OBJECT(source), "device", AICP_getVideoDevice().c_str(), nullptr);
 
   // Create a GstStructure for extra-controls
   GstStructure *controls = gst_structure_new(

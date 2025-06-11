@@ -18,7 +18,7 @@ void test_ocv(int testCase) {
 
     // NG
   // string pipelineS =
-  //     "v4l2src device=" + AICamrea_getVideoDevice() + " " +
+  //     "v4l2src device=" + AICP_getVideoDevice() + " " +
   //     "! video/x-raw, width=640, height=480, framerate=30/1  " +
   //     "! videoconvert "
   //     "! v4l2h264enc "
@@ -26,7 +26,7 @@ void test_ocv(int testCase) {
 
   // NG
   // string pipelineS =
-  //     "v4l2src device=" + AICamrea_getVideoDevice() + " " +
+  //     "v4l2src device=" + AICP_getVideoDevice() + " " +
   //     "! video/x-raw, width=640, height=480, framerate=30/1  " +
   //     "! videoconvert "
   //     "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
@@ -34,7 +34,7 @@ void test_ocv(int testCase) {
 
   // NG
   // string pipelineS =
-  //     "v4l2src device=" + AICamrea_getVideoDevice() + " " +
+  //     "v4l2src device=" + AICP_getVideoDevice() + " " +
   //     "! video/x-raw,width=640,height=480 " +
   //     "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=mmap "
   //     "! appsink";
@@ -44,14 +44,14 @@ void test_ocv(int testCase) {
 
   // OK
   // string pipelineS =
-  //     "v4l2src device=" + AICamrea_getVideoDevice() + " " +
+  //     "v4l2src device=" + AICP_getVideoDevice() + " " +
   //     "! video/x-raw, width=640, height=480, framerate=30/1  " +
   //     "! videoconvert "
   //     "! appsink";
 
   // NG
   string pipelineS =
-      "v4l2src device=" + AICamrea_getVideoDevice() + " " +
+      "v4l2src device=" + AICP_getVideoDevice() + " " +
       "! video/x-raw, width=640, height=480 " +
       "! videoconvert "
       "! appsink";

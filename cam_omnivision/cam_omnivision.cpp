@@ -35,9 +35,9 @@ namespace fs = std::filesystem;
 
 void CIS_handle_RESTful(std::vector<std::string> segments) {
   if (isSameString(segments[1], "start")) {
-    AICamera_streamingStart();
+    AICP_streamingStart();
   } else if (isSameString(segments[1], "stop")) {
-    AICamera_streamingStop();
+    AICP_streamingStop();
 
   } else if (isSameString(segments[1], "tp")) {
     xlog("take picture");
@@ -56,12 +56,12 @@ void CIS_handle_RESTful(std::vector<std::string> segments) {
     } else {
       path = "/home/root/primax/fw_" + getTimeString() + ".png";
     }
-    AICamera_setImagePath(path.c_str());
-    AICamera_captureImage();
+    AICP_setImagePath(path.c_str());
+    AICP_captureImage();
   }
 }
 
-bool AICamrea_isUseCISCamera() {
+bool AICP_isUseCISCamera() {
   if (isPathExist(AICamreaCISPath)) {
     xlog("path /dev/csi_cam_preview exist");
     return true;
@@ -71,10 +71,10 @@ bool AICamrea_isUseCISCamera() {
   }
 }
 
-std::string AICamrea_getVideoDevice() {
+std::string AICP_getVideoDevice() {
   std::string videoPath;
 
-  bool isUseCSICamera = AICamrea_isUseCISCamera();
+  bool isUseCSICamera = AICP_isUseCISCamera();
 
   if (isUseCSICamera) {
     videoPath = AICamreaCISPath;
@@ -110,7 +110,7 @@ std::string AICamrea_getVideoDevice() {
 }
 
 int ioctl_get_value(int control_ID) {
-  int fd = open(AICamrea_getVideoDevice().c_str(), O_RDWR);
+  int fd = open(AICP_getVideoDevice().c_str(), O_RDWR);
   if (fd == -1) {
     xlog("Failed to open video device:%s", strerror(errno));
     return -1;
@@ -139,7 +139,7 @@ int ioctl_get_value(int control_ID) {
 }
 
 int ioctl_set_value(int control_ID, int value) {
-  int fd = open(AICamrea_getVideoDevice().c_str(), O_RDWR);
+  int fd = open(AICP_getVideoDevice().c_str(), O_RDWR);
   if (fd == -1) {
     xlog("Failed to open video device:%s", strerror(errno));
     return -1;
@@ -160,156 +160,156 @@ int ioctl_set_value(int control_ID, int value) {
   return 0;
 }
 
-int AICamera_getBrightness() {
+int AICP_getBrightness() {
   return ioctl_get_value(V4L2_CID_BRIGHTNESS);
 }
 
-void AICamera_setBrightness(int value) {
+void AICP_setBrightness(int value) {
   xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_BRIGHTNESS, value);
 }
 
-int AICamera_getContrast() {
+int AICP_getContrast() {
   return ioctl_get_value(V4L2_CID_CONTRAST);
 }
 
-void AICamera_setContrast(int value) {
+void AICP_setContrast(int value) {
   xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_CONTRAST, value);
 }
 
-int AICamera_getSaturation() {
+int AICP_getSaturation() {
   return ioctl_get_value(V4L2_CID_SATURATION);
 }
 
-void AICamera_setSaturation(int value) {
+void AICP_setSaturation(int value) {
   xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_SATURATION, value);
 }
 
-int AICamera_getHue() {
+int AICP_getHue() {
   return ioctl_get_value(V4L2_CID_HUE);
 }
 
-void AICamera_setHue(int value) {
+void AICP_setHue(int value) {
   xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_HUE, value);
 }
 
 // command example
 // v4l2-ctl -d 78 --get-ctrl=white_balance_automatic
-int AICamera_getWhiteBalanceAutomatic() {
+int AICP_getWhiteBalanceAutomatic() {
   return ioctl_get_value(V4L2_CID_AUTO_WHITE_BALANCE);
 }
 
 // command example
 // v4l2-ctl -d 78 --set-ctrl=white_balance_automatic=0
 // v4l2-ctl -d 78 --set-ctrl=white_balance_automatic=1
-void AICamera_setWhiteBalanceAutomatic(bool enable) {
+void AICP_setWhiteBalanceAutomatic(bool enable) {
   xlog("enable:%d", enable);
   ioctl_set_value(V4L2_CID_AUTO_WHITE_BALANCE, enable ? 1 : 0);
 }
 
-int AICamera_getSharpness() {
+int AICP_getSharpness() {
   return ioctl_get_value(V4L2_CID_SHARPNESS);
 }
 
-void AICamera_setSharpness(int value) {
+void AICP_setSharpness(int value) {
   xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_SHARPNESS, value);
 }
 
-int AICamera_getISO() {
+int AICP_getISO() {
   return ioctl_get_value(0x009819a9);
 }
 
-void AICamera_setISO(int value) {
+void AICP_setISO(int value) {
   xlog("value:%d", value);
   ioctl_set_value(0x009819a9, value);
 }
 
-int AICamera_getExposure() {
+int AICP_getExposure() {
   return ioctl_get_value(V4L2_CID_EXPOSURE);
 }
 
-void AICamera_setExposure(int value) {
+void AICP_setExposure(int value) {
   xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_EXPOSURE, value);
 }
 
-int AICamera_getWhiteBalanceTemperature() {
+int AICP_getWhiteBalanceTemperature() {
   return ioctl_get_value(V4L2_CID_WHITE_BALANCE_TEMPERATURE);
 }
 
-void AICamera_setWhiteBalanceTemperature(int value) {
+void AICP_setWhiteBalanceTemperature(int value) {
   xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_WHITE_BALANCE_TEMPERATURE, value);
 }
 
-int AICamera_getExposureAuto() {
+int AICP_getExposureAuto() {
   return ioctl_get_value(V4L2_CID_EXPOSURE_AUTO);
 }
 
-void AICamera_setExposureAuto(bool enable) {
+void AICP_setExposureAuto(bool enable) {
   xlog("enable:%d", enable);
   ioctl_set_value(V4L2_CID_EXPOSURE_AUTO, enable ? 0 : 1);
 }
 
-int AICamera_getExposureTimeAbsolute() {
+int AICP_getExposureTimeAbsolute() {
   xlog("");
   return ioctl_get_value(V4L2_CID_EXPOSURE_ABSOLUTE);
 }
 
-void AICamera_setExposureTimeAbsolute(double sec) {
+void AICP_setExposureTimeAbsolute(double sec) {
   xlog("tmp sec:%f", sec);
   int value = (int)(sec * 1000000.0);
   xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_EXPOSURE_ABSOLUTE, value);
 }
 
-int AICamera_getFocusAbsolute() {
+int AICP_getFocusAbsolute() {
   return ioctl_get_value(V4L2_CID_FOCUS_ABSOLUTE);
 }
 
-void AICamera_setFocusAbsolute(int value) {
+void AICP_setFocusAbsolute(int value) {
   xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_FOCUS_ABSOLUTE, value);
 }
 
-int AICamera_getFocusAuto() {
+int AICP_getFocusAuto() {
   return ioctl_get_value(V4L2_CID_FOCUS_AUTO);
 }
 
-void AICamera_setFocusAuto(bool enable) {
+void AICP_setFocusAuto(bool enable) {
   xlog("enable:%d", enable);
   ioctl_set_value(V4L2_CID_FOCUS_AUTO, enable ? 1 : 0);
 }
 
-void AICamera_setImagePath(const string& imagePath) {
+void AICP_setImagePath(const string& imagePath) {
   pathName_savedImage = imagePath;
   xlog("pathName_savedImage:%s", pathName_savedImage.c_str());
 }
 
-void AICamera_setCropImagePath(const string& imagePath) {
+void AICP_setCropImagePath(const string& imagePath) {
   pathName_croppedImage = imagePath;
   xlog("pathName_croppedImage:%s", pathName_croppedImage.c_str());
 }
 
-void AICamera_setInputImagePath(const string& imagePath) {
+void AICP_setInputImagePath(const string& imagePath) {
   pathName_inputImage = imagePath;
   xlog("pathName_inputImage:%s", pathName_inputImage.c_str());
 }
 
-void AICamera_setCropROI(cv::Rect roi) {
+void AICP_setCropROI(cv::Rect roi) {
   crop_roi = roi;
   xlog("ROI x:%d, y:%d, w:%d, h:%d", crop_roi.x, crop_roi.y, crop_roi.width, crop_roi.height);
 }
 
-bool AICamera_isCropImage() {
+bool AICP_isCropImage() {
   return (crop_roi != cv::Rect(0, 0, 0, 0));
 }
 
-void AICamera_captureImage() {
+void AICP_captureImage() {
   if (!isStreaming) {
     xlog("do nothing...camera is not streaming");
     return;
@@ -318,21 +318,21 @@ void AICamera_captureImage() {
   isCapturePhoto = true;
 }
 
-void AICamera_enableCrop(bool enable) {
+void AICP_enableCrop(bool enable) {
   isCropPhoto = enable;
   xlog("isCropPhoto:%d", isCropPhoto);
 }
 
-void AICamera_enablePadding(bool enable) {
+void AICP_enablePadding(bool enable) {
   isPaddingPhoto = enable;
   xlog("isPaddingPhoto:%d", isPaddingPhoto);
 }
 
-void AICAMERA_load_crop_saveImage() {
+void AICP_load_crop_saveImage() {
   // not use thread here
   // std::thread([]() {
     try {
-      xlog("---- AICAMERA_load_crop_saveImage start ----");
+      xlog("---- AICP_load_crop_saveImage start ----");
 
       // Load the image
       cv::Mat image = cv::imread(pathName_inputImage);
@@ -384,7 +384,7 @@ void AICAMERA_load_crop_saveImage() {
         }
 
         cv::Rect reset_roi(0, 0, 0, 0);
-        AICamera_setCropROI(reset_roi);
+        AICP_setCropROI(reset_roi);
 
       } else {
         // save the image
@@ -398,14 +398,14 @@ void AICAMERA_load_crop_saveImage() {
     } catch (const std::exception &e) {
       xlog("Exception during image save: %s", e.what());
     }
-    xlog("---- AICAMERA_load_crop_saveImage stop ----");
+    xlog("---- AICP_load_crop_saveImage stop ----");
   // }).detach();  // Detach to run in the background
 }
 
-void AICAMERA_threadSaveImage(const std::string path, const cv::Mat &frameBuffer) {
+void AICP_threadSaveImage(const std::string path, const cv::Mat &frameBuffer) {
   std::thread([path, frameBuffer]() {
     try {
-      xlog("---- AICAMERA_threadSaveImage start ----");
+      xlog("---- AICP_threadSaveImage start ----");
       // Extract directory from the full path
 
       // ??
@@ -436,14 +436,14 @@ void AICAMERA_threadSaveImage(const std::string path, const cv::Mat &frameBuffer
       xlog("Exception during image save: %s", e.what());
     }
 
-    xlog("---- AICAMERA_threadSaveImage stop ----");
+    xlog("---- AICP_threadSaveImage stop ----");
   }).detach();  // Detach to run in the background
 }
 
-void AICAMERA_threadSaveCropImage(const std::string path, const cv::Mat &frameBuffer, cv::Rect roi) {
+void AICP_threadSaveCropImage(const std::string path, const cv::Mat &frameBuffer, cv::Rect roi) {
   std::thread([path, frameBuffer, roi]() {
     try {
-      xlog("---- AICAMERA_threadSaveCropImage start ----");
+      xlog("---- AICP_threadSaveCropImage start ----");
       bool isCrop = true;
       // bool isPadding = true;
 
@@ -506,7 +506,7 @@ void AICAMERA_threadSaveCropImage(const std::string path, const cv::Mat &frameBu
         }
 
         cv::Rect reset_roi(0, 0, 0, 0);
-        AICamera_setCropROI(reset_roi);
+        AICP_setCropROI(reset_roi);
 
       } else {
         // save the image
@@ -521,11 +521,11 @@ void AICAMERA_threadSaveCropImage(const std::string path, const cv::Mat &frameBu
       xlog("Exception during image save: %s", e.what());
     }
 
-    xlog("---- AICAMERA_threadSaveCropImage stop ----");
+    xlog("---- AICP_threadSaveCropImage stop ----");
   }).detach();  // Detach to run in the background
 }
 
-void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info) {
+void AICP_saveImage(GstPad *pad, GstPadProbeInfo *info) {
   if (isCapturePhoto) {
 
     xlog("");
@@ -593,8 +593,8 @@ void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info) {
         filename = pathName_savedImage;
       }
 
-      AICAMERA_threadSaveImage(filename, bgr_frame);
-      AICAMERA_threadSaveCropImage(pathName_croppedImage, bgr_frame, crop_roi);
+      AICP_threadSaveImage(filename, bgr_frame);
+      AICP_threadSaveCropImage(pathName_croppedImage, bgr_frame, crop_roi);
       
     } else if (format && g_strcmp0(format, "I420") == 0) {
       int width = 0, height = 0;
@@ -626,8 +626,8 @@ void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info) {
         filename = pathName_savedImage;
       }
 
-      AICAMERA_threadSaveImage(filename, bgr_frame);
-      AICAMERA_threadSaveCropImage(pathName_croppedImage, bgr_frame, crop_roi);
+      AICP_threadSaveImage(filename, bgr_frame);
+      AICP_threadSaveCropImage(pathName_croppedImage, bgr_frame, crop_roi);
     }
 
     // Cleanup
@@ -637,8 +637,8 @@ void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info) {
 }
 
 // Callback to handle incoming buffer data
-GstPadProbeReturn AICAMERA_streamingDataCallback(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
-  AICAMERA_saveImage(pad, info);
+GstPadProbeReturn AICP_streamingDataCallback(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+  AICP_saveImage(pad, info);
   return GST_PAD_PROBE_OK;
 }
 
@@ -668,7 +668,7 @@ void ThreadAICameraStreaming() {
   }
 
   // Set properties for the elements
-  g_object_set(G_OBJECT(source), "device", AICamrea_getVideoDevice().c_str(), nullptr);
+  g_object_set(G_OBJECT(source), "device", AICP_getVideoDevice().c_str(), nullptr);
 
   // Define the capabilities for the capsfilter
   // 5M : 2592 * 1944
@@ -714,7 +714,7 @@ void ThreadAICameraStreaming() {
   // Attach pad probe to capture frames
   GstPad *pad = gst_element_get_static_pad(encoder, "sink");
   if (pad) {
-    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)AICAMERA_streamingDataCallback, nullptr, nullptr);
+    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)AICP_streamingDataCallback, nullptr, nullptr);
     gst_object_unref(pad);
   }
 
@@ -734,7 +734,7 @@ void ThreadAICameraStreaming() {
           // g_main_loop_quit(loop);
 
           // ?? to stop streaming
-          AICamera_streamingStop();
+          AICP_streamingStop();
           break;
         }
   
@@ -743,7 +743,7 @@ void ThreadAICameraStreaming() {
           // g_main_loop_quit(static_cast<GMainLoop *>(user_data));
 
           // ?? to stop streaming
-          AICamera_streamingStop();
+          AICP_streamingStop();
           break;
   
         default:
@@ -812,7 +812,7 @@ void ThreadAICameraStreaming_usb() {
   }
 
   // Set properties for the elements
-  g_object_set(G_OBJECT(source), "device", AICamrea_getVideoDevice().c_str(), nullptr);
+  g_object_set(G_OBJECT(source), "device", AICP_getVideoDevice().c_str(), nullptr);
 
   // Define the capabilities for the capsfilter
   // AD : 2048 * 1536
@@ -856,7 +856,7 @@ void ThreadAICameraStreaming_usb() {
   // Attach pad probe to capture frames
   GstPad *pad = gst_element_get_static_pad(encoder, "sink");
   if (pad) {
-    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)AICAMERA_streamingDataCallback, nullptr, nullptr);
+    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)AICP_streamingDataCallback, nullptr, nullptr);
     gst_object_unref(pad);
   }
 
@@ -886,7 +886,7 @@ void ThreadAICameraStreaming_usb() {
 
 }
 
-void AICamera_streamingStart() {
+void AICP_streamingStart() {
   xlog("");
   if (isStreaming) {
     xlog("thread already running");
@@ -894,7 +894,7 @@ void AICamera_streamingStart() {
   }
   isStreaming = true;
 
-  if (AICamrea_isUseCISCamera())
+  if (AICP_isUseCISCamera())
   {
     t_aicamera_streaming = std::thread(ThreadAICameraStreaming);
   } else {
@@ -904,7 +904,7 @@ void AICamera_streamingStart() {
   t_aicamera_streaming.detach();
 }
 
-void AICamera_streamingStop() {
+void AICP_streamingStop() {
   xlog("");
   if (!isStreaming) {
     xlog("Streaming not running");

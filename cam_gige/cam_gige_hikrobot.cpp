@@ -10,7 +10,7 @@
 #include "image_utils.hpp"
 #include "restfulx.hpp"
 
-extern void AICAMERA_saveImage(GstPad *pad, GstPadProbeInfo *info);
+extern void AICP_saveImage(GstPad *pad, GstPadProbeInfo *info);
 
 UsedGigeCam usedGigeCam = ugc_hikrobot;
 
