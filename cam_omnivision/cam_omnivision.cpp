@@ -262,7 +262,7 @@ int AICamera_getExposureTimeAbsolute() {
 
 void AICamera_setExposureTimeAbsolute(double sec) {
   xlog("tmp sec:%f", sec);
-  int value = (int)(sec * 10000000.0);
+  int value = (int)(sec * 1000000.0);
   xlog("value:%d", value);
   ioctl_set_value(V4L2_CID_EXPOSURE_ABSOLUTE, value);
 }
