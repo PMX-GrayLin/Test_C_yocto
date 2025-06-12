@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-// C++ Standard Library headers 
+// C++ headers
 #include <string>
 #include <cstring>
 
@@ -26,7 +26,6 @@ using namespace std;
 #define xlog(fmt, ...) printf("%s:%d, " fmt "\n\r", __func__, __LINE__, ##__VA_ARGS__)
 #endif
 
-extern int testCounter;
 
 void startTimer(int ms);
 void stopTimer();

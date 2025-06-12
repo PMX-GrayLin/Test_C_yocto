@@ -10,7 +10,6 @@
 #include <libgen.h>
 
 // test vars
-int testCounter = 0;
 
 bool isTimerRunning = false;
 int counterTimer = 0;
@@ -25,7 +24,7 @@ void startTimer(int ms) {
 
       while (isTimerRunning) {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-
+        counterTimer++;
       }
       xlog("timer stop >>>>");
     }).detach();  // Detach to run in the background
