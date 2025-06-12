@@ -62,15 +62,18 @@ void handle_RESTful(std::vector<std::string> segments) {
       FW_setDIOOut(segments[1], segments[3]);
     }
 
-  } else if (segments.size() >= 3 && isSameString(segments[0], "gpio")) {
+  } else if (isSameString(segments[0], "gpio")) {
 
-    if (isSameString(segments[1], "set")) {
+    if (segments.size() >=3 && isSameString(segments[1], "set")) {
       int gpio_num = stoi(segments[2]);
       int gpio_vaue = (segments[3] == "1") ? 1 : 0 ;
       FW_setGPIO(gpio_num, gpio_vaue);
-    } else if (isSameString(segments[1], "get")) {
+    } else if (segments.size() >=2 && isSameString(segments[1], "get")) {
       int gpio_num = stoi(segments[2]);
       FW_getGPIO(gpio_num);
+    } else if (segments.size() >=2 && isSameString(segments[1], "toggle")) {
+      int gpio_num = stoi(segments[2]);
+      FW_toggleGPIO(gpio_num);
     }
 
 #if defined(ENABLE_CIS)
@@ -98,9 +101,9 @@ void handle_RESTful(std::vector<std::string> segments) {
 
   } else if (isSameString(segments[0], "mqtt")) {
     if (isSameString(segments[1], "start")) {
-      thread_mqtt_start();
+      mqtt_start();
     } else if (isSameString(segments[1], "stop")) {
-      thread_mqtt_stop();
+      mqtt_stop();
     } else if (isSameString(segments[1], "send")) {
       MQTTClient::send_message_static("topic123", "message123");
     }
@@ -120,51 +123,6 @@ void handle_RESTful(std::vector<std::string> segments) {
     xlog("product:%s", product.c_str());
   }
 }
-
-// bool isMQTTRunning = false;
-// void thread_mqtt_start() {
-//   if (!isMQTTRunning) {
-//     std::thread([] {
-//       xlog("thread_mqtt_start start >>>>");
-//       isMQTTRunning = true;
-
-//       // MQTT loop
-//       mosqpp::lib_init();
-//       MQTTClient client("my_client");
-
-//       client.connect("localhost", 1883);
-//       client.subscribe(nullptr, "PX/VBS/Cmd");
-
-//       while (true) {
-//         client.loop();  // This triggers on_message()
-//         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-//       }
-//       mosqpp::lib_cleanup();
-
-//       xlog("thread_mqtt_start stop >>>>");
-//     }).detach();  // Detach to run in the background
-
-//   } else {
-//     xlog("thread_mqtt_start already running...");
-//   }
-// }
-
-// void thread_mqtt_stop() {
-//   isMQTTRunning = false;
-// }
-
-// void handle_mqtt(std::string payload) {
-//   xlog("MQTT payload:%s", payload.c_str());
-// }
-
-// MQTTClient::MQTTClient(const char* id)
-//     : mosqpp::mosquittopp(id) {}
-
-// void MQTTClient::on_message(const struct mosquitto_message* message) {
-//   std::string payload(static_cast<char*>(message->payload), message->payloadlen);
-
-//   handle_mqtt(payload);
-// }
 
 #if defined(ENABLE_FTDI)
 

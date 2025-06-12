@@ -53,10 +53,10 @@ void MQTTClient::send_message_static(const std::string &topic, const std::string
   instance->send_message(topic, message);
 }
 
-void thread_mqtt_start() {
+void mqtt_start() {
   if (!isMQTTRunning) {
     std::thread([] {
-      xlog("thread_mqtt_start start >>>>");
+      xlog("thread start >>>>");
       isMQTTRunning = true;
 
       mosqpp::lib_init();
@@ -73,14 +73,18 @@ void thread_mqtt_start() {
       client.disconnect();
       mosqpp::lib_cleanup();
 
-      xlog("thread_mqtt_start stop >>>>");
+      xlog("thread stop >>>>");
     }).detach();  // Detach to run in the background
 
   } else {
-    xlog("thread_mqtt_start already running...");
+    xlog("thread already running...");
   }
 }
 
-void thread_mqtt_stop() {
+void mqtt_stop() {
   isMQTTRunning = false;
+}
+
+void mqtt_send(string topic, string message) {
+  MQTTClient::send_message_static(topic, message);
 }

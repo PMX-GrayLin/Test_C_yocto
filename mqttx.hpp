@@ -20,5 +20,6 @@ class MQTTClient : public mosqpp::mosquittopp {
   static MQTTClient* instance;
 };
 
-void thread_mqtt_start();
-void thread_mqtt_stop();
+void mqtt_start();
+void mqtt_stop();
+void mqtt_send(string topic, string message);
