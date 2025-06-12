@@ -73,7 +73,6 @@ void handle_RESTful(std::vector<std::string> segments) {
       FW_getGPIO(gpio_num);
     }
 
-
 #if defined(ENABLE_CIS)
 
   } else if (isSameString(segments[0], "gst")) {

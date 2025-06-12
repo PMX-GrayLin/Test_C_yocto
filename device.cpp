@@ -174,6 +174,15 @@ void FW_setGPIO(int gpio_num, int value) {
   gpiod_chip_close(chip);
 }
 
+void FW_toggleGPIO(int gpio_num) {
+  int current_value = FW_getGPIO(gpio_num);
+  if (current_value < 0) {
+    xlog("Failed to read GPIO:%d for toggle", gpio_num);
+    return;
+  }
+  FW_setGPIO(gpio_num, !current_value);
+}
+
 void FW_setLED(string led_index, string led_color) {
   int gpio_index1 = 0;
   int gpio_index2 = 0;

@@ -78,8 +78,10 @@ void FW_getProduct();
 void FW_writePWMFile(const std::string &path, const std::string &value);
 extern void FW_setPWM(const std::string &pwmIndex, const std::string &sPercent);
 
+// GPIO ops
 int FW_getGPIO(int gpio_num);
 void FW_setGPIO(int gpio_num, int value);
+void FW_toggleGPIO(int gpio_num);
 
 // led
 void FW_setLED(string led_index, string led_color);
