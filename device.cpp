@@ -113,9 +113,13 @@ int FW_getGPIO(int gpio_num) {
     return -1;
   }
 
-  // Request line as input
-  if (gpiod_line_request_input(line, "my_gpio_control") < 0) {
-    xlog("Failed to request GPIO line as input");
+  struct gpiod_line_request_config cfg = {
+      .consumer = "my_gpio_control",
+      .request_type = GPIOD_LINE_REQUEST_DIRECTION_AS_IS,
+  };
+
+  if (gpiod_line_request(line, &cfg, 0) < 0) {
+    xlog("Failed to request GPIO line with direction as-is");
     gpiod_chip_close(chip);
     return -1;
   }
