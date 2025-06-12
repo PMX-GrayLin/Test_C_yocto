@@ -63,9 +63,16 @@ void handle_RESTful(std::vector<std::string> segments) {
     }
 
   } else if (segments.size() >= 3 && isSameString(segments[0], "gpio")) {
-    int gpio_num = stoi(segments[1]);
-    int gpio_vaue = (segments[2] == "1") ? 1 : 0 ;
-    FW_setGPIO(gpio_num, gpio_vaue);
+
+    if (isSameString(segments[1], "set")) {
+      int gpio_num = stoi(segments[2]);
+      int gpio_vaue = (segments[3] == "1") ? 1 : 0 ;
+      FW_setGPIO(gpio_num, gpio_vaue);
+    } else if (isSameString(segments[1], "get")) {
+      int gpio_num = stoi(segments[2]);
+      FW_getGPIO(gpio_num);
+    }
+
 
 #if defined(ENABLE_CIS)
 

@@ -91,6 +91,50 @@ void FW_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
   }
 }
 
+int FW_getGPIO(int gpio_num) {
+  xlog("Getting GPIO status for gpio:%d", gpio_num);
+
+  gpiod_chip *chip;
+  gpiod_line *line;
+  int value;
+
+  // Open GPIO chip
+  chip = gpiod_chip_open(GPIO_CHIP);
+  if (!chip) {
+    xlog("Failed to open GPIO chip:%s", GPIO_CHIP);
+    return -1;
+  }
+
+  // Get GPIO line
+  line = gpiod_chip_get_line(chip, gpio_num);
+  if (!line) {
+    xlog("Failed to get GPIO line");
+    gpiod_chip_close(chip);
+    return -1;
+  }
+
+  // Request line as input
+  if (gpiod_line_request_input(line, "my_gpio_control") < 0) {
+    xlog("Failed to request GPIO line as input");
+    gpiod_chip_close(chip);
+    return -1;
+  }
+
+  // Read the GPIO value
+  value = gpiod_line_get_value(line);
+  if (value < 0) {
+    xlog("Failed to get GPIO value");
+  } else {
+    xlog("GPIO value:%d", value);
+  }
+
+  // Release resources
+  gpiod_line_release(line);
+  gpiod_chip_close(chip);
+
+  return value;
+}
+
 void FW_setGPIO(int gpio_num, int value) {
   // xlog("gpiod version:%s", gpiod_version_string());
   xlog("gpio:%d, value:%d", gpio_num, value);
