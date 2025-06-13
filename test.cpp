@@ -195,6 +195,8 @@ int main(int argc, char* argv[]) {
     xlog("argv[%d]:%s", i, argv[i]);
   }
 
+  FW_setLED("1", "green");
+  
   httplib::Server svr;
 
 #if defined(ENABLE_OST)
