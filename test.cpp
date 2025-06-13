@@ -119,8 +119,10 @@ void handle_RESTful(std::vector<std::string> segments) {
 
     // xlog("time:%s", getTimeString().c_str());
     
-    product = exec_command("fw_printenv | grep '^product=' | cut -d '=' -f2");
-    xlog("product:%s", product.c_str());
+    // product = exec_command("fw_printenv | grep '^product=' | cut -d '=' -f2");
+    // xlog("product:%s", product.c_str());
+
+    FW_getDeviceInfo();
   }
 }
 
@@ -195,14 +197,14 @@ int main(int argc, char* argv[]) {
     xlog("argv[%d]:%s", i, argv[i]);
   }
 
-  FW_getDeviceIndo();
+  FW_getDeviceInfo();
 
   // set Power led to system ready
   FW_setLED("1", "green");  
 
   // set camera led
   // ??
-  
+
   httplib::Server svr;
 
 #if defined(ENABLE_OST)

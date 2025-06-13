@@ -52,7 +52,7 @@ void FW_getHostnamePrefix() {
   xlog("hostname_prefix:%s", hostname_prefix.c_str());
 }
 
-void FW_getDeviceIndo() {
+void FW_getDeviceInfo() {
   FW_getProduct();
   FW_getHostnamePrefix();
 }

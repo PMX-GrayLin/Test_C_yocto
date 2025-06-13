@@ -75,7 +75,7 @@ extern std::string hostname_prefix;
 
 void FW_getProduct();
 void FW_getHostnamePrefix();
-void FW_getDeviceIndo();
+void FW_getDeviceInfo();
 
 bool FW_isDeviceAICamera();
 bool FW_isDeviceVisionHub();
