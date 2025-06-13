@@ -17,56 +17,56 @@ typedef enum {
     spf_PNG,
 } SavedPhotoFormat;
 
-extern void AICP_handle_RESTful(std::vector<std::string> segments);
+void AICP_handle_RESTful(std::vector<std::string> segments);
 
-extern bool AICP_isUseCISCamera();
-extern std::string AICP_getVideoDevice();
+bool AICP_isUseCISCamera();
+std::string AICP_getVideoDevice();
 
 // IOCTLS ===========
 int ioctl_get_value_aic(int control_ID);
 int ioctl_set_value_aic(int control_ID, int value);
-extern int AICP_getBrightness();
-extern void AICP_setBrightness(int value);
-extern int AICP_getContrast();
-extern void AICP_setContrast(int value);
-extern int AICP_getSaturation();
-extern void AICP_setSaturation(int value);
-extern int AICP_getHue();
-extern void AICP_setHue(int value);
-extern int AICP_getWhiteBalanceAutomatic();
-extern void AICP_setWhiteBalanceAutomatic(bool enable);
-extern int AICP_getSharpness();
-extern void AICP_setSharpness(int value);
-extern int AICP_getISO();
-extern void AICP_setISO(int value);
-extern int AICP_getExposure();
-extern void AICP_setExposure(int value);
-extern int AICP_getWhiteBalanceTemperature();
-extern void AICP_setWhiteBalanceTemperature(int value);
-extern int AICP_getExposureAuto();
-extern void AICP_setExposureAuto(bool enable);
-extern int AICP_getExposureTimeAbsolute();
-extern void AICP_setExposureTimeAbsolute(double sec);
-extern int AICP_getFocusAbsolute();
-extern void AICP_setFocusAbsolute(int value);
-extern int AICP_getFocusAuto();
-extern void AICP_setFocusAuto(bool enable);  
+int AICP_getBrightness();
+void AICP_setBrightness(int value);
+int AICP_getContrast();
+void AICP_setContrast(int value);
+int AICP_getSaturation();
+void AICP_setSaturation(int value);
+int AICP_getHue();
+void AICP_setHue(int value);
+int AICP_getWhiteBalanceAutomatic();
+void AICP_setWhiteBalanceAutomatic(bool enable);
+int AICP_getSharpness();
+void AICP_setSharpness(int value);
+int AICP_getISO();
+void AICP_setISO(int value);
+int AICP_getExposure();
+void AICP_setExposure(int value);
+int AICP_getWhiteBalanceTemperature();
+void AICP_setWhiteBalanceTemperature(int value);
+int AICP_getExposureAuto();
+void AICP_setExposureAuto(bool enable);
+int AICP_getExposureTimeAbsolute();
+void AICP_setExposureTimeAbsolute(double sec);
+int AICP_getFocusAbsolute();
+void AICP_setFocusAbsolute(int value);
+int AICP_getFocusAuto();
+void AICP_setFocusAuto(bool enable);  
 // IOCTLS ===========
 
-extern void AICP_setImagePath(const string& imagePath);
-extern void AICP_setCropImagePath(const string& imagePath);
-extern void AICP_setInputImagePath(const string& imagePath);
-extern bool AICP_isCropImage();
-extern void AICP_captureImage();
-extern void AICP_enableCrop(bool enable);
-extern void AICP_enablePadding(bool enable);
+void AICP_setImagePath(const string& imagePath);
+void AICP_setCropImagePath(const string& imagePath);
+void AICP_setInputImagePath(const string& imagePath);
+bool AICP_isCropImage();
+void AICP_captureImage();
+void AICP_enableCrop(bool enable);
+void AICP_enablePadding(bool enable);
 
 // Streaming
 void Thread_AICPStreaming();
 void Thread_AICPStreaming_usb();
-extern void AICP_streamingStart();
-extern void AICP_streamingStop();
+void AICP_streamingStart();
+void AICP_streamingStop();
 
 // image processing
-extern void AICP_load_crop_saveImage();
+void AICP_load_crop_saveImage();
 
