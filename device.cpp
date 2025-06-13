@@ -48,7 +48,7 @@ void FW_getProduct() {
 }
 
 void FW_getHostnamePrefix() {
-  hostname_prefix =  = exec_command("hostname | awk -F'-' '{print $1}'");
+  hostname_prefix = exec_command("hostname | awk -F'-' '{print $1}'");
   xlog("hostname_prefix:%s", hostname_prefix.c_str());
 }
 
@@ -279,11 +279,6 @@ void FW_toggleLED(string led_index, string led_color) {
     FW_toggleGPIO(gpio_index1);
     FW_toggleGPIO(gpio_index2);
   } 
-}
-
-void FW_setCameraLED() {
-  
-  
 }
 
 uint64_t get_current_millis() {
