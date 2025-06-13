@@ -71,8 +71,14 @@ typedef enum {
 } GPIO_LEVEl;
 
 extern std::string product;
+extern std::string hostname_prefix;
 
 void FW_getProduct();
+void FW_getHostnamePrefix();
+void FW_getDeviceIndo();
+
+bool FW_isDeviceAICamera();
+bool FW_isDeviceVisionHub();
 
 // PWM 
 void FW_writePWMFile(const std::string &path, const std::string &value);
@@ -86,6 +92,7 @@ void FW_toggleGPIO(int gpio_num);
 // led
 void FW_setLED(string led_index, string led_color);
 void FW_toggleLED(string led_index, string led_color);
+void FW_setCameraLED();
 
 // DI
 void Thread_FWMonitorDI();

@@ -72,6 +72,7 @@ void Thread_AICPStreaming();
 void Thread_AICPStreaming_usb();
 void AICP_streamingStart();
 void AICP_streamingStop();
+void AICP_streamingLED();
 
 // image processing
 void AICP_load_crop_saveImage();

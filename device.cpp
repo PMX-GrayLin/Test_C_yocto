@@ -9,8 +9,8 @@
 
 #define DEBOUNCE_TIME_MS 20
 
-// ai_camera_plus or vision_hub_plus 
-std::string product = "ai_camera_plus";
+std::string product = "ai_camera_plus";     // ai_camera_plus or vision_hub_plus
+std::string hostname_prefix = "aicamera";   // aicamera or visionhub
 
 // PWM
 const std::string path_pwm = "/sys/devices/platform/soc/10048000.pwm/pwm/pwmchip0";
@@ -44,6 +44,33 @@ bool isMonitorDIO[NUM_DIO] = {false};
 
 void FW_getProduct() {
   product = exec_command("fw_printenv | grep '^product=' | cut -d '=' -f2");
+  xlog("product:%s", product.c_str());
+}
+
+void FW_getHostnamePrefix() {
+  hostname_prefix =  = exec_command("hostname | awk -F'-' '{print $1}'");
+  xlog("hostname_prefix:%s", hostname_prefix.c_str());
+}
+
+void FW_getDeviceIndo() {
+  FW_getProduct();
+  FW_getHostnamePrefix();
+}
+
+bool FW_isDeviceAICamera() {
+  if (product == "ai_camera_plus" || hostname_prefix == "aicamera") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool FW_isDeviceVisionHub() {
+  if (product == "vision_hub_plus" || hostname_prefix == "visionhub") {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void FW_writePWMFile(const std::string &path, const std::string &value) {
@@ -252,6 +279,11 @@ void FW_toggleLED(string led_index, string led_color) {
     FW_toggleGPIO(gpio_index1);
     FW_toggleGPIO(gpio_index2);
   } 
+}
+
+void FW_setCameraLED() {
+  
+  
 }
 
 uint64_t get_current_millis() {

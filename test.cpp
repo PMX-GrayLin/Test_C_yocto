@@ -195,7 +195,13 @@ int main(int argc, char* argv[]) {
     xlog("argv[%d]:%s", i, argv[i]);
   }
 
-  FW_setLED("1", "green");
+  FW_getDeviceIndo();
+
+  // set Power led to system ready
+  FW_setLED("1", "green");  
+
+  // set camera led
+  // ??
   
   httplib::Server svr;
 

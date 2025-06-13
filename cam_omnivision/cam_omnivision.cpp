@@ -909,13 +909,17 @@ void AICP_streamingStop() {
   if (gst_loop) {
     xlog("g_main_loop_quit");
     g_main_loop_quit(gst_loop);
-    // g_main_loop_unref(gst_loop);
-    // gst_loop = nullptr;
   } else {
     xlog("gst_loop is invalid or already destroyed.");
   }
 
-  // ??
   isStreaming_aic = false;
 }
 
+void AICP_streamingLED() {
+  counterFrame_aic++;
+  if (counterFrame_aic%15 == 0)
+  {
+    FW_toggleLED("2", "orange");
+  }
+}
