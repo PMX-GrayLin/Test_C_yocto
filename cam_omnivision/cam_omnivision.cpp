@@ -8,23 +8,25 @@
 
 #include <gst/gst.h>
 
-std::thread t_aicamera_streaming;
+#include "device.hpp"
+
+std::thread t_streaming_aic;
 bool isStreaming_aic = false;
 
 bool isCapturePhoto_aic = false;
 bool isCropPhoto_aic = false;
 bool isPaddingPhoto_aic = false;
-SavedPhotoFormat savedPhotoFormat = spf_PNG;
-std::string pathName_savedImage = "";
-std::string pathName_croppedImage = "";
-std::string pathName_inputImage = "";
-cv::Rect crop_roi(0, 0, 0, 0);
+SavedPhotoFormat savedPhotoFormat_aic = spf_PNG;
+std::string pathName_savedImage_aic = "";
+std::string pathName_croppedImage_aic = "";
+std::string pathName_inputImage_aic = "";
+cv::Rect crop_roi_aic(0, 0, 0, 0);
 
-static volatile int counterFrame = 0;
-static int counterImg = 0;
+static volatile int counterFrame_aic = 0;
+static int counterImg_aic = 0;
 
-static GstElement *gst_pipeline = nullptr;
-static GMainLoop *gst_loop = nullptr;
+static GstElement *gst_pipeline_aic = nullptr;
+static GMainLoop *gst_loop_aic = nullptr;
 
 namespace fs = std::filesystem;
 
@@ -281,27 +283,27 @@ void AICP_setFocusAuto(bool enable) {
 }
 
 void AICP_setImagePath(const string& imagePath) {
-  pathName_savedImage = imagePath;
-  xlog("pathName_savedImage:%s", pathName_savedImage.c_str());
+  pathName_savedImage_aic = imagePath;
+  xlog("pathName_savedImage_aic:%s", pathName_savedImage_aic.c_str());
 }
 
 void AICP_setCropImagePath(const string& imagePath) {
-  pathName_croppedImage = imagePath;
-  xlog("pathName_croppedImage:%s", pathName_croppedImage.c_str());
+  pathName_croppedImage_aic = imagePath;
+  xlog("pathName_croppedImage_aic:%s", pathName_croppedImage_aic.c_str());
 }
 
 void AICP_setInputImagePath(const string& imagePath) {
-  pathName_inputImage = imagePath;
-  xlog("pathName_inputImage:%s", pathName_inputImage.c_str());
+  pathName_inputImage_aic = imagePath;
+  xlog("pathName_inputImage_aic:%s", pathName_inputImage_aic.c_str());
 }
 
 void AICP_setCropROI(cv::Rect roi) {
-  crop_roi = roi;
-  xlog("ROI x:%d, y:%d, w:%d, h:%d", crop_roi.x, crop_roi.y, crop_roi.width, crop_roi.height);
+  crop_roi_aic = roi;
+  xlog("ROI x:%d, y:%d, w:%d, h:%d", crop_roi_aic.x, crop_roi_aic.y, crop_roi_aic.width, crop_roi_aic.height);
 }
 
 bool AICP_isCropImage() {
-  return (crop_roi != cv::Rect(0, 0, 0, 0));
+  return (crop_roi_aic != cv::Rect(0, 0, 0, 0));
 }
 
 void AICP_captureImage() {
@@ -330,15 +332,15 @@ void AICP_load_crop_saveImage() {
       xlog("---- AICP_load_crop_saveImage start ----");
 
       // Load the image
-      cv::Mat image = cv::imread(pathName_inputImage);
+      cv::Mat image = cv::imread(pathName_inputImage_aic);
       if (image.empty()) {
-        xlog("Failed to load image from %s", pathName_inputImage.c_str());
+        xlog("Failed to load image from %s", pathName_inputImage_aic.c_str());
         return;
       }
 
       if (isCropPhoto_aic) {
         // Crop the region of interest (ROI)
-        cv::Mat croppedImage = image(crop_roi);
+        cv::Mat croppedImage = image(crop_roi_aic);
 
         if (isPaddingPhoto_aic) {
           // Create a black canvas of the target size
@@ -362,19 +364,19 @@ void AICP_load_crop_saveImage() {
           croppedImage.copyTo(paddedImage(roi_padding));
 
           // Attempt to save the image
-          if (cv::imwrite(pathName_savedImage, paddedImage)) {
-            xlog("Saved crop frame to %s", pathName_savedImage.c_str());
+          if (cv::imwrite(pathName_savedImage_aic, paddedImage)) {
+            xlog("Saved crop frame to %s", pathName_savedImage_aic.c_str());
           } else {
-            xlog("Failed crop to save frame to %s", pathName_savedImage.c_str());
+            xlog("Failed crop to save frame to %s", pathName_savedImage_aic.c_str());
           }
 
         } else {
           
           // Attempt to save the image
-          if (cv::imwrite(pathName_savedImage, croppedImage)) {
-            xlog("Saved crop frame to %s", pathName_savedImage.c_str());
+          if (cv::imwrite(pathName_savedImage_aic, croppedImage)) {
+            xlog("Saved crop frame to %s", pathName_savedImage_aic.c_str());
           } else {
-            xlog("Failed crop to save frame to %s", pathName_savedImage.c_str());
+            xlog("Failed crop to save frame to %s", pathName_savedImage_aic.c_str());
           }
         }
 
@@ -383,10 +385,10 @@ void AICP_load_crop_saveImage() {
 
       } else {
         // save the image
-        if (cv::imwrite(pathName_savedImage, image)) {
-          xlog("Saved crop frame to %s", pathName_savedImage.c_str());
+        if (cv::imwrite(pathName_savedImage_aic, image)) {
+          xlog("Saved crop frame to %s", pathName_savedImage_aic.c_str());
         } else {
-          xlog("Failed crop to save frame to %s", pathName_savedImage.c_str());
+          xlog("Failed crop to save frame to %s", pathName_savedImage_aic.c_str());
         }
       }
 
@@ -571,25 +573,25 @@ void AICP_saveImage(GstPad *pad, GstPadProbeInfo *info) {
       cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
 
       // Save the frame to a picture
-      counterImg++;
+      counterImg_aic++;
       std::ostringstream oss;
       std::string filename = "";
 
-      if (pathName_savedImage == "") {
-        if (savedPhotoFormat == spf_BMP) {
-          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".bmp";
-        } else if (savedPhotoFormat == spf_JPEG) {
-          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".jpg";
+      if (pathName_savedImage_aic == "") {
+        if (savedPhotoFormat_aic == spf_BMP) {
+          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg_aic << ".bmp";
+        } else if (savedPhotoFormat_aic == spf_JPEG) {
+          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg_aic << ".jpg";
         } else {
-          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".png";
+          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg_aic << ".png";
         }
         filename = oss.str();
       } else {
-        filename = pathName_savedImage;
+        filename = pathName_savedImage_aic;
       }
 
       AICP_threadSaveImage(filename, bgr_frame);
-      AICP_threadSaveCropImage(pathName_croppedImage, bgr_frame, crop_roi);
+      AICP_threadSaveCropImage(pathName_croppedImage_aic, bgr_frame, crop_roi_aic);
       
     } else if (format && g_strcmp0(format, "I420") == 0) {
       int width = 0, height = 0;
@@ -604,25 +606,25 @@ void AICP_saveImage(GstPad *pad, GstPadProbeInfo *info) {
       cv::cvtColor(i420_frame, bgr_frame, cv::COLOR_YUV2BGR_I420);
 
       // Save the frame
-      counterImg++;
+      counterImg_aic++;
       std::ostringstream oss;
       std::string filename = "";
 
-      if (pathName_savedImage == "") {
-        if (savedPhotoFormat == spf_BMP) {
-          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".bmp";
-        } else if (savedPhotoFormat == spf_JPEG) {
-          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".jpg";
+      if (pathName_savedImage_aic == "") {
+        if (savedPhotoFormat_aic == spf_BMP) {
+          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg_aic << ".bmp";
+        } else if (savedPhotoFormat_aic == spf_JPEG) {
+          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg_aic << ".jpg";
         } else {
-          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg << ".png";
+          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg_aic << ".png";
         }
         filename = oss.str();
       } else {
-        filename = pathName_savedImage;
+        filename = pathName_savedImage_aic;
       }
 
       AICP_threadSaveImage(filename, bgr_frame);
-      AICP_threadSaveCropImage(pathName_croppedImage, bgr_frame, crop_roi);
+      AICP_threadSaveCropImage(pathName_croppedImage_aic, bgr_frame, crop_roi_aic);
     }
 
     // Cleanup
@@ -633,14 +635,15 @@ void AICP_saveImage(GstPad *pad, GstPadProbeInfo *info) {
 
 // Callback to handle incoming buffer data
 GstPadProbeReturn AICP_streamingDataCallback(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+  AICP_streamingLED();
   AICP_saveImage(pad, info);
   return GST_PAD_PROBE_OK;
 }
 
 void Thread_AICPStreaming() {
   xlog("++++ start ++++");
-  counterFrame = 0;
-  counterImg = 0;
+  counterFrame_aic = 0;
+  counterImg_aic = 0;
 
   // Initialize GStreamer
   gst_init(nullptr, nullptr);
@@ -649,7 +652,7 @@ void Thread_AICPStreaming() {
   // gst-launch-1.0 v4l2src device=${VIDEO_DEV[0]} ! video/x-raw,width=2048,height=1536 ! queue ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! h264parse config-interval=1 ! rtspclientsink location=rtsp://localhost:8554/mystream
 
   // Create the elements
-  gst_pipeline = gst_pipeline_new("video-pipeline");
+  gst_pipeline_aic = gst_pipeline_new("video-pipeline");
   GstElement *source = gst_element_factory_make("v4l2src", "source");
   GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
   GstElement *queue = gst_element_factory_make("queue", "queue");
@@ -657,7 +660,7 @@ void Thread_AICPStreaming() {
   GstElement *parser = gst_element_factory_make("h264parse", "parser");
   GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
 
-  if (!gst_pipeline || !source || !capsfilter || !queue || !encoder || !parser || !sink) {
+  if (!gst_pipeline_aic || !source || !capsfilter || !queue || !encoder || !parser || !sink) {
     xlog("failed to create GStreamer elements");
     return;
   }
@@ -687,7 +690,7 @@ void Thread_AICPStreaming() {
   );
   if (!controls) {
     xlog("Failed to create GstStructure");
-    gst_object_unref(gst_pipeline);
+    gst_object_unref(gst_pipeline_aic);
     return;
   }
   g_object_set(G_OBJECT(encoder), "extra-controls", controls, nullptr);
@@ -699,10 +702,10 @@ void Thread_AICPStreaming() {
   g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
 
   // Build the pipeline
-  gst_bin_add_many(GST_BIN(gst_pipeline), source, capsfilter, queue, encoder, parser, sink, nullptr);
+  gst_bin_add_many(GST_BIN(gst_pipeline_aic), source, capsfilter, queue, encoder, parser, sink, nullptr);
   if (!gst_element_link_many(source, capsfilter, queue, encoder, parser, sink, nullptr)) {
     xlog("failed to link elements in the pipeline");
-    gst_object_unref(gst_pipeline);
+    gst_object_unref(gst_pipeline_aic);
     return;
   }
 
@@ -714,7 +717,7 @@ void Thread_AICPStreaming() {
   }
 
   // Add bus watch to handle errors and EOS
-  GstBus *bus = gst_element_get_bus(gst_pipeline);
+  GstBus *bus = gst_element_get_bus(gst_pipeline_aic);
   gst_bus_add_watch(bus, [](GstBus *, GstMessage *msg, gpointer user_data) -> gboolean {
       switch (GST_MESSAGE_TYPE(msg)) {
         case GST_MESSAGE_ERROR: {
@@ -747,11 +750,11 @@ void Thread_AICPStreaming() {
       return TRUE; }, nullptr);
 
   // Start the pipeline
-  GstStateChangeReturn ret = gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
+  GstStateChangeReturn ret = gst_element_set_state(gst_pipeline_aic, GST_STATE_PLAYING);
   if (ret == GST_STATE_CHANGE_FAILURE) {
     xlog("failed to start the pipeline");
-    gst_element_set_state(gst_pipeline, GST_STATE_NULL);
-    gst_object_unref(gst_pipeline);
+    gst_element_set_state(gst_pipeline_aic, GST_STATE_NULL);
+    gst_object_unref(gst_pipeline_aic);
     isStreaming_aic = false;
     return;
   }
@@ -760,20 +763,20 @@ void Thread_AICPStreaming() {
   isStreaming_aic = true;
 
   // Run the main loop
-  gst_loop = g_main_loop_new(nullptr, FALSE);
+  gst_loop_aic = g_main_loop_new(nullptr, FALSE);
   gst_bus_set_sync_handler(bus, nullptr, nullptr, nullptr);
   gst_object_unref(bus);
-  g_main_loop_run(gst_loop);
+  g_main_loop_run(gst_loop_aic);
 
   // Stop the pipeline when finished or interrupted
   xlog("Stopping the pipeline...");
-  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
+  gst_element_set_state(gst_pipeline_aic, GST_STATE_NULL);
 
   // Clean up
-  gst_object_unref(gst_pipeline);
-  if (gst_loop) {
-    g_main_loop_unref(gst_loop);
-    gst_loop = nullptr;
+  gst_object_unref(gst_pipeline_aic);
+  if (gst_loop_aic) {
+    g_main_loop_unref(gst_loop_aic);
+    gst_loop_aic = nullptr;
   }
 
   isStreaming_aic = false;
@@ -783,8 +786,8 @@ void Thread_AICPStreaming() {
 
 void Thread_AICPStreaming_usb() {
   xlog("++++ start ++++");
-  counterFrame = 0;
-  counterImg = 0;
+  counterFrame_aic = 0;
+  counterImg_aic = 0;
 
   // Initialize GStreamer
   gst_init(nullptr, nullptr);
@@ -793,7 +796,7 @@ void Thread_AICPStreaming_usb() {
   // gst-launch-1.0 v4l2src device="/dev/video137" io-mode=2 ! image/jpeg,width=2048,height=1536,framerate=30/1 ! jpegdec ! videoconvert ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
   
   // Create the elements
-  gst_pipeline = gst_pipeline_new("video-pipeline");
+  gst_pipeline_aic = gst_pipeline_new("video-pipeline");
   GstElement *source = gst_element_factory_make("v4l2src", "source");
   GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
   GstElement *jpegdec = gst_element_factory_make("jpegdec", "jpegdec");
@@ -801,7 +804,7 @@ void Thread_AICPStreaming_usb() {
   GstElement *encoder = gst_element_factory_make("v4l2h264enc", "encoder");
   GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
 
-  if (!gst_pipeline || !source || !capsfilter || !jpegdec || !videoconvert || !encoder || !sink) {
+  if (!gst_pipeline_aic || !source || !capsfilter || !jpegdec || !videoconvert || !encoder || !sink) {
     xlog("failed to create GStreamer elements");
     return;
   }
@@ -830,7 +833,7 @@ void Thread_AICPStreaming_usb() {
   );
   if (!controls) {
     xlog("Failed to create GstStructure");
-    gst_object_unref(gst_pipeline);
+    gst_object_unref(gst_pipeline_aic);
     return;
   }
   g_object_set(G_OBJECT(encoder), "extra-controls", controls, nullptr);
@@ -841,10 +844,10 @@ void Thread_AICPStreaming_usb() {
   g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
 
   // // Build the pipeline
-  gst_bin_add_many(GST_BIN(gst_pipeline), source, capsfilter, jpegdec, videoconvert, encoder, sink, nullptr);
+  gst_bin_add_many(GST_BIN(gst_pipeline_aic), source, capsfilter, jpegdec, videoconvert, encoder, sink, nullptr);
   if (!gst_element_link_many(source, capsfilter, jpegdec, videoconvert, encoder, sink, nullptr)) {
     xlog("failed to link elements in the pipeline");
-    gst_object_unref(gst_pipeline);
+    gst_object_unref(gst_pipeline_aic);
     return;
   }
 
@@ -856,10 +859,10 @@ void Thread_AICPStreaming_usb() {
   }
 
   // Start the pipeline
-  GstStateChangeReturn ret = gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
+  GstStateChangeReturn ret = gst_element_set_state(gst_pipeline_aic, GST_STATE_PLAYING);
   if (ret == GST_STATE_CHANGE_FAILURE) {
     xlog("failed to start the pipeline");
-    gst_object_unref(gst_pipeline);
+    gst_object_unref(gst_pipeline_aic);
     return;
   }
 
@@ -867,15 +870,15 @@ void Thread_AICPStreaming_usb() {
   isStreaming_aic = true;
 
   // Run the main loop
-  gst_loop = g_main_loop_new(nullptr, FALSE);
-  g_main_loop_run(gst_loop);
+  gst_loop_aic = g_main_loop_new(nullptr, FALSE);
+  g_main_loop_run(gst_loop_aic);
 
   // Stop the pipeline when finished or interrupted
   xlog("Stopping the pipeline...");
-  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
+  gst_element_set_state(gst_pipeline_aic, GST_STATE_NULL);
 
   // Clean up
-  gst_object_unref(gst_pipeline);
+  gst_object_unref(gst_pipeline_aic);
   isStreaming_aic = false;
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 
@@ -889,14 +892,16 @@ void AICP_streamingStart() {
   }
   isStreaming_aic = true;
 
+  FW_setLED("2", "off");
+
   if (AICP_isUseCISCamera())
   {
-    t_aicamera_streaming = std::thread(Thread_AICPStreaming);
+    t_streaming_aic = std::thread(Thread_AICPStreaming);
   } else {
-    t_aicamera_streaming = std::thread(Thread_AICPStreaming_usb);  
+    t_streaming_aic = std::thread(Thread_AICPStreaming_usb);  
   }
   
-  t_aicamera_streaming.detach();
+  t_streaming_aic.detach();
 }
 
 void AICP_streamingStop() {
@@ -906,11 +911,11 @@ void AICP_streamingStop() {
     return;
   }
 
-  if (gst_loop) {
+  if (gst_loop_aic) {
     xlog("g_main_loop_quit");
-    g_main_loop_quit(gst_loop);
+    g_main_loop_quit(gst_loop_aic);
   } else {
-    xlog("gst_loop is invalid or already destroyed.");
+    xlog("gst_loop_aic is invalid or already destroyed.");
   }
 
   isStreaming_aic = false;

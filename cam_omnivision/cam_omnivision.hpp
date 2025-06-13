@@ -8,13 +8,13 @@
 
 #include <vector>
 
-#define AICamreaCISPath "/dev/csi_cam_preview"
-#define AICamreaUSBPath "/dev/video137"
-
 // apply only used header
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
+
+#define AICamreaCISPath "/dev/csi_cam_preview"
+#define AICamreaUSBPath "/dev/video137"
 
 typedef enum {
     spf_BMP,
