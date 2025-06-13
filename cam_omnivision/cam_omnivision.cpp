@@ -60,10 +60,10 @@ void AICP_handle_RESTful(std::vector<std::string> segments) {
 
 bool AICP_isUseCISCamera() {
   if (isPathExist(AICamreaCISPath)) {
-    xlog("path /dev/csi_cam_preview exist");
+    // xlog("path /dev/csi_cam_preview exist");
     return true;
   } else {
-    xlog("path /dev/csi_cam_preview not exist");
+    // xlog("path /dev/csi_cam_preview not exist");
     return false;
   }
 }

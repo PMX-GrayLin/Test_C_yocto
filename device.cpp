@@ -44,12 +44,12 @@ bool isMonitorDIO[NUM_DIO] = {false};
 
 void FW_getProduct() {
   product = exec_command("fw_printenv | grep '^product=' | cut -d '=' -f2");
-  xlog("product:%s", product.c_str());
+  // xlog("product:%s", product.c_str());
 }
 
 void FW_getHostnamePrefix() {
   hostname_prefix = exec_command("hostname | awk -F'-' '{print $1}'");
-  xlog("hostname_prefix:%s", hostname_prefix.c_str());
+  // xlog("hostname_prefix:%s", hostname_prefix.c_str());
 }
 
 void FW_getDeviceInfo() {
