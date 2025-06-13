@@ -3,7 +3,7 @@
 APP_NAME=fw_daemon
 
 # add define to enable/disable functions
-ENABLE_Gige ?= 1
+ENABLE_Gige ?= 0
 ENABLE_CIS ?= 0
 ENABLE_OST = 0
 ENABLE_TestCode = 0

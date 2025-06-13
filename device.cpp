@@ -223,6 +223,37 @@ void FW_setLED(string led_index, string led_color) {
   }
 }
 
+void FW_toggleLED(string led_index, string led_color) {
+  int gpio_index1 = 0;
+  int gpio_index2 = 0;
+
+  if (led_index == "1") {
+    gpio_index1 = ledgp_1_red;
+    gpio_index2 = ledgp_1_green;  
+  } else if (led_index == "2") {
+    gpio_index1 = ledgp_2_red;
+    gpio_index2 = ledgp_2_green;  
+  } else if (led_index == "3") {
+    gpio_index1 = ledgp_3_red;
+    gpio_index2 = ledgp_3_green;  
+  } else if (led_index == "4") {
+    gpio_index1 = ledgp_4_red;
+    gpio_index2 = ledgp_4_green;  
+  } else if (led_index == "5") {
+    gpio_index1 = ledgp_5_red;
+    gpio_index2 = ledgp_5_green;  
+  }
+
+  if (isSameString(led_color, "red")) {
+    FW_toggleGPIO(gpio_index1);
+  } else if (isSameString(led_color, "green")) {
+    FW_toggleGPIO(gpio_index2);
+  } else if (isSameString(led_color, "orange")) {
+    FW_toggleGPIO(gpio_index1);
+    FW_toggleGPIO(gpio_index2);
+  } 
+}
+
 uint64_t get_current_millis() {
     auto now = std::chrono::steady_clock::now();
     return std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();

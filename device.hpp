@@ -85,6 +85,7 @@ void FW_toggleGPIO(int gpio_num);
 
 // led
 void FW_setLED(string led_index, string led_color);
+void FW_toggleLED(string led_index, string led_color);
 
 // DI
 void Thread_FWMonitorDI();
