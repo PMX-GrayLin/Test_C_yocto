@@ -11,6 +11,11 @@
 #define AICamreaCISPath "/dev/csi_cam_preview"
 #define AICamreaUSBPath "/dev/video137"
 
+// apply only used header
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
+
 typedef enum {
     spf_BMP,
     spf_JPEG,
@@ -56,6 +61,7 @@ void AICP_setFocusAuto(bool enable);
 void AICP_setImagePath(const string& imagePath);
 void AICP_setCropImagePath(const string& imagePath);
 void AICP_setInputImagePath(const string& imagePath);
+void AICP_setCropROI(cv::Rect roi);
 bool AICP_isCropImage();
 void AICP_captureImage();
 void AICP_enableCrop(bool enable);
