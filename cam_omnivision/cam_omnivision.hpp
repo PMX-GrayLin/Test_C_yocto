@@ -23,8 +23,8 @@ extern bool AICP_isUseCISCamera();
 extern std::string AICP_getVideoDevice();
 
 // IOCTLS ===========
-int ioctl_get_value(int control_ID);
-int ioctl_set_value(int control_ID, int value);
+int ioctl_get_value_aic(int control_ID);
+int ioctl_set_value_aic(int control_ID, int value);
 extern int AICP_getBrightness();
 extern void AICP_setBrightness(int value);
 extern int AICP_getContrast();

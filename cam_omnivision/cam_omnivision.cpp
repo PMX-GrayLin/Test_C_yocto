@@ -14,11 +14,11 @@
 #include <opencv2/imgcodecs.hpp>
 
 std::thread t_aicamera_streaming;
-bool isStreaming = false;
+bool isStreaming_aic = false;
 
-bool isCapturePhoto = false;
-bool isCropPhoto = false;
-bool isPaddingPhoto = false;
+bool isCapturePhoto_aic = false;
+bool isCropPhoto_aic = false;
+bool isPaddingPhoto_aic = false;
 SavedPhotoFormat savedPhotoFormat = spf_PNG;
 std::string pathName_savedImage = "";
 std::string pathName_croppedImage = "";
@@ -109,7 +109,7 @@ std::string AICP_getVideoDevice() {
   return videoPath;
 }
 
-int ioctl_get_value(int control_ID) {
+int ioctl_get_value_aic(int control_ID) {
   int fd = open(AICP_getVideoDevice().c_str(), O_RDWR);
   if (fd == -1) {
     xlog("Failed to open video device:%s", strerror(errno));
@@ -138,7 +138,7 @@ int ioctl_get_value(int control_ID) {
   return ctrl.value;
 }
 
-int ioctl_set_value(int control_ID, int value) {
+int ioctl_set_value_aic(int control_ID, int value) {
   int fd = open(AICP_getVideoDevice().c_str(), O_RDWR);
   if (fd == -1) {
     xlog("Failed to open video device:%s", strerror(errno));
@@ -161,45 +161,45 @@ int ioctl_set_value(int control_ID, int value) {
 }
 
 int AICP_getBrightness() {
-  return ioctl_get_value(V4L2_CID_BRIGHTNESS);
+  return ioctl_get_value_aic(V4L2_CID_BRIGHTNESS);
 }
 
 void AICP_setBrightness(int value) {
   xlog("value:%d", value);
-  ioctl_set_value(V4L2_CID_BRIGHTNESS, value);
+  ioctl_set_value_aic(V4L2_CID_BRIGHTNESS, value);
 }
 
 int AICP_getContrast() {
-  return ioctl_get_value(V4L2_CID_CONTRAST);
+  return ioctl_get_value_aic(V4L2_CID_CONTRAST);
 }
 
 void AICP_setContrast(int value) {
   xlog("value:%d", value);
-  ioctl_set_value(V4L2_CID_CONTRAST, value);
+  ioctl_set_value_aic(V4L2_CID_CONTRAST, value);
 }
 
 int AICP_getSaturation() {
-  return ioctl_get_value(V4L2_CID_SATURATION);
+  return ioctl_get_value_aic(V4L2_CID_SATURATION);
 }
 
 void AICP_setSaturation(int value) {
   xlog("value:%d", value);
-  ioctl_set_value(V4L2_CID_SATURATION, value);
+  ioctl_set_value_aic(V4L2_CID_SATURATION, value);
 }
 
 int AICP_getHue() {
-  return ioctl_get_value(V4L2_CID_HUE);
+  return ioctl_get_value_aic(V4L2_CID_HUE);
 }
 
 void AICP_setHue(int value) {
   xlog("value:%d", value);
-  ioctl_set_value(V4L2_CID_HUE, value);
+  ioctl_set_value_aic(V4L2_CID_HUE, value);
 }
 
 // command example
 // v4l2-ctl -d 78 --get-ctrl=white_balance_automatic
 int AICP_getWhiteBalanceAutomatic() {
-  return ioctl_get_value(V4L2_CID_AUTO_WHITE_BALANCE);
+  return ioctl_get_value_aic(V4L2_CID_AUTO_WHITE_BALANCE);
 }
 
 // command example
@@ -207,82 +207,82 @@ int AICP_getWhiteBalanceAutomatic() {
 // v4l2-ctl -d 78 --set-ctrl=white_balance_automatic=1
 void AICP_setWhiteBalanceAutomatic(bool enable) {
   xlog("enable:%d", enable);
-  ioctl_set_value(V4L2_CID_AUTO_WHITE_BALANCE, enable ? 1 : 0);
+  ioctl_set_value_aic(V4L2_CID_AUTO_WHITE_BALANCE, enable ? 1 : 0);
 }
 
 int AICP_getSharpness() {
-  return ioctl_get_value(V4L2_CID_SHARPNESS);
+  return ioctl_get_value_aic(V4L2_CID_SHARPNESS);
 }
 
 void AICP_setSharpness(int value) {
   xlog("value:%d", value);
-  ioctl_set_value(V4L2_CID_SHARPNESS, value);
+  ioctl_set_value_aic(V4L2_CID_SHARPNESS, value);
 }
 
 int AICP_getISO() {
-  return ioctl_get_value(0x009819a9);
+  return ioctl_get_value_aic(0x009819a9);
 }
 
 void AICP_setISO(int value) {
   xlog("value:%d", value);
-  ioctl_set_value(0x009819a9, value);
+  ioctl_set_value_aic(0x009819a9, value);
 }
 
 int AICP_getExposure() {
-  return ioctl_get_value(V4L2_CID_EXPOSURE);
+  return ioctl_get_value_aic(V4L2_CID_EXPOSURE);
 }
 
 void AICP_setExposure(int value) {
   xlog("value:%d", value);
-  ioctl_set_value(V4L2_CID_EXPOSURE, value);
+  ioctl_set_value_aic(V4L2_CID_EXPOSURE, value);
 }
 
 int AICP_getWhiteBalanceTemperature() {
-  return ioctl_get_value(V4L2_CID_WHITE_BALANCE_TEMPERATURE);
+  return ioctl_get_value_aic(V4L2_CID_WHITE_BALANCE_TEMPERATURE);
 }
 
 void AICP_setWhiteBalanceTemperature(int value) {
   xlog("value:%d", value);
-  ioctl_set_value(V4L2_CID_WHITE_BALANCE_TEMPERATURE, value);
+  ioctl_set_value_aic(V4L2_CID_WHITE_BALANCE_TEMPERATURE, value);
 }
 
 int AICP_getExposureAuto() {
-  return ioctl_get_value(V4L2_CID_EXPOSURE_AUTO);
+  return ioctl_get_value_aic(V4L2_CID_EXPOSURE_AUTO);
 }
 
 void AICP_setExposureAuto(bool enable) {
   xlog("enable:%d", enable);
-  ioctl_set_value(V4L2_CID_EXPOSURE_AUTO, enable ? 0 : 1);
+  ioctl_set_value_aic(V4L2_CID_EXPOSURE_AUTO, enable ? 0 : 1);
 }
 
 int AICP_getExposureTimeAbsolute() {
   xlog("");
-  return ioctl_get_value(V4L2_CID_EXPOSURE_ABSOLUTE);
+  return ioctl_get_value_aic(V4L2_CID_EXPOSURE_ABSOLUTE);
 }
 
 void AICP_setExposureTimeAbsolute(double sec) {
   xlog("tmp sec:%f", sec);
   int value = (int)(sec * 1000000.0);
   xlog("value:%d", value);
-  ioctl_set_value(V4L2_CID_EXPOSURE_ABSOLUTE, value);
+  ioctl_set_value_aic(V4L2_CID_EXPOSURE_ABSOLUTE, value);
 }
 
 int AICP_getFocusAbsolute() {
-  return ioctl_get_value(V4L2_CID_FOCUS_ABSOLUTE);
+  return ioctl_get_value_aic(V4L2_CID_FOCUS_ABSOLUTE);
 }
 
 void AICP_setFocusAbsolute(int value) {
   xlog("value:%d", value);
-  ioctl_set_value(V4L2_CID_FOCUS_ABSOLUTE, value);
+  ioctl_set_value_aic(V4L2_CID_FOCUS_ABSOLUTE, value);
 }
 
 int AICP_getFocusAuto() {
-  return ioctl_get_value(V4L2_CID_FOCUS_AUTO);
+  return ioctl_get_value_aic(V4L2_CID_FOCUS_AUTO);
 }
 
 void AICP_setFocusAuto(bool enable) {
   xlog("enable:%d", enable);
-  ioctl_set_value(V4L2_CID_FOCUS_AUTO, enable ? 1 : 0);
+  ioctl_set_value_aic(V4L2_CID_FOCUS_AUTO, enable ? 1 : 0);
 }
 
 void AICP_setImagePath(const string& imagePath) {
@@ -310,22 +310,22 @@ bool AICP_isCropImage() {
 }
 
 void AICP_captureImage() {
-  if (!isStreaming) {
+  if (!isStreaming_aic) {
     xlog("do nothing...camera is not streaming");
     return;
   }
   xlog("");
-  isCapturePhoto = true;
+  isCapturePhoto_aic = true;
 }
 
 void AICP_enableCrop(bool enable) {
-  isCropPhoto = enable;
-  xlog("isCropPhoto:%d", isCropPhoto);
+  isCropPhoto_aic = enable;
+  xlog("isCropPhoto_aic:%d", isCropPhoto_aic);
 }
 
 void AICP_enablePadding(bool enable) {
-  isPaddingPhoto = enable;
-  xlog("isPaddingPhoto:%d", isPaddingPhoto);
+  isPaddingPhoto_aic = enable;
+  xlog("isPaddingPhoto_aic:%d", isPaddingPhoto_aic);
 }
 
 void AICP_load_crop_saveImage() {
@@ -341,11 +341,11 @@ void AICP_load_crop_saveImage() {
         return;
       }
 
-      if (isCropPhoto) {
+      if (isCropPhoto_aic) {
         // Crop the region of interest (ROI)
         cv::Mat croppedImage = image(crop_roi);
 
-        if (isPaddingPhoto) {
+        if (isPaddingPhoto_aic) {
           // Create a black canvas of the target size
           int squqareSize = (croppedImage.cols > croppedImage.rows) ? croppedImage.cols : croppedImage.rows;
           cv::Size paddingSize(squqareSize, squqareSize);
@@ -526,10 +526,10 @@ void AICP_threadSaveCropImage(const std::string path, const cv::Mat &frameBuffer
 }
 
 void AICP_saveImage(GstPad *pad, GstPadProbeInfo *info) {
-  if (isCapturePhoto) {
+  if (isCapturePhoto_aic) {
 
     xlog("");
-    isCapturePhoto = false;
+    isCapturePhoto_aic = false;
     
     GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buffer == nullptr) {
@@ -757,12 +757,12 @@ void Thread_AICPStreaming() {
     xlog("failed to start the pipeline");
     gst_element_set_state(gst_pipeline, GST_STATE_NULL);
     gst_object_unref(gst_pipeline);
-    isStreaming = false;
+    isStreaming_aic = false;
     return;
   }
 
   xlog("pipeline is running...");
-  isStreaming = true;
+  isStreaming_aic = true;
 
   // Run the main loop
   gst_loop = g_main_loop_new(nullptr, FALSE);
@@ -781,7 +781,7 @@ void Thread_AICPStreaming() {
     gst_loop = nullptr;
   }
 
-  isStreaming = false;
+  isStreaming_aic = false;
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 
 }
@@ -869,7 +869,7 @@ void Thread_AICPStreaming_usb() {
   }
 
   xlog("pipeline is running...");
-  isStreaming = true;
+  isStreaming_aic = true;
 
   // Run the main loop
   gst_loop = g_main_loop_new(nullptr, FALSE);
@@ -881,18 +881,18 @@ void Thread_AICPStreaming_usb() {
 
   // Clean up
   gst_object_unref(gst_pipeline);
-  isStreaming = false;
+  isStreaming_aic = false;
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 
 }
 
 void AICP_streamingStart() {
   xlog("");
-  if (isStreaming) {
+  if (isStreaming_aic) {
     xlog("thread already running");
     return;
   }
-  isStreaming = true;
+  isStreaming_aic = true;
 
   if (AICP_isUseCISCamera())
   {
@@ -906,7 +906,7 @@ void AICP_streamingStart() {
 
 void AICP_streamingStop() {
   xlog("");
-  if (!isStreaming) {
+  if (!isStreaming_aic) {
     xlog("Streaming not running");
     return;
   }
@@ -921,6 +921,6 @@ void AICP_streamingStop() {
   }
 
   // ??
-  isStreaming = false;
+  isStreaming_aic = false;
 }
 
