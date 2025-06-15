@@ -7,7 +7,7 @@
 #define NUM_Triger      2                 // Number of Triger, treat as DI
 #define NUM_DO          2                 // Number of DO
 
-// ? NUM_DIOm aicamera = 2, visionhb = 4
+// NUM_DIOm aicamera = 2, visionhb = 4
 #define NUM_DIO         4                 // Number of DIO
 
 

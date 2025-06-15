@@ -22,32 +22,35 @@ typedef enum {
 } GstArvAuto;
 
 struct GigeControlParams {
-  double exposure;    // Exposure time (in microseconds)
-  double gain;        // Gain value (in dB)
   int exposure_auto;  // Auto exposure mode: 0=off, 1=once, 2=continuous
+  double exposure;    // Exposure time (in microseconds)
+
   int gain_auto;      // Auto gain mode: 0=off, 1=once, 2=continuous
+  double gain;        // Gain value (in dB)
 };
 
-extern void Gige_handle_RESTful_hik(std::vector<std::string> segments);
+void Gige_handle_RESTful_hik(std::vector<std::string> segments);
 
-extern void GigE_getSettings_hik();
+void GigE_getSettings_hik();
 
-extern double GigE_getExposure_hik();
-extern void GigE_setExposure_hik(string exposureTimeS);
-extern GstArvAuto GigE_getExposureAuto_hik();
-extern void GigE_setExposureAuto_hik(string gstArvAutoS);
+double GigE_getExposure_hik();
+void GigE_setExposure_hik(string exposureTimeS);
+GstArvAuto GigE_getExposureAuto_hik();
+void GigE_setExposureAuto_hik(string gstArvAutoS);
 
-extern double GigE_getGain_hik();
-extern void GigE_setGain_hik(string gainS);
-extern GstArvAuto GigE_getGainAuto_hik();
-extern void GigE_setGainAuto_hik(string gstArvAutoS);
+double GigE_getGain_hik();
+void GigE_setGain_hik(string gainS);
+GstArvAuto GigE_getGainAuto_hik();
+void GigE_setGainAuto_hik(string gstArvAutoS);
 
 void GigE_setImagePath_hik(const string& imagePath);
 void GigE_captureImage_hik();
 
 void GigE_ThreadStreaming_Hik();
-extern void GigE_StreamingStart_Hik();
-extern void GigE_StreamingStop_Hik();
+void GigE_StreamingStart_Hik();
+void GigE_StreamingStop_Hik();
+
+void GigE_streamingLED();
 
 /* 
 

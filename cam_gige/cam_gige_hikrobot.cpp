@@ -9,6 +9,7 @@
 
 #include "image_utils.hpp"
 #include "restfulx.hpp"
+#include "device.hpp"
 
 extern void AICP_saveImage(GstPad *pad, GstPadProbeInfo *info);
 
@@ -25,6 +26,8 @@ struct GigeControlParams gigeControlParams = {0};
 
 bool isCapturePhoto_hik = false;
 std::string pathName_savedImage_hik = "";
+
+static volatile int counterFrame_hik = 0;
 
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   if (isSameString(segments[1], "start")) {
@@ -355,4 +358,12 @@ void GigE_StreamingStop_Hik() {
   }
 
   isStreaming_gige_hik = false;
+}
+
+void GigE_streamingLED() {
+  counterFrame_hik++;
+  if (counterFrame_hik%15 == 0)
+  {
+    FW_toggleLED("2", "orange");
+  }
 }
