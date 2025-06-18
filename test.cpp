@@ -192,7 +192,10 @@ void test_ftdi() {
 #endif // ENABLE_FTDI
 
 int main(int argc, char* argv[]) {
+  
+  xlog("");
   xlog("Compiled at %s %s", __DATE__, __TIME__);
+  
   for (int i = 0; i < argc; ++i) {
     xlog("argv[%d]:%s", i, argv[i]);
   }
