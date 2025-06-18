@@ -1,5 +1,7 @@
 #include "image_utils.hpp"
 
+#include <vector>
+
 #include <gst/gst.h>
 
 // apply only used header
@@ -7,12 +9,32 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
+SyncSignal syncSignal_save;
+
+void imgu_resetSignal() {
+    std::lock_guard<std::mutex> lock(syncSignal_save.mtx);
+    syncSignal_save.done = false;
+}
+void imgu_waitSignal() {
+  std::unique_lock<std::mutex> lock(syncSignal_save.mtx);
+  syncSignal_save.cv.wait(lock, [&syncSignal_save] { return syncSignal_save.done; });
+}
+void imgu_trigerSignal(SyncSignal *sync) {
+  if (sync) {
+    std::lock_guard<std::mutex> lock(sync->mtx);
+    sync->done = true;
+    sync->cv.notify_one();
+  }
+}
+
 void imgu_saveImage(
   void *v_pad /* GstPad* */,
   void *v_info /* GstPadProbeInfo */,
   const std::string &filePathName,
   const SimpleRect roi) 
 {
+  auto start = std::chrono::high_resolution_clock::now();
+
   GstPad *pad = static_cast<GstPad *>(v_pad);
   GstPadProbeInfo *info = static_cast<GstPadProbeInfo *>(v_info);
   cv::Rect cv_roi(roi.x, roi.y, roi.width, roi.height);
@@ -78,13 +100,40 @@ void imgu_saveImage(
   if (bgr_frame.empty()) {
     xlog("bgr_frame is empty. Cannot save image to %s", filePathName.c_str());
   } else {
-    
+    // #1 save full image
+    std::vector<int> params;
+
+    // Lowercase file extension check (C++17 compatible)
+    std::string lower_path = filePathName;
+    std::transform(lower_path.begin(), lower_path.end(), lower_path.begin(), ::tolower);
+
+    if (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".png") {
+      params = {cv::IMWRITE_PNG_COMPRESSION, 0};  // Fastest (no compression)
+    } else if (
+        (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".jpg") ||
+        (lower_path.size() >= 5 && lower_path.substr(lower_path.size() - 5) == ".jpeg")) {
+      params = {cv::IMWRITE_JPEG_QUALITY, 95};  // Quality: 0–100 (default is 95)
+    }
+
+    bool isSaveOK;
+    if (!params.empty()) {
+      isSaveOK = cv::imwrite(filePathName, bgr_frame, params);
+    } else {
+      isSaveOK = cv::imwrite(filePathName, bgr_frame);
+    }
+    if (isSaveOK) {
+      xlog("Saved frame to %s", filePathName.c_str());
+    } else {
+      xlog("Failed to save frame to %s", filePathName.c_str());
+    }
+
+    // #2 save crop image
     // Validate ROI dimensions
     bool isCrop = true;
     if (cv_roi.x < 0 || cv_roi.y < 0 || cv_roi.width == 0 || cv_roi.height == 0 ||
         cv_roi.x + cv_roi.width > bgr_frame.cols ||
         cv_roi.y + cv_roi.height > bgr_frame.rows) {
-      xlog("ROI not correct...");
+      xlog("ROI not correct... not crop");
       isCrop = false;
     }
 
@@ -119,15 +168,11 @@ void imgu_saveImage(
         xlog("Failed crop to save frame to %s", filePathName.c_str());
       }
 
-    } else {
-      if (cv::imwrite(filePathName, bgr_frame)) {
-        xlog("Saved frame to %s", filePathName.c_str());
-      } else {
-        xlog("Failed to save frame to %s", filePathName.c_str());
-      }
-    }
-
+    } 
   }
+
+  auto end = std::chrono::high_resolution_clock::now();
+  xlog("Elapsed time: %lld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 
   // Cleanup
   gst_buffer_unmap(buffer, &map);
@@ -138,7 +183,8 @@ void imgu_saveImage_thread(
   void *v_pad, 
   void *v_info, 
   const std::string &filePathName,
-  const SimpleRect roi) 
+  const SimpleRect roi,
+  SyncSignal *sync) 
 {
   GstPad *pad = static_cast<GstPad *>(v_pad);
   GstPadProbeInfo *info = static_cast<GstPadProbeInfo *>(v_info);
@@ -158,7 +204,7 @@ void imgu_saveImage_thread(
   }
 
   // Launch thread using copied buffer and pad
-  std::thread([pad, copied_buffer, filePathName, roi]() {
+  std::thread([pad, copied_buffer, filePathName, roi, sync]() {
     // Create a temporary GstPadProbeInfo-like struct
     GstPadProbeInfo fake_info = {};
     GST_PAD_PROBE_INFO_DATA(&fake_info) = copied_buffer;
@@ -168,6 +214,9 @@ void imgu_saveImage_thread(
 
     // Cleanup
     gst_buffer_unref(copied_buffer);
+
+    // Signal if sync object provided & job done
+    imgu_trigerSignal(sync);
   }).detach();
 }
 

@@ -94,12 +94,6 @@ void GigE_saveImage_hik(GstPad *pad, GstPadProbeInfo *info) {
   }
 }
 
-// Callback to handle incoming buffer data
-GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
-  GigE_saveImage_hik(pad, info);
-  return GST_PAD_PROBE_OK;
-}
-
 void GigE_getSettings_hik() {
   // Get the current values
   double exposure, gain;
@@ -198,6 +192,12 @@ void GigE_captureImage_hik() {
   }
   xlog("");
   isCapturePhoto_hik = true;
+}
+
+// Callback to handle incoming buffer data
+GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+  GigE_saveImage_hik(pad, info);
+  return GST_PAD_PROBE_OK;
 }
 
 void GigE_ThreadStreaming_Hik() {
