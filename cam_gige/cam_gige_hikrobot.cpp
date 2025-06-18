@@ -196,6 +196,7 @@ void GigE_captureImage_hik() {
 
 // Callback to handle incoming buffer data
 GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+  GigE_streamingLED();
   GigE_saveImage_hik(pad, info);
   return GST_PAD_PROBE_OK;
 }
