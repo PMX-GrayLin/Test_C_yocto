@@ -84,7 +84,7 @@ void FW_writePWMFile(const std::string &path, const std::string &value) {
 }
 
 void FW_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
-  // actual is pwm0 & pwm1
+  // actual is pwm1 & pwm0 (aicamera always 1)
   // Map logical index to actual hardware index
   std::string actualPwmIndex;
   if (pwmIndex == "1") {
