@@ -14,7 +14,7 @@ std::string hostname_prefix = "aicamera";   // aicamera or visionhub
 
 // PWM
 const std::string path_pwm = "/sys/devices/platform/soc/10048000.pwm/pwm/pwmchip0";
-const int pwmPeriod = 20000;                    // 5 kHz
+const int pwmPeriod = 200000;                   // 5 kHz
 
 // DI
 int DI_GPIOs[NUM_DI] = {digp_1, digp_2};        // DI GPIO
