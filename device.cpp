@@ -88,9 +88,9 @@ void FW_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
   // Map logical index to actual hardware index
   std::string actualPwmIndex;
   if (pwmIndex == "1") {
-    actualPwmIndex = "0";
-  } else if (pwmIndex == "2") {
     actualPwmIndex = "1";
+  } else if (pwmIndex == "2") {
+    actualPwmIndex = "0";
   } else {
     xlog("Invalid pwmIndex: %s", pwmIndex.c_str());
     return;
