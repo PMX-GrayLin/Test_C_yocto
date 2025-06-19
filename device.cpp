@@ -104,7 +104,7 @@ void FW_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
   if (!isPathExist(pwmTarget.c_str())) {
     xlog("PWM init... pwm%s", actualPwmIndex.c_str());
     FW_writePWMFile(path_pwmExport, actualPwmIndex);
-    usleep(500000);  // sleep 0.5s
+    usleep(500000);  // sleep 500ms
     FW_writePWMFile(pwmTarget + "/period", std::to_string(pwmPeriod));
   }
 
