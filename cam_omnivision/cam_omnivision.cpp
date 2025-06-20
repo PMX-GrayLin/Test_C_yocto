@@ -8,6 +8,7 @@
 #include <gst/gst.h>
 
 #include "device.hpp"
+#include "image_utils.hpp"
 
 std::thread t_streaming_aic;
 bool isStreaming_aic = false;
@@ -22,7 +23,6 @@ std::string pathName_inputImage_aic = "";
 cv::Rect crop_roi_aic(0, 0, 0, 0);
 
 static volatile int counterFrame_aic = 0;
-static int counterImg_aic = 0;
 
 static GstElement *gst_pipeline_aic = nullptr;
 static GMainLoop *gst_loop_aic = nullptr;
@@ -59,47 +59,22 @@ void AICP_handle_RESTful(std::vector<std::string> segments) {
 
 bool AICP_isUseCISCamera() {
   if (isPathExist(AICamreaCISPath)) {
-    // xlog("path /dev/csi_cam_preview exist");
+    xlog("path /dev/csi_cam_preview exist");
     return true;
   } else {
-    // xlog("path /dev/csi_cam_preview not exist");
+    xlog("path /dev/csi_cam_preview not exist");
     return false;
   }
 }
 
 std::string AICP_getVideoDevice() {
+  
   std::string videoPath;
-
-  bool isUseCSICamera = AICP_isUseCISCamera();
-
-  if (isUseCSICamera) {
+  if (AICP_isUseCISCamera()) {
     videoPath = AICamreaCISPath;
   } else {
     videoPath = AICamreaUSBPath;
   }
-
-  // #if defined(USE_USB_CAM)
-
-  //   videoPath = "/dev/video137";
-
-  // #else
-  //   FILE *pipe = popen("v4l2-ctl --list-devices | grep mtk-v4l2-camera -A 3", "r");
-  //   if (pipe) {
-  //     std::string output;
-  //     char buffer[256];
-  //     while (fgets(buffer, sizeof(buffer), pipe)) {
-  //       output += buffer;
-  //     }
-  //     pclose(pipe);
-
-  //     std::regex device_regex("/dev/video\\d+");
-  //     std::smatch match;
-  //     if (std::regex_search(output, match, device_regex)) {
-  //       videoPath = match[0];
-  //     }
-  //   }
-
-  // #endif
 
   xlog("videoPath:%s", videoPath.c_str());
   return videoPath;
@@ -310,6 +285,7 @@ void AICP_captureImage() {
     xlog("do nothing...camera is not streaming");
     return;
   }
+
   xlog("");
   isCapturePhoto_aic = true;
 }
@@ -329,6 +305,7 @@ void AICP_load_crop_saveImage() {
   // std::thread([]() {
     try {
       xlog("---- AICP_load_crop_saveImage start ----");
+      auto start = std::chrono::high_resolution_clock::now();
 
       // Load the image
       cv::Mat image = cv::imread(pathName_inputImage_aic);
@@ -337,59 +314,67 @@ void AICP_load_crop_saveImage() {
         return;
       }
 
+      cv::Mat outputImage;
+
       if (isCropPhoto_aic) {
-        // Crop the region of interest (ROI)
-        cv::Mat croppedImage = image(crop_roi_aic);
+        // Crop region
+        cv::Rect roi = crop_roi_aic & cv::Rect(0, 0, image.cols, image.rows);  // safety clip
+        if (roi.width <= 0 || roi.height <= 0) {
+          xlog("Invalid ROI for cropping");
+          return;
+        }
+
+        cv::Mat croppedImage = image(roi);
 
         if (isPaddingPhoto_aic) {
-          // Create a black canvas of the target size
-          int squqareSize = (croppedImage.cols > croppedImage.rows) ? croppedImage.cols : croppedImage.rows;
-          cv::Size paddingSize(squqareSize, squqareSize);
-          cv::Mat paddedImage = cv::Mat::zeros(paddingSize, croppedImage.type());
+          int squareSize = std::max(croppedImage.cols, croppedImage.rows);
+          cv::Mat paddedImage = cv::Mat::zeros(squareSize, squareSize, croppedImage.type());
 
-          // Calculate offsets to center the cropped image
-          int offsetX = (paddedImage.cols - croppedImage.cols) / 2;
-          int offsetY = (paddedImage.rows - croppedImage.rows) / 2;
-          // Check if offsets are valid
-          if (offsetX < 0 || offsetY < 0) {
-            xlog("Error: Cropped image is larger than the padding canvas!");
-            return;
-          }
+          int offsetX = (squareSize - croppedImage.cols) / 2;
+          int offsetY = (squareSize - croppedImage.rows) / 2;
 
-          // Define the ROI on the black canvas where the cropped image will be placed
-          cv::Rect roi_padding(offsetX, offsetY, croppedImage.cols, croppedImage.rows);
-
-          // Copy the cropped image onto the black canvas
-          croppedImage.copyTo(paddedImage(roi_padding));
-
-          // Attempt to save the image
-          if (cv::imwrite(pathName_savedImage_aic, paddedImage)) {
-            xlog("Saved crop frame to %s", pathName_savedImage_aic.c_str());
-          } else {
-            xlog("Failed crop to save frame to %s", pathName_savedImage_aic.c_str());
-          }
-
+          croppedImage.copyTo(paddedImage(cv::Rect(offsetX, offsetY, croppedImage.cols, croppedImage.rows)));
+          outputImage = paddedImage;
         } else {
-          
-          // Attempt to save the image
-          if (cv::imwrite(pathName_savedImage_aic, croppedImage)) {
-            xlog("Saved crop frame to %s", pathName_savedImage_aic.c_str());
-          } else {
-            xlog("Failed crop to save frame to %s", pathName_savedImage_aic.c_str());
-          }
+          outputImage = croppedImage;
         }
 
-        cv::Rect reset_roi(0, 0, 0, 0);
-        AICP_setCropROI(reset_roi);
+        // Reset crop ROI
+        AICP_setCropROI(cv::Rect(0, 0, 0, 0));
 
       } else {
-        // save the image
-        if (cv::imwrite(pathName_savedImage_aic, image)) {
-          xlog("Saved crop frame to %s", pathName_savedImage_aic.c_str());
-        } else {
-          xlog("Failed crop to save frame to %s", pathName_savedImage_aic.c_str());
-        }
+        outputImage = image;
       }
+
+      // Save image
+      std::vector<int> params;
+
+      // Lowercase file extension check (C++17 compatible)
+      std::string lower_path = pathName_savedImage_aic;
+      std::transform(lower_path.begin(), lower_path.end(), lower_path.begin(), ::tolower);
+
+      if (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".png") {
+        params = {cv::IMWRITE_PNG_COMPRESSION, 0};  // Fastest (no compression)
+      } else if (
+          (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".jpg") ||
+          (lower_path.size() >= 5 && lower_path.substr(lower_path.size() - 5) == ".jpeg")) {
+        params = {cv::IMWRITE_JPEG_QUALITY, 95};  // Quality: 0–100 (default is 95)
+      }
+
+      bool isSaveOK;
+      if (!params.empty()) {
+        isSaveOK = cv::imwrite(pathName_savedImage_aic, outputImage, params);
+      } else {
+        isSaveOK = cv::imwrite(pathName_savedImage_aic, outputImage);
+      }
+      if (isSaveOK) {
+        xlog("Saved frame to %s", pathName_savedImage_aic.c_str());
+      } else {
+        xlog("Failed to save frame to %s", pathName_savedImage_aic.c_str());
+      }
+
+      auto end = std::chrono::high_resolution_clock::now();
+      xlog("Elapsed time: %lld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 
     } catch (const std::exception &e) {
       xlog("Exception during image save: %s", e.what());
@@ -421,12 +406,17 @@ void AICP_threadSaveImage(const std::string path, const cv::Mat &frameBuffer) {
         return;
       }
 
+      auto start = std::chrono::high_resolution_clock::now();
+
       // save the image
       if (cv::imwrite(path, frameBuffer)) {
         xlog("Saved frame to %s", path.c_str());
       } else {
         xlog("Failed to save frame to %s", path.c_str());
       }
+
+      auto end = std::chrono::high_resolution_clock::now();
+      xlog("Elapsed time: %lld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 
     } catch (const std::exception &e) {
       xlog("Exception during image save: %s", e.what());
@@ -523,113 +513,93 @@ void AICP_threadSaveCropImage(const std::string path, const cv::Mat &frameBuffer
 
 void AICP_saveImage(GstPad *pad, GstPadProbeInfo *info) {
   if (isCapturePhoto_aic) {
-
-    xlog("");
     isCapturePhoto_aic = false;
-    
-    GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
-    if (buffer == nullptr) {
-      xlog("Failed to get buffer");
-      return;
-    }
 
-    // Get the capabilities of the pad to understand the format
-    GstCaps *caps = gst_pad_get_current_caps(pad);
-    if (!caps) {
-      xlog("Failed to get caps");
-      return;
-    }
-    // Print the entire caps for debugging
-    // xlog("caps: %s", gst_caps_to_string(caps));
-
-    // Map the buffer to access its data
-    GstMapInfo map;
-    if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-      xlog("Failed to map buffer");
-      gst_caps_unref(caps);
-      return;
-    }
-
-    // Get the structure of the first capability (format)
-    GstStructure *str = gst_caps_get_structure(caps, 0);
-    const gchar *format = gst_structure_get_string(str, "format");
-    xlog("format:%s", format);
-
-    // Only proceed if the format is NV12
-    if (format && g_strcmp0(format, "NV12") == 0) {
-      int width = 0, height = 0;
-      if (!gst_structure_get_int(str, "width", &width) ||
-          !gst_structure_get_int(str, "height", &height)) {
-        xlog("Failed to get video dimensions");
-      }
-      // xlog("Video dimensions: %dx%d", width, height);
-
-      // Create a cv::Mat to store the frame in NV12 format
-      cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
-      // Create a cv::Mat to store the frame in BGR format
-      cv::Mat bgr_frame(height, width, CV_8UC3);
-      // Convert NV12 to BGR using OpenCV
-      cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
-
-      // Save the frame to a picture
-      counterImg_aic++;
-      std::ostringstream oss;
-      std::string filename = "";
-
-      if (pathName_savedImage_aic == "") {
-        if (savedPhotoFormat_aic == spf_BMP) {
-          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg_aic << ".bmp";
-        } else if (savedPhotoFormat_aic == spf_JPEG) {
-          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg_aic << ".jpg";
-        } else {
-          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg_aic << ".png";
-        }
-        filename = oss.str();
-      } else {
-        filename = pathName_savedImage_aic;
-      }
-
-      AICP_threadSaveImage(filename, bgr_frame);
-      AICP_threadSaveCropImage(pathName_croppedImage_aic, bgr_frame, crop_roi_aic);
-      
-    } else if (format && g_strcmp0(format, "I420") == 0) {
-      int width = 0, height = 0;
-      if (!gst_structure_get_int(str, "width", &width) ||
-          !gst_structure_get_int(str, "height", &height)) {
-        xlog("Failed to get video dimensions");
-      }
-
-      // Convert I420 to BGR using OpenCV
-      cv::Mat i420_frame(height + height / 2, width, CV_8UC1, map.data);
-      cv::Mat bgr_frame(height, width, CV_8UC3);
-      cv::cvtColor(i420_frame, bgr_frame, cv::COLOR_YUV2BGR_I420);
-
-      // Save the frame
-      counterImg_aic++;
-      std::ostringstream oss;
-      std::string filename = "";
-
-      if (pathName_savedImage_aic == "") {
-        if (savedPhotoFormat_aic == spf_BMP) {
-          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg_aic << ".bmp";
-        } else if (savedPhotoFormat_aic == spf_JPEG) {
-          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg_aic << ".jpg";
-        } else {
-          oss << "frame_" << std::setw(5) << std::setfill('0') << counterImg_aic << ".png";
-        }
-        filename = oss.str();
-      } else {
-        filename = pathName_savedImage_aic;
-      }
-
-      AICP_threadSaveImage(filename, bgr_frame);
-      AICP_threadSaveCropImage(pathName_croppedImage_aic, bgr_frame, crop_roi_aic);
-    }
-
-    // Cleanup
-    gst_buffer_unmap(buffer, &map);
-    gst_caps_unref(caps);
+    SimpleRect roi = {crop_roi_aic.x, crop_roi_aic.y, crop_roi_aic.width, crop_roi_aic.height};
+    imgu_saveImage_thread((void *)pad, (void *)info, pathName_savedImage_aic, &syncSignal_save);
+    imgu_cropImage_thread((void *)pad, (void *)info, pathName_croppedImage_aic, roi, &syncSignal_crop);
   }
+
+  // if (isCapturePhoto_aic) {
+  //   auto start = std::chrono::high_resolution_clock::now();
+
+  //   xlog("");
+  //   isCapturePhoto_aic = false;
+    
+  //   GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
+  //   if (buffer == nullptr) {
+  //     xlog("Failed to get buffer");
+  //     return;
+  //   }
+
+  //   // Get the capabilities of the pad to understand the format
+  //   GstCaps *caps = gst_pad_get_current_caps(pad);
+  //   if (!caps) {
+  //     xlog("Failed to get caps");
+  //     return;
+  //   }
+  //   // Print the entire caps for debugging
+  //   // xlog("caps: %s", gst_caps_to_string(caps));
+
+  //   // Map the buffer to access its data
+  //   GstMapInfo map;
+  //   if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+  //     xlog("Failed to map buffer");
+  //     gst_caps_unref(caps);
+  //     return;
+  //   }
+
+  //   // Get the structure of the first capability (format)
+  //   GstStructure *str = gst_caps_get_structure(caps, 0);
+  //   const gchar *format = gst_structure_get_string(str, "format");
+  //   xlog("format:%s", format);
+
+  //   // Only proceed if the format is NV12
+  //   if (format && g_strcmp0(format, "NV12") == 0) {
+  //     int width = 0, height = 0;
+  //     if (!gst_structure_get_int(str, "width", &width) ||
+  //         !gst_structure_get_int(str, "height", &height)) {
+  //       xlog("Failed to get video dimensions");
+  //     }
+  //     // xlog("Video dimensions: %dx%d", width, height);
+
+  //     // Create a cv::Mat to store the frame in NV12 format
+  //     cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
+  //     // Create a cv::Mat to store the frame in BGR format
+  //     cv::Mat bgr_frame(height, width, CV_8UC3);
+  //     // Convert NV12 to BGR using OpenCV
+  //     cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
+
+  //     auto end = std::chrono::high_resolution_clock::now();
+  //     xlog("Elapsed time: %lld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+
+  //     // Save the frame to a picture
+  //     AICP_threadSaveImage(pathName_savedImage_aic, bgr_frame);
+  //     // AICP_threadSaveCropImage(pathName_croppedImage_aic, bgr_frame, crop_roi_aic);
+      
+  //   } else if (format && g_strcmp0(format, "I420") == 0) {
+  //     int width = 0, height = 0;
+  //     if (!gst_structure_get_int(str, "width", &width) ||
+  //         !gst_structure_get_int(str, "height", &height)) {
+  //       xlog("Failed to get video dimensions");
+  //     }
+
+  //     // Convert I420 to BGR using OpenCV
+  //     cv::Mat i420_frame(height + height / 2, width, CV_8UC1, map.data);
+  //     cv::Mat bgr_frame(height, width, CV_8UC3);
+  //     cv::cvtColor(i420_frame, bgr_frame, cv::COLOR_YUV2BGR_I420);
+
+  //     auto end = std::chrono::high_resolution_clock::now();
+  //     xlog("Elapsed time: %lld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+
+  //     AICP_threadSaveImage(pathName_savedImage_aic, bgr_frame);
+  //     // AICP_threadSaveCropImage(pathName_croppedImage_aic, bgr_frame, crop_roi_aic);
+  //   }
+
+  //   // Cleanup
+  //   gst_buffer_unmap(buffer, &map);
+  //   gst_caps_unref(caps);
+  // }
 }
 
 // Callback to handle incoming buffer data
@@ -642,7 +612,6 @@ GstPadProbeReturn AICP_streamingDataCallback(GstPad *pad, GstPadProbeInfo *info,
 void Thread_AICPStreaming() {
   xlog("++++ start ++++");
   counterFrame_aic = 0;
-  counterImg_aic = 0;
 
   // Initialize GStreamer
   gst_init(nullptr, nullptr);
@@ -780,13 +749,11 @@ void Thread_AICPStreaming() {
 
   isStreaming_aic = false;
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
-
 }
 
 void Thread_AICPStreaming_usb() {
   xlog("++++ start ++++");
   counterFrame_aic = 0;
-  counterImg_aic = 0;
 
   // Initialize GStreamer
   gst_init(nullptr, nullptr);

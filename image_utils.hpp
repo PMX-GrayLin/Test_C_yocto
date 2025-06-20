@@ -19,19 +19,34 @@ struct SyncSignal {
 };
 
 extern SyncSignal syncSignal_save;
+extern SyncSignal syncSignal_crop;
 
-void imgu_resetSignal();
-void imgu_waitSignal();
+void imgu_resetSignal(SyncSignal *sync);
+void imgu_waitSignal(SyncSignal *sync);
 
 // save whole image or the cropped image
 void imgu_saveImage(
+    void* v_pad /* GstPad* */,
+    void* v_info /* GstPadProbeInfo */,
+    const std::string& filePathName
+);
+
+void imgu_saveImage_thread(
+    void* v_pad /* GstPad* */,
+    void* v_info /* GstPadProbeInfo */,
+    const std::string& filePathName,
+    SyncSignal *sync = nullptr
+);
+
+// cropped image
+void imgu_cropImage(
     void* v_pad /* GstPad* */,
     void* v_info /* GstPadProbeInfo */,
     const std::string& filePathName,
     const SimpleRect roi = {0, 0, 0, 0}
 );
 
-void imgu_saveImage_thread(
+void imgu_cropImage_thread(
     void* v_pad /* GstPad* */,
     void* v_info /* GstPadProbeInfo */,
     const std::string& filePathName,
