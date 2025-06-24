@@ -77,3 +77,10 @@ void AICP_streamingLED();
 // image processing
 void AICP_load_crop_saveImage();
 
+// publish din state
+void AICP_publishDINState(int din_pin, const std::string& pin_state);
+
+// publish dio din state
+void AICP_publishDIODINState(int din_pin, const std::string& pin_state);
+
+

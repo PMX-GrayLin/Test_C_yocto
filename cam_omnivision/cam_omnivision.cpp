@@ -6,6 +6,8 @@
 #include <iomanip>
 
 #include <gst/gst.h>
+#include "json.hpp"
+#include "mqtt_client.hpp"
 
 #include "device.hpp"
 #include "image_utils.hpp"
@@ -59,7 +61,7 @@ void AICP_handle_RESTful(std::vector<std::string> segments) {
 
 bool AICP_isUseCISCamera() {
   if (isPathExist(AICamreaCISPath)) {
-    xlog("path /dev/csi_cam_preview exist");
+    // xlog("path /dev/csi_cam_preview exist");
     return true;
   } else {
     xlog("path /dev/csi_cam_preview not exist");
@@ -76,7 +78,7 @@ std::string AICP_getVideoDevice() {
     videoPath = AICamreaUSBPath;
   }
 
-  xlog("videoPath:%s", videoPath.c_str());
+  // xlog("videoPath:%s", videoPath.c_str());
   return videoPath;
 }
 
@@ -232,7 +234,7 @@ int AICP_getExposureTimeAbsolute() {
 }
 
 void AICP_setExposureTimeAbsolute(double sec) {
-  xlog("tmp sec:%f", sec);
+  xlog("sec:%f", sec);
   int value = (int)(sec * 1000000.0);
   xlog("value:%d", value);
   ioctl_set_value_aic(V4L2_CID_EXPOSURE_ABSOLUTE, value);
@@ -298,89 +300,6 @@ void AICP_enableCrop(bool enable) {
 void AICP_enablePadding(bool enable) {
   isPaddingPhoto_aic = enable;
   xlog("isPaddingPhoto_aic:%d", isPaddingPhoto_aic);
-}
-
-void AICP_load_crop_saveImage() {
-  // not use thread here
-  // std::thread([]() {
-    try {
-      xlog("---- AICP_load_crop_saveImage start ----");
-      auto start = std::chrono::high_resolution_clock::now();
-
-      // Load the image
-      cv::Mat image = cv::imread(pathName_inputImage_aic);
-      if (image.empty()) {
-        xlog("Failed to load image from %s", pathName_inputImage_aic.c_str());
-        return;
-      }
-
-      cv::Mat outputImage;
-
-      if (isCropPhoto_aic) {
-        // Crop region
-        cv::Rect roi = crop_roi_aic & cv::Rect(0, 0, image.cols, image.rows);  // safety clip
-        if (roi.width <= 0 || roi.height <= 0) {
-          xlog("Invalid ROI for cropping");
-          return;
-        }
-
-        cv::Mat croppedImage = image(roi);
-
-        if (isPaddingPhoto_aic) {
-          int squareSize = std::max(croppedImage.cols, croppedImage.rows);
-          cv::Mat paddedImage = cv::Mat::zeros(squareSize, squareSize, croppedImage.type());
-
-          int offsetX = (squareSize - croppedImage.cols) / 2;
-          int offsetY = (squareSize - croppedImage.rows) / 2;
-
-          croppedImage.copyTo(paddedImage(cv::Rect(offsetX, offsetY, croppedImage.cols, croppedImage.rows)));
-          outputImage = paddedImage;
-        } else {
-          outputImage = croppedImage;
-        }
-
-        // Reset crop ROI
-        AICP_setCropROI(cv::Rect(0, 0, 0, 0));
-
-      } else {
-        outputImage = image;
-      }
-
-      // Save image
-      std::vector<int> params;
-
-      // Lowercase file extension check (C++17 compatible)
-      std::string lower_path = pathName_savedImage_aic;
-      std::transform(lower_path.begin(), lower_path.end(), lower_path.begin(), ::tolower);
-
-      if (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".png") {
-        params = {cv::IMWRITE_PNG_COMPRESSION, 0};  // Fastest (no compression)
-      } else if (
-          (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".jpg") ||
-          (lower_path.size() >= 5 && lower_path.substr(lower_path.size() - 5) == ".jpeg")) {
-        params = {cv::IMWRITE_JPEG_QUALITY, 95};  // Quality: 0–100 (default is 95)
-      }
-
-      bool isSaveOK;
-      if (!params.empty()) {
-        isSaveOK = cv::imwrite(pathName_savedImage_aic, outputImage, params);
-      } else {
-        isSaveOK = cv::imwrite(pathName_savedImage_aic, outputImage);
-      }
-      if (isSaveOK) {
-        xlog("Saved frame to %s", pathName_savedImage_aic.c_str());
-      } else {
-        xlog("Failed to save frame to %s", pathName_savedImage_aic.c_str());
-      }
-
-      auto end = std::chrono::high_resolution_clock::now();
-      xlog("Elapsed time: %lld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
-
-    } catch (const std::exception &e) {
-      xlog("Exception during image save: %s", e.what());
-    }
-    xlog("---- AICP_load_crop_saveImage stop ----");
-  // }).detach();  // Detach to run in the background
 }
 
 void AICP_threadSaveImage(const std::string path, const cv::Mat &frameBuffer) {
@@ -893,4 +812,107 @@ void AICP_streamingLED() {
   {
     FW_toggleLED("2", "orange");
   }
+}
+
+void AICP_load_crop_saveImage() {
+  // not use thread here
+  // std::thread([]() {
+    try {
+      xlog("---- AICP_load_crop_saveImage start ----");
+      auto start = std::chrono::high_resolution_clock::now();
+
+      // Load the image
+      cv::Mat image = cv::imread(pathName_inputImage_aic);
+      if (image.empty()) {
+        xlog("Failed to load image from %s", pathName_inputImage_aic.c_str());
+        return;
+      }
+
+      cv::Mat outputImage;
+
+      if (isCropPhoto_aic) {
+        // Crop region
+        cv::Rect roi = crop_roi_aic & cv::Rect(0, 0, image.cols, image.rows);  // safety clip
+        if (roi.width <= 0 || roi.height <= 0) {
+          xlog("Invalid ROI for cropping");
+          return;
+        }
+
+        cv::Mat croppedImage = image(roi);
+
+        if (isPaddingPhoto_aic) {
+          int squareSize = std::max(croppedImage.cols, croppedImage.rows);
+          cv::Mat paddedImage = cv::Mat::zeros(squareSize, squareSize, croppedImage.type());
+
+          int offsetX = (squareSize - croppedImage.cols) / 2;
+          int offsetY = (squareSize - croppedImage.rows) / 2;
+
+          croppedImage.copyTo(paddedImage(cv::Rect(offsetX, offsetY, croppedImage.cols, croppedImage.rows)));
+          outputImage = paddedImage;
+        } else {
+          outputImage = croppedImage;
+        }
+
+        // Reset crop ROI
+        AICP_setCropROI(cv::Rect(0, 0, 0, 0));
+
+      } else {
+        outputImage = image;
+      }
+
+      // Save image
+      std::vector<int> params;
+
+      // Lowercase file extension check (C++17 compatible)
+      std::string lower_path = pathName_savedImage_aic;
+      std::transform(lower_path.begin(), lower_path.end(), lower_path.begin(), ::tolower);
+
+      if (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".png") {
+        params = {cv::IMWRITE_PNG_COMPRESSION, 0};  // Fastest (no compression)
+      } else if (
+          (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".jpg") ||
+          (lower_path.size() >= 5 && lower_path.substr(lower_path.size() - 5) == ".jpeg")) {
+        params = {cv::IMWRITE_JPEG_QUALITY, 95};  // Quality: 0–100 (default is 95)
+      }
+
+      bool isSaveOK;
+      if (!params.empty()) {
+        isSaveOK = cv::imwrite(pathName_savedImage_aic, outputImage, params);
+      } else {
+        isSaveOK = cv::imwrite(pathName_savedImage_aic, outputImage);
+      }
+      if (isSaveOK) {
+        xlog("Saved frame to %s", pathName_savedImage_aic.c_str());
+      } else {
+        xlog("Failed to save frame to %s", pathName_savedImage_aic.c_str());
+      }
+
+      auto end = std::chrono::high_resolution_clock::now();
+      xlog("Elapsed time: %lld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+
+    } catch (const std::exception &e) {
+      xlog("Exception during image save: %s", e.what());
+    }
+    xlog("---- AICP_load_crop_saveImage stop ----");
+  // }).detach();  // Detach to run in the background
+}
+
+void AICP_publishDINState(int din_pin, const std::string &pin_state) {
+  nlohmann::ordered_json j;
+  j["cmd"] = "IO_DIN_EVENT_SET_RESP";
+  j["args"]["din_pin"] = std::to_string(din_pin + 1);
+  j["args"]["pin_state"] = pin_state;
+
+  std::string json = j.dump();
+  mqtt_publish((char *)json.c_str(), 0);
+}
+
+void AICP_publishDIODINState(int din_pin, const std::string &pin_state) {
+  nlohmann::ordered_json j;
+  j["cmd"] = "IO_DIO_DIN_EVENT_SET_RESP";
+  j["args"]["din_pin"] = std::to_string(din_pin + 1);
+  j["args"]["pin_state"] = pin_state;
+
+  std::string json = j.dump();
+  mqtt_publish((char *)json.c_str(), 0);
 }
