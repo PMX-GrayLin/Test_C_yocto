@@ -7,7 +7,7 @@
 
 #include <gst/gst.h>
 #include "json.hpp"
-#include "mqtt_client.hpp"
+// #include "mqttx.hpp"
 
 #include "device.hpp"
 #include "image_utils.hpp"
@@ -904,7 +904,7 @@ void AICP_publishDINState(int din_pin, const std::string &pin_state) {
   j["args"]["pin_state"] = pin_state;
 
   std::string json = j.dump();
-  mqtt_publish((char *)json.c_str(), 0);
+  // ?? mqtt send
 }
 
 void AICP_publishDIODINState(int din_pin, const std::string &pin_state) {
@@ -914,5 +914,5 @@ void AICP_publishDIODINState(int din_pin, const std::string &pin_state) {
   j["args"]["pin_state"] = pin_state;
 
   std::string json = j.dump();
-  mqtt_publish((char *)json.c_str(), 0);
+  // ?? mqtt send
 }
