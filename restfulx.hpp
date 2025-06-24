@@ -9,5 +9,6 @@ void sendRESTFulAsync(const std::string& url, int port = defaultRESRfulPort);
 
 void sendRESTful_streamingStatus(int index, bool isStreaming, int port = defaultRESRfulPort);
 void sendRESTful_DI(int index, bool isLevelHigh, int port = defaultRESRfulPort);
+void sendRESTful_DIODI(int index, bool isLevelHigh, int port = defaultRESRfulPort);
 
 

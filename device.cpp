@@ -41,6 +41,9 @@ int DIO_DO_GPIOs[NUM_DIO] = {diodogp_1, diodogp_2, diodogp_3, diodogp_4};       
 DIO_Direction dioDirection[NUM_DIO] = {diod_in};
 std::thread t_aicamera_monitorDIO[NUM_DIO];
 bool isMonitorDIO[NUM_DIO] = {false};
+GPIO_LEVEl DIODI_gpio_level_last[NUM_DIO] = {gpiol_unknown, gpiol_unknown};
+GPIO_LEVEl DIODI_gpio_level_new[NUM_DIO] = {gpiol_unknown, gpiol_unknown};
+uint64_t DIODI_last_event_time[NUM_DIO] = {0};
 
 void FW_getProduct() {
   product = exec_command("fw_printenv | grep '^product=' | cut -d '=' -f2");
@@ -494,9 +497,9 @@ void FW_setDO(string index_do, string on_off) {
     return;
   }
 
-  if (isSameString(on_off, "on")) {
+  if (isSameString(on_off, "on") || isSameString(on_off, "1")) {
     isON = true;
-  } else if (isSameString(on_off, "off")) {
+  } else if (isSameString(on_off, "off") || isSameString(on_off, "0")) {
     isON = false;
   } else {
     xlog("input string should be on or off...");
@@ -533,7 +536,6 @@ void Thread_FWMonitorDIOIn(int index_dio) {
     return;
   }
 
-
   // Request GPIO line for both rising and falling edge events
   ret = gpiod_line_request_both_edges_events(line, "gpio_interrupt");
   if (ret < 0) {
@@ -545,6 +547,9 @@ void Thread_FWMonitorDIOIn(int index_dio) {
   // Get file descriptor for polling
   fd.fd = gpiod_line_event_get_fd(line);
   fd.events = POLLIN;
+  
+  // get init value & update to App
+  sendRESTful_DIODI(index_dio, (gpiod_line_get_value(line) == 1));
 
   xlog("Thread Monitoring GPIO %d for events...start", DIO_DI_GPIOs[index_dio]);
 
@@ -560,8 +565,21 @@ void Thread_FWMonitorDIOIn(int index_dio) {
       struct gpiod_line_event event;
       gpiod_line_event_read(line, &event);
 
-      xlog("GPIO %d event detected! Type: %s", DIO_DI_GPIOs[index_dio],
-           (event.event_type == GPIOD_LINE_EVENT_RISING_EDGE) ? "RISING" : "FALLING");
+      // Debounce per line
+      uint64_t now = get_current_millis();
+      if (now - DIODI_last_event_time[index_dio] < DEBOUNCE_TIME_MS) {
+        continue;
+      }
+
+      DOIDI_gpio_level_new[i] = (gpiod_line_get_value(line) == 1) ? gpiol_high : gpiol_low;
+
+      if (DIODI_gpio_level_new[index_dio] != DIODI_gpio_level_last[index_dio]) {
+        DIODI_gpio_level_last[index_dio] = DIODI_gpio_level_new[index_dio];
+        DIODI_last_event_time[index_dio] = now;
+        // xlog("GPIO %d event detected! status:%s", DIODI_GPIOs[index_dio], (DIODI_gpio_level_last[index_dio] == gpiol_high) ? "high" : "low");
+
+        sendRESTful_DIODI(index_dio, DIODI_gpio_level_last[index_dio] == gpiol_high);
+      }
     }
   }
 
@@ -641,9 +659,9 @@ void FW_setDIOOut(string index_dio, string on_off) {
     return;
   }
 
-  if (isSameString(on_off, "on")) {
+  if (isSameString(on_off, "on") || isSameString(on_off, "1")) {
     isON = true;
-  } else if (isSameString(on_off, "off")) {
+  } else if (isSameString(on_off, "off") || isSameString(on_off, "0")) {
     isON = false;
   } else {
     xlog("input string should be on or off...");

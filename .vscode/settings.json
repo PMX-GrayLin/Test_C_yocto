@@ -87,6 +87,7 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "valarray": "cpp",
-        "__config": "cpp"
+        "__config": "cpp",
+        "span": "cpp"
     }
 }

@@ -41,4 +41,9 @@ void sendRESTful_DI(int index, bool isLevelHigh, int port) {
   sendRESTFulAsync(url);
 }
 
-
+void sendRESTful_DIODI(int index, bool isLevelHigh, int port) {
+  string content_fixed = "http://localhost:" + std::to_string(port) + "/fw/";
+  string content_rest = "dio_di/" + std::to_string(index + 1) + "/status/" + (isLevelHigh ? "high" : "low");
+  string url = content_fixed + content_rest;
+  sendRESTFulAsync(url);
+}
