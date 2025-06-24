@@ -571,7 +571,7 @@ void Thread_FWMonitorDIOIn(int index_dio) {
         continue;
       }
 
-      DOIDI_gpio_level_new[index_dio] = (gpiod_line_get_value(line) == 1) ? gpiol_high : gpiol_low;
+      DIODI_gpio_level_new[index_dio] = (gpiod_line_get_value(line) == 1) ? gpiol_high : gpiol_low;
 
       if (DIODI_gpio_level_new[index_dio] != DIODI_gpio_level_last[index_dio]) {
         DIODI_gpio_level_last[index_dio] = DIODI_gpio_level_new[index_dio];
