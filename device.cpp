@@ -547,7 +547,7 @@ void Thread_FWMonitorDIOIn(int index_dio) {
   // Get file descriptor for polling
   fd.fd = gpiod_line_event_get_fd(line);
   fd.events = POLLIN;
-  
+
   // get init value & update to App
   sendRESTful_DIODI(index_dio, (gpiod_line_get_value(line) == 1));
 
