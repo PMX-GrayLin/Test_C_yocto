@@ -1,6 +1,7 @@
 #include "device.hpp"
 
 #include <fstream>
+#include <sstream>
 #include <gpiod.h>
 #include <poll.h>
 #include <chrono>
