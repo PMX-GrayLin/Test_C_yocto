@@ -117,7 +117,7 @@ void handle_RESTful(std::vector<std::string> segments) {
   } else if (isSameString(segments[0], "tf")) {
     // test functions
 
-    bool ret = isI2CAddressExist(std::stoi(segments[1]), std::stoi(segments[2]));
+    bool ret = isI2CAddressExist(segments[1], segments[2]);
     if (ret) {
       xlog("exist...");
     } else {

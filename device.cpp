@@ -672,8 +672,11 @@ void FW_setDIOOut(string index_dio, string on_off) {
   FW_setGPIO(index_gpio, isON ? 1 : 0);
 }
 
-bool isI2CAddressExist(int bus, int address) {
-  string cmd = "i2cdetect -y -r " + std::to_string(bus);
+bool isI2CAddressExist(const std::string &busS, const std::string &addressS) {
+  string cmd = "i2cdetect -y -r " + busS;
+
+  // Convert address string to int, supporting "0x" prefix or pure decimal
+  int address = std::strtol(addressStr.c_str(), nullptr, 0);  // base 0 allows 0x for hex, otherwise decimal
 
   FILE *pipe = popen(cmd.c_str(), "r");
   if (!pipe) {
