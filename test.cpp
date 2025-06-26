@@ -117,14 +117,14 @@ void handle_RESTful(std::vector<std::string> segments) {
   } else if (isSameString(segments[0], "tf")) {
     // test functions
 
-    bool ret = isI2CAddressExist(std::to_integer(segments[1]), std::to_integer(segments[2]));
+    bool ret = isI2CAddressExist(std::stoi(segments[1]), std::stoi(segments[2]));
     if (ret) {
       xlog("exist...");
     } else {
       xlog("not exist...");
     }
   }
-  
+
 }
 
 #if defined(ENABLE_FTDI)
