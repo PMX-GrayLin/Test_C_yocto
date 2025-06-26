@@ -676,7 +676,7 @@ bool isI2CAddressExist(int bus, int address) {
 
   FILE *pipe = popen(cmd.c_str(), "r");
   if (!pipe) {
-    std::cerr << "Failed to run i2cdetect" << std::endl;
+    xlog("Failed to run i2cdetect");
     return false;
   }
 
