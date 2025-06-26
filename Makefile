@@ -1,4 +1,8 @@
 
+# Version
+FW_VERSION := $(shell expr $$(date +%Y) - 2024).$$(date +%m).$$(date +%d)
+VERSION_FLAG += -DFW_VERSION=\"$(FW_VERSION)\"
+
 # APP_NAME=test
 APP_NAME=fw_daemon
 
