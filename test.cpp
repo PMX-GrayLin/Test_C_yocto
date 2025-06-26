@@ -207,7 +207,11 @@ int main(int argc, char* argv[]) {
   FW_setLED("1", "green");  
 
   // set camera led
-  // ??
+  if (FW_isDeviceAICamera()) {
+    if (FW_isDeviceAICameraPlus()) {
+      FW_setLED("2", "green");
+    }
+  }
 
   httplib::Server svr;
 

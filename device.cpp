@@ -68,7 +68,10 @@ bool FW_isDeviceAICamera() {
     return false;
   }
 }
+bool FW_isDeviceAICameraPlus() {
+  return 
 
+}
 bool FW_isDeviceVisionHub() {
   if (product == "vision_hub_plus" || hostname_prefix == "visionhub") {
     return true;

@@ -78,6 +78,7 @@ void FW_getHostnamePrefix();
 void FW_getDeviceInfo();
 
 bool FW_isDeviceAICamera();
+bool FW_isDeviceAICameraPlus();
 bool FW_isDeviceVisionHub();
 
 // PWM 
