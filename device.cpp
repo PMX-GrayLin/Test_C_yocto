@@ -676,7 +676,7 @@ bool isI2CAddressExist(const std::string &busS, const std::string &addressS) {
   string cmd = "i2cdetect -y -r " + busS;
 
   // Convert address string to int, supporting "0x" prefix or pure decimal
-  int address = std::strtol(addressStr.c_str(), nullptr, 0);  // base 0 allows 0x for hex, otherwise decimal
+  int address = std::strtol(addressS.c_str(), nullptr, 0);  // base 0 allows 0x for hex, otherwise decimal
 
   FILE *pipe = popen(cmd.c_str(), "r");
   if (!pipe) {
