@@ -117,13 +117,14 @@ void handle_RESTful(std::vector<std::string> segments) {
   } else if (isSameString(segments[0], "tf")) {
     // test functions
 
-    // xlog("time:%s", getTimeString().c_str());
-    
-    // product = exec_command("fw_printenv | grep '^product=' | cut -d '=' -f2");
-    // xlog("product:%s", product.c_str());
-
-    FW_getDeviceInfo();
+    bool ret = isI2CAddressExist(std::to_integer(segments[1]), std::to_integer(segments[2]));
+    if (ret) {
+      xlog("exist...");
+    } else {
+      xlog("not exist...");
+    }
   }
+  
 }
 
 #if defined(ENABLE_FTDI)

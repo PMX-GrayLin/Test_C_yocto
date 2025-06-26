@@ -671,3 +671,44 @@ void FW_setDIOOut(string index_dio, string on_off) {
   FW_setGPIO(index_gpio, isON ? 1 : 0);
 }
 
+bool isI2CAddressExist(int bus, int address) {
+  string cmd = "i2cdetect -y -r " + std::to_string(bus);
+
+  FILE *pipe = popen(cmd.c_str(), "r");
+  if (!pipe) {
+    std::cerr << "Failed to run i2cdetect" << std::endl;
+    return false;
+  }
+
+  std::string row;
+  int row_target = address & 0xF0;
+  int col_index = address & 0x0F;
+
+  char buffer[256];
+  while (fgets(buffer, sizeof(buffer), pipe)) {
+    row = buffer;
+
+    // Look for the row starting with the address nibble
+    std::istringstream iss(row);
+    std::string row_label;
+    iss >> row_label;
+
+    if (row_label.length() >= 2 && std::stoi(row_label, nullptr, 16) == row_target) {
+      std::string cell;
+      int index = 0;
+      while (iss >> cell) {
+        if (index == col_index) {
+          pclose(pipe);
+          if (cell == "--") {
+            return false;
+          }
+          return true;  // found address or UU
+        }
+        index++;
+      }
+    }
+  }
+
+  pclose(pipe);
+  return false;
+}
