@@ -194,6 +194,7 @@ void test_ftdi() {
 int main(int argc, char* argv[]) {
   
   xlog("");
+  xlog("");
   xlog("FW Version:%s", FW_VERSION);
 
   for (int i = 0; i < argc; ++i) {
