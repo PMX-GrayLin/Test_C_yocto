@@ -62,11 +62,8 @@ void FW_getDeviceInfo() {
 }
 
 bool FW_isDeviceAICamera() {
-  if (product == "ai_camera_plus" || hostname_prefix == "aicamera") {
-    return true;
-  } else {
-    return false;
-  }
+  return (product.find("ai_camera_plus") != std::string::npos ||
+          hostname_prefix.find("aicamera") != std::string::npos);
 }
 bool FW_isDeviceAICameraPlus() {
   // i2c2, slave address 0x36 for cis camera
