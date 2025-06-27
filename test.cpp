@@ -209,6 +209,7 @@ int main(int argc, char* argv[]) {
   // set camera led
   if (FW_isDeviceAICamera()) {
     if (FW_isDeviceAICameraPlus()) {
+      xlog("");
       FW_setLED("2", "green");
     }
   }
