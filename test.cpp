@@ -194,7 +194,12 @@ void test_ftdi() {
 
 // Signal handler function
 void signalHandler(int signal) {
-  xlog("Received signal:%d", signal);
+  xlog("Received signal:0x%x", signal);
+
+  
+  FW_setLED("1", "red");  
+  FW_setLED("2", "off");  
+
   std::exit(EXIT_SUCCESS);
 }
 
@@ -217,17 +222,11 @@ int main(int argc, char* argv[]) {
   FW_setLED("1", "green");  
 
   // set camera led
-  xlog("product:%s",product.c_str());
-  xlog("hostname_prefix:%s",hostname_prefix.c_str());
-  
   if (FW_isDeviceAICamera()) {
-    xlog("");
     if (FW_isDeviceAICameraPlus()) {
-      xlog("");
       FW_setLED("2", "green");
     }
   }
-  xlog("");
 
   httplib::Server svr;
 
