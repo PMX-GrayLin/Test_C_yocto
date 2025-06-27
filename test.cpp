@@ -3,6 +3,9 @@
 #include "device.hpp"
 #include "httplib.hpp"
 #include "mqttx.hpp"
+#include <atomic>
+
+std::atomic<bool> exit_requested(false);
 
 #if defined(ENABLE_CIS)
 #include "cam_omnivision.hpp"
@@ -195,7 +198,7 @@ void test_ftdi() {
 // Signal handler function
 void signalHandler(int signal) {
   xlog("Received signal:%d", signal);
-
+  exit_requested = true;
 }
 
 int main(int argc, char* argv[]) {
