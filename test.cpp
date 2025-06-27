@@ -217,7 +217,9 @@ int main(int argc, char* argv[]) {
   FW_setLED("1", "green");  
 
   // set camera led
-  xlog("");
+  xlog("product:%s",product);
+  xlog("hostname_prefix:%s",hostname_prefix);
+  
   if (FW_isDeviceAICamera()) {
     xlog("");
     if (FW_isDeviceAICameraPlus()) {
