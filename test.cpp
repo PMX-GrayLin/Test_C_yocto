@@ -203,7 +203,7 @@ int main(int argc, char* argv[]) {
 
   FW_getDeviceInfo();
 
-  // set Power led to system ready
+  // set power led to system ready
   FW_setLED("1", "green");  
 
   // set camera led
