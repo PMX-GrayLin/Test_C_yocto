@@ -206,7 +206,7 @@ void signalHandler(int signal) {
 int main(int argc, char* argv[]) {
   
   xlog("");
-  xlog("FW Version:%s", FW_VERSION);
+  xlog("FW Version:%s, Compile at %s %s", FW_VERSION, __DATE__, __TIME__);
 
   for (int i = 0; i < argc; ++i) {
     xlog("argv[%d]:%s", i, argv[i]);
@@ -219,7 +219,7 @@ int main(int argc, char* argv[]) {
   FW_getDeviceInfo();
 
   // set power led to system ready
-  FW_setLED("1", "green");  
+  FW_setLED("1", "green");
 
   // set camera led
   if (FW_isDeviceAICamera()) {
