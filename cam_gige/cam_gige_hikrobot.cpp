@@ -287,6 +287,7 @@ void GigE_ThreadStreaming_Hik() {
           g_free(dbg);
   
           GigE_StreamingStop_Hik();
+          FW_setLED("2","red");
           break;
         }
   
@@ -294,6 +295,7 @@ void GigE_ThreadStreaming_Hik() {
           xlog("Received EOS, stopping...");
 
           GigE_StreamingStop_Hik();
+          FW_setLED("2","red");
           break;
   
         default:
@@ -330,6 +332,7 @@ void GigE_ThreadStreaming_Hik() {
     loop_gige_hik = nullptr;
   }
 
+  FW_setLED("2","green");
   isStreaming_gige_hik = false;
   sendRESTful_streamingStatus(0, isStreaming_gige_hik);
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
