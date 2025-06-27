@@ -192,6 +192,12 @@ void test_ftdi() {
 
 #endif // ENABLE_FTDI
 
+// Signal handler function
+void signalHandler(int signal) {
+  xlog("Received signal:%d", signal);
+
+}
+
 int main(int argc, char* argv[]) {
   
   xlog("");
@@ -201,6 +207,10 @@ int main(int argc, char* argv[]) {
     xlog("argv[%d]:%s", i, argv[i]);
   }
 
+  // Register signal handlers
+  std::signal(SIGINT, signalHandler);   // Ctrl-C
+  std::signal(SIGTERM, signalHandler);  // kill <pid>
+
   FW_getDeviceInfo();
 
   // set power led to system ready
@@ -208,6 +218,7 @@ int main(int argc, char* argv[]) {
 
   // set camera led
   if (FW_isDeviceAICamera()) {
+    xlog("");
     if (FW_isDeviceAICameraPlus()) {
       xlog("");
       FW_setLED("2", "green");
