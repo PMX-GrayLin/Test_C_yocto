@@ -346,6 +346,8 @@ void GigE_StreamingStart_Hik() {
   }
   isStreaming_gige_hik = true;
 
+  FW_toggleLED("2", "off");
+
   t_streaming_gige_hik = std::thread(GigE_ThreadStreaming_Hik);
   t_streaming_gige_hik.detach();
 }
