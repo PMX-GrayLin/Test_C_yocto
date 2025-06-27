@@ -69,9 +69,10 @@ bool FW_isDeviceAICamera() {
   }
 }
 bool FW_isDeviceAICameraPlus() {
-  return 
-
+  // i2c2, slave address 0x36 for cis camera
+  return FW_isI2CAddressExist("2", "0x36");
 }
+
 bool FW_isDeviceVisionHub() {
   if (product == "vision_hub_plus" || hostname_prefix == "visionhub") {
     return true;
@@ -675,7 +676,7 @@ void FW_setDIOOut(string index_dio, string on_off) {
   FW_setGPIO(index_gpio, isON ? 1 : 0);
 }
 
-bool isI2CAddressExist(const std::string &busS, const std::string &addressS) {
+bool FW_isI2CAddressExist(const std::string &busS, const std::string &addressS) {
   string cmd = "i2cdetect -y -r " + busS;
 
   // Convert address string to int, supporting "0x" prefix or pure decimal

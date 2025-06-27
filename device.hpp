@@ -114,4 +114,4 @@ extern void FW_MonitorDIOInStop(int index_dio);
 extern void FW_setDIODirection(string index_dio, string di_do);
 extern void FW_setDIOOut(string index_dio, string on_off);
 
-bool isI2CAddressExist(const std::string& busS, const std::string& addressS);
+bool FW_isI2CAddressExist(const std::string& busS, const std::string& addressS);
