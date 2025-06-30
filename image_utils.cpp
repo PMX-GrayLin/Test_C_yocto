@@ -175,7 +175,7 @@ void imgu_saveImage(
   }
 
   auto end = std::chrono::high_resolution_clock::now();
-  xlog("Elapsed time: %lld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+  xlog("Elapsed time: %ld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 
   // Cleanup
   gst_buffer_unmap(buffer, &map);
@@ -357,9 +357,9 @@ void imgu_cropImage(
         try {
           bool isSaveOK;
           if (!params.empty()) {
-            isSaveOK = cv::imwrite(filePathName, paddedImage, params);
+            isSaveOK = cv::imwrite(filePathName, bgr_frame, params);
           } else {
-            isSaveOK = cv::imwrite(filePathName, paddedImage);
+            isSaveOK = cv::imwrite(filePathName, bgr_frame);
           }
           xlog("%s frame to %s", isSaveOK ? "Saved" : "Failed to save", filePathName.c_str());
         } catch (const cv::Exception &e) {
@@ -369,7 +369,7 @@ void imgu_cropImage(
   }
 
   auto end = std::chrono::high_resolution_clock::now();
-  xlog("Elapsed time: %lld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+  xlog("Elapsed time: %ld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 
   // Cleanup
   gst_buffer_unmap(buffer, &map);

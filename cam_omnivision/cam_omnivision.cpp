@@ -335,7 +335,7 @@ void AICP_threadSaveImage(const std::string path, const cv::Mat &frameBuffer) {
       }
 
       auto end = std::chrono::high_resolution_clock::now();
-      xlog("Elapsed time: %lld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+      xlog("Elapsed time: %ld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 
     } catch (const std::exception &e) {
       xlog("Exception during image save: %s", e.what());
@@ -490,7 +490,7 @@ void AICP_saveImage(GstPad *pad, GstPadProbeInfo *info) {
   //     cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
 
   //     auto end = std::chrono::high_resolution_clock::now();
-  //     xlog("Elapsed time: %lld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+  //     xlog("Elapsed time: %ld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 
   //     // Save the frame to a picture
   //     AICP_threadSaveImage(pathName_savedImage_aic, bgr_frame);
@@ -888,7 +888,7 @@ void AICP_load_crop_saveImage() {
       }
 
       auto end = std::chrono::high_resolution_clock::now();
-      xlog("Elapsed time: %lld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+      xlog("Elapsed time: %ld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 
     } catch (const std::exception &e) {
       xlog("Exception during image save: %s", e.what());
