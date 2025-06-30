@@ -22,6 +22,19 @@ typedef enum {
     spf_PNG,
 } SavedPhotoFormat;
 
+enum class VideoFlipMethod {
+  // defined by gstreamer, # gst-inspect-1.0 videoflip
+  vfm_NONE = 0,                  // Identity (no rotation)
+  vfm_CLOCKWISE = 1,             // Rotate clockwise 90 degrees
+  vfm_ROTATE_180 = 2,            // Rotate 180 degrees
+  vfm_COUNTERCLOCKWISE = 3,      // Rotate counter-clockwise 90 degrees
+  vfm_HORIZONTAL_FLIP = 4,       // Flip horizontally
+  vfm_VERTICAL_FLIP = 5,         // Flip vertically
+  vfm_UPPER_LEFT_DIAGONAL = 6,   // Flip across upper left/lower right diagonal
+  vfm_UPPER_RIGHT_DIAGONAL = 7,  // Flip across upper right/lower left diagonal
+  vfm_AUTOMATIC = 8              // Use image-orientation tag
+};
+
 void AICP_handle_RESTful(std::vector<std::string> segments);
 
 bool AICP_isUseCISCamera();
@@ -73,6 +86,7 @@ void Thread_AICPStreaming_usb();
 void AICP_streamingStart();
 void AICP_streamingStop();
 void AICP_streamingLED();
+void AICP_setFlip(const std::string & methodS);
 
 // image processing
 void AICP_load_crop_saveImage();
@@ -82,5 +96,4 @@ void AICP_publishDINState(int din_pin, const std::string& pin_state);
 
 // publish dio din state
 void AICP_publishDIODINState(int din_pin, const std::string& pin_state);
-
 
