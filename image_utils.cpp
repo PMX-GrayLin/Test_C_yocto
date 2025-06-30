@@ -350,36 +350,21 @@ void imgu_cropImage(
       } else {
         isSaveOK = cv::imwrite(filePathName, paddedImage);
       }
-      if (isSaveOK) {
-        xlog("Saved frame to %s", filePathName.c_str());
-      } else {
-        xlog("Failed to save frame to %s", filePathName.c_str());
-      }
+      xlog("%s frame to %s", isSaveOK ? "Saved" : "Failed to save", filePathName.c_str());
 
-      // if (cv::imwrite(filePathName, paddedImage)) {
-      //   xlog("Saved crop frame to %s", filePathName.c_str());
-      // } else {
-      //   xlog("Failed crop to save frame to %s", filePathName.c_str());
-      // }
     } else {
         // save the image
-        bool isSaveOK;
-        if (!params.empty()) {
-          isSaveOK = cv::imwrite(filePathName, bgr_frame, params);
-        } else {
-          isSaveOK = cv::imwrite(filePathName, bgr_frame);
+        try {
+          bool isSaveOK;
+          if (!params.empty()) {
+            isSaveOK = cv::imwrite(filePathName, paddedImage, params);
+          } else {
+            isSaveOK = cv::imwrite(filePathName, paddedImage);
+          }
+          xlog("%s frame to %s", isSaveOK ? "Saved" : "Failed to save", filePathName.c_str());
+        } catch (const cv::Exception &e) {
+          xlog("cv::imwrite exception: %s", e.what());
         }
-        if (isSaveOK) {
-          xlog("Saved frame to %s", filePathName.c_str());
-        } else {
-          xlog("Failed to save frame to %s", filePathName.c_str());
-        }
-
-        // if (cv::imwrite(filePathName, bgr_frame)) {
-        //   xlog("Saved crop frame to %s", filePathName.c_str());
-        // } else {
-        //   xlog("Failed crop to save frame to %s", filePathName.c_str());
-        // }
     }
   }
 

@@ -436,7 +436,7 @@ void AICP_saveImage(GstPad *pad, GstPadProbeInfo *info) {
 
     SimpleRect roi = {crop_roi_aic.x, crop_roi_aic.y, crop_roi_aic.width, crop_roi_aic.height};
     imgu_saveImage_thread((void *)pad, (void *)info, pathName_savedImage_aic, &syncSignal_save);
-    // imgu_cropImage_thread((void *)pad, (void *)info, pathName_croppedImage_aic, roi, &syncSignal_crop);
+    imgu_cropImage_thread((void *)pad, (void *)info, pathName_croppedImage_aic, roi, &syncSignal_crop);
   }
 
   // if (isCapturePhoto_aic) {
