@@ -118,60 +118,18 @@ void imgu_saveImage(
       params = {cv::IMWRITE_JPEG_QUALITY, 95};  // Quality: 0–100 (default is 95)
     }
 
-    bool isSaveOK;
-    if (!params.empty()) {
-      isSaveOK = cv::imwrite(filePathName, bgr_frame, params);
-    } else {
-      isSaveOK = cv::imwrite(filePathName, bgr_frame);
+    try {
+      bool isSaveOK;
+      if (!params.empty()) {
+        isSaveOK = cv::imwrite(filePathName, bgr_frame, params);
+      } else {
+        isSaveOK = cv::imwrite(filePathName, bgr_frame);
+      }
+      xlog("%s frame to %s", isSaveOK ? "Saved" : "Failed to save", filePathName.c_str());
+    } catch (const cv::Exception &e) {
+      xlog("cv::imwrite exception: %s", e.what());
     }
-    if (isSaveOK) {
-      xlog("Saved frame to %s", filePathName.c_str());
-    } else {
-      xlog("Failed to save frame to %s", filePathName.c_str());
-    }
 
-    // #2 save crop image
-    // Validate ROI dimensions
-    // bool isCrop = true;
-    // if (cv_roi.x < 0 || cv_roi.y < 0 || cv_roi.width == 0 || cv_roi.height == 0 ||
-    //     cv_roi.x + cv_roi.width > bgr_frame.cols ||
-    //     cv_roi.y + cv_roi.height > bgr_frame.rows) {
-    //   xlog("ROI not correct... not crop");
-    //   isCrop = false;
-    // }
-
-    // if (isCrop) {
-    //   // Crop the region of interest (ROI)
-    //   cv::Mat croppedImage = bgr_frame(cv_roi);
-
-    //   // Create a black canvas of the target size
-    //   int squqareSize = (croppedImage.cols > croppedImage.rows) ? croppedImage.cols : croppedImage.rows;
-    //   cv::Size paddingSize(squqareSize, squqareSize);
-    //   cv::Mat paddedImage = cv::Mat::zeros(paddingSize, croppedImage.type());
-
-    //   // Calculate offsets to center the cropped image
-    //   int offsetX = (paddedImage.cols - croppedImage.cols) / 2;
-    //   int offsetY = (paddedImage.rows - croppedImage.rows) / 2;
-    //   // Check if offsets are valid
-    //   if (offsetX < 0 || offsetY < 0) {
-    //     xlog("Error: Cropped image is larger than the padding canvas!");
-    //     return;
-    //   }
-
-    //   // Define the ROI on the black canvas where the cropped image will be placed
-    //   cv::Rect roi_padding(offsetX, offsetY, croppedImage.cols, croppedImage.rows);
-
-    //   // Copy the cropped image onto the black canvas
-    //   croppedImage.copyTo(paddedImage(roi_padding));
-
-    //   // Attempt to save the image
-    //   if (cv::imwrite(filePathName, paddedImage)) {
-    //     xlog("Saved crop frame to %s", filePathName.c_str());
-    //   } else {
-    //     xlog("Failed crop to save frame to %s", filePathName.c_str());
-    //   }
-
-    // } 
   }
 
   auto end = std::chrono::high_resolution_clock::now();
@@ -344,13 +302,17 @@ void imgu_cropImage(
       croppedImage.copyTo(paddedImage(roi_padding));
 
       // Attempt to save the image
-      bool isSaveOK;
-      if (!params.empty()) {
-        isSaveOK = cv::imwrite(filePathName, paddedImage, params);
-      } else {
-        isSaveOK = cv::imwrite(filePathName, paddedImage);
+      try {
+        bool isSaveOK;
+        if (!params.empty()) {
+          isSaveOK = cv::imwrite(filePathName, paddedImage, params);
+        } else {
+          isSaveOK = cv::imwrite(filePathName, paddedImage);
+        }
+        xlog("%s frame to %s", isSaveOK ? "Saved" : "Failed to save", filePathName.c_str());
+      } catch (const cv::Exception &e) {
+        xlog("cv::imwrite exception: %s", e.what());
       }
-      xlog("%s frame to %s", isSaveOK ? "Saved" : "Failed to save", filePathName.c_str());
 
     } else {
         // save the image
