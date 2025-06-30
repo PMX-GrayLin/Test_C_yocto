@@ -27,6 +27,7 @@ cv::Rect crop_roi_aic(0, 0, 0, 0);
 static volatile int counterFrame_aic = 0;
 
 static GstElement *gst_pipeline_aic = nullptr;
+static GstElement *gst_flip = nullptr;
 static GMainLoop *gst_loop_aic = nullptr;
 
 namespace fs = std::filesystem;
@@ -34,8 +35,12 @@ namespace fs = std::filesystem;
 void AICP_handle_RESTful(std::vector<std::string> segments) {
   if (isSameString(segments[1], "start")) {
     AICP_streamingStart();
+
   } else if (isSameString(segments[1], "stop")) {
     AICP_streamingStop();
+
+  } else if (isSameString(segments[1], "flip")) {
+    AICP_setFlip(segments[2]);
 
   } else if (isSameString(segments[1], "tp")) {
     xlog("take picture");
@@ -438,7 +443,6 @@ void AICP_saveImage(GstPad *pad, GstPadProbeInfo *info) {
     imgu_saveImage_thread((void *)pad, (void *)info, pathName_savedImage_aic, &syncSignal_save);
     imgu_cropImage_thread((void *)pad, (void *)info, pathName_croppedImage_aic, roi, &syncSignal_crop);
   }
-
 }
 
 // Callback to handle incoming buffer data
@@ -462,12 +466,13 @@ void Thread_AICPStreaming() {
   gst_pipeline_aic = gst_pipeline_new("video-pipeline");
   GstElement *source = gst_element_factory_make("v4l2src", "source");
   GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
+  gst_flip = gst_element_factory_make("videoflip", "flip"); 
   GstElement *queue = gst_element_factory_make("queue", "queue");
   GstElement *encoder = gst_element_factory_make("v4l2h264enc", "encoder");
   GstElement *parser = gst_element_factory_make("h264parse", "parser");
   GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
 
-  if (!gst_pipeline_aic || !source || !capsfilter || !queue || !encoder || !parser || !sink) {
+  if (!gst_pipeline_aic || !source || !capsfilter || !gst_flip || !queue || !encoder || !parser || !sink) {
     xlog("failed to create GStreamer elements");
     return;
   }
@@ -487,6 +492,9 @@ void Thread_AICPStreaming() {
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
   gst_caps_unref(caps);
+
+  // Set videoflip mode: 0 = none, 1 = clockwise, 2 = rotate-180, 3 = counter-clockwise, etc.
+  g_object_set(gst_flip, "method", 0, nullptr);  // no flip initially
 
   // Create a GstStructure for extra-controls
   GstStructure *controls = gst_structure_new(
@@ -509,8 +517,8 @@ void Thread_AICPStreaming() {
   g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
 
   // Build the pipeline
-  gst_bin_add_many(GST_BIN(gst_pipeline_aic), source, capsfilter, queue, encoder, parser, sink, nullptr);
-  if (!gst_element_link_many(source, capsfilter, queue, encoder, parser, sink, nullptr)) {
+  gst_bin_add_many(GST_BIN(gst_pipeline_aic), source, capsfilter, gst_flip, queue, encoder, parser, sink, nullptr);
+  if (!gst_element_link_many(source, capsfilter, gst_flip, queue, encoder, parser, sink, nullptr)) {
     xlog("failed to link elements in the pipeline");
     gst_object_unref(gst_pipeline_aic);
     return;
@@ -535,20 +543,16 @@ void Thread_AICPStreaming() {
           g_error_free(err);
           g_free(dbg);
   
-          // GMainLoop *loop = static_cast<GMainLoop *>(user_data);
-          // g_main_loop_quit(loop);
-
-          // ?? to stop streaming
           AICP_streamingStop();
+          FW_setLED("2","red");
           break;
         }
   
         case GST_MESSAGE_EOS:
           xlog("Received EOS, stopping...");
-          // g_main_loop_quit(static_cast<GMainLoop *>(user_data));
 
-          // ?? to stop streaming
           AICP_streamingStop();
+          FW_setLED("2","red");
           break;
   
         default:
@@ -586,6 +590,7 @@ void Thread_AICPStreaming() {
     gst_loop_aic = nullptr;
   }
 
+  FW_setLED("2","green");
   isStreaming_aic = false;
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
@@ -734,6 +739,26 @@ void AICP_streamingLED() {
   }
 }
 
+void AICP_setFlip(const std::string & methodS) {
+
+  VideoFlipMethod method = VideoFlipMethod::vfm_NONE;
+  if (gst_flip) {
+    if (isSameString(methodS, "horizontal") || isSameString(methodS, "h")) {
+      method = VideoFlipMethod::vfm_HORIZONTAL_FLIP ;
+    } else if (isSameString(methodS, "vertical") || isSameString(methodS, "v")) {
+      method = VideoFlipMethod::vfm_VERTICAL_FLIP ;
+    } else if (isSameString(methodS, "rotate180") || isSameString(methodS, "r180")) {
+      method = VideoFlipMethod::vfm_ROTATE_180 ;
+    } else if (isSameString(methodS, "none") || isSameString(methodS, "normal") || isSameString(methodS, "n")) {
+      method = VideoFlipMethod::vfm_NONE ;
+    }
+    g_object_set(gst_flip, "method", static_cast<int>(method), nullptr);
+    xlog("Flip method set to %d", static_cast<int>(method));
+  } else {
+    xlog("Flip element not initialized");
+  }
+}
+
 void AICP_load_crop_saveImage() {
   // not use thread here
   // std::thread([]() {
@@ -808,7 +833,7 @@ void AICP_load_crop_saveImage() {
       }
 
       auto end = std::chrono::high_resolution_clock::now();
-      xlog("Elapsed time: %ld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+      xlog("Elapsed time: %lld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 
     } catch (const std::exception &e) {
       xlog("Exception during image save: %s", e.what());
@@ -836,3 +861,4 @@ void AICP_publishDIODINState(int din_pin, const std::string &pin_state) {
   std::string json = j.dump();
   // ?? send mqtt
 }
+
