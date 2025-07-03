@@ -9,9 +9,11 @@ void sendRESTFul(const std::string& url, int port) {
     xlog("url:%s", url.c_str());
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 100L);
-    
-    // Don't wait for the response body
-    curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
+
+    // Send as GET (default) instead of HEAD
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, [](void*, size_t size, size_t nmemb, void*) -> size_t {
+      return size * nmemb;  // ignore response body
+    });
 
     CURLcode res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
