@@ -225,19 +225,27 @@ void FW_setLED(string led_index, string led_color) {
 
   if (led_index == "1") {
     gpio_index1 = ledgp_1_red;
-    gpio_index2 = ledgp_1_green;  
+    gpio_index2 = ledgp_1_green;
   } else if (led_index == "2") {
     gpio_index1 = ledgp_2_red;
-    gpio_index2 = ledgp_2_green;  
+    gpio_index2 = ledgp_2_green;
   } else if (led_index == "3") {
     gpio_index1 = ledgp_3_red;
-    gpio_index2 = ledgp_3_green;  
-  } else if (led_index == "4") {
-    gpio_index1 = ledgp_4_red;
-    gpio_index2 = ledgp_4_green;  
-  } else if (led_index == "5") {
-    gpio_index1 = ledgp_5_red;
-    gpio_index2 = ledgp_5_green;  
+    gpio_index2 = ledgp_3_green;
+  } else if (!FW_isDeviceAICamera()) {
+    if (led_index == "4") {
+      gpio_index1 = ledgp_4_red;
+      gpio_index2 = ledgp_4_green;
+    } else if (led_index == "5") {
+      gpio_index1 = ledgp_5_red;
+      gpio_index2 = ledgp_5_green;
+    } else {
+      xlog("LED index '%s' not supported.", led_index.c_str());
+      return;
+    }
+  } else {
+    xlog("LED index '%s' not supported on AI camera.", led_index.c_str());
+    return;
   }
 
   if (isSameString(led_color, "red")) {
@@ -245,7 +253,7 @@ void FW_setLED(string led_index, string led_color) {
     FW_setGPIO(gpio_index2, 0);
   } else if (isSameString(led_color, "green")) {
     FW_setGPIO(gpio_index1, 0);
-    FW_setGPIO(gpio_index2, 1);;
+    FW_setGPIO(gpio_index2, 1);
   } else if (isSameString(led_color, "orange")) {
     FW_setGPIO(gpio_index1, 1);
     FW_setGPIO(gpio_index2, 1);
