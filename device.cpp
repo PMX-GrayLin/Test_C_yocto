@@ -6,6 +6,11 @@
 #include <poll.h>
 #include <chrono>
 
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <net/if.h>
+#include <sys/socket.h>
+
 #include "restfulx.hpp"
 
 #define DEBOUNCE_TIME_MS 20
@@ -735,4 +740,24 @@ bool FW_isI2CAddressExist(const std::string &busS, const std::string &addressS) 
 
   pclose(pipe);
   return false;
+}
+
+void parseLinkMessage(struct nlmsghdr *nlh) {
+    struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
+    struct rtattr *attr = IFLA_RTA(ifi);
+    int attr_len = IFLA_PAYLOAD(nlh);
+
+    char ifname[IF_NAMESIZE] = {0};
+
+    for (; RTA_OK(attr, attr_len); attr = RTA_NEXT(attr, attr_len)) {
+        if (attr->rta_type == IFLA_IFNAME) {
+            strncpy(ifname, (char *)RTA_DATA(attr), IF_NAMESIZE);
+        }
+    }
+
+    if (ifname[0]) {
+        bool linkUp = ifi->ifi_flags & IFF_LOWER_UP;
+        std::cout << "[event] Interface " << ifname << " is now "
+                  << (linkUp ? "LINK UP" : "LINK DOWN") << std::endl;
+    }
 }
