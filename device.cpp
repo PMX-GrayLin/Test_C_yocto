@@ -94,7 +94,7 @@ void FW_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
   std::string actualPwmIndex;
   if (pwmIndex == "1") {
     actualPwmIndex = "1";
-  } else if (pwmIndex == "2") {
+  } else if (pwmIndex == "2" && FW_isDeviceVisionHub()) {
     actualPwmIndex = "0";
   } else {
     xlog("Invalid pwmIndex: %s", pwmIndex.c_str());
@@ -269,19 +269,27 @@ void FW_toggleLED(string led_index, string led_color) {
 
   if (led_index == "1") {
     gpio_index1 = ledgp_1_red;
-    gpio_index2 = ledgp_1_green;  
+    gpio_index2 = ledgp_1_green;
   } else if (led_index == "2") {
     gpio_index1 = ledgp_2_red;
-    gpio_index2 = ledgp_2_green;  
+    gpio_index2 = ledgp_2_green;
   } else if (led_index == "3") {
     gpio_index1 = ledgp_3_red;
-    gpio_index2 = ledgp_3_green;  
-  } else if (led_index == "4") {
-    gpio_index1 = ledgp_4_red;
-    gpio_index2 = ledgp_4_green;  
-  } else if (led_index == "5") {
-    gpio_index1 = ledgp_5_red;
-    gpio_index2 = ledgp_5_green;  
+    gpio_index2 = ledgp_3_green;
+  } else if (FW_isDeviceVisionHub()) {
+    if (led_index == "4") {
+      gpio_index1 = ledgp_4_red;
+      gpio_index2 = ledgp_4_green;
+    } else if (led_index == "5") {
+      gpio_index1 = ledgp_5_red;
+      gpio_index2 = ledgp_5_green;
+    } else {
+      xlog("LED index '%s' not supported.", led_index.c_str());
+      return;
+    }
+  } else {
+    xlog("LED index '%s' not supported", led_index.c_str());
+    return;
   }
 
   if (isSameString(led_color, "red")) {
@@ -526,7 +534,8 @@ void Thread_FWMonitorDIOIn(int index_dio) {
   struct pollfd fd;
   int ret;
 
-  if (index_dio < 0 || index_dio >= NUM_DIO) {
+  int num_dio = FW_isDeviceVisionHub() ? 4 : 2;
+  if (index_dio < 0 || index_dio >= num_dio) {
     xlog("Invalid DIO index: %d", index_dio);
     return;
   }
@@ -621,7 +630,8 @@ void FW_setDIODirection(string index_dio, string di_do) {
   int index_gpio_out = 0;
 
   int index = std::stoi(index_dio);
-  if (index > 0 && index <= NUM_DIO) {
+  int num_dio = FW_isDeviceVisionHub() ? 4 : 2;
+  if (index > 0 && index <= num_dio) {
     index_gpio_in = DIO_DI_GPIOs[index - 1];
     index_gpio_out = DIO_DO_GPIOs[index - 1];
   } else {
@@ -662,7 +672,8 @@ void FW_setDIOOut(string index_dio, string on_off) {
     return;
   }
 
-  if (index > 0 && index <= NUM_DIO) {
+  int num_dio = FW_isDeviceVisionHub() ? 4 : 2;
+  if (index > 0 && index <= num_dio) {
     index_gpio = DIO_DO_GPIOs[index - 1];
   } else {
     xlog("index out of range...");
