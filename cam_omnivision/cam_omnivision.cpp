@@ -11,6 +11,7 @@
 
 #include "device.hpp"
 #include "image_utils.hpp"
+#include "restfulx.hpp"
 
 std::thread t_streaming_aic;
 bool isStreaming_aic = false;
