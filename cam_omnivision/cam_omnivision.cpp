@@ -572,6 +572,7 @@ void Thread_AICPStreaming() {
 
   xlog("pipeline is running...");
   isStreaming_aic = true;
+  sendRESTful_streamingStatus(0, isStreaming_aic);
 
   // Run the main loop
   gst_loop_aic = g_main_loop_new(nullptr, FALSE);
@@ -592,6 +593,7 @@ void Thread_AICPStreaming() {
 
   FW_setLED("2","green");
   isStreaming_aic = false;
+  sendRESTful_streamingStatus(0, isStreaming_aic);
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 

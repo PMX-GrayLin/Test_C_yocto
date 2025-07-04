@@ -232,7 +232,7 @@ void FW_setLED(string led_index, string led_color) {
   } else if (led_index == "3") {
     gpio_index1 = ledgp_3_red;
     gpio_index2 = ledgp_3_green;
-  } else if (!FW_isDeviceAICamera()) {
+  } else if (FW_isDeviceVisionHub()) {
     if (led_index == "4") {
       gpio_index1 = ledgp_4_red;
       gpio_index2 = ledgp_4_green;
@@ -244,7 +244,7 @@ void FW_setLED(string led_index, string led_color) {
       return;
     }
   } else {
-    xlog("LED index '%s' not supported on AI camera.", led_index.c_str());
+    xlog("LED index '%s' not supported", led_index.c_str());
     return;
   }
 
