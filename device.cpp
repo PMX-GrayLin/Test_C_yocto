@@ -789,7 +789,7 @@ void Thread_FWMonitorNetLink() {
   xlog("---- Start ----");
 
   char buffer[BUFFER_SIZE];
-  while (isNetLinkMonitoring.load()) {
+  while (isMonitorNetLink.load()) {
     ssize_t len = recv(sock, buffer, sizeof(buffer), 0);
     if (len < 0) {
       if (errno == EINTR) continue;  // allow interruption
