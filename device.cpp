@@ -829,7 +829,7 @@ void FW_MonitorNetLinkStop() {
   isMonitorNetLink = false;
 
   // Unblock recv() by sending dummy message or let timeout (optional)
-  if (netMonitorThread.joinable()) {
-    netMonitorThread.join();
-  }
+  // if (t_monitorNetLink.joinable()) {
+  //   t_monitorNetLink.join();
+  // }
 }
