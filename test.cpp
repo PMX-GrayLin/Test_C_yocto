@@ -124,10 +124,9 @@ void handle_RESTful(std::vector<std::string> segments) {
     //   xlog("not exist...");
     // }
 
-    if (isSameString(segments[1], "1"))
-    {
+    if (isSameString(segments[1], "1")) {
       FW_MonitorNetLinkStart();
-    } else if if (isSameString(segments[1], "2")) {
+    } else if (isSameString(segments[1], "2")) {
       FW_MonitorNetLinkStop();
     }
     
