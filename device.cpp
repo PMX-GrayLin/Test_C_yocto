@@ -99,11 +99,8 @@ bool FW_isDeviceAICameraPlus() {
 }
 
 bool FW_isDeviceVisionHub() {
-  if (product == "vision_hub_plus" || hostname_prefix == "visionhub") {
-    return true;
-  } else {
-    return false;
-  }
+  return (product.find("vision_hub_plus") != std::string::npos ||
+          hostname_prefix.find("visionhub") != std::string::npos);
 }
 
 void FW_writePWMFile(const std::string &path, const std::string &value) {
