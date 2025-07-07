@@ -742,6 +742,9 @@ bool FW_isI2CAddressExist(const std::string &busS, const std::string &addressS) 
   return false;
 }
 
+#define BUFFER_SIZE 4096
+std::atomic<bool> running(true);
+
 void parseLinkMessage(struct nlmsghdr *nlh) {
     struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
     struct rtattr *attr = IFLA_RTA(ifi);
