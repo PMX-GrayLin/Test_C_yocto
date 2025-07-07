@@ -880,6 +880,9 @@ bool isUvcCamera(struct udev_device *dev) {
   const char *driver = udev_device_get_property_value(dev, "ID_USB_DRIVER");
   const char *id_model = udev_device_get_property_value(dev, "ID_MODEL");
 
+  xlog("std::string(cap):%s", std::string(cap));
+  xlog("std::string(driver):%s", std::string(driver));
+
   // Only consider real UVC video devices
   if (cap && std::string(cap).find("capture") != std::string::npos &&
       driver && std::string(driver) == "uvcvideo") {
