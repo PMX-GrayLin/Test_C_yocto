@@ -752,9 +752,7 @@ bool FW_isI2CAddressExist(const std::string &busS, const std::string &addressS) 
   return false;
 }
 
-#define BUFFER_SIZE 4096
-
-void parseLinkMessage(struct nlmsghdr *nlh) {
+void parseNetLinkMessage(struct nlmsghdr *nlh) {
   struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
   struct rtattr *attr = IFLA_RTA(ifi);
   int attr_len = IFLA_PAYLOAD(nlh);
@@ -792,7 +790,7 @@ void Thread_FWMonitorNetLink() {
 
   xlog("---- Start ----");
 
-  char buffer[BUFFER_SIZE];
+  char buffer[4096];
   while (isMonitorNetLink.load()) {
     ssize_t len = recv(sock, buffer, sizeof(buffer), 0);
     if (len < 0) {
@@ -804,7 +802,7 @@ void Thread_FWMonitorNetLink() {
     struct nlmsghdr *nlh = (struct nlmsghdr *)buffer;
     while (NLMSG_OK(nlh, len)) {
       if (nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK) {
-        parseLinkMessage(nlh);
+        parseNetLinkMessage(nlh);
       }
       nlh = NLMSG_NEXT(nlh, len);
     }
@@ -849,9 +847,11 @@ void FW_MonitorNetLinkStop() {
 
   isMonitorNetLink = false;
 
+  // force kill, may unsafe, but test seems OK.
   pthread_cancel(t_monitorNetLink.native_handle());
+
   // Unblock recv() by sending dummy message or let timeout (optional)
-  if (t_monitorNetLink.joinable()) {
-    t_monitorNetLink.join();
-  }
+  // if (t_monitorNetLink.joinable()) {
+  //   t_monitorNetLink.join();
+  // }
 }
