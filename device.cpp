@@ -889,44 +889,44 @@ bool isUvcCamera(struct udev_device *dev) {
   return false;
 }
 
-bool isVideoNodeWorking(const char* devNode) {
-    int fd = open(devNode, O_RDONLY);
-    if (fd < 0) return false;
+// bool isVideoNodeWorking(const char* devNode) {
+//     int fd = open(devNode, O_RDONLY);
+//     if (fd < 0) return false;
 
-    struct v4l2_capability cap;
-    bool result = (ioctl(fd, VIDIOC_QUERYCAP, &cap) == 0);
-    close(fd);
-    return result;
-}
+//     struct v4l2_capability cap;
+//     bool result = (ioctl(fd, VIDIOC_QUERYCAP, &cap) == 0);
+//     close(fd);
+//     return result;
+// }
 
 void FW_CheckInitialUVCDevices() {
-    struct udev* udev = udev_new();
-    if (!udev) {
-      xlog("Failed to create udev context (initial check)");
-        return;
+  struct udev *udev = udev_new();
+  if (!udev) {
+    xlog("Failed to create udev context (initial check)");
+    return;
+  }
+
+  struct udev_enumerate *enumerate = udev_enumerate_new(udev);
+  udev_enumerate_add_match_subsystem(enumerate, "video4linux");
+  udev_enumerate_scan_devices(enumerate);
+
+  struct udev_list_entry *devices = udev_enumerate_get_list_entry(enumerate);
+  struct udev_list_entry *entry;
+
+  udev_list_entry_foreach(entry, devices) {
+    const char *path = udev_list_entry_get_name(entry);
+    struct udev_device *dev = udev_device_new_from_syspath(udev, path);
+
+    if (isUvcCamera(dev)) {
+      const char *devNode = udev_device_get_devnode(dev);
+      xlog("[UVC] Initial found : %s", (devNode ? devNode : "unknown"));
     }
 
-    struct udev_enumerate* enumerate = udev_enumerate_new(udev);
-    udev_enumerate_add_match_subsystem(enumerate, "video4linux");
-    udev_enumerate_scan_devices(enumerate);
+    udev_device_unref(dev);
+  }
 
-    struct udev_list_entry* devices = udev_enumerate_get_list_entry(enumerate);
-    struct udev_list_entry* entry;
-
-    udev_list_entry_foreach(entry, devices) {
-        const char* path = udev_list_entry_get_name(entry);
-        struct udev_device* dev = udev_device_new_from_syspath(udev, path);
-        const char* devNode = udev_device_get_devnode(dev);
-
-        if (isUvcCamera(dev) && isVideoNodeWorking(devNode)) {
-            xlog("[UVC] Initial found : %s", (devNode ? devNode : "unknown"));
-        }
-
-        udev_device_unref(dev);
-    }
-
-    udev_enumerate_unref(enumerate);
-    udev_unref(udev);
+  udev_enumerate_unref(enumerate);
+  udev_unref(udev);
 }
 
 void Thread_FWMonitorUVC() {
