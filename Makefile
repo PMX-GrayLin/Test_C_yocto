@@ -46,6 +46,7 @@ CFLAG += ${INCLUDES_HEADERs}
 
 # lib dir
 INCLUDES_LIB += -L$(BB_LIBDIR)
+INCLUDES_LIB += -L$(BB_LIBDIR)/../../lib
 INCLUDES_LIB += -L$(BB_LIBDIR)/gstreamer-1.0
 
 # lib
@@ -56,6 +57,7 @@ LINK_LIBS += -lgobject-2.0
 LINK_LIBS += -lmosquitto -lmosquittopp
 LINK_LIBS += -lgpiod
 LINK_LIBS += -lcurl
+LINK_LIBS += -ludev
 # LINK_LIBS += -lft4222 -lftd2xx
 
 OCVLDFLAG +=-lopencv_core 
