@@ -10,6 +10,7 @@
 #include <linux/rtnetlink.h>
 #include <net/if.h>
 #include <sys/socket.h>
+#include <atomic>
 
 #include "restfulx.hpp"
 
@@ -760,15 +761,14 @@ void parseLinkMessage(struct nlmsghdr *nlh) {
 
     if (ifname[0]) {
         bool linkUp = ifi->ifi_flags & IFF_LOWER_UP;
-        std::cout << "[event] Interface " << ifname << " is now "
-                  << (linkUp ? "LINK UP" : "LINK DOWN") << std::endl;
+        xlog("[event] Interface %s is now %s", ifname, (linkUp ? "LINK UP" : "LINK DOWN"));
     }
 }
 
 void monitorLinkThread() {
     int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
     if (sock < 0) {
-        perror("socket");
+      xlog("socket error");
         return;
     }
 
@@ -777,7 +777,7 @@ void monitorLinkThread() {
     addr.nl_groups = RTMGRP_LINK;
 
     if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-        perror("bind");
+      xlog("bind error");
         close(sock);
         return;
     }
@@ -788,7 +788,7 @@ void monitorLinkThread() {
         ssize_t len = recv(sock, buffer, sizeof(buffer), 0);
         if (len < 0) {
             if (errno == EINTR) continue;  // allow interruption
-            perror("recv");
+      xlog("recv error");
             break;
         }
 
@@ -802,5 +802,5 @@ void monitorLinkThread() {
     }
 
     close(sock);
-    std::cout << "[thread] Link monitor thread exiting." << std::endl;
+    xlog("[thread] Link monitor thread exiting");
 }
