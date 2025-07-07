@@ -13,6 +13,8 @@
 #include <sys/ioctl.h>
 #include <atomic>
 
+#include <libudev.h>
+
 #ifndef IFF_LOWER_UP
 #define IFF_LOWER_UP 0x10000
 #endif
