@@ -813,11 +813,38 @@ void Thread_FWMonitorNetLink() {
   xlog("---- Stop ----");
 }
 
+void FW_CheckInitialNetLinkState(const char* ifname = "eth0") {
+  int sock = socket(AF_INET, SOCK_DGRAM, 0);
+  if (sock < 0) {
+    xlog("Initial check: socket error");
+    return;
+  }
+
+  struct ifreq ifr = {};
+  strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+
+  if (ioctl(sock, SIOCGIFFLAGS, &ifr) == -1) {
+    xlog("Initial check: ioctl error");
+    close(sock);
+    return;
+  }
+
+  close(sock);
+
+  bool linkUp = ifr.ifr_flags & IFF_LOWER_UP;
+  xlog("[initial] Interface %s is %s", ifname, (linkUp ? "LINK UP" : "LINK DOWN"));
+}
+
 void FW_MonitorNetLinkStart() {
     if (isMonitorNetLink.load()) {
     xlog("Monitor already running.");
     return;
   }
+
+  FW_CheckInitialLinkState("eth0");
+  FW_CheckInitialLinkState("eth1");
+  FW_CheckInitialLinkState("eth2");
+  FW_CheckInitialLinkState("eth4");
 
   isMonitorNetLink = true;
   t_monitorNetLink = std::thread(Thread_FWMonitorNetLink);
