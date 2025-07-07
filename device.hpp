@@ -119,3 +119,7 @@ bool FW_isI2CAddressExist(const std::string& busS, const std::string& addressS);
 void Thread_FWMonitorNetLink();
 extern void FW_MonitorNetLinkStart();
 extern void FW_MonitorNetLinkStop();
+
+void Thread_FWMonitorUVC();
+extern void FW_MonitorUVCStart();
+extern void FW_MonitorUVCStop();

@@ -855,3 +855,87 @@ void FW_MonitorNetLinkStop() {
   //   t_monitorNetLink.join();
   // }
 }
+
+static std::thread g_uvcMonitorThread;
+static std::atomic<bool> g_monitoring{false};
+
+bool isUvcCamera(struct udev_device* dev) {
+    const char* subsystem = udev_device_get_subsystem(dev);
+    if (!subsystem || std::string(subsystem) != "video4linux")
+        return false;
+
+    const char* devNode = udev_device_get_devnode(dev);
+    if (!devNode || std::string(devNode).find("/dev/video") != 0)
+        return false;
+
+    const char* cap = udev_device_get_property_value(dev, "ID_V4L_CAPABILITIES");
+    return cap != nullptr;
+}
+
+void Thread_FWMonitorUVC() {
+    struct udev* udev = udev_new();
+    if (!udev) {
+        std::cerr << "Failed to create udev context.\n";
+        return;
+    }
+
+    struct udev_monitor* mon = udev_monitor_new_from_netlink(udev, "udev");
+    if (!mon) {
+        std::cerr << "Failed to create udev monitor.\n";
+        udev_unref(udev);
+        return;
+    }
+
+    udev_monitor_filter_add_match_subsystem_devtype(mon, "video4linux", nullptr);
+    udev_monitor_enable_receiving(mon);
+    int fd = udev_monitor_get_fd(mon);
+
+    std::cout << "[UVC] Monitoring thread started.\n";
+
+    while (g_monitoring) {
+        fd_set fds;
+        FD_ZERO(&fds);
+        FD_SET(fd, &fds);
+
+        struct timeval tv;
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+
+        int ret = select(fd + 1, &fds, nullptr, nullptr, &tv);
+        if (ret > 0 && FD_ISSET(fd, &fds)) {
+            struct udev_device* dev = udev_monitor_receive_device(mon);
+            if (dev) {
+                if (isUvcCamera(dev)) {
+                    const char* action = udev_device_get_action(dev);
+                    const char* devNode = udev_device_get_devnode(dev);
+                    std::cout << "[UVC] " << (action ? action : "unknown")
+                              << ": " << (devNode ? devNode : "unknown") << "\n";
+                }
+                udev_device_unref(dev);
+            }
+        }
+    }
+
+    std::cout << "[UVC] Monitoring thread stopped.\n";
+    udev_monitor_unref(mon);
+    udev_unref(udev);
+}
+
+// Public API to start monitoring
+extern void FW_MonitorUVCStart() {
+    if (g_monitoring)
+        return;
+
+    g_monitoring = true;
+    g_uvcMonitorThread = std::thread(Thread_FWMonitorUVC);
+}
+
+// Public API to stop monitoring
+extern void FW_MonitorUVCStop() {
+    if (!g_monitoring)
+        return;
+
+    g_monitoring = false;
+    if (g_uvcMonitorThread.joinable())
+        g_uvcMonitorThread.join();
+}
