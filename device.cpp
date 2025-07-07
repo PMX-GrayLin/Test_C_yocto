@@ -10,6 +10,7 @@
 #include <linux/rtnetlink.h>
 #include <net/if.h>
 #include <sys/socket.h>
+#include <sys/ioctl.h>
 #include <atomic>
 
 #ifndef IFF_LOWER_UP
