@@ -20,8 +20,8 @@
 
 #define DEBOUNCE_TIME_MS 20
 
-std::string product = "ai_camera_plus";     // ai_camera_plus or vision_hub_plus
-std::string hostname_prefix = "aicamera";   // aicamera or visionhub
+std::string product = "ai_camera_plus";         // ai_camera_plus or vision_hub_plus
+std::string hostname_prefix = "aicamera";       // aicamera or visionhub
 
 // PWM
 const std::string path_pwm = "/sys/devices/platform/soc/10048000.pwm/pwm/pwmchip0";
