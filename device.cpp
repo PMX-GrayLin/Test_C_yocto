@@ -69,6 +69,11 @@ uint64_t DIODI_last_event_time[NUM_DIO] = {0};
 std::thread t_monitorNetLink;
 std::atomic<bool> isMonitorNetLink(false);
 
+// UVC
+// static std::thread t_monitorUVC;
+// static std::atomic<bool> isMonitorUVC{false};
+
+
 void FW_getProduct() {
   product = exec_command("fw_printenv | grep '^product=' | cut -d '=' -f2");
   // xlog("product:%s", product.c_str());
@@ -864,8 +869,8 @@ void FW_MonitorNetLinkStop() {
   // }
 }
 
-static std::thread g_uvcMonitorThread;
-static std::atomic<bool> g_monitoring{false};
+static std::thread t_monitorUVC;
+static std::atomic<bool> isMonitorUVC{false};
 
 bool isUvcCamera(struct udev_device* dev) {
     const char* subsystem = udev_device_get_subsystem(dev);
@@ -879,32 +884,6 @@ bool isUvcCamera(struct udev_device* dev) {
     const char* cap = udev_device_get_property_value(dev, "ID_V4L_CAPABILITIES");
     return cap != nullptr;
 }
-
-// bool isUvcCamera(struct udev_device *dev) {
-//   const char *subsystem = udev_device_get_subsystem(dev);
-//   if (!subsystem || std::string(subsystem) != "video4linux")
-//     return false;
-
-//   const char *devNode = udev_device_get_devnode(dev);
-//   if (!devNode || std::string(devNode).find("/dev/video") != 0)
-//     return false;
-
-//   const char *cap = udev_device_get_property_value(dev, "ID_V4L_CAPABILITIES");
-//   const char *driver = udev_device_get_property_value(dev, "ID_USB_DRIVER");
-//   const char *id_model = udev_device_get_property_value(dev, "ID_MODEL");
-
-//   xlog("devNode:%s", devNode);
-//   xlog("cap:%s", cap);
-//   xlog("driver:%s", driver);
-
-//   // Only consider real UVC video devices
-//   if (cap && std::string(cap).find("capture") != std::string::npos &&
-//       driver && std::string(driver) == "uvcvideo") {
-//     return true;
-//   }
-
-//   return false;
-// }
 
 void FW_CheckInitialUVCDevices() {
   struct udev *udev = udev_new();
@@ -956,7 +935,7 @@ void Thread_FWMonitorUVC() {
 
   xlog("---- Start ----");
 
-  while (g_monitoring) {
+  while (isMonitorUVC) {
     fd_set fds;
     FD_ZERO(&fds);
     FD_SET(fd, &fds);
@@ -988,21 +967,21 @@ void Thread_FWMonitorUVC() {
 
 // Public API to start monitoring
 extern void FW_MonitorUVCStart() {
-    if (g_monitoring)
+    if (isMonitorUVC)
         return;
 
     FW_CheckInitialUVCDevices();
     
-    g_monitoring = true;
-    g_uvcMonitorThread = std::thread(Thread_FWMonitorUVC);
+    isMonitorUVC = true;
+    t_monitorUVC = std::thread(Thread_FWMonitorUVC);
 }
 
 // Public API to stop monitoring
 extern void FW_MonitorUVCStop() {
-    if (!g_monitoring)
+    if (!isMonitorUVC)
         return;
 
-    g_monitoring = false;
-    if (g_uvcMonitorThread.joinable())
-        g_uvcMonitorThread.join();
+    isMonitorUVC = false;
+    if (t_monitorUVC.joinable())
+        t_monitorUVC.join();
 }
