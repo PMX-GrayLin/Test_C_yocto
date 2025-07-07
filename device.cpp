@@ -810,7 +810,7 @@ void Thread_FWMonitorNetLink() {
 }
 
 void FW_MonitorNetLinkStart() {
-  std::thread netThread(Thread_FWMonitorNetLinkStart);
+  std::thread netThread(Thread_FWMonitorNetLink);
 }
 
 void FW_MonitorNetLinkStop() {
