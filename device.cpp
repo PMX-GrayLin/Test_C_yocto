@@ -15,6 +15,12 @@
 
 #include <libudev.h>
 
+#include <fcntl.h>             // O_RDONLY
+#include <unistd.h>            // open, close
+#include <sys/ioctl.h>         // ioctl
+#include <linux/videodev2.h>   // v4l2_capability, VIDIOC_QUERYCAP
+
+
 #ifndef IFF_LOWER_UP
 #define IFF_LOWER_UP 0x10000
 #endif
