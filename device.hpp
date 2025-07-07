@@ -116,4 +116,6 @@ extern void FW_setDIOOut(string index_dio, string on_off);
 
 bool FW_isI2CAddressExist(const std::string& busS, const std::string& addressS);
 
-void monitorLinkThread();
+void Thread_FWMonitorNetLink();
+extern void FW_MonitorNetLinkStart();
+extern void FW_MonitorNetLinkStop();

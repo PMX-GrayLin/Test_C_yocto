@@ -117,12 +117,20 @@ void handle_RESTful(std::vector<std::string> segments) {
   } else if (isSameString(segments[0], "tf")) {
     // test functions
 
-    bool ret = FW_isI2CAddressExist(segments[1], segments[2]);
-    if (ret) {
-      xlog("exist...");
-    } else {
-      xlog("not exist...");
+    // bool ret = FW_isI2CAddressExist(segments[1], segments[2]);
+    // if (ret) {
+    //   xlog("exist...");
+    // } else {
+    //   xlog("not exist...");
+    // }
+
+    if (isSameString(segments[1], "1"))
+    {
+      FW_MonitorNetLinkStart();
+    } else if if (isSameString(segments[1], "2")) {
+      FW_MonitorNetLinkStop();
     }
+    
   }
 
 }
@@ -227,8 +235,6 @@ int main(int argc, char* argv[]) {
       FW_setLED("2", "green");
     }
   }
-
-  std::thread netThread(monitorLinkThread);
 
   httplib::Server svr;
 

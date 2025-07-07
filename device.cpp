@@ -748,63 +748,71 @@ bool FW_isI2CAddressExist(const std::string &busS, const std::string &addressS) 
 }
 
 #define BUFFER_SIZE 4096
-std::atomic<bool> running(true);
+std::atomic<bool> isMonitorNetLink(true);
 
 void parseLinkMessage(struct nlmsghdr *nlh) {
-    struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
-    struct rtattr *attr = IFLA_RTA(ifi);
-    int attr_len = IFLA_PAYLOAD(nlh);
+  struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
+  struct rtattr *attr = IFLA_RTA(ifi);
+  int attr_len = IFLA_PAYLOAD(nlh);
 
-    char ifname[IF_NAMESIZE] = {0};
+  char ifname[IF_NAMESIZE] = {0};
 
-    for (; RTA_OK(attr, attr_len); attr = RTA_NEXT(attr, attr_len)) {
-        if (attr->rta_type == IFLA_IFNAME) {
-            strncpy(ifname, (char *)RTA_DATA(attr), IF_NAMESIZE);
-        }
+  for (; RTA_OK(attr, attr_len); attr = RTA_NEXT(attr, attr_len)) {
+    if (attr->rta_type == IFLA_IFNAME) {
+      strncpy(ifname, (char *)RTA_DATA(attr), IF_NAMESIZE);
     }
+  }
 
-    if (ifname[0]) {
-        bool linkUp = ifi->ifi_flags & IFF_LOWER_UP;
-        xlog("[event] Interface %s is now %s", ifname, (linkUp ? "LINK UP" : "LINK DOWN"));
-    }
+  if (ifname[0]) {
+    bool linkUp = ifi->ifi_flags & IFF_LOWER_UP;
+    xlog("[event] Interface %s is now %s", ifname, (linkUp ? "LINK UP" : "LINK DOWN"));
+  }
 }
 
-void monitorLinkThread() {
-    int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
-    if (sock < 0) {
-      xlog("socket error");
-        return;
-    }
+void Thread_FWMonitorNetLink() {
+  int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+  if (sock < 0) {
+    xlog("socket error");
+    return;
+  }
 
-    struct sockaddr_nl addr = {};
-    addr.nl_family = AF_NETLINK;
-    addr.nl_groups = RTMGRP_LINK;
+  struct sockaddr_nl addr = {};
+  addr.nl_family = AF_NETLINK;
+  addr.nl_groups = RTMGRP_LINK;
 
-    if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-      xlog("bind error");
-        close(sock);
-        return;
-    }
-
-    char buffer[BUFFER_SIZE];
-
-    while (running.load()) {
-        ssize_t len = recv(sock, buffer, sizeof(buffer), 0);
-        if (len < 0) {
-            if (errno == EINTR) continue;  // allow interruption
-      xlog("recv error");
-            break;
-        }
-
-        struct nlmsghdr *nlh = (struct nlmsghdr *)buffer;
-        while (NLMSG_OK(nlh, len)) {
-            if (nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK) {
-                parseLinkMessage(nlh);
-            }
-            nlh = NLMSG_NEXT(nlh, len);
-        }
-    }
-
+  if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    xlog("bind error");
     close(sock);
-    xlog("[thread] Link monitor thread exiting");
+    return;
+  }
+
+  char buffer[BUFFER_SIZE];
+
+  while (isNetLinkMonitoring.load()) {
+    ssize_t len = recv(sock, buffer, sizeof(buffer), 0);
+    if (len < 0) {
+      if (errno == EINTR) continue;  // allow interruption
+      xlog("recv error");
+      break;
+    }
+
+    struct nlmsghdr *nlh = (struct nlmsghdr *)buffer;
+    while (NLMSG_OK(nlh, len)) {
+      if (nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK) {
+        parseLinkMessage(nlh);
+      }
+      nlh = NLMSG_NEXT(nlh, len);
+    }
+  }
+
+  close(sock);
+  xlog("[thread] Link monitor thread exiting");
+}
+
+void FW_MonitorNetLinkStart() {
+  std::thread netThread(Thread_FWMonitorNetLinkStart);
+}
+
+void FW_MonitorNetLinkStop() {
+  isMonitorNetLink = false;
 }
