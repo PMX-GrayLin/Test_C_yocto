@@ -874,6 +874,36 @@ bool isUvcCamera(struct udev_device* dev) {
     return cap != nullptr;
 }
 
+void FW_CheckInitialUVCDevices() {
+    struct udev* udev = udev_new();
+    if (!udev) {
+        std::cerr << "Failed to create udev context (initial check).\n";
+        return;
+    }
+
+    struct udev_enumerate* enumerate = udev_enumerate_new(udev);
+    udev_enumerate_add_match_subsystem(enumerate, "video4linux");
+    udev_enumerate_scan_devices(enumerate);
+
+    struct udev_list_entry* devices = udev_enumerate_get_list_entry(enumerate);
+    struct udev_list_entry* entry;
+
+    udev_list_entry_foreach(entry, devices) {
+        const char* path = udev_list_entry_get_name(entry);
+        struct udev_device* dev = udev_device_new_from_syspath(udev, path);
+
+        if (isUvcCamera(dev)) {
+            const char* devNode = udev_device_get_devnode(dev);
+            std::cout << "[UVC] Initial found: " << (devNode ? devNode : "unknown") << "\n";
+        }
+
+        udev_device_unref(dev);
+    }
+
+    udev_enumerate_unref(enumerate);
+    udev_unref(udev);
+}
+
 void Thread_FWMonitorUVC() {
   struct udev *udev = udev_new();
   if (!udev) {
@@ -927,6 +957,8 @@ extern void FW_MonitorUVCStart() {
     if (g_monitoring)
         return;
 
+    FW_CheckInitialUVCDevices();
+    
     g_monitoring = true;
     g_uvcMonitorThread = std::thread(Thread_FWMonitorUVC);
 }
