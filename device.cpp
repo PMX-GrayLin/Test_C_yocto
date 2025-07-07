@@ -857,7 +857,7 @@ void FW_MonitorNetLinkStop() {
   isMonitorNetLink = false;
 
   // Unblock recv() by sending dummy message or let timeout (optional)
-  // if (t_monitorNetLink.joinable()) {
-  //   t_monitorNetLink.join();
-  // }
+  if (t_monitorNetLink.joinable()) {
+    t_monitorNetLink.join();
+  }
 }
