@@ -872,6 +872,19 @@ void FW_MonitorNetLinkStop() {
 static std::thread t_monitorUVC;
 static std::atomic<bool> isMonitorUVC{false};
 
+// bool isUvcCamera(struct udev_device* dev) {
+//     const char* subsystem = udev_device_get_subsystem(dev);
+//     if (!subsystem || std::string(subsystem) != "video4linux")
+//         return false;
+
+//     const char* devNode = udev_device_get_devnode(dev);
+//     if (!devNode || std::string(devNode).find("/dev/video") != 0)
+//         return false;
+
+//     const char* cap = udev_device_get_property_value(dev, "ID_V4L_CAPABILITIES");
+//     return cap != nullptr;
+// }
+
 bool isUvcCamera(struct udev_device* dev) {
     const char* subsystem = udev_device_get_subsystem(dev);
     if (!subsystem || std::string(subsystem) != "video4linux")
@@ -882,7 +895,16 @@ bool isUvcCamera(struct udev_device* dev) {
         return false;
 
     const char* cap = udev_device_get_property_value(dev, "ID_V4L_CAPABILITIES");
-    return cap != nullptr;
+    const char* driver = udev_device_get_property_value(dev, "ID_USB_DRIVER");
+    const char* id_model = udev_device_get_property_value(dev, "ID_MODEL");
+
+    // Only consider real UVC video devices
+    if (cap && std::string(cap).find("capture") != std::string::npos &&
+        driver && std::string(driver) == "uvcvideo") {
+        return true;
+    }
+
+    return false;
 }
 
 void FW_CheckInitialUVCDevices() {
