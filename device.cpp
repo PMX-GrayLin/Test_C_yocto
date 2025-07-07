@@ -786,8 +786,9 @@ void Thread_FWMonitorNetLink() {
     return;
   }
 
-  char buffer[BUFFER_SIZE];
+  xlog("---- Start ----");
 
+  char buffer[BUFFER_SIZE];
   while (isNetLinkMonitoring.load()) {
     ssize_t len = recv(sock, buffer, sizeof(buffer), 0);
     if (len < 0) {
@@ -806,7 +807,7 @@ void Thread_FWMonitorNetLink() {
   }
 
   close(sock);
-  xlog("[thread] Link monitor thread exiting");
+  xlog("---- Stop ----");
 }
 
 void FW_MonitorNetLinkStart() {
