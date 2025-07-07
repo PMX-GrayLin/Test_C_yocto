@@ -842,10 +842,10 @@ void FW_MonitorNetLinkStart() {
     return;
   }
 
-  FW_CheckInitialLinkState("eth0");
-  FW_CheckInitialLinkState("eth1");
-  FW_CheckInitialLinkState("eth2");
-  FW_CheckInitialLinkState("eth4");
+  FW_CheckInitialNetLinkState("eth0");
+  FW_CheckInitialNetLinkState("eth1");
+  FW_CheckInitialNetLinkState("eth2");
+  FW_CheckInitialNetLinkState("eth4");
 
   isMonitorNetLink = true;
   t_monitorNetLink = std::thread(Thread_FWMonitorNetLink);
