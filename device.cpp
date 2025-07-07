@@ -814,26 +814,20 @@ void Thread_FWMonitorNetLink() {
   xlog("---- Stop ----");
 }
 
-void FW_CheckInitialNetLinkState(const char* ifname = "eth0") {
-  int sock = socket(AF_INET, SOCK_DGRAM, 0);
-  if (sock < 0) {
-    xlog("Initial check: socket error");
+void FW_CheckInitialNetLinkState(const char *ifname = "eth0") {
+  std::string path = std::string("/sys/class/net/") + ifname + "/operstate";
+  std::ifstream file(path);
+
+  if (!file.is_open()) {
+    xlog("Initial check: failed to open %s", path.c_str());
     return;
   }
 
-  struct ifreq ifr = {};
-  strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+  std::string state;
+  std::getline(file, state);
+  file.close();
 
-  if (ioctl(sock, SIOCGIFFLAGS, &ifr) == -1) {
-    xlog("Initial check: ioctl error");
-    close(sock);
-    return;
-  }
-
-  close(sock);
-
-  bool linkUp = ifr.ifr_flags & IFF_LOWER_UP;
-  xlog("[initial] Interface %s is %s", ifname, (linkUp ? "LINK UP" : "LINK DOWN"));
+  xlog("[initial] Interface %s is %s", ifname, state.c_str());
 }
 
 void FW_MonitorNetLinkStart() {
@@ -845,7 +839,6 @@ void FW_MonitorNetLinkStart() {
   FW_CheckInitialNetLinkState("eth0");
   FW_CheckInitialNetLinkState("eth1");
   FW_CheckInitialNetLinkState("eth2");
-  FW_CheckInitialNetLinkState("eth4");
 
   isMonitorNetLink = true;
   t_monitorNetLink = std::thread(Thread_FWMonitorNetLink);
