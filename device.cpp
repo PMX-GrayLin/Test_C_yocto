@@ -877,7 +877,7 @@ bool isUvcCamera(struct udev_device* dev) {
 void FW_CheckInitialUVCDevices() {
     struct udev* udev = udev_new();
     if (!udev) {
-        std::cerr << "Failed to create udev context (initial check).\n";
+      xlog("Failed to create udev context (initial check)");
         return;
     }
 
@@ -894,7 +894,7 @@ void FW_CheckInitialUVCDevices() {
 
         if (isUvcCamera(dev)) {
             const char* devNode = udev_device_get_devnode(dev);
-            std::cout << "[UVC] Initial found: " << (devNode ? devNode : "unknown") << "\n";
+            xlog("[UVC] Initial found : %s", (devNode ? devNode : "unknown"));
         }
 
         udev_device_unref(dev);
