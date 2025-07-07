@@ -58,7 +58,7 @@ uint64_t DIODI_last_event_time[NUM_DIO] = {0};
 
 // net interface
 std::thread t_monitorNetLink;
-std::atomic<bool> isMonitorNetLink(true);
+std::atomic<bool> isMonitorNetLink(false);
 
 void FW_getProduct() {
   product = exec_command("fw_printenv | grep '^product=' | cut -d '=' -f2");
