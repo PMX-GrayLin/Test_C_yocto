@@ -985,7 +985,10 @@ void Thread_FWMonitorUVC() {
     if (ret > 0 && FD_ISSET(fd, &fds)) {
       struct udev_device *dev = udev_monitor_receive_device(mon);
       if (dev) {
-        if (isUvcCamera(dev)) {
+        const char *devNode = udev_device_get_devnode(dev);
+
+        // if (isUvcCamera(dev)) {
+        if (isVideoCaptureDevice(devNode)) {
           const char *action = udev_device_get_action(dev);
           const char *devNode = udev_device_get_devnode(dev);
           xlog("[UVC] %s : %s", (action ? action : "unknown"), (devNode ? devNode : "unknown"));
