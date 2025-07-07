@@ -56,6 +56,10 @@ GPIO_LEVEl DIODI_gpio_level_last[NUM_DIO] = {gpiol_unknown, gpiol_unknown};
 GPIO_LEVEl DIODI_gpio_level_new[NUM_DIO] = {gpiol_unknown, gpiol_unknown};
 uint64_t DIODI_last_event_time[NUM_DIO] = {0};
 
+// net interface
+std::thread t_monitorNetLink;
+std::atomic<bool> isMonitorNetLink(true);
+
 void FW_getProduct() {
   product = exec_command("fw_printenv | grep '^product=' | cut -d '=' -f2");
   // xlog("product:%s", product.c_str());
@@ -748,7 +752,6 @@ bool FW_isI2CAddressExist(const std::string &busS, const std::string &addressS) 
 }
 
 #define BUFFER_SIZE 4096
-std::atomic<bool> isMonitorNetLink(true);
 
 void parseLinkMessage(struct nlmsghdr *nlh) {
   struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
@@ -811,9 +814,22 @@ void Thread_FWMonitorNetLink() {
 }
 
 void FW_MonitorNetLinkStart() {
-  std::thread netThread(Thread_FWMonitorNetLink);
+    if (isMonitorNetLink.load()) {
+    xlog("Monitor already running.");
+    return;
+  }
+
+  isMonitorNetLink = true;
+  t_monitorNetLink = std::thread(Thread_FWMonitorNetLink);
 }
 
 void FW_MonitorNetLinkStop() {
+ if (!isMonitorNetLink.load()) return;
+
   isMonitorNetLink = false;
+
+  // Unblock recv() by sending dummy message or let timeout (optional)
+  if (netMonitorThread.joinable()) {
+    netMonitorThread.join();
+  }
 }
