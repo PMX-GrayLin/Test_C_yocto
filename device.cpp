@@ -12,6 +12,10 @@
 #include <sys/socket.h>
 #include <atomic>
 
+#ifndef IFF_LOWER_UP
+#define IFF_LOWER_UP 0x10000
+#endif
+
 #include "restfulx.hpp"
 
 #define DEBOUNCE_TIME_MS 20
