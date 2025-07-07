@@ -228,6 +228,8 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  std::thread netThread(monitorLinkThread);
+
   httplib::Server svr;
 
 #if defined(ENABLE_OST)

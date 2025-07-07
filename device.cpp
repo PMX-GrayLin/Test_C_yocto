@@ -761,3 +761,43 @@ void parseLinkMessage(struct nlmsghdr *nlh) {
                   << (linkUp ? "LINK UP" : "LINK DOWN") << std::endl;
     }
 }
+
+void monitorLinkThread() {
+    int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+    if (sock < 0) {
+        perror("socket");
+        return;
+    }
+
+    struct sockaddr_nl addr = {};
+    addr.nl_family = AF_NETLINK;
+    addr.nl_groups = RTMGRP_LINK;
+
+    if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        perror("bind");
+        close(sock);
+        return;
+    }
+
+    char buffer[BUFFER_SIZE];
+
+    while (running.load()) {
+        ssize_t len = recv(sock, buffer, sizeof(buffer), 0);
+        if (len < 0) {
+            if (errno == EINTR) continue;  // allow interruption
+            perror("recv");
+            break;
+        }
+
+        struct nlmsghdr *nlh = (struct nlmsghdr *)buffer;
+        while (NLMSG_OK(nlh, len)) {
+            if (nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK) {
+                parseLinkMessage(nlh);
+            }
+            nlh = NLMSG_NEXT(nlh, len);
+        }
+    }
+
+    close(sock);
+    std::cout << "[thread] Link monitor thread exiting." << std::endl;
+}
