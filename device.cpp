@@ -867,21 +867,17 @@ void FW_MonitorNetLinkStop() {
 static std::thread g_uvcMonitorThread;
 static std::atomic<bool> g_monitoring{false};
 
-bool isVideoCaptureDevice(const char* devNode) {
-    int fd = open(devNode, O_RDONLY);
-    if (fd < 0) return false;
+bool isUvcCamera(struct udev_device* dev) {
+    const char* subsystem = udev_device_get_subsystem(dev);
+    if (!subsystem || std::string(subsystem) != "video4linux")
+        return false;
 
-    struct v4l2_capability cap;
-    bool result = false;
+    const char* devNode = udev_device_get_devnode(dev);
+    if (!devNode || std::string(devNode).find("/dev/video") != 0)
+        return false;
 
-    if (ioctl(fd, VIDIOC_QUERYCAP, &cap) == 0) {
-        if ((cap.capabilities & V4L2_CAP_VIDEO_CAPTURE) || (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE)) {
-            result = true;
-        }
-    }
-
-    close(fd);
-    return result;
+    const char* cap = udev_device_get_property_value(dev, "ID_V4L_CAPABILITIES");
+    return cap != nullptr;
 }
 
 // bool isUvcCamera(struct udev_device *dev) {
@@ -910,16 +906,6 @@ bool isVideoCaptureDevice(const char* devNode) {
 //   return false;
 // }
 
-// bool isVideoNodeWorking(const char* devNode) {
-//     int fd = open(devNode, O_RDONLY);
-//     if (fd < 0) return false;
-
-//     struct v4l2_capability cap;
-//     bool result = (ioctl(fd, VIDIOC_QUERYCAP, &cap) == 0);
-//     close(fd);
-//     return result;
-// }
-
 void FW_CheckInitialUVCDevices() {
   struct udev *udev = udev_new();
   if (!udev) {
@@ -939,9 +925,7 @@ void FW_CheckInitialUVCDevices() {
     struct udev_device *dev = udev_device_new_from_syspath(udev, path);
     const char *devNode = udev_device_get_devnode(dev);
 
-    // if (isUvcCamera(dev)) {
-    if (devNode && isVideoCaptureDevice(devNode)) {
-      
+    if (isUvcCamera(dev)) {
       xlog("[UVC] Initial found : %s", (devNode ? devNode : "unknown"));
     }
 
@@ -987,8 +971,7 @@ void Thread_FWMonitorUVC() {
       if (dev) {
         const char *devNode = udev_device_get_devnode(dev);
 
-        // if (isUvcCamera(dev)) {
-        if (isVideoCaptureDevice(devNode)) {
+        if (isUvcCamera(dev)) {
           const char *action = udev_device_get_action(dev);
           const char *devNode = udev_device_get_devnode(dev);
           xlog("[UVC] %s : %s", (action ? action : "unknown"), (devNode ? devNode : "unknown"));
