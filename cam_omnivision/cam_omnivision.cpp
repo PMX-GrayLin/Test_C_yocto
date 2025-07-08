@@ -28,7 +28,7 @@ cv::Rect crop_roi_aic(0, 0, 0, 0);
 static volatile int counterFrame_aic = 0;
 
 static GstElement *gst_pipeline_aic = nullptr;
-static GstElement *gst_flip = nullptr;
+static GstElement *gst_flip_aic = nullptr;
 static GMainLoop *gst_loop_aic = nullptr;
 
 namespace fs = std::filesystem;
@@ -467,13 +467,13 @@ void Thread_AICPStreaming() {
   gst_pipeline_aic = gst_pipeline_new("video-pipeline");
   GstElement *source = gst_element_factory_make("v4l2src", "source");
   GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
-  gst_flip = gst_element_factory_make("videoflip", "flip"); 
+  gst_flip_aic = gst_element_factory_make("videoflip", "flip"); 
   GstElement *queue = gst_element_factory_make("queue", "queue");
   GstElement *encoder = gst_element_factory_make("v4l2h264enc", "encoder");
   GstElement *parser = gst_element_factory_make("h264parse", "parser");
   GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
 
-  if (!gst_pipeline_aic || !source || !capsfilter || !gst_flip || !queue || !encoder || !parser || !sink) {
+  if (!gst_pipeline_aic || !source || !capsfilter || !gst_flip_aic || !queue || !encoder || !parser || !sink) {
     xlog("failed to create GStreamer elements");
     return;
   }
@@ -495,7 +495,7 @@ void Thread_AICPStreaming() {
   gst_caps_unref(caps);
 
   // Set videoflip mode: 0 = none, 1 = clockwise, 2 = rotate-180, 3 = counter-clockwise, etc.
-  g_object_set(gst_flip, "method", 0, nullptr);  // no flip initially
+  g_object_set(gst_flip_aic, "method", 0, nullptr);  // no flip initially
 
   // Create a GstStructure for extra-controls
   GstStructure *controls = gst_structure_new(
@@ -518,8 +518,8 @@ void Thread_AICPStreaming() {
   g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
 
   // Build the pipeline
-  gst_bin_add_many(GST_BIN(gst_pipeline_aic), source, capsfilter, gst_flip, queue, encoder, parser, sink, nullptr);
-  if (!gst_element_link_many(source, capsfilter, gst_flip, queue, encoder, parser, sink, nullptr)) {
+  gst_bin_add_many(GST_BIN(gst_pipeline_aic), source, capsfilter, gst_flip_aic, queue, encoder, parser, sink, nullptr);
+  if (!gst_element_link_many(source, capsfilter, gst_flip_aic, queue, encoder, parser, sink, nullptr)) {
     xlog("failed to link elements in the pipeline");
     gst_object_unref(gst_pipeline_aic);
     return;
@@ -694,7 +694,6 @@ void Thread_AICPStreaming_usb() {
   gst_object_unref(gst_pipeline_aic);
   isStreaming_aic = false;
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
-
 }
 
 void AICP_streamingStart() {
@@ -745,7 +744,7 @@ void AICP_streamingLED() {
 void AICP_setFlip(const std::string & methodS) {
 
   VideoFlipMethod method = VideoFlipMethod::vfm_NONE;
-  if (gst_flip) {
+  if (gst_flip_aic) {
     if (isSameString(methodS, "horizontal") || isSameString(methodS, "h")) {
       method = VideoFlipMethod::vfm_HORIZONTAL_FLIP ;
     } else if (isSameString(methodS, "vertical") || isSameString(methodS, "v")) {
@@ -755,7 +754,7 @@ void AICP_setFlip(const std::string & methodS) {
     } else if (isSameString(methodS, "none") || isSameString(methodS, "normal") || isSameString(methodS, "n")) {
       method = VideoFlipMethod::vfm_NONE ;
     }
-    g_object_set(gst_flip, "method", static_cast<int>(method), nullptr);
+    g_object_set(gst_flip_aic, "method", static_cast<int>(method), nullptr);
     xlog("Flip method set to %d", static_cast<int>(method));
   } else {
     xlog("Flip element not initialized");

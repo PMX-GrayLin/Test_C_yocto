@@ -6,6 +6,7 @@
 
 #if defined(ENABLE_CIS)
 #include "cam_omnivision.hpp"
+#include "cam_uvc.hpp"
 #endif
 
 #if defined(ENABLE_Gige)
@@ -98,6 +99,10 @@ void handle_RESTful(std::vector<std::string> segments) {
     test_gst(testCase);
     
 #endif
+
+  } else if (isSameString(segments[0], "uvc")) {
+    
+    UVC_handle_RESTful(segments);
 
   } else if (isSameString(segments[0], "mqtt")) {
     if (isSameString(segments[1], "start")) {
@@ -209,9 +214,15 @@ void test_ftdi() {
 void signalHandler(int signal) {
   xlog("Received signal:0x%x", signal);
 
-  
+  // detect UVC thread
+  FW_MonitorUVCStop();
+
+  // detect GigE plug-in/out thread
+  FW_MonitorNetLinkStop();
+
   FW_setLED("1", "red");  
   FW_setLED("2", "off");  
+  FW_setLED("3", "off");  
 
   std::exit(EXIT_SUCCESS);
 }
@@ -238,9 +249,18 @@ int main(int argc, char* argv[]) {
   if (FW_isDeviceAICamera()) {
     if (FW_isDeviceAICameraPlus()) {
       FW_setLED("2", "green");
+    } else {
+      // AI Box, detect UVC devices
     }
   }
 
+  // detect UVC thread
+  FW_MonitorUVCStart();
+
+  // detect GigE plug-in/out thread
+  FW_MonitorNetLinkStart();
+
+  // RSETful
   httplib::Server svr;
 
 #if defined(ENABLE_OST)

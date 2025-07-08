@@ -5,6 +5,12 @@
 #include <mutex>
 #include <condition_variable>
 
+typedef enum {
+    spf_BMP,
+    spf_JPEG,
+    spf_PNG,
+} SavedPhotoFormat;
+
 struct SimpleRect {
     int x;
     int y;

@@ -16,12 +16,6 @@
 #define AICamreaCISPath "/dev/csi_cam_preview"
 #define AICamreaUSBPath "/dev/video137"
 
-typedef enum {
-    spf_BMP,
-    spf_JPEG,
-    spf_PNG,
-} SavedPhotoFormat;
-
 enum class VideoFlipMethod {
   // defined by gstreamer, # gst-inspect-1.0 videoflip
   vfm_NONE = 0,                  // Identity (no rotation)
