@@ -963,9 +963,9 @@ void Thread_FWMonitorUVC() {
             UVC_setDevicePath(std::string(devNode));
             FW_setLED("2", "green");
           } else if (isSameString(action, "remove")) {
-            UVC_streamingStop();
             UVC_setDevicePath("");
             FW_setLED("2", "off");
+            UVC_streamingStop();
           }
         }
         udev_device_unref(dev);
