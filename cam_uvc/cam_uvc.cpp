@@ -104,7 +104,6 @@ void Thread_UVCStreaming() {
   counterFrame_uvc = 0;
   gst_init(nullptr, nullptr);
 
-  bool success = false;
   GstCaps *caps = nullptr;
   gst_pipeline_uvc = gst_pipeline_new("video-pipeline");
   GstElement *source = gst_element_factory_make("v4l2src", "source");
@@ -163,7 +162,6 @@ void Thread_UVCStreaming() {
 
             xlog("Stopping pipeline...");
             gst_element_set_state(gst_pipeline_uvc, GST_STATE_NULL);
-            success = true;
           }
         }
       }
