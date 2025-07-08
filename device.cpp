@@ -975,6 +975,11 @@ void Thread_FWMonitorUVC() {
           const char *action = udev_device_get_action(dev);
           const char *devNode = udev_device_get_devnode(dev);
           xlog("[UVC] %s : %s", (action ? action : "unknown"), (devNode ? devNode : "unknown"));
+          if (isSameString(action, "add")) {
+            UVC_setDevicePath(std::string(devNode));
+          } else if (isSameString(action, "remove")) {
+            UVC_setDevicePath("");
+          }
         }
         udev_device_unref(dev);
       }
