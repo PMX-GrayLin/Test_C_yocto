@@ -2,7 +2,7 @@
 
 #include <atomic>
 #include <vector>
-#include <mutex>
+#include <chrono>
 
 #include <gst/gst.h>
 
@@ -23,7 +23,7 @@ static GstElement *source_gige_hik = nullptr;
 
 std::thread t_streaming_gige_hik;
 std::atomic<bool> isStreaming_gige_hik{false};
-std::mutex streaming_mutex_gige_hik;
+std::chrono::steady_clock::time_point lastStartTime_gige_hik;
 
 struct GigeControlParams gigeControlParams = {0};
 
@@ -343,8 +343,14 @@ void GigE_ThreadStreaming_Hik() {
 }
 
 void GigE_StreamingStart_Hik() {
-  std::lock_guard<std::mutex> lock(streaming_mutex_gige_hik);
   xlog("");
+  auto now = std::chrono::steady_clock::now();
+  if (now - lastStartTime_gige_hik < std::chrono::seconds(0.5)) {
+    xlog("Start called too soon, ignoring");
+    return;
+  }
+  lastStartTime_gige_hik = now;
+
   if (isStreaming_gige_hik.load()) {
     xlog("thread already running");
     return;
@@ -356,7 +362,6 @@ void GigE_StreamingStart_Hik() {
 }
 
 void GigE_StreamingStop_Hik() {
-  std::lock_guard<std::mutex> lock(streaming_mutex_gige_hik);
   xlog("");
   if (!isStreaming_gige_hik.load()) {
     xlog("thread not running");
