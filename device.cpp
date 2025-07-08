@@ -20,8 +20,6 @@
 #include <sys/ioctl.h>         // ioctl
 #include <linux/videodev2.h>   // v4l2_capability, VIDIOC_QUERYCAP
 
-extern void UVC_setDevicePath(const string& devicePath);
-
 #ifndef IFF_LOWER_UP
 #define IFF_LOWER_UP 0x10000
 #endif
@@ -870,19 +868,6 @@ void FW_MonitorNetLinkStop() {
 static std::thread t_monitorUVC;
 static std::atomic<bool> isMonitorUVC{false};
 
-// bool isUvcCamera(struct udev_device* dev) {
-//     const char* subsystem = udev_device_get_subsystem(dev);
-//     if (!subsystem || std::string(subsystem) != "video4linux")
-//         return false;
-
-//     const char* devNode = udev_device_get_devnode(dev);
-//     if (!devNode || std::string(devNode).find("/dev/video") != 0)
-//         return false;
-
-//     const char* cap = udev_device_get_property_value(dev, "ID_V4L_CAPABILITIES");
-//     return cap != nullptr;
-// }
-
 bool isUvcCamera(struct udev_device* dev) {
     const char* subsystem = udev_device_get_subsystem(dev);
     if (!subsystem || std::string(subsystem) != "video4linux")
@@ -936,6 +921,9 @@ void FW_CheckInitialUVCDevices() {
   udev_unref(udev);
 }
 
+extern void UVC_setDevicePath(const string& devicePath);
+extern void UVC_streamingStop();
+
 void Thread_FWMonitorUVC() {
   struct udev *udev = udev_new();
   if (!udev) {
@@ -978,6 +966,7 @@ void Thread_FWMonitorUVC() {
           if (isSameString(action, "add")) {
             UVC_setDevicePath(std::string(devNode));
           } else if (isSameString(action, "remove")) {
+            UVC_streamingStop();
             UVC_setDevicePath("");
           }
         }
@@ -993,21 +982,21 @@ void Thread_FWMonitorUVC() {
 
 // Public API to start monitoring
 extern void FW_MonitorUVCStart() {
-    if (isMonitorUVC)
-        return;
+  if (isMonitorUVC)
+    return;
 
-    FW_CheckInitialUVCDevices();
-    
-    isMonitorUVC = true;
-    t_monitorUVC = std::thread(Thread_FWMonitorUVC);
+  FW_CheckInitialUVCDevices();
+
+  isMonitorUVC = true;
+  t_monitorUVC = std::thread(Thread_FWMonitorUVC);
 }
 
 // Public API to stop monitoring
 extern void FW_MonitorUVCStop() {
-    if (!isMonitorUVC)
-        return;
+  if (!isMonitorUVC)
+    return;
 
-    isMonitorUVC = false;
-    if (t_monitorUVC.joinable())
-        t_monitorUVC.join();
+  isMonitorUVC = false;
+  if (t_monitorUVC.joinable())
+    t_monitorUVC.join();
 }
