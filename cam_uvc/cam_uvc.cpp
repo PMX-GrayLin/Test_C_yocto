@@ -1,6 +1,7 @@
 #include "cam_uvc.hpp"
 
 #include <atomic>
+#include <chrono>
 
 #include <gst/gst.h>
 
@@ -12,10 +13,10 @@
 #include "image_utils.hpp"
 #include "restfulx.hpp"
 #include "device.hpp"
-#include "cam_uvc.hpp"
 
 std::thread t_streaming_uvc;
 std::atomic<bool> isStreaming_uvc{false};
+std::chrono::steady_clock::time_point lastStartTime_uvc;
 
 bool isCapturePhoto_uvc = false;
 bool isCropPhoto_uvc = false;
@@ -188,6 +189,13 @@ void Thread_UVCStreaming() {
 
 void UVC_streamingStart() {
   xlog("");
+  auto now = std::chrono::steady_clock::now();
+  if (now - lastStartTime_uvc < std::chrono::seconds(1)) {
+    xlog("Start called too soon, ignoring");
+    return;
+  }
+  lastStartTime_uvc = now;
+
   if (isStreaming_uvc.load()) {
     xlog("thread already running");
     return;

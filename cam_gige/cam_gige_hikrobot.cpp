@@ -1,7 +1,6 @@
 #include "cam_gige_hikrobot.hpp"
 
 #include <atomic>
-#include <vector>
 #include <chrono>
 
 #include <gst/gst.h>
