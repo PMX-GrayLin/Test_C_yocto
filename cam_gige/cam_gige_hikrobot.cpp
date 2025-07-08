@@ -1,5 +1,6 @@
 #include "cam_gige_hikrobot.hpp"
 
+#include <atomic>
 #include <vector>
 
 #include <gst/gst.h>
@@ -22,7 +23,7 @@ static GMainLoop *loop_gige_hik = nullptr;
 static GstElement *source_gige_hik = nullptr;
 
 std::thread t_streaming_gige_hik;
-bool isStreaming_gige_hik = false;
+std::atomic<bool> isStreaming_gige_hik{false};
 
 struct GigeControlParams gigeControlParams = {0};
 
@@ -188,7 +189,7 @@ void GigE_setImagePath_hik(const string &imagePath) {
 }
 
 void GigE_captureImage_hik() {
-  if (!isStreaming_gige_hik) {
+  if (!isStreaming_gige_hik.load()) {
     xlog("do nothing...camera is not streaming");
     return;
   }
@@ -334,7 +335,8 @@ void GigE_ThreadStreaming_Hik() {
     loop_gige_hik = nullptr;
   }
 
-  FW_setLED("2","green");
+  FW_CheckInitialNetLinkState("eth1");
+
   isStreaming_gige_hik = false;
   sendRESTful_streamingStatus(0, isStreaming_gige_hik);
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
@@ -342,30 +344,30 @@ void GigE_ThreadStreaming_Hik() {
 
 void GigE_StreamingStart_Hik() {
   xlog("");
-  if (isStreaming_gige_hik) {
+  if (isStreaming_gige_hik.load()) {
     xlog("thread already running");
     return;
   }
-  isStreaming_gige_hik = true;
 
-  FW_toggleLED("2", "off");
-
+  FW_setLED("2", "off");
   t_streaming_gige_hik = std::thread(GigE_ThreadStreaming_Hik);
   t_streaming_gige_hik.detach();
 }
 
 void GigE_StreamingStop_Hik() {
-  if (!isStreaming_gige_hik) {
-    xlog("Streaming not running");
+  if (!isStreaming_gige_hik.load()) {
+    xlog("thread not running");
     return;
   }
 
   if (loop_gige_hik) {
     xlog("g_main_loop_quit");
     g_main_loop_quit(loop_gige_hik);  // Unref should only happen in the thread
+  } else {
+    xlog("gst_loop_uvc is invalid or already destroyed.");
   }
 
-  isStreaming_gige_hik = false;
+  // isStreaming_gige_hik = false;
 }
 
 void GigE_streamingLED() {
