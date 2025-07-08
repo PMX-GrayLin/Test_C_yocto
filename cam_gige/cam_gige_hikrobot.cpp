@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <vector>
+#include <mutex>
 
 #include <gst/gst.h>
 
@@ -14,8 +15,6 @@
 #include "restfulx.hpp"
 #include "device.hpp"
 
-extern void AICP_saveImage(GstPad *pad, GstPadProbeInfo *info);
-
 UsedGigeCam usedGigeCam = ugc_hikrobot;
 
 static GstElement *pipeline_gige_hik = nullptr;
@@ -24,6 +23,7 @@ static GstElement *source_gige_hik = nullptr;
 
 std::thread t_streaming_gige_hik;
 std::atomic<bool> isStreaming_gige_hik{false};
+std::mutex streaming_mutex_gige_hik;
 
 struct GigeControlParams gigeControlParams = {0};
 
@@ -343,6 +343,7 @@ void GigE_ThreadStreaming_Hik() {
 }
 
 void GigE_StreamingStart_Hik() {
+  std::lock_guard<std::mutex> lock(gige_streaming_mutex);
   xlog("");
   if (isStreaming_gige_hik.load()) {
     xlog("thread already running");
@@ -355,6 +356,8 @@ void GigE_StreamingStart_Hik() {
 }
 
 void GigE_StreamingStop_Hik() {
+  std::lock_guard<std::mutex> lock(gige_streaming_mutex);
+  xlog("");
   if (!isStreaming_gige_hik.load()) {
     xlog("thread not running");
     return;
