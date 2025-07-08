@@ -795,6 +795,36 @@ void parseNetLinkMessage(struct nlmsghdr *nlh) {
   }
 }
 
+void FW_CheckInitialNetLinkState(const char *ifname = "eth0") {
+  std::string path = std::string("/sys/class/net/") + ifname + "/operstate";
+  std::ifstream file(path);
+
+  if (!file.is_open()) {
+    xlog("Initial check: failed to open %s", path.c_str());
+    return;
+  }
+
+  std::string state;
+  std::getline(file, state);
+  file.close();
+
+  xlog("[initial] Interface %s is %s", ifname, state.c_str());
+
+  if (isSameString(ifname, "eth1")) {
+    if (isSameString(state, "up")) {
+      FW_setLED("2", "green");
+    } else if (isSameString(state, "down")) {
+      FW_setLED("2", "off");
+    }
+  } else if (isSameString(ifname, "eth2")) {
+    if (isSameString(state, "up")) {
+      FW_setLED("3", "green");
+    } else if (isSameString(state, "down")) {
+      FW_setLED("3", "off");
+    }
+  }
+}
+
 void Thread_FWMonitorNetLink() {
   int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
   if (sock < 0) {
@@ -834,36 +864,6 @@ void Thread_FWMonitorNetLink() {
 
   close(sock);
   xlog("---- Stop ----");
-}
-
-void FW_CheckInitialNetLinkState(const char *ifname = "eth0") {
-  std::string path = std::string("/sys/class/net/") + ifname + "/operstate";
-  std::ifstream file(path);
-
-  if (!file.is_open()) {
-    xlog("Initial check: failed to open %s", path.c_str());
-    return;
-  }
-
-  std::string state;
-  std::getline(file, state);
-  file.close();
-
-  xlog("[initial] Interface %s is %s", ifname, state.c_str());
-
-  if (isSameString(ifname, "eth1")) {
-    if (isSameString(state, "up")) {
-      FW_setLED("2", "green");
-    } else if (isSameString(state, "down")) {
-      FW_setLED("2", "off");
-    }
-  } else if (isSameString(ifname, "eth2")) {
-    if (isSameString(state, "up")) {
-      FW_setLED("3", "green");
-    } else if (isSameString(state, "down")) {
-      FW_setLED("3", "off");
-    }
-  }
 }
 
 void FW_MonitorNetLinkStart() {
@@ -939,6 +939,8 @@ void FW_CheckInitialUVCDevices() {
       xlog("[UVC] Initial found : %s", (devNode ? devNode : "unknown"));
       FW_setLED("2", "green");
       UVC_setDevicePath(std::string(devNode));
+    } else {
+      FW_setLED("2", "off");
     }
 
     udev_device_unref(dev);

@@ -163,10 +163,8 @@ void Thread_UVCStreaming() {
             g_main_loop_run(gst_loop_uvc);
 
             xlog("Stopping pipeline...");
-            if (devicePath_uvc != "") {
-              FW_setLED("2", "green");
-            }
-
+            FW_CheckInitialUVCDevices();
+            
             gst_element_set_state(gst_pipeline_uvc, GST_STATE_NULL);
           }
         }
