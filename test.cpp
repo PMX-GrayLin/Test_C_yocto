@@ -6,7 +6,6 @@
 
 #if defined(ENABLE_CIS)
 #include "cam_omnivision.hpp"
-#include "cam_uvc.hpp"
 #endif
 
 #if defined(ENABLE_Gige)
@@ -22,6 +21,8 @@
 #include "test_gst.hpp"
 #include "test_ocv.hpp"
 #endif
+
+#include "cam_uvc.hpp"
 
 // #if defined(ENABLE_FTDI)
 // #include "ftd2xx.h"
