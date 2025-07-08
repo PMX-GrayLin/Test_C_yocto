@@ -781,15 +781,15 @@ void parseNetLinkMessage(struct nlmsghdr *nlh) {
 
     if (isSameString(ifname, "eth1")) {
       if (linkUp) {
-        FW_setLED("1", "green");
-      } else {
-        FW_setLED("1", "off");
-      }
-    } else if (isSameString(ifname, "eth2")) {
-      if (linkUp) {
         FW_setLED("2", "green");
       } else {
         FW_setLED("2", "off");
+      }
+    } else if (isSameString(ifname, "eth2")) {
+      if (linkUp) {
+        FW_setLED("3", "green");
+      } else {
+        FW_setLED("3", "off");
       }
     }
   }
@@ -853,15 +853,15 @@ void FW_CheckInitialNetLinkState(const char *ifname = "eth0") {
 
   if (isSameString(ifname, "eth1")) {
     if (isSameString(state, "up")) {
-      FW_setLED("1", "green");
-    } else if (isSameString(state, "down")) {
-      FW_setLED("1", "off");
-    }
-  } else if (isSameString(ifname, "eth2")) {
-    if (isSameString(state, "up")) {
       FW_setLED("2", "green");
     } else if (isSameString(state, "down")) {
       FW_setLED("2", "off");
+    }
+  } else if (isSameString(ifname, "eth2")) {
+    if (isSameString(state, "up")) {
+      FW_setLED("3", "green");
+    } else if (isSameString(state, "down")) {
+      FW_setLED("3", "off");
     }
   }
 }
