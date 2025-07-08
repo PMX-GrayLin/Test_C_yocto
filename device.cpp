@@ -64,14 +64,15 @@ GPIO_LEVEl DIODI_gpio_level_last[NUM_DIO] = {gpiol_unknown, gpiol_unknown};
 GPIO_LEVEl DIODI_gpio_level_new[NUM_DIO] = {gpiol_unknown, gpiol_unknown};
 uint64_t DIODI_last_event_time[NUM_DIO] = {0};
 
-// net interface
+// Net Interface
 std::thread t_monitorNetLink;
 std::atomic<bool> isMonitorNetLink(false);
 
 // UVC
-// static std::thread t_monitorUVC;
-// static std::atomic<bool> isMonitorUVC{false};
-
+static std::thread t_monitorUVC;
+static std::atomic<bool> isMonitorUVC{false};
+extern void UVC_setDevicePath(const string& devicePath);
+extern void UVC_streamingStop();
 
 void FW_getProduct() {
   product = exec_command("fw_printenv | grep '^product=' | cut -d '=' -f2");
@@ -865,9 +866,6 @@ void FW_MonitorNetLinkStop() {
   // }
 }
 
-static std::thread t_monitorUVC;
-static std::atomic<bool> isMonitorUVC{false};
-
 bool isUvcCamera(struct udev_device* dev) {
     const char* subsystem = udev_device_get_subsystem(dev);
     if (!subsystem || std::string(subsystem) != "video4linux")
@@ -920,9 +918,6 @@ void FW_CheckInitialUVCDevices() {
   udev_enumerate_unref(enumerate);
   udev_unref(udev);
 }
-
-extern void UVC_setDevicePath(const string& devicePath);
-extern void UVC_streamingStop();
 
 void Thread_FWMonitorUVC() {
   struct udev *udev = udev_new();
