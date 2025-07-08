@@ -345,7 +345,7 @@ void GigE_ThreadStreaming_Hik() {
 void GigE_StreamingStart_Hik() {
   xlog("");
   auto now = std::chrono::steady_clock::now();
-  if (now - lastStartTime_gige_hik < std::chrono::seconds(0.5)) {
+  if (now - lastStartTime_gige_hik < std::chrono::seconds(1)) {
     xlog("Start called too soon, ignoring");
     return;
   }
