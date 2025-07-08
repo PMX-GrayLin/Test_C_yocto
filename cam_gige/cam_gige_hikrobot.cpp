@@ -343,7 +343,7 @@ void GigE_ThreadStreaming_Hik() {
 }
 
 void GigE_StreamingStart_Hik() {
-  std::lock_guard<std::mutex> lock(gige_streaming_mutex);
+  std::lock_guard<std::mutex> lock(streaming_mutex_gige_hik);
   xlog("");
   if (isStreaming_gige_hik.load()) {
     xlog("thread already running");
@@ -356,7 +356,7 @@ void GigE_StreamingStart_Hik() {
 }
 
 void GigE_StreamingStop_Hik() {
-  std::lock_guard<std::mutex> lock(gige_streaming_mutex);
+  std::lock_guard<std::mutex> lock(streaming_mutex_gige_hik);
   xlog("");
   if (!isStreaming_gige_hik.load()) {
     xlog("thread not running");
