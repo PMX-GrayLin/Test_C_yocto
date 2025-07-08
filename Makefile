@@ -93,6 +93,8 @@ endif
 ifeq ($(ENABLE_TestCode),1)
 	CPPSOURCEFILES += $(wildcard temp/*.cpp)
 endif
+CPPSOURCEFILES += $(wildcard cam_uvc/*.cpp)
+
 CPPOBJECTS = $(patsubst %.cpp,%.o,$(CPPSOURCEFILES))
 
 %.o: %.cpp
