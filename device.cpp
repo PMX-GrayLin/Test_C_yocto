@@ -795,7 +795,7 @@ void parseNetLinkMessage(struct nlmsghdr *nlh) {
   }
 }
 
-void FW_CheckInitialNetLinkState(const char *ifname = "eth0", bool isInitcheck = false) {
+void FW_CheckInitialNetLinkState(const char *ifname, bool isInitcheck) {
   std::string path = std::string("/sys/class/net/") + ifname + "/operstate";
   std::ifstream file(path);
 
@@ -920,7 +920,7 @@ bool isUvcCamera(struct udev_device* dev) {
     return false;
 }
 
-void FW_CheckInitialUVCDevices(bool isInitcheck = false) {
+void FW_CheckInitialUVCDevices(bool isInitcheck) {
   struct udev *udev = udev_new();
   if (!udev) {
     xlog("Failed to create udev context (initial check)");
