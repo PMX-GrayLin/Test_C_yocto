@@ -105,21 +105,22 @@ extern void FW_MonitorTrigerStart();
 extern void FW_MonitorTrigerStop();
 
 // DO
-extern void FW_setDO(string index_do, string on_off);
+void FW_setDO(string index_do, string on_off);
 
 // DIO
 void Thread_FWMonitorDIOIn(int index_dio);
-extern void FW_MonitorDIOInStart(int index_dio);
-extern void FW_MonitorDIOInStop(int index_dio);
-extern void FW_setDIODirection(string index_dio, string di_do);
-extern void FW_setDIOOut(string index_dio, string on_off);
+void FW_MonitorDIOInStart(int index_dio);
+void FW_MonitorDIOInStop(int index_dio);
+void FW_setDIODirection(string index_dio, string di_do);
+void FW_setDIOOut(string index_dio, string on_off);
 
 bool FW_isI2CAddressExist(const std::string& busS, const std::string& addressS);
 
 void Thread_FWMonitorNetLink();
-extern void FW_MonitorNetLinkStart();
-extern void FW_MonitorNetLinkStop();
+void FW_CheckInitialNetLinkState(const char *ifname);
+void FW_MonitorNetLinkStart();
+void FW_MonitorNetLinkStop();
 
 void Thread_FWMonitorUVC();
-extern void FW_MonitorUVCStart();
-extern void FW_MonitorUVCStop();
+void FW_MonitorUVCStart();
+void FW_MonitorUVCStop();
