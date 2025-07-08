@@ -1,7 +1,6 @@
 #include "cam_uvc.hpp"
 
 #include <atomic>
-#include <vector>
 
 #include <gst/gst.h>
 

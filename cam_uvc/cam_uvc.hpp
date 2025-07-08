@@ -2,6 +2,8 @@
 
 #include "global.hpp"
 
+#include <vector>
+
 void UVC_handle_RESTful(std::vector<std::string> segments);
 
 void UVC_setDevicePath(const string& devicePath);
