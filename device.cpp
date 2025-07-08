@@ -778,6 +778,20 @@ void parseNetLinkMessage(struct nlmsghdr *nlh) {
   if (ifname[0]) {
     bool linkUp = ifi->ifi_flags & IFF_LOWER_UP;
     xlog("[event] Interface %s is now %s", ifname, (linkUp ? "LINK UP" : "LINK DOWN"));
+
+    if (isSameString(ifname, "eth1")) {
+      if (linkUp) {
+        FW_setLED("1", "green");
+      } else {
+        FW_setLED("1", "off");
+      }
+    } else if (isSameString(ifname, "eth2")) {
+      if (linkUp) {
+        FW_setLED("2", "green");
+      } else {
+        FW_setLED("2", "off");
+      }
+    }
   }
 }
 
@@ -836,6 +850,20 @@ void FW_CheckInitialNetLinkState(const char *ifname = "eth0") {
   file.close();
 
   xlog("[initial] Interface %s is %s", ifname, state.c_str());
+
+  if (isSameString(ifname, "eth1")) {
+    if (isSameString(state, "up")) {
+      FW_setLED("1", "green");
+    } else if (isSameString(state, "down")) {
+      FW_setLED("1", "off");
+    }
+  } else if (isSameString(ifname, "eth2")) {
+    if (isSameString(state, "up")) {
+      FW_setLED("2", "green");
+    } else if (isSameString(state, "down")) {
+      FW_setLED("2", "off");
+    }
+  }
 }
 
 void FW_MonitorNetLinkStart() {
