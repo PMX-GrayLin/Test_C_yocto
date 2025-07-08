@@ -108,7 +108,7 @@ void Thread_UVCStreaming() {
   gst_init(nullptr, nullptr);
 
   // final gst pipeline
-  // gst-launch-1.0 v4l2src device="/dev/video137" io-mode=2 ! image/jpeg,width=2048,height=1536,framerate=30/1 ! jpegdec ! videoconvert ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
+  // gst-launch-1.0 v4l2src device="/dev/video137" ! image/jpeg,width=2048,height=1536,framerate=30/1 ! jpegdec ! videoconvert ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
 
   // Create the elements
   gst_pipeline_uvc = gst_pipeline_new("video-pipeline");
@@ -126,6 +126,7 @@ void Thread_UVCStreaming() {
 
   // Set properties for the elements
   g_object_set(G_OBJECT(source), "device", devicePath_uvc.c_str(), nullptr);
+  xlog("devicePath_uvc:%s", devicePath_uvc);
 
   // Define the capabilities for the capsfilter
   GstCaps *caps = gst_caps_new_simple(
