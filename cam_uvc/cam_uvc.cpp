@@ -1,4 +1,4 @@
-#include "cam_gige_hikrobot.hpp"
+#include "cam_uvc.hpp"
 
 #include <atomic>
 #include <gst/gst.h>
@@ -164,7 +164,7 @@ void Thread_UVCStreaming() {
             if (devicePath_uvc != "") {
               FW_setLED("2", "green");
             }
-            
+
             gst_element_set_state(gst_pipeline_uvc, GST_STATE_NULL);
           }
         }
