@@ -909,6 +909,7 @@ void FW_CheckInitialUVCDevices() {
 
     if (isUvcCamera(dev)) {
       xlog("[UVC] Initial found : %s", (devNode ? devNode : "unknown"));
+      FW_setLED("2", "green");
       UVC_setDevicePath(std::string(devNode));
     }
 
@@ -960,9 +961,11 @@ void Thread_FWMonitorUVC() {
           xlog("[UVC] %s : %s", (action ? action : "unknown"), (devNode ? devNode : "unknown"));
           if (isSameString(action, "add")) {
             UVC_setDevicePath(std::string(devNode));
+            FW_setLED("2", "green");
           } else if (isSameString(action, "remove")) {
             UVC_streamingStop();
             UVC_setDevicePath("");
+            FW_setLED("2", "off");
           }
         }
         udev_device_unref(dev);
