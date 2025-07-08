@@ -116,12 +116,12 @@ void FW_setDIOOut(string index_dio, string on_off);
 
 bool FW_isI2CAddressExist(const std::string& busS, const std::string& addressS);
 
-void FW_CheckInitialNetLinkState(const char *ifname);
+void FW_CheckInitialNetLinkState(const char *ifname, bool isInitcheck);
 void Thread_FWMonitorNetLink();
 void FW_MonitorNetLinkStart();
 void FW_MonitorNetLinkStop();
 
-void FW_CheckInitialUVCDevices();
+void FW_CheckInitialUVCDevices(bool isInitcheck);
 void Thread_FWMonitorUVC();
 void FW_MonitorUVCStart();
 void FW_MonitorUVCStop();

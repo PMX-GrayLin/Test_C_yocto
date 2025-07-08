@@ -795,7 +795,7 @@ void parseNetLinkMessage(struct nlmsghdr *nlh) {
   }
 }
 
-void FW_CheckInitialNetLinkState(const char *ifname = "eth0") {
+void FW_CheckInitialNetLinkState(const char *ifname = "eth0", bool isInitcheck = false) {
   std::string path = std::string("/sys/class/net/") + ifname + "/operstate";
   std::ifstream file(path);
 
@@ -814,13 +814,17 @@ void FW_CheckInitialNetLinkState(const char *ifname = "eth0") {
     if (isSameString(state, "up")) {
       FW_setLED("2", "green");
     } else if (isSameString(state, "down")) {
-      FW_setLED("2", "off");
+      if (!isInitcheck) {
+        FW_setLED("2", "off");
+      }
     }
   } else if (isSameString(ifname, "eth2")) {
     if (isSameString(state, "up")) {
       FW_setLED("3", "green");
     } else if (isSameString(state, "down")) {
-      FW_setLED("3", "off");
+      if (!isInitcheck) {
+        FW_setLED("3", "off");
+      }
     }
   }
 }
@@ -872,9 +876,9 @@ void FW_MonitorNetLinkStart() {
     return;
   }
 
-  FW_CheckInitialNetLinkState("eth0");
-  FW_CheckInitialNetLinkState("eth1");
-  FW_CheckInitialNetLinkState("eth2");
+  FW_CheckInitialNetLinkState("eth0", true);
+  FW_CheckInitialNetLinkState("eth1", true);
+  FW_CheckInitialNetLinkState("eth2", true);
 
   isMonitorNetLink = true;
   t_monitorNetLink = std::thread(Thread_FWMonitorNetLink);
@@ -916,7 +920,7 @@ bool isUvcCamera(struct udev_device* dev) {
     return false;
 }
 
-void FW_CheckInitialUVCDevices() {
+void FW_CheckInitialUVCDevices(bool isInitcheck = false) {
   struct udev *udev = udev_new();
   if (!udev) {
     xlog("Failed to create udev context (initial check)");
@@ -940,7 +944,9 @@ void FW_CheckInitialUVCDevices() {
       FW_setLED("2", "green");
       UVC_setDevicePath(std::string(devNode));
     } else {
-      FW_setLED("2", "off");
+      if (!isInitcheck) {
+        FW_setLED("2", "off");
+      }
     }
 
     udev_device_unref(dev);
@@ -1013,7 +1019,7 @@ extern void FW_MonitorUVCStart() {
   if (isMonitorUVC)
     return;
 
-  FW_CheckInitialUVCDevices();
+  FW_CheckInitialUVCDevices(true);
 
   isMonitorUVC = true;
   t_monitorUVC = std::thread(Thread_FWMonitorUVC);
