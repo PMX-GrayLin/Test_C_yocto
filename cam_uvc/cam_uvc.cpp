@@ -104,6 +104,8 @@ void Thread_UVCStreaming() {
   counterFrame_uvc = 0;
   gst_init(nullptr, nullptr);
 
+  bool success = false;
+  GstCaps *caps = nullptr;
   gst_pipeline_uvc = gst_pipeline_new("video-pipeline");
   GstElement *source = gst_element_factory_make("v4l2src", "source");
   GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
@@ -114,75 +116,69 @@ void Thread_UVCStreaming() {
 
   if (!gst_pipeline_uvc || !source || !capsfilter || !jpegdec || !videoconvert || !encoder || !sink) {
     xlog("Failed to create GStreamer elements");
-    goto fail_pipeline;
+  } else {
+    g_object_set(G_OBJECT(source), "device", devicePath_uvc.c_str(), nullptr);
+    xlog("devicePath_uvc: %s", devicePath_uvc.c_str());
+
+    caps = gst_caps_new_simple(
+        "image/jpeg",
+        "width", G_TYPE_INT, 1920,
+        "height", G_TYPE_INT, 1080,
+        "framerate", GST_TYPE_FRACTION, 30, 1,
+        nullptr);
+
+    if (!caps) {
+      xlog("Failed to create caps");
+    } else {
+      g_object_set(capsfilter, "caps", caps, nullptr);
+
+      GstStructure *controls = gst_structure_new("extra-controls", "video_gop_size", G_TYPE_INT, 30, nullptr);
+      if (!controls) {
+        xlog("Failed to create controls");
+      } else {
+        g_object_set(encoder, "extra-controls", controls, nullptr);
+        g_object_set(encoder, "capture-io-mode", 4, nullptr);
+        g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
+        gst_structure_free(controls);
+
+        gst_bin_add_many(GST_BIN(gst_pipeline_uvc), source, capsfilter, jpegdec, videoconvert, encoder, sink, nullptr);
+        if (!gst_element_link_many(source, capsfilter, jpegdec, videoconvert, encoder, sink, nullptr)) {
+          xlog("Failed to link elements");
+        } else {
+          GstPad *pad = gst_element_get_static_pad(encoder, "sink");
+          if (pad) {
+            gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)UVC_streamingDataCallback, nullptr, nullptr);
+            gst_object_unref(pad);
+          }
+
+          GstStateChangeReturn ret = gst_element_set_state(gst_pipeline_uvc, GST_STATE_PLAYING);
+          if (ret == GST_STATE_CHANGE_FAILURE) {
+            xlog("Failed to start pipeline");
+          } else {
+            xlog("Pipeline is running...");
+            isStreaming_uvc = true;
+
+            gst_loop_uvc = g_main_loop_new(nullptr, FALSE);
+            g_main_loop_run(gst_loop_uvc);
+
+            xlog("Stopping pipeline...");
+            gst_element_set_state(gst_pipeline_uvc, GST_STATE_NULL);
+            success = true;
+          }
+        }
+      }
+    }
   }
 
-  g_object_set(G_OBJECT(source), "device", devicePath_uvc.c_str(), nullptr);
-  xlog("devicePath_uvc: %s", devicePath_uvc.c_str());
-
-  GstCaps *caps = gst_caps_new_simple(
-      "image/jpeg",
-      "width", G_TYPE_INT, 1920,
-      "height", G_TYPE_INT, 1080,
-      "framerate", GST_TYPE_FRACTION, 30, 1,
-      nullptr);
-  if (!caps) {
-    xlog("Failed to create caps");
-    goto fail_pipeline;
-  }
-  g_object_set(capsfilter, "caps", caps, nullptr);
-
-  GstStructure *controls = gst_structure_new(
-      "extra-controls",
-      "video_gop_size", G_TYPE_INT, 30,
-      nullptr);
-  if (!controls) {
-    xlog("Failed to create controls");
+  if (caps) {
     gst_caps_unref(caps);
-    goto fail_pipeline;
   }
 
-  g_object_set(encoder, "extra-controls", controls, nullptr);
-  g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf
-  g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
-
-  gst_structure_free(controls);  // safe to free now
-
-  gst_bin_add_many(GST_BIN(gst_pipeline_uvc), source, capsfilter, jpegdec, videoconvert, encoder, sink, nullptr);
-  if (!gst_element_link_many(source, capsfilter, jpegdec, videoconvert, encoder, sink, nullptr)) {
-    xlog("Failed to link GStreamer elements");
-    gst_caps_unref(caps);
-    goto fail_pipeline;
-  }
-
-  GstPad *pad = gst_element_get_static_pad(encoder, "sink");
-  if (pad) {
-    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)UVC_streamingDataCallback, nullptr, nullptr);
-    gst_object_unref(pad);
-  }
-
-  GstStateChangeReturn ret = gst_element_set_state(gst_pipeline_uvc, GST_STATE_PLAYING);
-  if (ret == GST_STATE_CHANGE_FAILURE) {
-    xlog("Failed to start pipeline");
-    gst_caps_unref(caps);
-    goto fail_pipeline;
-  }
-
-  isStreaming_uvc = true;
-  xlog("Pipeline is running...");
-
-  gst_loop_uvc = g_main_loop_new(nullptr, FALSE);
-  g_main_loop_run(gst_loop_uvc);
-
-  xlog("Stopping pipeline...");
-  gst_element_set_state(gst_pipeline_uvc, GST_STATE_NULL);
-  gst_caps_unref(caps);
-
-fail_pipeline:
   if (gst_pipeline_uvc) {
     gst_object_unref(gst_pipeline_uvc);
     gst_pipeline_uvc = nullptr;
   }
+
   isStreaming_uvc = false;
   xlog("++++ stop ++++, pipeline stopped and cleaned");
 }
