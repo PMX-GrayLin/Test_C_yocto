@@ -76,14 +76,13 @@ void UVC_setImagePath(const string &imagePath) {
 }
 
 void UVC_captureImage() {
-  if (!isStreaming_uvc) {
+  if (!isStreaming_uvc.load()) {
     xlog("do nothing...camera is not streaming");
     return;
   }
 
   xlog("");
   isCapturePhoto_uvc = true;
-    
 }
 
 void UVC_saveImage(GstPad *pad, GstPadProbeInfo *info) {
