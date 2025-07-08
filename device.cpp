@@ -20,6 +20,7 @@
 #include <sys/ioctl.h>         // ioctl
 #include <linux/videodev2.h>   // v4l2_capability, VIDIOC_QUERYCAP
 
+extern void UVC_setDevicePath(const string& devicePath);
 
 #ifndef IFF_LOWER_UP
 #define IFF_LOWER_UP 0x10000
@@ -925,6 +926,7 @@ void FW_CheckInitialUVCDevices() {
 
     if (isUvcCamera(dev)) {
       xlog("[UVC] Initial found : %s", (devNode ? devNode : "unknown"));
+      UVC_setDevicePath(std::string(devNode));
     }
 
     udev_device_unref(dev);

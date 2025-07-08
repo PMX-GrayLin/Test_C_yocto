@@ -67,7 +67,7 @@ void UVC_handle_RESTful(std::vector<std::string> segments) {
 
 }
 
-void UVC_setDrvicePath(const string &devicePath) {
+void UVC_setDevicePath(const string &devicePath) {
     devicePath_uvc = devicePath;
 }
 
@@ -126,7 +126,7 @@ void Thread_UVCStreaming() {
 
   // Set properties for the elements
   g_object_set(G_OBJECT(source), "device", devicePath_uvc.c_str(), nullptr);
-  xlog("devicePath_uvc:%s", devicePath_uvc);
+  xlog("devicePath_uvc:%s", devicePath_uvc.c_str());
 
   // Define the capabilities for the capsfilter
   GstCaps *caps = gst_caps_new_simple(

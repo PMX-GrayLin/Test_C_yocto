@@ -4,7 +4,7 @@
 
 void UVC_handle_RESTful(std::vector<std::string> segments);
 
-void UVC_setDrvicePath(const string& devicePath);
+void UVC_setDevicePath(const string& devicePath);
 void UVC_setImagePath(const string& imagePath);
 void UVC_captureImage();
 
