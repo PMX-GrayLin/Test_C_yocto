@@ -3,8 +3,6 @@
 
 #include "global.hpp"
 
-#include <vector>
-
 #define NUM_GigE 2
 
 typedef enum {

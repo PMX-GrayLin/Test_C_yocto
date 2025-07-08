@@ -1,5 +1,7 @@
 #include "cam_gige_hikrobot.hpp"
 
+#include <vector>
+
 #include <gst/gst.h>
 
 // apply only used header
