@@ -102,7 +102,6 @@ GstPadProbeReturn UVC_streamingDataCallback(GstPad *pad, GstPadProbeInfo *info, 
 void Thread_UVCStreaming() {
   xlog("++++ start ++++");
   counterFrame_uvc = 0;
-
   gst_init(nullptr, nullptr);
 
   gst_pipeline_uvc = gst_pipeline_new("video-pipeline");
@@ -115,7 +114,7 @@ void Thread_UVCStreaming() {
 
   if (!gst_pipeline_uvc || !source || !capsfilter || !jpegdec || !videoconvert || !encoder || !sink) {
     xlog("Failed to create GStreamer elements");
-    goto cleanup;
+    goto fail_pipeline;
   }
 
   g_object_set(G_OBJECT(source), "device", devicePath_uvc.c_str(), nullptr);
@@ -127,6 +126,10 @@ void Thread_UVCStreaming() {
       "height", G_TYPE_INT, 1080,
       "framerate", GST_TYPE_FRACTION, 30, 1,
       nullptr);
+  if (!caps) {
+    xlog("Failed to create caps");
+    goto fail_pipeline;
+  }
   g_object_set(capsfilter, "caps", caps, nullptr);
 
   GstStructure *controls = gst_structure_new(
@@ -134,19 +137,22 @@ void Thread_UVCStreaming() {
       "video_gop_size", G_TYPE_INT, 30,
       nullptr);
   if (!controls) {
-    xlog("Failed to create GstStructure");
-    goto cleanup;
+    xlog("Failed to create controls");
+    gst_caps_unref(caps);
+    goto fail_pipeline;
   }
 
   g_object_set(encoder, "extra-controls", controls, nullptr);
   g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf
   g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
-  gst_structure_free(controls);
+
+  gst_structure_free(controls);  // safe to free now
 
   gst_bin_add_many(GST_BIN(gst_pipeline_uvc), source, capsfilter, jpegdec, videoconvert, encoder, sink, nullptr);
   if (!gst_element_link_many(source, capsfilter, jpegdec, videoconvert, encoder, sink, nullptr)) {
     xlog("Failed to link GStreamer elements");
-    goto cleanup;
+    gst_caps_unref(caps);
+    goto fail_pipeline;
   }
 
   GstPad *pad = gst_element_get_static_pad(encoder, "sink");
@@ -157,28 +163,26 @@ void Thread_UVCStreaming() {
 
   GstStateChangeReturn ret = gst_element_set_state(gst_pipeline_uvc, GST_STATE_PLAYING);
   if (ret == GST_STATE_CHANGE_FAILURE) {
-    xlog("Failed to start GStreamer pipeline");
-    goto cleanup;
+    xlog("Failed to start pipeline");
+    gst_caps_unref(caps);
+    goto fail_pipeline;
   }
 
-  xlog("Pipeline running...");
   isStreaming_uvc = true;
+  xlog("Pipeline is running...");
 
   gst_loop_uvc = g_main_loop_new(nullptr, FALSE);
   g_main_loop_run(gst_loop_uvc);
 
   xlog("Stopping pipeline...");
   gst_element_set_state(gst_pipeline_uvc, GST_STATE_NULL);
+  gst_caps_unref(caps);
 
-cleanup:
+fail_pipeline:
   if (gst_pipeline_uvc) {
     gst_object_unref(gst_pipeline_uvc);
     gst_pipeline_uvc = nullptr;
   }
-  if (caps) {
-    gst_caps_unref(caps);
-  }
-
   isStreaming_uvc = false;
   xlog("++++ stop ++++, pipeline stopped and cleaned");
 }
