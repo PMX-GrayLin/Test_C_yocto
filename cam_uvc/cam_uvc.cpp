@@ -71,9 +71,9 @@ void UVC_handle_RESTful(std::vector<std::string> segments) {
 
 void UVC_setDevicePath(const string &devicePath) {
     devicePath_uvc = devicePath;
-    
+
     // also save to file
-    string cmd = "echo " + devicePath + " ~/primax/misc/camera_uvc.conf";
+    string cmd = "echo " + devicePath + " > ~/primax/misc/camera_uvc.conf";
     exec_command(cmd);
 }
 
