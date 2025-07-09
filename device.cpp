@@ -67,6 +67,7 @@ uint64_t DIODI_last_event_time[NUM_DIO] = {0};
 // Net Interface
 std::thread t_monitorNetLink;
 std::atomic<bool> isMonitorNetLink(false);
+int wakeupFd = -1;
 
 // UVC
 static std::thread t_monitorUVC;
@@ -245,7 +246,7 @@ void FW_toggleGPIO(int gpio_num) {
 }
 
 void FW_setLED(string led_index, string led_color) {
-  xlog("led_index:%s, led_color:%s", led_index.c_str(), led_color.c_str());
+  // xlog("led_index:%s, led_color:%s", led_index.c_str(), led_color.c_str());
   int gpio_index1 = 0;
   int gpio_index2 = 0;
 
@@ -831,8 +832,8 @@ void FW_CheckInitialNetLinkState(const char *ifname, bool isInitcheck) {
 }
 
 void Thread_FWMonitorNetLink() {
-  int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
-  if (sock < 0) {
+  int netlinkSock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+  if (netlinkSock < 0) {
     xlog("socket error");
     return;
   }
@@ -841,35 +842,113 @@ void Thread_FWMonitorNetLink() {
   addr.nl_family = AF_NETLINK;
   addr.nl_groups = RTMGRP_LINK;
 
-  if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+  if (bind(netlinkSock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
     xlog("bind error");
-    close(sock);
+    close(netlinkSock);
     return;
   }
 
+  // Set up wakeup pipe
+  int pipefd[2];
+  if (socketpair(AF_UNIX, SOCK_DGRAM, 0, pipefd) != 0) {
+    xlog("socketpair error");
+    close(netlinkSock);
+    return;
+  }
+
+  int readFd = pipefd[0];
+  wakeupFd = pipefd[1];
+
+  fd_set fds;
+  char buffer[4096];
+
   xlog("---- Start ----");
 
-  char buffer[4096];
-  while (isMonitorNetLink.load()) {
-    ssize_t len = recv(sock, buffer, sizeof(buffer), 0);
-    if (len < 0) {
-      if (errno == EINTR) continue;  // allow interruption
-      xlog("recv error");
+  while (true) {
+    FD_ZERO(&fds);
+    FD_SET(netlinkSock, &fds);
+    FD_SET(readFd, &fds);
+
+    int maxfd = std::max(netlinkSock, readFd) + 1;
+    int ret = select(maxfd, &fds, nullptr, nullptr, nullptr);
+
+    if (ret < 0) {
+      if (errno == EINTR) continue;
+      xlog("select error");
       break;
     }
 
-    struct nlmsghdr *nlh = (struct nlmsghdr *)buffer;
-    while (NLMSG_OK(nlh, len)) {
-      if (nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK) {
-        parseNetLinkMessage(nlh);
+    if (FD_ISSET(readFd, &fds)) {
+      xlog("wakeup received, exiting thread");
+      break;  // graceful exit
+    }
+
+    if (FD_ISSET(netlinkSock, &fds)) {
+      ssize_t len = recv(netlinkSock, buffer, sizeof(buffer), 0);
+      if (len < 0) {
+        if (errno == EINTR) continue;
+        xlog("recv error");
+        break;
       }
-      nlh = NLMSG_NEXT(nlh, len);
+
+      struct nlmsghdr *nlh = (struct nlmsghdr *)buffer;
+      while (NLMSG_OK(nlh, len)) {
+        if (nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK) {
+          parseLinkMessage(nlh);
+        }
+        nlh = NLMSG_NEXT(nlh, len);
+      }
     }
   }
 
-  close(sock);
+  close(netlinkSock);
+  close(readFd);
+  close(wakeupFd);
+  wakeupFd = -1;
+
   xlog("---- Stop ----");
 }
+
+// void Thread_FWMonitorNetLink() {
+//   int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+//   if (sock < 0) {
+//     xlog("socket error");
+//     return;
+//   }
+
+//   struct sockaddr_nl addr = {};
+//   addr.nl_family = AF_NETLINK;
+//   addr.nl_groups = RTMGRP_LINK;
+
+//   if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+//     xlog("bind error");
+//     close(sock);
+//     return;
+//   }
+
+//   xlog("---- Start ----");
+
+//   char buffer[4096];
+//   while (isMonitorNetLink.load()) {
+//     ssize_t len = recv(sock, buffer, sizeof(buffer), 0);
+//     if (len < 0) {
+//       if (errno == EINTR) continue;  // allow interruption
+//       xlog("recv error");
+//       break;
+//     }
+
+//     struct nlmsghdr *nlh = (struct nlmsghdr *)buffer;
+//     while (NLMSG_OK(nlh, len)) {
+//       if (nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK) {
+//         parseNetLinkMessage(nlh);
+//       }
+//       nlh = NLMSG_NEXT(nlh, len);
+//     }
+//   }
+
+//   close(sock);
+//   xlog("---- Stop ----");
+// }
 
 void FW_MonitorNetLinkStart() {
     if (isMonitorNetLink.load()) {
@@ -890,10 +969,15 @@ void FW_MonitorNetLinkStop() {
 
   isMonitorNetLink = false;
 
-  // force kill, may unsafe, but test seems OK.
-  pthread_cancel(t_monitorNetLink.native_handle());
+  // Unblock recv() by sending dummy message or let timeout
+  if (wakeupFd != -1) {
+    const char c = 'x';
+    send(wakeupFd, &c, 1, 0);
+  }
 
-  // Unblock recv() by sending dummy message or let timeout (optional)
+  // force kill, may unsafe, but test seems OK.
+  // pthread_cancel(t_monitorNetLink.native_handle());
+
   // if (t_monitorNetLink.joinable()) {
   //   t_monitorNetLink.join();
   // }
@@ -958,7 +1042,6 @@ void FW_CheckInitialUVCDevices(bool isInitcheck) {
     FW_setLED("2", "green");
   } else {
     if (!isInitcheck) {
-      xlog("");
       FW_setLED("2", "off");
     }
   }
