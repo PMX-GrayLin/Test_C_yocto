@@ -245,6 +245,7 @@ void FW_toggleGPIO(int gpio_num) {
 }
 
 void FW_setLED(string led_index, string led_color) {
+  xlog("led_index:%s, led_color:%s", led_index.c_str(), led_color.c_str());
   int gpio_index1 = 0;
   int gpio_index2 = 0;
 
