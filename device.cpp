@@ -945,7 +945,9 @@ void FW_CheckInitialUVCDevices(bool isInitcheck) {
       FW_setLED("2", "green");
       UVC_setDevicePath(std::string(devNode));
     } else {
+      xlog("");
       if (!isInitcheck) {
+        xlog("");
         FW_setLED("2", "off");
       }
     }
