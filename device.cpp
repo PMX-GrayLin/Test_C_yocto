@@ -935,6 +935,8 @@ void FW_CheckInitialUVCDevices(bool isInitcheck) {
   struct udev_list_entry *devices = udev_enumerate_get_list_entry(enumerate);
   struct udev_list_entry *entry;
 
+  bool isUVCDetected = false;
+
   udev_list_entry_foreach(entry, devices) {
     const char *path = udev_list_entry_get_name(entry);
     struct udev_device *dev = udev_device_new_from_syspath(udev, path);
@@ -942,17 +944,23 @@ void FW_CheckInitialUVCDevices(bool isInitcheck) {
 
     if (isUvcCamera(dev)) {
       xlog("[UVC] Initial found : %s", (devNode ? devNode : "unknown"));
-      FW_setLED("2", "green");
+      isUVCDetected = true;
       UVC_setDevicePath(std::string(devNode));
-    } else {
-      xlog("");
-      if (!isInitcheck) {
-        xlog("");
-        FW_setLED("2", "off");
-      }
-    }
+
+      udev_device_unref(dev);
+      break;
+    } 
 
     udev_device_unref(dev);
+  }
+
+  if (isUVCDetected) {
+    FW_setLED("2", "green");
+  } else {
+    if (!isInitcheck) {
+      xlog("");
+      FW_setLED("2", "off");
+    }
   }
 
   udev_enumerate_unref(enumerate);
