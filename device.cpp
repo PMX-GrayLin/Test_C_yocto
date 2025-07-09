@@ -894,7 +894,7 @@ void Thread_FWMonitorNetLink() {
       struct nlmsghdr *nlh = (struct nlmsghdr *)buffer;
       while (NLMSG_OK(nlh, len)) {
         if (nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK) {
-          parseLinkMessage(nlh);
+          parseNetLinkMessage(nlh);
         }
         nlh = NLMSG_NEXT(nlh, len);
       }
