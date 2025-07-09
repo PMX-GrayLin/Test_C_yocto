@@ -162,9 +162,7 @@ void Thread_UVCStreaming() {
             gst_loop_uvc = g_main_loop_new(nullptr, FALSE);
             g_main_loop_run(gst_loop_uvc);
 
-            xlog("Stopping pipeline...");
-            FW_CheckInitialUVCDevices();
-            
+            xlog("Stopping pipeline...");            
             gst_element_set_state(gst_pipeline_uvc, GST_STATE_NULL);
           }
         }
@@ -181,6 +179,7 @@ void Thread_UVCStreaming() {
     gst_pipeline_uvc = nullptr;
   }
 
+  FW_CheckInitialUVCDevices();
   isStreaming_uvc = false;
   xlog("++++ stop ++++, pipeline stopped and cleaned");
 }
