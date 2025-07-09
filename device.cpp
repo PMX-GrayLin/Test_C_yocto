@@ -962,6 +962,7 @@ void FW_MonitorNetLinkStart() {
 
   isMonitorNetLink = true;
   t_monitorNetLink = std::thread(Thread_FWMonitorNetLink);
+  t_monitorNetLink.detach()
 }
 
 void FW_MonitorNetLinkStop() {
