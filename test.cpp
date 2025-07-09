@@ -130,17 +130,17 @@ void handle_RESTful(std::vector<std::string> segments) {
     //   xlog("not exist...");
     // }
 
-    // if (isSameString(segments[1], "1")) {
-    //   FW_MonitorNetLinkStart();
-    // } else if (isSameString(segments[1], "2")) {
-    //   FW_MonitorNetLinkStop();
-    // }
-
     if (isSameString(segments[1], "1")) {
-      FW_MonitorUVCStart();
+      FW_MonitorNetLinkStart();
     } else if (isSameString(segments[1], "2")) {
-      FW_MonitorUVCStop();
+      FW_MonitorNetLinkStop();
     }
+
+    // if (isSameString(segments[1], "1")) {
+    //   FW_MonitorUVCStart();
+    // } else if (isSameString(segments[1], "2")) {
+    //   FW_MonitorUVCStop();
+    // }
 
   }
 
