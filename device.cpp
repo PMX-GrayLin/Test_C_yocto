@@ -962,7 +962,7 @@ void FW_MonitorNetLinkStart() {
 
   isMonitorNetLink = true;
   t_monitorNetLink = std::thread(Thread_FWMonitorNetLink);
-  t_monitorNetLink.detach();
+  // t_monitorNetLink.detach();
 }
 
 void FW_MonitorNetLinkStop() {
@@ -976,12 +976,12 @@ void FW_MonitorNetLinkStop() {
     send(wakeupFd, &c, 1, 0);
   }
 
+  if (t_monitorNetLink.joinable()) {
+    t_monitorNetLink.join();
+  }
+
   // force kill, may unsafe, but test seems OK.
   // pthread_cancel(t_monitorNetLink.native_handle());
-
-  // if (t_monitorNetLink.joinable()) {
-  //   t_monitorNetLink.join();
-  // }
 }
 
 bool isUvcCamera(struct udev_device* dev) {
