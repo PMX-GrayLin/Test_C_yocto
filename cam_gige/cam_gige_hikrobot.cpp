@@ -334,7 +334,7 @@ void GigE_ThreadStreaming_Hik() {
     loop_gige_hik = nullptr;
   }
 
-  FW_CheckInitialNetLinkState("eth1");
+  FW_CheckNetLinkState("eth1");
 
   isStreaming_gige_hik = false;
   sendRESTful_streamingStatus(0, isStreaming_gige_hik);

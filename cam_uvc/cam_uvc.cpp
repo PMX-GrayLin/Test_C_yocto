@@ -179,7 +179,8 @@ void Thread_UVCStreaming() {
     gst_pipeline_uvc = nullptr;
   }
 
-  FW_CheckInitialUVCDevices();
+  FW_CheckUVCDevices();
+
   isStreaming_uvc = false;
   xlog("++++ stop ++++, pipeline stopped and cleaned");
 }

@@ -114,15 +114,17 @@ void FW_MonitorDIOInStop(int index_dio);
 void FW_setDIODirection(string index_dio, string di_do);
 void FW_setDIOOut(string index_dio, string on_off);
 
+// I2C
 bool FW_isI2CAddressExist(const std::string& busS, const std::string& addressS);
 
-// void FW_CheckInitialNetLinkState(const char *ifname, bool isInitcheck);
-void FW_CheckInitialNetLinkState(const char *ifname = "eth0", bool isInitcheck = false);
+// Net Interface
+void FW_CheckNetLinkState(const char *ifname = "eth0", bool isInitcheck = false);
 void Thread_FWMonitorNetLink();
 void FW_MonitorNetLinkStart();
 void FW_MonitorNetLinkStop();
 
-void FW_CheckInitialUVCDevices(bool isInitcheck = false);
+// UVC
+void FW_CheckUVCDevices(bool isInitcheck = false);
 void Thread_FWMonitorUVC();
 void FW_MonitorUVCStart();
 void FW_MonitorUVCStop();

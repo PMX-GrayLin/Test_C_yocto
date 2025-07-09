@@ -797,7 +797,7 @@ void parseNetLinkMessage(struct nlmsghdr *nlh) {
   }
 }
 
-void FW_CheckInitialNetLinkState(const char *ifname, bool isInitcheck) {
+void FW_CheckNetLinkState(const char *ifname, bool isInitcheck) {
   std::string path = std::string("/sys/class/net/") + ifname + "/operstate";
   std::ifstream file(path);
 
@@ -956,9 +956,9 @@ void FW_MonitorNetLinkStart() {
     return;
   }
 
-  FW_CheckInitialNetLinkState("eth0", true);
-  FW_CheckInitialNetLinkState("eth1", true);
-  FW_CheckInitialNetLinkState("eth2", true);
+  FW_CheckNetLinkState("eth0", true);
+  FW_CheckNetLinkState("eth1", true);
+  FW_CheckNetLinkState("eth2", true);
 
   isMonitorNetLink = true;
   t_monitorNetLink = std::thread(Thread_FWMonitorNetLink);
@@ -1005,7 +1005,7 @@ bool isUvcCamera(struct udev_device* dev) {
     return false;
 }
 
-void FW_CheckInitialUVCDevices(bool isInitcheck) {
+void FW_CheckUVCDevices(bool isInitcheck) {
   struct udev *udev = udev_new();
   if (!udev) {
     xlog("Failed to create udev context (initial check)");
@@ -1113,7 +1113,7 @@ extern void FW_MonitorUVCStart() {
   if (isMonitorUVC)
     return;
 
-  FW_CheckInitialUVCDevices(true);
+  FW_CheckUVCDevices(true);
 
   isMonitorUVC = true;
   t_monitorUVC = std::thread(Thread_FWMonitorUVC);
