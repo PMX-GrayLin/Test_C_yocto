@@ -38,7 +38,7 @@ const int pwmPeriod = 200000;                   // 5 kHz
 // DI
 int DI_GPIOs[NUM_DI] = {digp_1, digp_2};        // DI GPIO
 std::thread t_aicamera_monitorDI;
-bool isMonitorDI = false;
+std::atomic<bool> isMonitorDI = false;
 GPIO_LEVEl DI_gpio_level_last[NUM_DI] = {gpiol_unknown, gpiol_unknown};
 GPIO_LEVEl DI_gpio_level_new[NUM_DI] = {gpiol_unknown, gpiol_unknown};
 uint64_t DI_last_event_time[NUM_DI] = {0};
@@ -46,7 +46,7 @@ uint64_t DI_last_event_time[NUM_DI] = {0};
 // Triger
 int Triger_GPIOs[NUM_Triger] = {tgp_1, tgp_2};  // Triger GPIO
 std::thread t_aicamera_monitorTriger;
-bool isMonitorTriger = false;
+std::atomic<bool> isMonitorTriger = false;
 GPIO_LEVEl Triger_gpio_level_last[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
 GPIO_LEVEl Triger_gpio_level_new[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
 uint64_t Triger_last_event_time[NUM_Triger] = {0};
@@ -375,10 +375,15 @@ void Thread_FWMonitorDI() {
 
   // Main loop to monitor GPIOs
   while (isMonitorDI) {
-    ret = poll(fds, NUM_DI, -1);  // Wait indefinitely for an event
+    ret = poll(&fd, 1, 500);  // timeout = 500ms, to check stop flag periodically
     if (ret < 0) {
       xlog("Error in poll");
       break;
+    }
+
+    if (ret == 0) {
+      // timeout, continue loop to check isMonitorDIO
+      continue;
     }
 
     // Check which GPIO triggered the event
@@ -473,10 +478,15 @@ void Thread_FWMonitorTriger() {
 
   // Main loop to monitor GPIOs
   while (isMonitorTriger) {
-    ret = poll(fds, NUM_Triger, -1);  // Wait indefinitely for an event
+    ret = poll(&fd, 1, 500);  // timeout = 500ms, to check stop flag periodically
     if (ret < 0) {
       xlog("Error in poll");
       break;
+    }
+
+    if (ret == 0) {
+      // timeout, continue loop to check isMonitorDIO
+      continue;
     }
 
     // Check which GPIO triggered the event
@@ -602,7 +612,7 @@ void Thread_FWMonitorDIOIn(int index_dio) {
   // Main loop to monitor GPIO
   while (isMonitorDIO[index_dio]) {
     // ret = poll(&fd, 1, -1);  // Wait indefinitely for an event
-    ret = poll(&fd, 1, 1000);  // timeout = 1000ms, to check stop flag periodically
+    ret = poll(&fd, 1, 500);  // timeout = 500ms, to check stop flag periodically
     if (ret < 0) {
       xlog("Error in poll");
       break;
