@@ -221,7 +221,7 @@ void signalHandler(int signal) {
   // detect GigE plug-in/out thread
   FW_MonitorNetLinkStop();
 
-  // DIO thread
+  // detect DIO thread
   FW_MonitorDIStop();
   FW_MonitorTrigerStop();
   for (size_t i = 0; i < FW_getDIONum(); i++) {
