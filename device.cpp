@@ -652,7 +652,7 @@ void Thread_FWMonitorDIOIn(int index_dio) {
 }
 
 void FW_MonitorDIOInStart(int index_dio) {
-  xlog("");
+  xlog("Start monitoring DIO %d", index_dio);
   if (isMonitorDIO[index_dio]) {
     xlog("thread already running for DIO %d, GPIO %d", index_dio, DIO_DI_GPIOs[index_dio]);
     return;
@@ -660,11 +660,22 @@ void FW_MonitorDIOInStart(int index_dio) {
 
   isMonitorDIO[index_dio] = true;
   t_aicamera_monitorDIO[index_dio] = std::thread(Thread_FWMonitorDIOIn, index_dio);
-  t_aicamera_monitorDIO[index_dio].detach();
+
 }
 
 void FW_MonitorDIOInStop(int index_dio) {
+  xlog("Stop monitoring DIO %d, GPIO %d", index_dio, DIO_DI_GPIOs[index_dio]);
+
+  if (!isMonitorDIO[index_dio]) {
+    xlog("Thread not running for DIO %d", index_dio);
+    return;
+  }
+
   isMonitorDIO[index_dio] = false;
+
+  if (t_aicamera_monitorDIO[index_dio].joinable()) {
+    t_aicamera_monitorDIO[index_dio].join();
+  }
 }
 
 void FW_setDIODirection(string index_dio, string di_do) {
@@ -1128,7 +1139,7 @@ void Thread_FWMonitorUVC() {
 }
 
 // Public API to start monitoring
-extern void FW_MonitorUVCStart() {
+void FW_MonitorUVCStart() {
   if (isMonitorUVC)
     return;
 
@@ -1139,7 +1150,7 @@ extern void FW_MonitorUVCStart() {
 }
 
 // Public API to stop monitoring
-extern void FW_MonitorUVCStop() {
+void FW_MonitorUVCStop() {
   if (!isMonitorUVC)
     return;
 
