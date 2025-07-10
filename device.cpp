@@ -59,7 +59,7 @@ int DIO_DI_GPIOs[NUM_DIO] = {diodigp_1, diodigp_2, diodigp_3, diodigp_4};       
 int DIO_DO_GPIOs[NUM_DIO] = {diodogp_1, diodogp_2, diodogp_3, diodogp_4};       // DO GPIO
 DIO_Direction dioDirection[NUM_DIO] = {diod_in};
 std::thread t_aicamera_monitorDIO[NUM_DIO];
-bool isMonitorDIO[NUM_DIO] = {false};
+std::atomic<bool> isMonitorDIO[NUM_DIO] = {false};
 GPIO_LEVEl DIODI_gpio_level_last[NUM_DIO] = {gpiol_unknown, gpiol_unknown};
 GPIO_LEVEl DIODI_gpio_level_new[NUM_DIO] = {gpiol_unknown, gpiol_unknown};
 uint64_t DIODI_last_event_time[NUM_DIO] = {0};
@@ -601,10 +601,16 @@ void Thread_FWMonitorDIOIn(int index_dio) {
 
   // Main loop to monitor GPIO
   while (isMonitorDIO[index_dio]) {
-    ret = poll(&fd, 1, -1);  // Wait indefinitely for an event
+    // ret = poll(&fd, 1, -1);  // Wait indefinitely for an event
+    ret = poll(&fd, 1, 1000);  // timeout = 1000ms, to check stop flag periodically
     if (ret < 0) {
       xlog("Error in poll");
       break;
+    }
+
+    if (ret == 0) {
+      // timeout, continue loop to check isMonitorDIO
+      continue;
     }
 
     if (fd.revents & POLLIN) {
@@ -639,11 +645,12 @@ void Thread_FWMonitorDIOIn(int index_dio) {
 void FW_MonitorDIOInStart(int index_dio) {
   xlog("");
   if (isMonitorDIO[index_dio]) {
-    xlog("thread already running");
+    xlog("thread already running for DIO %d, GPIO %d", index_dio, DIO_DI_GPIOs[index_dio]);
     return;
   }
+
   isMonitorDIO[index_dio] = true;
-  t_aicamera_monitorDIO[index_dio] = std::thread(Thread_FWMonitorDIOIn, index_dio);  
+  t_aicamera_monitorDIO[index_dio] = std::thread(Thread_FWMonitorDIOIn, index_dio);
   t_aicamera_monitorDIO[index_dio].detach();
 }
 
