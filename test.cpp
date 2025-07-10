@@ -266,7 +266,9 @@ int main(int argc, char* argv[]) {
   FW_MonitorUVCStart();
 
   // detect GigE plug-in/out thread
-  FW_MonitorNetLinkStart();
+  if (FW_isDeviceVisionHub()) {
+    FW_MonitorNetLinkStart();
+  }
 
   // RSETful
   httplib::Server svr;
