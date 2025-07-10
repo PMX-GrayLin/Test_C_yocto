@@ -429,8 +429,7 @@ void FW_MonitorDIStart() {
     return;
   }
   isMonitorDI = true;
-  t_aicamera_monitorDI = std::thread(Thread_FWMonitorDI);  
-  t_aicamera_monitorDI.detach();
+  t_aicamera_monitorDI = std::thread(Thread_FWMonitorDI);
 }
 void FW_MonitorDIStop() {
   if (!isMonitorDI) {
