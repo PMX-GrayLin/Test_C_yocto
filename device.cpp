@@ -571,8 +571,7 @@ void Thread_FWMonitorDIOIn(int index_dio) {
   struct pollfd fd;
   int ret;
 
-  int num_dio = FW_isDeviceVisionHub() ? 4 : 2;
-  if (index_dio < 0 || index_dio >= num_dio) {
+  if (index_dio < 0 || index_dio >= FW_getDIONum()) {
     xlog("Invalid DIO index: %d", index_dio);
     return;
   }
@@ -674,8 +673,7 @@ void FW_setDIODirection(string index_dio, string di_do) {
   int index_gpio_out = 0;
 
   int index = std::stoi(index_dio);
-  int num_dio = FW_isDeviceVisionHub() ? 4 : 2;
-  if (index > 0 && index <= num_dio) {
+  if (index > 0 && index <= FW_getDIONum()) {
     index_gpio_in = DIO_DI_GPIOs[index - 1];
     index_gpio_out = DIO_DO_GPIOs[index - 1];
   } else {
@@ -716,8 +714,7 @@ void FW_setDIOOut(string index_dio, string on_off) {
     return;
   }
 
-  int num_dio = FW_isDeviceVisionHub() ? 4 : 2;
-  if (index > 0 && index <= num_dio) {
+  if (index > 0 && index <= FW_getDIONum()) {
     index_gpio = DIO_DO_GPIOs[index - 1];
   } else {
     xlog("index out of range...");
@@ -734,6 +731,10 @@ void FW_setDIOOut(string index_dio, string on_off) {
   }
 
   FW_setGPIO(index_gpio, isON ? 1 : 0);
+}
+
+int FW_getDIONum() {
+  return FW_isDeviceVisionHub() ? 4 : 2;
 }
 
 bool FW_isI2CAddressExist(const std::string &busS, const std::string &addressS) {

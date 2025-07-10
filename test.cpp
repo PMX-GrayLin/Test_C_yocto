@@ -221,6 +221,13 @@ void signalHandler(int signal) {
   // detect GigE plug-in/out thread
   FW_MonitorNetLinkStop();
 
+  // DIO thread
+  FW_MonitorDIStop();
+  FW_MonitorTrigerStop();
+  for (size_t i = 0; i < FW_getDIONum(); i++) {
+    FW_MonitorDIOInStop(i);
+  }
+
   FW_setLED("1", "red");  
   FW_setLED("2", "off");  
   FW_setLED("3", "off");  

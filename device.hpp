@@ -113,6 +113,7 @@ void FW_MonitorDIOInStart(int index_dio);
 void FW_MonitorDIOInStop(int index_dio);
 void FW_setDIODirection(string index_dio, string di_do);
 void FW_setDIOOut(string index_dio, string on_off);
+int FW_getDIONum();
 
 // I2C
 bool FW_isI2CAddressExist(const std::string& busS, const std::string& addressS);
