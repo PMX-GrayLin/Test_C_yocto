@@ -190,7 +190,6 @@ void Thread_UVCStreaming() {
 }
 
 void UVC_streamingStart() {
-  xlog("");
   auto now = std::chrono::steady_clock::now();
   if (now - lastStartTime_uvc < std::chrono::seconds(1)) {
     xlog("Start called too soon, ignoring");
@@ -209,7 +208,6 @@ void UVC_streamingStart() {
 }
 
 void UVC_streamingStop() {
-  xlog("");
   if (!isStreaming_uvc.load()) {
     xlog("thread not running");
     return;

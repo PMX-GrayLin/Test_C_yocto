@@ -1,5 +1,8 @@
 #include "cam_omnivision.hpp"
 
+#include <atomic>
+#include <chrono>
+
 #include <linux/videodev2.h>  // For V4L2 definitions
 #include <sys/ioctl.h>        // For ioctl()
 #include <fcntl.h>            // For open()
@@ -14,7 +17,8 @@
 #include "restfulx.hpp"
 
 std::thread t_streaming_aic;
-bool isStreaming_aic = false;
+std::atomic<bool> isStreaming_aic{false};
+std::chrono::steady_clock::time_point lastStartTime_aic;
 
 bool isCapturePhoto_aic = false;
 bool isCropPhoto_aic = false;
@@ -289,7 +293,7 @@ bool AICP_isCropImage() {
 }
 
 void AICP_captureImage() {
-  if (!isStreaming_aic) {
+  if (!isStreaming_aic.load()) {
     xlog("do nothing...camera is not streaming");
     return;
   }
@@ -475,6 +479,7 @@ void Thread_AICPStreaming() {
 
   if (!gst_pipeline_aic || !source || !capsfilter || !gst_flip_aic || !queue || !encoder || !parser || !sink) {
     xlog("failed to create GStreamer elements");
+    isStreaming_aic = false;
     return;
   }
 
@@ -522,6 +527,7 @@ void Thread_AICPStreaming() {
   if (!gst_element_link_many(source, capsfilter, gst_flip_aic, queue, encoder, parser, sink, nullptr)) {
     xlog("failed to link elements in the pipeline");
     gst_object_unref(gst_pipeline_aic);
+    isStreaming_aic = false;
     return;
   }
 
@@ -572,13 +578,13 @@ void Thread_AICPStreaming() {
   }
 
   xlog("pipeline is running...");
-  isStreaming_aic = true;
   sendRESTful_streamingStatus(0, isStreaming_aic);
 
   // Run the main loop
   gst_loop_aic = g_main_loop_new(nullptr, FALSE);
   gst_bus_set_sync_handler(bus, nullptr, nullptr, nullptr);
   gst_object_unref(bus);
+
   g_main_loop_run(gst_loop_aic);
 
   // Stop the pipeline when finished or interrupted
@@ -656,7 +662,7 @@ void Thread_AICPStreaming_usb() {
   g_object_set(encoder, "capture-io-mode", 4, nullptr);  // dmabuf = 4
   g_object_set(sink, "location", "rtsp://localhost:8554/mystream", nullptr);
 
-  // // Build the pipeline
+  // Build the pipeline
   gst_bin_add_many(GST_BIN(gst_pipeline_aic), source, capsfilter, jpegdec, videoconvert, encoder, sink, nullptr);
   if (!gst_element_link_many(source, capsfilter, jpegdec, videoconvert, encoder, sink, nullptr)) {
     xlog("failed to link elements in the pipeline");
@@ -697,28 +703,30 @@ void Thread_AICPStreaming_usb() {
 }
 
 void AICP_streamingStart() {
-  xlog("");
-  if (isStreaming_aic) {
-    xlog("thread already running");
+  auto now = std::chrono::steady_clock::now();
+  if (now - lastStartTime_aic < std::chrono::seconds(1)) {
+    xlog("Start called too soon, ignoring");
     return;
   }
-  isStreaming_aic = true;
+  lastStartTime_aic = now;
 
+  if (isStreaming_aic.load()) {
+    xlog("Thread already running");
+    return;
+  }
+
+  isStreaming_aic.store(true);
   FW_setLED("2", "off");
 
-  if (AICP_isUseCISCamera())
-  {
+  if (AICP_isUseCISCamera()) {
     t_streaming_aic = std::thread(Thread_AICPStreaming);
   } else {
-    t_streaming_aic = std::thread(Thread_AICPStreaming_usb);  
+    t_streaming_aic = std::thread(Thread_AICPStreaming_usb);
   }
-  
-  t_streaming_aic.detach();
 }
 
 void AICP_streamingStop() {
-  xlog("");
-  if (!isStreaming_aic) {
+  if (!isStreaming_aic.load()) {
     xlog("Streaming not running");
     return;
   }
@@ -727,10 +735,15 @@ void AICP_streamingStop() {
     xlog("g_main_loop_quit");
     g_main_loop_quit(gst_loop_aic);
   } else {
-    xlog("gst_loop_aic is invalid or already destroyed.");
+    xlog("gst_loop_aic is invalid or already destroyed");
   }
 
-  isStreaming_aic = false;
+  // Wait for thread to complete
+  if (t_streaming_aic.joinable()) {
+    t_streaming_aic.join();
+  }
+
+  isStreaming_aic.store(false);
 }
 
 void AICP_streamingLED() {
