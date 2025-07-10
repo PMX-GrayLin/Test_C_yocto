@@ -424,7 +424,6 @@ void Thread_FWMonitorDI() {
 }
 
 void FW_MonitorDIStart() {
-  xlog("");
   if (isMonitorDI) {
     xlog("thread already running");
     return;
@@ -434,7 +433,6 @@ void FW_MonitorDIStart() {
   t_aicamera_monitorDI.detach();
 }
 void FW_MonitorDIStop() {
-  xlog("");
   if (!isMonitorDI) {
     xlog("thread not running...");
     return;
@@ -537,7 +535,6 @@ void Thread_FWMonitorTriger() {
 }
 
 void FW_MonitorTrigerStart() {
-  xlog("");
   if (isMonitorTriger) {
     xlog("thread already running");
     return;
@@ -546,7 +543,6 @@ void FW_MonitorTrigerStart() {
   t_aicamera_monitorTriger = std::thread(Thread_FWMonitorTriger);  
 }
 void FW_MonitorTrigerStop() {
-  xlog("");
   if (!isMonitorTriger) {
     xlog("thread not running...");
     return;
@@ -671,7 +667,6 @@ void Thread_FWMonitorDIOIn(int index_dio) {
 }
 
 void FW_MonitorDIOInStart(int index_dio) {
-  xlog("");
   if (isMonitorDIO[index_dio]) {
     xlog("thread already running...");
     return;
@@ -682,7 +677,6 @@ void FW_MonitorDIOInStart(int index_dio) {
 }
 
 void FW_MonitorDIOInStop(int index_dio) {
-  xlog("");
   if (!isMonitorDIO[index_dio]) {
     xlog("thread not running...");
     return;
