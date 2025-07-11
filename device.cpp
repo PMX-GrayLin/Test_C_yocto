@@ -375,7 +375,7 @@ void Thread_FWMonitorDI() {
 
   // Main loop to monitor GPIOs
   while (isMonitorDI) {
-    ret = poll(fds, 1, 500);  // timeout = 500ms, to check stop flag periodically
+    ret = poll(fds, NUM_DI, 500);  // timeout = 500ms, to check stop flag periodically
     if (ret < 0) {
       xlog("Error in poll");
       break;
@@ -485,7 +485,7 @@ void Thread_FWMonitorTriger() {
 
   // Main loop to monitor GPIOs
   while (isMonitorTriger) {
-    ret = poll(fds, 1, 500);  // timeout = 500ms, to check stop flag periodically
+    ret = poll(fds, NUM_Triger, 500);  // timeout = 500ms, to check stop flag periodically
     if (ret < 0) {
       xlog("Error in poll");
       break;
