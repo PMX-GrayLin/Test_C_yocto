@@ -2,11 +2,11 @@
 #include "restfulx.hpp"
 
 #include <vector>
-#include <algorithm>
+// #include <algorithm>
 
 #include <curl/curl.h>
 
-std::vector<int> RESTful_ports = {0};
+std::vector<int> RESTful_ports = {};
 
 void RESTful_register(const std::string& portS) {
 
