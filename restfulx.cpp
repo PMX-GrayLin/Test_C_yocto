@@ -104,7 +104,7 @@ void RESTFul_sendAsync(const std::string& url, const std::string& content) {
 
 void RESTful_send_streamingStatus_gst(bool isStreaming) {
   string url = "http://localhost";
-  string content = "gst/isStreaming/" + (isStreaming ? "true" : "false");
+  string content = std::string("gst/isStreaming/") + (isStreaming ? "true" : "false");
   RESTFul_sendAsync(url, content);
 }
 
