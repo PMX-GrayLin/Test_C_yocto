@@ -3,32 +3,66 @@
 
 #include <curl/curl.h>
 
-void sendRESTFul(const std::string& url, int port) {
-  CURL* curl = curl_easy_init();
-  if (curl) {
-    xlog("url:%s", url.c_str());
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 100L);
+// void sendRESTFul(const std::string& url, int port) {
+//   CURL* curl = curl_easy_init();
+//   if (curl) {
+//     xlog("url:%s", url.c_str());
+//     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+//     curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 100L);
 
-    // Send as GET (default) instead of HEAD
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, [](void*, size_t size, size_t nmemb, void*) -> size_t {
-      return size * nmemb;  // ignore response body
-    });
+//     // Send as GET (default) instead of HEAD
+//     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, [](void*, size_t size, size_t nmemb, void*) -> size_t {
+//       return size * nmemb;  // ignore response body
+//     });
 
-    CURLcode res = curl_easy_perform(curl);
-    if (res != CURLE_OK) {
-      xlog("curl_easy_perform failed:%s", curl_easy_strerror(res));
+//     CURLcode res = curl_easy_perform(curl);
+//     if (res != CURLE_OK) {
+//       xlog("curl_easy_perform failed:%s", curl_easy_strerror(res));
+//     }
+//     curl_easy_cleanup(curl);
+//   }
+// }
+
+// void sendRESTFulAsync(const std::string& url, int port) {
+//   std::thread([url, port]() {
+//     sendRESTFul(url, port);
+//   }).detach();  // Detach so it runs independently
+// }
+
+void sendRESTFul(const std::string& url, const std::vector<int>& ports) {
+  if (ports.empty()) {
+    xlog("No ports provided, skipping RESTful request.");
+    return;
+  }
+
+  for (int port : ports) {
+    CURL* curl = curl_easy_init();
+    if (curl) {
+      std::string full_url = url + ":" + std::to_string(port);
+      xlog("Sending to url: %s", full_url.c_str());
+
+      curl_easy_setopt(curl, CURLOPT_URL, full_url.c_str());
+      curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 100L);
+
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, [](void*, size_t size, size_t nmemb, void*) -> size_t {
+        return size * nmemb;
+      });
+
+      CURLcode res = curl_easy_perform(curl);
+      if (res != CURLE_OK) {
+        xlog("curl_easy_perform failed: %s", curl_easy_strerror(res));
+      }
+
+      curl_easy_cleanup(curl);
     }
-    curl_easy_cleanup(curl);
   }
 }
 
-void sendRESTFulAsync(const std::string& url, int port) {
-  std::thread([url, port]() {
-    sendRESTFul(url, port);
-  }).detach();  // Detach so it runs independently
+void sendRESTFulAsync(const std::string& url, const std::vector<int>& ports) {
+  std::thread([url, ports]() {
+    sendRESTFul(url, ports);
+  }).detach();
 }
-
 void sendRESTful_streamingStatus(int index, bool isStreaming, int port) {
   string content_fixed = "http://localhost:" + std::to_string(port) + "/fw/";
   string content_rest = "gige" + std::to_string(index + 1) + "/isStreaming/" + (isStreaming ? "true" : "false");
