@@ -41,13 +41,11 @@ void RESTful_unRegister(const std::string& portS) {
 void RESTFul_send(const std::string& url, const std::string& content) {
   if (RESTful_ports.empty()) {
     xlog("no ports provided, skip...");
-    xlog("no ports provided, skip...");
     return;
   }
 
   if (content.empty()) {
     xlog("content is empty, skipping...");
-    xlog("content is empty, skipping...");
     return;
   }
 
@@ -55,12 +53,7 @@ void RESTFul_send(const std::string& url, const std::string& content) {
   std::vector<int> ports_copy = RESTful_ports;
 
   for (int port : ports_copy) {
-  // Use a copy of the ports because we may modify RESTful_ports while iterating
-  std::vector<int> ports_copy = RESTful_ports;
-
-  for (int port : ports_copy) {
     if (port == 0) {
-      xlog("port is zero, do nothing...");
       xlog("port is zero, do nothing...");
       continue;
     }
