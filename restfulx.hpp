@@ -2,8 +2,6 @@
 
 #include "global.hpp"
 
-#include <vector>
-
 #define DefaultRESRfulPort 7654
 
 void RESTful_register(const std::string&  portS);

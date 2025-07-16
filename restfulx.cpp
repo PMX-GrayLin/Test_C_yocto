@@ -1,6 +1,9 @@
 
 #include "restfulx.hpp"
 
+#include <vector>
+#include <algorithm>
+
 #include <curl/curl.h>
 
 std::vector<int> RESTful_ports = {0};
