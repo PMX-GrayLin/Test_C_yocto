@@ -2,7 +2,7 @@
 #include "restfulx.hpp"
 
 #include <vector>
-// #include <algorithm>
+#include <algorithm>
 
 #include <curl/curl.h>
 
