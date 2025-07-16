@@ -4,12 +4,15 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
+#include <unordered_map>
 
 #include <curl/curl.h>
 
+const int RESTful_MAX_FAIL = 3;
+std::unordered_map<int, int> port_fail_counts;
 const int MAX_FAIL_COUNT = 5;
 std::unordered_map<int, int> port_fail_counts;
-std::vector<int> RESTful_ports = {DefaultRESRfulPort};
+std::vector<int> RESTful_ports = {DefaultRESRfulPortDefaultRESRfulPort};
 
 void RESTful_register(const std::string& portS) {
 
@@ -40,10 +43,12 @@ void RESTful_unRegister(const std::string& portS) {
 void RESTFul_send(const std::string& url, const std::string& content) {
   if (RESTful_ports.empty()) {
     xlog("no ports provided, skip...");
+    xlog("no ports provided, skip...");
     return;
   }
 
   if (content.empty()) {
+    xlog("content is empty, skipping...");
     xlog("content is empty, skipping...");
     return;
   }
@@ -52,7 +57,12 @@ void RESTFul_send(const std::string& url, const std::string& content) {
   std::vector<int> ports_copy = RESTful_ports;
 
   for (int port : ports_copy) {
+  // Use a copy of the ports because we may modify RESTful_ports while iterating
+  std::vector<int> ports_copy = RESTful_ports;
+
+  for (int port : ports_copy) {
     if (port == 0) {
+      xlog("port is zero, do nothing...");
       xlog("port is zero, do nothing...");
       continue;
     }
@@ -79,6 +89,17 @@ void RESTFul_send(const std::string& url, const std::string& content) {
         xlog("curl_easy_perform failed: %s", curl_easy_strerror(res));
 
         port_fail_counts[port]++;
+        if (port_fail_counts[port] >= RESTful_MAX_FAIL) {
+          xlog("Port %d exceeded max fail count (%d), auto-unregistering...", port, RESTful_MAX_FAIL);
+          RESTful_unRegister(std::to_string(port));
+          port_fail_counts.erase(port);  // Clean up failure count
+        }
+
+      } else {
+        // On success, reset failure count
+        port_fail_counts[port] = 0;
+
+        port_fail_counts[port]++;
         if (port_fail_counts[port] >= MAX_FAIL_COUNT) {
           xlog("Port %d exceeded max fail count (%d), auto-unregistering...", port, MAX_FAIL_COUNT);
           RESTful_unRegister(std::to_string(port));
@@ -101,7 +122,13 @@ void RESTFul_sendAsync(const std::string& url, const std::string& content) {
   }).detach();
 }
 
-void RESTful_send_streamingStatus(int index, bool isStreaming) {
+void RESTful_send_streamingStatus_gst(bool isStreaming) {
+  string url = "http://localhost";
+  string content = "gst/isStreaming/" + (isStreaming ? "true" : "false");
+  RESTFul_sendAsync(url, content);
+}
+
+void RESTful_send_streamingStatus_gige_hik(int index, bool isStreaming) {
   string url = "http://localhost";
   string content = "gige" + std::to_string(index + 1) + "/isStreaming/" + (isStreaming ? "true" : "false");
   RESTFul_sendAsync(url, content);

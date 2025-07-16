@@ -63,7 +63,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else if (isSameString(segments[2], "gain-auto")) {
       //
     } else if (isSameString(segments[2], "isStreaming")) {
-      RESTful_send_streamingStatus(0, isStreaming_gige_hik);
+      RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik);
     }
 
   } else if (isSameString(segments[1], "tp")) {
@@ -317,7 +317,7 @@ void GigE_ThreadStreaming_Hik() {
 
   xlog("pipeline is running...");
   isStreaming_gige_hik = true;
-  RESTful_send_streamingStatus(0, isStreaming_gige_hik);
+  RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik);
 
   // Main loop
   loop_gige_hik = g_main_loop_new(nullptr, FALSE);
@@ -337,7 +337,7 @@ void GigE_ThreadStreaming_Hik() {
   FW_CheckNetLinkState("eth1");
 
   isStreaming_gige_hik = false;
-  RESTful_send_streamingStatus(0, isStreaming_gige_hik);
+  RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik);
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 
