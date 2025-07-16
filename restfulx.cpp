@@ -98,17 +98,6 @@ void RESTFul_send(const std::string& url, const std::string& content) {
       } else {
         // On success, reset failure count
         port_fail_counts[port] = 0;
-
-        port_fail_counts[port]++;
-        if (port_fail_counts[port] >= MAX_FAIL_COUNT) {
-          xlog("Port %d exceeded max fail count (%d), auto-unregistering...", port, MAX_FAIL_COUNT);
-          RESTful_unRegister(std::to_string(port));
-          port_fail_counts.erase(port);  // Clean up failure count
-        }
-
-      } else {
-        // On success, reset failure count
-        port_fail_counts[port] = 0;
       }
 
       curl_easy_cleanup(curl);
