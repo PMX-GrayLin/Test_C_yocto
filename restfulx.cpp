@@ -29,17 +29,34 @@
 //   }).detach();  // Detach so it runs independently
 // }
 
-void sendRESTFul(const std::string& url, const std::vector<int>& ports) {
-  if (ports.empty()) {
-    xlog("No ports provided, skipping RESTful request.");
+std::vector<int> RESTful_ports = { 0 };
+
+void sendRESTFul(const std::string& url, const std::string& content) {
+  if (RESTful_ports.empty()) {
+    xlog("no ports provided, skipping RESTful request.");
+    return;
+  }
+  
+  if (content.empty()) {
+    xlog("content is empty, skipping request.");
     return;
   }
 
-  for (int port : ports) {
+  for (int port : RESTful_ports) {
+    if (port == 0) {
+      xlog("port is zero, do nothing");
+      continue;
+    }
+
     CURL* curl = curl_easy_init();
     if (curl) {
       std::string full_url = url + ":" + std::to_string(port);
-      xlog("Sending to url: %s", full_url.c_str());
+      if (!content.empty()) {
+        if (content.front() != '/')
+          full_url += "/";
+        full_url += content;
+      }
+      xlog("send to url: %s", full_url.c_str());
 
       curl_easy_setopt(curl, CURLOPT_URL, full_url.c_str());
       curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 100L);
@@ -58,28 +75,26 @@ void sendRESTFul(const std::string& url, const std::vector<int>& ports) {
   }
 }
 
-void sendRESTFulAsync(const std::string& url, const std::vector<int>& ports) {
-  std::thread([url, ports]() {
-    sendRESTFul(url, ports);
+void sendRESTFulAsync(const std::string& url, const std::string& content) {
+  std::thread([url, content]() {
+    sendRESTFul(url, content);
   }).detach();
 }
-void sendRESTful_streamingStatus(int index, bool isStreaming, int port) {
-  string content_fixed = "http://localhost:" + std::to_string(port) + "/fw/";
-  string content_rest = "gige" + std::to_string(index + 1) + "/isStreaming/" + (isStreaming ? "true" : "false");
-  string url = content_fixed + content_rest;
-  sendRESTFulAsync(url);
+
+void sendRESTful_streamingStatus(int index, bool isStreaming) {
+  string url = "http://localhost";
+  string content = "gige" + std::to_string(index + 1) + "/isStreaming/" + (isStreaming ? "true" : "false");
+  sendRESTFulAsync(url, content);
 }
 
-void sendRESTful_DI(int index, bool isLevelHigh, int port) {
-  string content_fixed = "http://localhost:" + std::to_string(port) + "/fw/";
-  string content_rest = "di/" + std::to_string(index + 1) + "/status/" + (isLevelHigh ? "high" : "low");
-  string url = content_fixed + content_rest;
-  sendRESTFulAsync(url);
+void sendRESTful_DI(int index, bool isLevelHigh) {
+  string url = "http://localhost";
+  string content = "di/" + std::to_string(index + 1) + "/status/" + (isLevelHigh ? "high" : "low");
+  sendRESTFulAsync(url, content);
 }
 
-void sendRESTful_DIODI(int index, bool isLevelHigh, int port) {
-  string content_fixed = "http://localhost:" + std::to_string(port) + "/fw/";
-  string content_rest = "dio_di/" + std::to_string(index + 1) + "/status/" + (isLevelHigh ? "high" : "low");
-  string url = content_fixed + content_rest;
-  sendRESTFulAsync(url);
+void sendRESTful_DIODI(int index, bool isLevelHigh) {
+  string url = "http://localhost";
+  string content = "dio_di/" + std::to_string(index + 1) + "/status/" + (isLevelHigh ? "high" : "low");
+  sendRESTFulAsync(url, content);
 }
