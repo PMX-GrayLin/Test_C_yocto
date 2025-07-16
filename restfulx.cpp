@@ -3,40 +3,40 @@
 
 #include <curl/curl.h>
 
-// void sendRESTFul(const std::string& url, int port) {
-//   CURL* curl = curl_easy_init();
-//   if (curl) {
-//     xlog("url:%s", url.c_str());
-//     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-//     curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 100L);
+std::vector<int> RESTful_ports = {0};
 
-//     // Send as GET (default) instead of HEAD
-//     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, [](void*, size_t size, size_t nmemb, void*) -> size_t {
-//       return size * nmemb;  // ignore response body
-//     });
+void RESTful_register(const std::string& portS) {
 
-//     CURLcode res = curl_easy_perform(curl);
-//     if (res != CURLE_OK) {
-//       xlog("curl_easy_perform failed:%s", curl_easy_strerror(res));
-//     }
-//     curl_easy_cleanup(curl);
-//   }
-// }
+  int port = std::stoi(portS);
+  if (port <= 0) return;  // Ignore invalid ports
 
-// void sendRESTFulAsync(const std::string& url, int port) {
-//   std::thread([url, port]() {
-//     sendRESTFul(url, port);
-//   }).detach();  // Detach so it runs independently
-// }
+  // Check if port already exists
+  if (std::find(RESTful_ports.begin(), RESTful_ports.end(), port) == RESTful_ports.end()) {
+    RESTful_ports.push_back(port);
+    xlog("Registered port: %d", port);
+  } else {
+    xlog("Port %d already registered", port);
+  }
+}
 
-std::vector<int> RESTful_ports = { 0 };
+void RESTful_unRegister(const std::string& portS) {
 
-void sendRESTFul(const std::string& url, const std::string& content) {
+  int port = std::stoi(portS);
+  auto it = std::find(RESTful_ports.begin(), RESTful_ports.end(), port);
+  if (it != RESTful_ports.end()) {
+    RESTful_ports.erase(it);
+    xlog("Unregistered port: %d", port);
+  } else {
+    xlog("Port %d not found, cannot unregister", port);
+  }
+}
+
+void RESTFul_send(const std::string& url, const std::string& content) {
   if (RESTful_ports.empty()) {
     xlog("no ports provided, skipping RESTful request.");
     return;
   }
-  
+
   if (content.empty()) {
     xlog("content is empty, skipping request.");
     return;
@@ -75,26 +75,26 @@ void sendRESTFul(const std::string& url, const std::string& content) {
   }
 }
 
-void sendRESTFulAsync(const std::string& url, const std::string& content) {
+void RESTFul_sendAsync(const std::string& url, const std::string& content) {
   std::thread([url, content]() {
-    sendRESTFul(url, content);
+    RESTFul_send(url, content);
   }).detach();
 }
 
-void sendRESTful_streamingStatus(int index, bool isStreaming) {
+void RESTful_send_streamingStatus(int index, bool isStreaming) {
   string url = "http://localhost";
   string content = "gige" + std::to_string(index + 1) + "/isStreaming/" + (isStreaming ? "true" : "false");
-  sendRESTFulAsync(url, content);
+  RESTFul_sendAsync(url, content);
 }
 
-void sendRESTful_DI(int index, bool isLevelHigh) {
+void RESTful_send_DI(int index, bool isLevelHigh) {
   string url = "http://localhost";
   string content = "di/" + std::to_string(index + 1) + "/status/" + (isLevelHigh ? "high" : "low");
-  sendRESTFulAsync(url, content);
+  RESTFul_sendAsync(url, content);
 }
 
-void sendRESTful_DIODI(int index, bool isLevelHigh) {
+void RESTful_send_DIODI(int index, bool isLevelHigh) {
   string url = "http://localhost";
   string content = "dio_di/" + std::to_string(index + 1) + "/status/" + (isLevelHigh ? "high" : "low");
-  sendRESTFulAsync(url, content);
+  RESTFul_sendAsync(url, content);
 }

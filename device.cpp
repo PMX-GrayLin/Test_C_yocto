@@ -368,7 +368,7 @@ void Thread_FWMonitorDI() {
     fds[i].events = POLLIN;
 
     // get init value & update to App
-    sendRESTful_DI(i, (gpiod_line_get_value(lines[i]) == 1));
+    RESTful_send_DI(i, (gpiod_line_get_value(lines[i]) == 1));
   }
 
   xlog("^^^^ Start ^^^^");
@@ -408,7 +408,7 @@ void Thread_FWMonitorDI() {
           DI_last_event_time[i] = now;
           // xlog("GPIO %d event detected! status:%s", DI_GPIOs[i], (DI_gpio_level_last[i] == gpiol_high) ? "high" : "low");
 
-          sendRESTful_DI(i, DI_gpio_level_last[i] == gpiol_high);
+          RESTful_send_DI(i, DI_gpio_level_last[i] == gpiol_high);
         }
       }
     }
@@ -478,7 +478,7 @@ void Thread_FWMonitorTriger() {
     fds[i].events = POLLIN;
 
     // get init value & update to App
-    sendRESTful_DI(i, (gpiod_line_get_value(lines[i]) == 1));
+    RESTful_send_DI(i, (gpiod_line_get_value(lines[i]) == 1));
   }
 
   xlog("^^^^ Start ^^^^");
@@ -518,7 +518,7 @@ void Thread_FWMonitorTriger() {
           Triger_last_event_time[i] = now;
           // xlog("GPIO %d event detected! status:%s", Triger_GPIOs[i], (Triger_gpio_level_last[i] == gpiol_high) ? "high" : "low");
 
-          sendRESTful_DI(i, (Triger_gpio_level_last[i] == gpiol_high));
+          RESTful_send_DI(i, (Triger_gpio_level_last[i] == gpiol_high));
         }
       }
     }
@@ -618,7 +618,7 @@ void Thread_FWMonitorDIOIn(int index_dio) {
   fd.events = POLLIN;
 
   // get init value & update to App
-  sendRESTful_DIODI(index_dio, (gpiod_line_get_value(line) == 1));
+  RESTful_send_DIODI(index_dio, (gpiod_line_get_value(line) == 1));
 
   xlog("Thread Monitoring GPIO %d for events...start", DIO_DI_GPIOs[index_dio]);
 
@@ -653,7 +653,7 @@ void Thread_FWMonitorDIOIn(int index_dio) {
         DIODI_last_event_time[index_dio] = now;
         // xlog("GPIO %d event detected! status:%s", DIODI_GPIOs[index_dio], (DIODI_gpio_level_last[index_dio] == gpiol_high) ? "high" : "low");
 
-        sendRESTful_DIODI(index_dio, DIODI_gpio_level_last[index_dio] == gpiol_high);
+        RESTful_send_DIODI(index_dio, DIODI_gpio_level_last[index_dio] == gpiol_high);
       }
     }
   }

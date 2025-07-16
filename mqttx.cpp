@@ -81,7 +81,7 @@ void mqtt_start() {
   }
 }
 
-void mqtt_stop() {
+void RESTful_registermqtt_stop() {
   isMQTTRunning = false;
 }
 

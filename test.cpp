@@ -3,6 +3,7 @@
 #include "device.hpp"
 #include "httplib.hpp"
 #include "mqttx.hpp"
+#include "restfulx.hpp"
 
 #if defined(ENABLE_CIS)
 #include "cam_omnivision.hpp"
@@ -112,6 +113,13 @@ void handle_RESTful(std::vector<std::string> segments) {
       mqtt_stop();
     } else if (isSameString(segments[1], "send")) {
       MQTTClient::send_message_static("topic123", "message123");
+    }
+
+  } else if (isSameString(segments[0], "RESTful")) {
+    if (isSameString(segments[1], "register")) {
+      RESTful_register(segments[2]);
+    } else if (isSameString(segments[1], "unregister")) {
+      RESTful_unRegister(segments[2]);
     }
 
   } else if (isSameString(segments[0], "cmd")) {

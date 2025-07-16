@@ -4,18 +4,16 @@
 
 #include <vector>
 
-// #define defaultRESRfulPort 7654
-
-// void sendRESTFul(const std::string&  url, int port = defaultRESRfulPort);
-// void sendRESTFulAsync(const std::string& url, int port = defaultRESRfulPort);
-
 #define DefaultRESRfulPort 7654
 
-void sendRESTFul(const std::string& url, const std::string& content);
-void sendRESTFulAsync(const std::string& url, const std::string& content);
+void RESTful_register(const std::string&  portS);
+void RESTful_unRegister(const std::string& portS);
 
-void sendRESTful_streamingStatus(int index, bool isStreaming);
-void sendRESTful_DI(int index, bool isLevelHigh);
-void sendRESTful_DIODI(int index, bool isLevelHigh);
+void RESTFul_send(const std::string& url, const std::string& content);
+void RESTFul_sendAsync(const std::string& url, const std::string& content);
+
+void RESTful_send_streamingStatus(int index, bool isStreaming);
+void RESTful_send_DI(int index, bool isLevelHigh);
+void RESTful_send_DIODI(int index, bool isLevelHigh);
 
 
