@@ -2,6 +2,8 @@
 
 #include "global.hpp"
 
+#include <vector>
+
 // #define defaultRESRfulPort 7654
 
 // void sendRESTFul(const std::string&  url, int port = defaultRESRfulPort);
