@@ -119,7 +119,7 @@ void handle_RESTful(std::vector<std::string> segments) {
     if (isSameString(segments[1], "register")) {
       RESTful_register(segments[2], segments[3]);
     } else if (isSameString(segments[1], "unregister")) {
-      RESTful_unRegister(segments[2, segments[3]]);
+      RESTful_unRegister(segments[2], segments[3]);
     }
 
   } else if (isSameString(segments[0], "cmd")) {
