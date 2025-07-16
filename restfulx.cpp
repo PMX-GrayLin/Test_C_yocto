@@ -10,9 +10,7 @@
 
 const int RESTful_MAX_FAIL = 3;
 std::unordered_map<int, int> port_fail_counts;
-const int MAX_FAIL_COUNT = 5;
-std::unordered_map<int, int> port_fail_counts;
-std::vector<int> RESTful_ports = {DefaultRESRfulPortDefaultRESRfulPort};
+std::vector<int> RESTful_ports = {DefaultRESRfulPort};
 
 void RESTful_register(const std::string& portS) {
 
