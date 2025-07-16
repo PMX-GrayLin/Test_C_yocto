@@ -112,12 +112,18 @@ void RESTful_register(const std::string& url, const std::string& portS) {
   int port = std::stoi(portS);
   if (port <= 0) return;
 
-  auto key = std::make_pair(url, port);
+  // Ensure the URL starts with "http://"
+  std::string urlx = url;
+  if (urlx.find("http://") != 0 && urlx.find("https://") != 0) {
+    urlx = "http://" + urlx;
+  }
+
+  auto key = std::make_pair(urlx, port);
   if (RESTful_targets.find(key) == RESTful_targets.end()) {
     RESTful_targets.insert(key);
-    xlog("Registered: %s:%d", url.c_str(), port);
+    xlog("Registered: %s:%d", urlx.c_str(), port);
   } else {
-    xlog("Already registered: %s:%d", url.c_str(), port);
+    xlog("Already registered: %s:%d", urlx.c_str(), port);
   }
 }
 
