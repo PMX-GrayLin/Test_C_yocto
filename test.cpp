@@ -106,7 +106,7 @@ void handle_RESTful(std::vector<std::string> segments) {
     } else if (segments[1] == "3") {
       test_gst_appsink(testCase);
     } else if (segments[1] == "stop") {
-      test_gst_stopPipeline():
+      test_gst_stopPipeline();
     }
 
 #endif
