@@ -9,6 +9,8 @@ static int counterImg = 0;
 
 static GstElement *gst_pipeline = nullptr;
 static GMainLoop *gst_loop = nullptr;
+static std::thread gst_thread;
+static std::atomic<bool> gst_running{false};
 
 void test_gst_pipelineString(int testCase) {
   xlog("testCase:%d", testCase);
@@ -206,38 +208,63 @@ void test_gst_src(int testCase) {
 static GstFlowReturn on_new_sample(GstAppSink *appsink, gpointer user_data) {
     GstSample *sample = gst_app_sink_pull_sample(appsink);
     if (sample) {
-        xlog("New sample received!");
+        xlog("New sample received.");
         gst_sample_unref(sample);
         return GST_FLOW_OK;
     }
     return GST_FLOW_ERROR;
 }
 
-void test_gst_appsink(int testCase) {
-  xlog("");
+void gst_thread_appsink(int testCase) {
+  xlog("Initializing GStreamer pipeline...");
+
   gst_init(nullptr, nullptr);
 
-  GstElement *gst_pipeline = gst_parse_launch(
+  GstElement *pipeline = gst_parse_launch(
       "videotestsrc ! videoconvert ! video/x-raw,format=RGB ! appsink name=mysink", nullptr);
 
-  GstElement *appsink = gst_bin_get_by_name(GST_BIN(gst_pipeline), "mysink");
-  gst_app_sink_set_emit_signals((GstAppSink *)appsink, true);
-  gst_app_sink_set_drop((GstAppSink *)appsink, true);
-  gst_app_sink_set_max_buffers((GstAppSink *)appsink, 1);
+  GstElement *appsink = gst_bin_get_by_name(GST_BIN(pipeline), "mysink");
+  gst_app_sink_set_emit_signals(GST_APP_SINK(appsink), true);
+  gst_app_sink_set_drop(GST_APP_SINK(appsink), true);
+  gst_app_sink_set_max_buffers(GST_APP_SINK(appsink), 1);
 
-  // Connect the signal callback
   g_signal_connect(appsink, "new-sample", G_CALLBACK(on_new_sample), nullptr);
 
-  gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
+  gst_element_set_state(pipeline, GST_STATE_PLAYING);
 
   gst_loop = g_main_loop_new(nullptr, FALSE);
+  gst_running = true;
+  xlog("Running main loop.");
   g_main_loop_run(gst_loop);
+  xlog("Main loop exited.");
 
-  // Cleanup
-  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
-  gst_object_unref(gst_pipeline);
+  gst_element_set_state(pipeline, GST_STATE_NULL);
+  gst_object_unref(pipeline);
   gst_object_unref(appsink);
   g_main_loop_unref(gst_loop);
+  gst_loop = nullptr;
+  gst_running = false;
+
+  xlog("Pipeline stopped and cleaned up.");
+}
+
+void test_gst_appsink_start(int testCase) {
+    if (gst_running) {
+        xlog("Pipeline already running.");
+        return;
+    }
+    gst_thread = std::thread(gst_thread_func, testCase);
+}
+
+void test_gst_appsink_stop() {
+    if (gst_running && gst_loop) {
+        xlog("Stopping GStreamer pipeline...");
+        g_main_loop_quit(gst_loop);
+        if (gst_thread.joinable())
+            gst_thread.join();
+    } else {
+        xlog("Pipeline not running.");
+    }
 }
 
 void test_gst_stopPipeline() {
