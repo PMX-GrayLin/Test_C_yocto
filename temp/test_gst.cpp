@@ -217,10 +217,10 @@ void test_gst_appsink(int testCase) {
   xlog("");
   gst_init(nullptr, nullptr);
 
-  GstElement *pipeline = gst_parse_launch(
+  GstElement *gst_pipeline = gst_parse_launch(
       "videotestsrc ! videoconvert ! video/x-raw,format=RGB ! appsink name=mysink", nullptr);
 
-  GstElement *appsink = gst_bin_get_by_name(GST_BIN(pipeline), "mysink");
+  GstElement *appsink = gst_bin_get_by_name(GST_BIN(gst_pipeline), "mysink");
   gst_app_sink_set_emit_signals((GstAppSink *)appsink, true);
   gst_app_sink_set_drop((GstAppSink *)appsink, true);
   gst_app_sink_set_max_buffers((GstAppSink *)appsink, 1);
@@ -228,20 +228,20 @@ void test_gst_appsink(int testCase) {
   // Connect the signal callback
   g_signal_connect(appsink, "new-sample", G_CALLBACK(on_new_sample), nullptr);
 
-  gst_element_set_state(pipeline, GST_STATE_PLAYING);
+  gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
 
   // Run main loop for 5 seconds
-  GMainLoop *loop = g_main_loop_new(nullptr, FALSE);
+  gst_loop = g_main_loop_new(nullptr, FALSE);
   g_timeout_add_seconds(5, [](gpointer data) -> gboolean {
         g_main_loop_quit((GMainLoop *)data);
         return FALSE; }, loop);
-  g_main_loop_run(loop);
+  g_main_loop_run(gst_loop);
 
   // Cleanup
-  gst_element_set_state(pipeline, GST_STATE_NULL);
-  gst_object_unref(pipeline);
+  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
+  gst_object_unref(gst_pipeline);
   gst_object_unref(appsink);
-  g_main_loop_unref(loop);
+  g_main_loop_unref(gst_loop);
 }
 
 void test_gst_stopPipeline() {
