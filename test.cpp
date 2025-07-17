@@ -31,6 +31,8 @@
 // #endif
 
 void handle_RESTful(std::vector<std::string> segments) {
+
+  FW_toggleLED("1", "green");
   if (isSameString(segments[0], "led")) {
     if (segments.size() == 3) {
       FW_setLED(segments[1], segments[2]);
@@ -162,7 +164,7 @@ void handle_RESTful(std::vector<std::string> segments) {
     // }
 
   }
-
+  FW_toggleLED("1", "green");
 }
 
 #if defined(ENABLE_FTDI)
