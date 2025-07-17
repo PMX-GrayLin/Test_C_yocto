@@ -1,5 +1,6 @@
 #include "test_gst.hpp"
 #include <gst/gst.h>
+#include <gst/app/gstappsink.h>
 
 #include "cam_omnivision.hpp"
 
@@ -263,7 +264,7 @@ void test_gst2(int testCase) {
 static GstFlowReturn on_new_sample(GstAppSink *appsink, gpointer user_data) {
     GstSample *sample = gst_app_sink_pull_sample(appsink);
     if (sample) {
-        std::cout << "New sample received!" << std::endl;
+        xlog("New sample received!");
         gst_sample_unref(sample);
         return GST_FLOW_OK;
     }
