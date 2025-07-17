@@ -215,7 +215,7 @@ static GstFlowReturn on_new_sample(GstAppSink *appsink, gpointer user_data) {
 
 void test_gst_appsink(int testCase) {
   xlog("");
-  gst_init(&argc, &argv);
+  gst_init(nullptr, nullptr);
 
   GstElement *pipeline = gst_parse_launch(
       "videotestsrc ! videoconvert ! video/x-raw,format=RGB ! appsink name=mysink", nullptr);
