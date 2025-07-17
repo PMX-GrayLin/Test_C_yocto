@@ -230,11 +230,7 @@ void test_gst_appsink(int testCase) {
 
   gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
 
-  // Run main loop for 5 seconds
   gst_loop = g_main_loop_new(nullptr, FALSE);
-  g_timeout_add_seconds(5, [](gpointer data) -> gboolean {
-        g_main_loop_quit((GMainLoop *)data);
-        return FALSE; }, loop);
   g_main_loop_run(gst_loop);
 
   // Cleanup
