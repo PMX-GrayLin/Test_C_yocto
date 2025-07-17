@@ -5,7 +5,7 @@
 #include <gst/gst.h>
 #include <gst/app/gstappsink.h>
 
-// #include "cam_omnivision.hpp"
+#include "cam_omnivision.hpp"
 
 static volatile int counterFrame = 0;
 static int counterImg = 0;
