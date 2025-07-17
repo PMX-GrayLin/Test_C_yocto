@@ -97,11 +97,11 @@ void handle_RESTful(std::vector<std::string> segments) {
 #if defined(ENABLE_TestCode)
 
   } else if (isSameString(segments[0], "gstt")) {
-    int testCase = std::stoi(segments[2]);
+    // int testCase = std::stoi(segments[2]);
     if (segments[1] == "1") {
-      test_gst_pipelineString(testCase);
+      test_gst_pipelineString(0);
     } else if (segments[1] == "2") {
-      test_gst_src(testCase);
+      test_gst_src(0);
     } else if (segments[1] == "3") {
       xlog("test appsink");
       if (isSameString(segments[2], "start")) {
