@@ -128,14 +128,21 @@ void RESTful_register(const std::string& url, const std::string& portS) {
 
 void RESTful_unRegister(const std::string& url, const std::string& portS) {
   int port = std::stoi(portS);
-  auto key = std::make_pair(url, port);
+
+  // Ensure the URL starts with "http://"
+  std::string urlx = url;
+  if (urlx.find("http://") != 0 && urlx.find("https://") != 0) {
+    urlx = "http://" + urlx;
+  }
+
+  auto key = std::make_pair(urlx, port);
   auto it = RESTful_targets.find(key);
   if (it != RESTful_targets.end()) {
     RESTful_targets.erase(it);
     RESTful_failCount.erase(key);  // Clean up fail count
-    xlog("Unregistered: %s:%d", url.c_str(), port);
+    xlog("Unregistered: %s:%d", urlx.c_str(), port);
   } else {
-    xlog("Not found: %s:%d", url.c_str(), port);
+    xlog("Not found: %s:%d", urlx.c_str(), port);
   }
 }
 
