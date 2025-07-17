@@ -55,6 +55,7 @@ LINK_LIBS += -ljson-c
 LINK_LIBS += -lgstreamer-1.0
 LINK_LIBS += -lglib-2.0
 LINK_LIBS += -lgobject-2.0
+LINK_LIBS += -lgstapp-1.0
 LINK_LIBS += -lmosquitto -lmosquittopp
 LINK_LIBS += -lgpiod
 LINK_LIBS += -lcurl
