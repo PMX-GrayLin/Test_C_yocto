@@ -97,9 +97,16 @@ void handle_RESTful(std::vector<std::string> segments) {
 #if defined(ENABLE_TestCode)
 
   } else if (isSameString(segments[0], "gstt")) {
-    int testCase = std::stoi(segments[1]);
-    test_gst(testCase);
-    
+    int testFunc = std::stoi(segments[1]);
+    int testCase = std::stoi(segments[2]);
+    if (testFunc == 1) {
+      test_gst_pipelineString(testCase);
+    } else if (testFunc == 2) {
+      test_gst_src(testCase);
+    } else if (testFunc == 3) {
+      test_gst_appsink(testCase);
+    }
+
 #endif
 
   } else if (isSameString(segments[0], "uvc")) {

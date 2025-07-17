@@ -10,7 +10,7 @@ static int counterImg = 0;
 static GstElement *gst_pipeline = nullptr;
 static GMainLoop *gst_loop = nullptr;
 
-void test_gst(int testCase) {
+void test_gst_pipelineString(int testCase) {
   xlog("testCase:%d", testCase);
 
   GstElement *pipeline;
@@ -108,7 +108,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
   return GST_PAD_PROBE_OK;
 }
 
-void test_gst2(int testCase) {
+void test_gst_src(int testCase) {
   xlog("testCase:%d", testCase);
   counterFrame = 0;
   counterImg = 0;
