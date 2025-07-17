@@ -11,17 +11,16 @@
 
 struct PairHash {
   std::size_t operator()(const std::pair<std::string, int>& p) const {
-    return std::hash<std::string>()(p.first) ^ std::hash<int>()(p.second);
+    return std::hash<std::string>()(p.first) ^ (std::hash<int>()(p.second) << 1);
   }
 };
 
 const int RESTful_MAX_FAIL = 3;
 std::set<std::pair<std::string, int>> RESTful_targets;
-std::unordered_map<std::pair<std::string, int>, int, PairHash> fail_counts;
-
+std::unordered_map<std::pair<std::string, int>, int, PairHash> RESTful_failCount;
 
 // const int RESTful_MAX_FAIL = 3;
-// std::unordered_map<int, int> port_fail_counts;
+// std::unordered_map<int, int> port_RESTful_failCount;
 // std::vector<int> RESTful_ports = {DefaultRESRfulPort};
 
 // void RESTful_register(const std::string& portS) {
@@ -91,16 +90,16 @@ std::unordered_map<std::pair<std::string, int>, int, PairHash> fail_counts;
 //       if (res != CURLE_OK) {
 //         xlog("curl_easy_perform failed: %s", curl_easy_strerror(res));
 
-//         port_fail_counts[port]++;
-//         if (port_fail_counts[port] >= RESTful_MAX_FAIL) {
+//         port_RESTful_failCount[port]++;
+//         if (port_RESTful_failCount[port] >= RESTful_MAX_FAIL) {
 //           xlog("Port %d exceeded max fail count (%d), auto-unregistering...", port, RESTful_MAX_FAIL);
 //           RESTful_unRegister(std::to_string(port));
-//           port_fail_counts.erase(port);  // Clean up failure count
+//           port_RESTful_failCount.erase(port);  // Clean up failure count
 //         }
 
 //       } else {
 //         // On success, reset failure count
-//         port_fail_counts[port] = 0;
+//         port_RESTful_failCount[port] = 0;
 //       }
 
 //       curl_easy_cleanup(curl);
@@ -133,7 +132,7 @@ void RESTful_unRegister(const std::string& url, const std::string& portS) {
   auto it = RESTful_targets.find(key);
   if (it != RESTful_targets.end()) {
     RESTful_targets.erase(it);
-    fail_counts.erase(key);  // Clean up fail count
+    RESTful_failCount.erase(key);  // Clean up fail count
     xlog("Unregistered: %s:%d", url.c_str(), port);
   } else {
     xlog("Not found: %s:%d", url.c_str(), port);
@@ -179,14 +178,14 @@ void RESTFul_send(const std::string& content) {
       if (res != CURLE_OK) {
         xlog("curl_easy_perform failed: %s", curl_easy_strerror(res));
 
-        fail_counts[key]++;
-        if (fail_counts[key] >= RESTful_MAX_FAIL) {
+        RESTful_failCount[key]++;
+        if (RESTful_failCount[key] >= RESTful_MAX_FAIL) {
           xlog("Exceeded max fail count for %s:%d. Auto-unregistering.", url.c_str(), port);
           RESTful_targets.erase(key);
-          fail_counts.erase(key);
+          RESTful_failCount.erase(key);
         }
       } else {
-        fail_counts[key] = 0;
+        RESTful_failCount[key] = 0;
       }
 
       curl_easy_cleanup(curl);
