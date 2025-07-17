@@ -115,7 +115,7 @@ void handle_RESTful(std::vector<std::string> segments) {
       MQTTClient::send_message_static("topic123", "message123");
     }
 
-  } else if (isSameString(segments[0], "RESTful")) {
+  } else if (isSameString(segments[0], "restful")) {
     if (isSameString(segments[1], "register")) {
       RESTful_register(segments[2], segments[3]);
     } else if (isSameString(segments[1], "unregister")) {
