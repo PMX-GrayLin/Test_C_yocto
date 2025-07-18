@@ -8,8 +8,6 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
 
-#include "cam_omnivision.hpp"
-
 void test_ocv(int testCase) {
   xlog("testCase:%d", testCase);
 

@@ -5,8 +5,6 @@
 #include <gst/gst.h>
 #include <gst/app/gstappsink.h>
 
-#include "cam_omnivision.hpp"
-
 static volatile int counterFrame = 0;
 
 static GstElement *gst_pipeline = nullptr;
@@ -107,7 +105,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
   GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
   if (buffer) {
     counterFrame++;
-    if (counterFrame % 30 == 0) {
+    if (counterFrame % 300 == 0) {
       xlog("frame captured, counterFrame:%d", counterFrame);
     }
   }
@@ -234,7 +232,7 @@ static GstFlowReturn on_new_sample(GstAppSink *appsink, gpointer user_data) {
   GstSample *sample = gst_app_sink_pull_sample(appsink);
   if (sample) {
     counterFrame++;
-    if (counterFrame % 30 == 0) {
+    if (counterFrame % 300 == 0) {
       xlog("sample captured, counterFrame:%d", counterFrame);
     }
     gst_sample_unref(sample);
