@@ -101,9 +101,21 @@ void handle_RESTful(std::vector<std::string> segments) {
   } else if (isSameString(segments[0], "gstt")) {
     // int testCase = std::stoi(segments[2]);
     if (segments[1] == "1") {
-      test_gst_pipelineString(0);
+      xlog("test pipeline");
+      if (isSameString(segments[2], "start")) {
+        test_gst_pipeline_start(0);
+      } else if (isSameString(segments[2], "stop")) {
+        test_gst_pipeline_stop();
+      }
+
     } else if (segments[1] == "2") {
-      test_gst_src(0);
+      xlog("test src");
+      if (isSameString(segments[2], "start")) {
+        test_gst_src_start(0);
+      } else if (isSameString(segments[2], "stop")) {
+        test_gst_src_stop();
+      }
+
     } else if (segments[1] == "3") {
       xlog("test appsink");
       if (isSameString(segments[2], "start")) {

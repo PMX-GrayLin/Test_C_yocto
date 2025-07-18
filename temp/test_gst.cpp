@@ -8,14 +8,13 @@
 #include "cam_omnivision.hpp"
 
 static volatile int counterFrame = 0;
-static int counterImg = 0;
 
 static GstElement *gst_pipeline = nullptr;
 static GMainLoop *gst_loop = nullptr;
 static std::thread gst_thread;
 static std::atomic<bool> gst_running{false};
 
-void test_gst_pipelineString(int testCase) {
+void test_gst_pipeline(int testCase) {
   xlog("testCase:%d", testCase);
 
   GstElement *pipeline;
@@ -35,7 +34,7 @@ void test_gst_pipelineString(int testCase) {
     // OK
     // gst-launch-1.0 -v v4l2src device=/dev/video47 ! video/x-raw,width=1920,height=1080 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
     pipelineS =
-        "v4l2src device=" + AICP_getVideoDevice() + " " +
+        "v4l2src device=/dev/csi_cam_preview " +
         "! video/x-raw,width=2048,height=1536 " +
         "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf "
         "! rtspclientsink location=rtsp://localhost:8554/mystream";
@@ -105,18 +104,37 @@ void test_gst_pipelineString(int testCase) {
 // Callback to handle incoming buffer data
 GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
   GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
-  // if (buffer) {
-    // counterFrame++;
-    // xlog("frame captured, counterFrame:%d", counterFrame);
-
-  // }
+  if (buffer) {
+    counterFrame++;
+    if (counterFrame % 30 == 0) {
+      xlog("frame captured, counterFrame:%d", counterFrame);
+    }
+  }
   return GST_PAD_PROBE_OK;
 }
 
-void test_gst_src(int testCase) {
+void test_gst_pipeline_start(int testCase) {
+    if (gst_running) {
+        xlog("Pipeline already running.");
+        return;
+    }
+    gst_thread = std::thread(gst_thread_appsink, testCase);
+}
+
+void test_gst_pipeline_stop() {
+    if (gst_running && gst_loop) {
+        xlog("Stopping GStreamer pipeline...");
+        g_main_loop_quit(gst_loop);
+        if (gst_thread.joinable())
+            gst_thread.join();
+    } else {
+        xlog("Pipeline not running.");
+    }
+}
+
+void gst_thread_src(int testCase) {
   xlog("testCase:%d", testCase);
   counterFrame = 0;
-  counterImg = 0;
 
   // Initialize GStreamer
   gst_init(nullptr, nullptr);
@@ -137,8 +155,7 @@ void test_gst_src(int testCase) {
   }
 
   // Set properties for the elements
-  xlog("AICP_getVideoDevice:%s", AICP_getVideoDevice().c_str());
-  g_object_set(G_OBJECT(source), "device", AICP_getVideoDevice().c_str(), nullptr);
+  g_object_set(G_OBJECT(source), "device", "/dev/csi_cam_preview", nullptr);
 
   // Create a GstStructure for extra-controls
   GstStructure *controls = gst_structure_new(
@@ -208,14 +225,36 @@ void test_gst_src(int testCase) {
   xlog("Pipeline stopped and resources cleaned up.");
 }
 
-static GstFlowReturn on_new_sample(GstAppSink *appsink, gpointer user_data) {
-    GstSample *sample = gst_app_sink_pull_sample(appsink);
-    if (sample) {
-        xlog("New sample received.");
-        gst_sample_unref(sample);
-        return GST_FLOW_OK;
+void test_gst_src_start(int testCase) {
+    if (gst_running) {
+        xlog("Pipeline already running.");
+        return;
     }
-    return GST_FLOW_ERROR;
+    gst_thread = std::thread(gst_thread_src, testCase);
+}
+
+void test_gst_src_stop() {
+    if (gst_running && gst_loop) {
+        xlog("Stopping GStreamer pipeline...");
+        g_main_loop_quit(gst_loop);
+        if (gst_thread.joinable())
+            gst_thread.join();
+    } else {
+        xlog("Pipeline not running.");
+    }
+}
+
+static GstFlowReturn on_new_sample(GstAppSink *appsink, gpointer user_data) {
+  GstSample *sample = gst_app_sink_pull_sample(appsink);
+  if (sample) {
+    counterFrame++;
+    if (counterFrame % 30 == 0) {
+      xlog("sample captured, counterFrame:%d", counterFrame);
+    }
+    gst_sample_unref(sample);
+    return GST_FLOW_OK;
+  }
+  return GST_FLOW_ERROR;
 }
 
 void gst_thread_appsink(int testCase) {
