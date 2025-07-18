@@ -17,7 +17,7 @@ static std::atomic<bool> gst_running{false};
 void gst_thread_pipeline(int testCase) {
   xlog("++++ start ++++, testCase:%d", testCase);
 
-  GstElement *pipeline;
+  GstElement *gst_pipeline;
   GstBus *bus;
   GstMessage *msg;
   string pipelineS = "";
@@ -56,14 +56,14 @@ void gst_thread_pipeline(int testCase) {
 
   xlog("pipeline:%s", pipelineS.c_str());
 
-  pipeline = gst_parse_launch(pipelineS.c_str(), nullptr);
-  if (!pipeline) {
+  gst_pipeline = gst_parse_launch(pipelineS.c_str(), nullptr);
+  if (!gst_pipeline) {
     xlog("gst_parse_launch fail");
     return;
   }
 
   // Start playing
-  gst_element_set_state(pipeline, GST_STATE_PLAYING);
+  gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
 
   xlog("pipeline is running...");
 
@@ -73,8 +73,8 @@ void gst_thread_pipeline(int testCase) {
   g_main_loop_run(gst_loop);
 
   // Cleanup after main loop exits
-  gst_element_set_state(pipeline, GST_STATE_NULL);
-  gst_object_unref(pipeline);
+  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
+  gst_object_unref(gst_pipeline);
   g_main_loop_unref(gst_loop);
   gst_loop = nullptr;
   gst_running = false;
@@ -203,8 +203,8 @@ void gst_thread_src(int testCase) {
   xlog("Stopping the pipeline...");
 
   // Cleanup after main loop exits
-  gst_element_set_state(pipeline, GST_STATE_NULL);
-  gst_object_unref(pipeline);
+  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
+  gst_object_unref(gst_pipeline);
   g_main_loop_unref(gst_loop);
   gst_loop = nullptr;
   gst_running = false;
@@ -249,17 +249,17 @@ void gst_thread_appsink(int testCase) {
 
   gst_init(nullptr, nullptr);
 
-  GstElement *pipeline = gst_parse_launch(
+  gst_pipeline = gst_parse_launch(
       "videotestsrc ! videoconvert ! video/x-raw,format=RGB ! appsink name=mysink", nullptr);
 
-  GstElement *appsink = gst_bin_get_by_name(GST_BIN(pipeline), "mysink");
+  GstElement *appsink = gst_bin_get_by_name(GST_BIN(gst_pipeline), "mysink");
   gst_app_sink_set_emit_signals(GST_APP_SINK(appsink), true);
   gst_app_sink_set_drop(GST_APP_SINK(appsink), true);
   gst_app_sink_set_max_buffers(GST_APP_SINK(appsink), 1);
 
   g_signal_connect(appsink, "new-sample", G_CALLBACK(on_new_sample), nullptr);
 
-  gst_element_set_state(pipeline, GST_STATE_PLAYING);
+  gst_element_set_state(gst_pipeline, GST_STATE_PLAYING);
 
   gst_loop = g_main_loop_new(nullptr, FALSE);
   gst_running = true;
@@ -267,8 +267,8 @@ void gst_thread_appsink(int testCase) {
   g_main_loop_run(gst_loop);
   xlog("Main loop exited.");
 
-  gst_element_set_state(pipeline, GST_STATE_NULL);
-  gst_object_unref(pipeline);
+  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
+  gst_object_unref(gst_pipeline);
   gst_object_unref(appsink);
   g_main_loop_unref(gst_loop);
   gst_loop = nullptr;
