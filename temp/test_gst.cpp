@@ -15,7 +15,7 @@ static std::thread gst_thread;
 static std::atomic<bool> gst_running{false};
 
 void gst_thread_pipeline(int testCase) {
-  xlog("testCase:%d", testCase);
+  xlog("++++ start ++++, testCase:%d", testCase);
 
   GstElement *pipeline;
   GstBus *bus;
@@ -67,37 +67,17 @@ void gst_thread_pipeline(int testCase) {
 
   xlog("pipeline is running...");
 
-  // Wait until error or EOS
-  bus = gst_element_get_bus(pipeline);
-  msg = gst_bus_timed_pop_filtered(
-      bus,
-      GST_CLOCK_TIME_NONE,
-      static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+  // Create and run main loop
+  gst_loop = g_main_loop_new(nullptr, FALSE);
+  g_main_loop_run(gst_loop);
 
-  // Parse message
-  if (msg) {
-    GError *err;
-    gchar *debug_info;
-
-    switch (GST_MESSAGE_TYPE(msg)) {
-      case GST_MESSAGE_ERROR:
-        gst_message_parse_error(msg, &err, &debug_info);
-        g_clear_error(&err);
-        g_free(debug_info);
-        break;
-      case GST_MESSAGE_EOS:
-        break;
-      default:
-        break;
-    }
-    gst_message_unref(msg);
-  }
-
-  // Free resources
-  gst_object_unref(bus);
+  // Cleanup after main loop exits
   gst_element_set_state(pipeline, GST_STATE_NULL);
   gst_object_unref(pipeline);
+  g_main_loop_unref(gst_loop);
+  gst_loop = nullptr;
 
+  xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
   return;
 }
 
