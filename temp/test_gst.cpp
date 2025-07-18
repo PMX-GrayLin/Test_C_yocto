@@ -14,7 +14,7 @@ static GMainLoop *gst_loop = nullptr;
 static std::thread gst_thread;
 static std::atomic<bool> gst_running{false};
 
-void test_gst_pipeline(int testCase) {
+void gst_thread_pipeline(int testCase) {
   xlog("testCase:%d", testCase);
 
   GstElement *pipeline;
@@ -34,7 +34,7 @@ void test_gst_pipeline(int testCase) {
     // OK
     // gst-launch-1.0 -v v4l2src device=/dev/video47 ! video/x-raw,width=1920,height=1080 ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! rtspclientsink location=rtsp://localhost:8554/mystream
     pipelineS =
-        "v4l2src device=/dev/csi_cam_preview " +
+        std::string("v4l2src device=/dev/csi_cam_preview ") +
         "! video/x-raw,width=2048,height=1536 " +
         "! v4l2h264enc extra-controls=\"cid,video_gop_size=30\" capture-io-mode=dmabuf "
         "! rtspclientsink location=rtsp://localhost:8554/mystream";
@@ -101,24 +101,12 @@ void test_gst_pipeline(int testCase) {
   return;
 }
 
-// Callback to handle incoming buffer data
-GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
-  GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
-  if (buffer) {
-    counterFrame++;
-    if (counterFrame % 30 == 0) {
-      xlog("frame captured, counterFrame:%d", counterFrame);
-    }
-  }
-  return GST_PAD_PROBE_OK;
-}
-
 void test_gst_pipeline_start(int testCase) {
     if (gst_running) {
         xlog("Pipeline already running.");
         return;
     }
-    gst_thread = std::thread(gst_thread_appsink, testCase);
+    gst_thread = std::thread(gst_thread_pipeline, testCase);
 }
 
 void test_gst_pipeline_stop() {
@@ -130,6 +118,18 @@ void test_gst_pipeline_stop() {
     } else {
         xlog("Pipeline not running.");
     }
+}
+
+// Callback to handle incoming buffer data
+GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+  GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
+  if (buffer) {
+    counterFrame++;
+    if (counterFrame % 30 == 0) {
+      xlog("frame captured, counterFrame:%d", counterFrame);
+    }
+  }
+  return GST_PAD_PROBE_OK;
 }
 
 void gst_thread_src(int testCase) {
