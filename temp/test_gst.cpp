@@ -68,6 +68,7 @@ void gst_thread_pipeline(int testCase) {
   xlog("pipeline is running...");
 
   // Create and run main loop
+  gst_running = true;
   gst_loop = g_main_loop_new(nullptr, FALSE);
   g_main_loop_run(gst_loop);
 
@@ -76,6 +77,7 @@ void gst_thread_pipeline(int testCase) {
   gst_object_unref(pipeline);
   g_main_loop_unref(gst_loop);
   gst_loop = nullptr;
+  gst_running = false;
 
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
   return;
