@@ -115,7 +115,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
 }
 
 void gst_thread_src(int testCase) {
-  xlog("testCase:%d", testCase);
+  xlog("++++ start ++++, testCase:%d", testCase);
   counterFrame = 0;
 
   // Initialize GStreamer
@@ -193,6 +193,7 @@ void gst_thread_src(int testCase) {
   }
 
   xlog("pipeline is running...");
+  gst_running = true;
 
   // Run the main loop
   gst_loop = g_main_loop_new(nullptr, FALSE);
@@ -200,11 +201,14 @@ void gst_thread_src(int testCase) {
 
   // Stop the pipeline when finished or interrupted
   xlog("Stopping the pipeline...");
-  gst_element_set_state(gst_pipeline, GST_STATE_NULL);
 
-  // Clean up
-  gst_object_unref(gst_pipeline);
-  xlog("Pipeline stopped and resources cleaned up.");
+  // Cleanup after main loop exits
+  gst_element_set_state(pipeline, GST_STATE_NULL);
+  gst_object_unref(pipeline);
+  g_main_loop_unref(gst_loop);
+  gst_loop = nullptr;
+  gst_running = false;
+  xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 
 void test_gst_src_start(int testCase) {
@@ -240,7 +244,8 @@ static GstFlowReturn on_new_sample(GstAppSink *appsink, gpointer user_data) {
 }
 
 void gst_thread_appsink(int testCase) {
-  xlog("Initializing GStreamer pipeline...");
+  xlog("++++ start ++++, testCase:%d", testCase);
+  counterFrame = 0;
 
   gst_init(nullptr, nullptr);
 
@@ -269,7 +274,7 @@ void gst_thread_appsink(int testCase) {
   gst_loop = nullptr;
   gst_running = false;
 
-  xlog("Pipeline stopped and cleaned up.");
+  xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 
 void test_gst_appsink_start(int testCase) {
