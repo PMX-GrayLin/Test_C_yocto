@@ -11,7 +11,7 @@ APP_NAME=fw_daemon
 ENABLE_Gige ?= 0
 ENABLE_CIS ?= 0
 ENABLE_OST = 0
-ENABLE_TestCode = 1
+ENABLE_TestCode = 0
 
 ifeq ($(ENABLE_CIS),1)
 DEFINES += -DENABLE_CIS
