@@ -534,6 +534,11 @@ void Thread_FWMonitorTriger() {
 }
 
 void FW_MonitorTrigerStart() {
+  if (!FW_isDeviceVisionHub()) {
+    xlog("return... Triger function it's only for VisionHub");
+    return;
+  }
+
   if (isMonitorTriger) {
     xlog("thread already running");
     return;
