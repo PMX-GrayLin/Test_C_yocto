@@ -127,8 +127,10 @@ void Thread_UVCStreaming() {
 
     caps = gst_caps_new_simple(
         "image/jpeg",
-        "width", G_TYPE_INT, 1920,
-        "height", G_TYPE_INT, 1080,
+        // "width", G_TYPE_INT, 1920,
+        // "height", G_TYPE_INT, 1080,
+        "width", G_TYPE_INT, 2592,
+        "height", G_TYPE_INT, 1944,
         "framerate", GST_TYPE_FRACTION, 30, 1,
         nullptr);
 
