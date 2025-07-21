@@ -19,6 +19,8 @@ const int RESTful_MAX_FAIL = 3;
 std::set<std::pair<std::string, int>> RESTful_targets;
 std::unordered_map<std::pair<std::string, int>, int, PairHash> RESTful_failCount;
 
+bool isTestRESTful = true;
+
 // const int RESTful_MAX_FAIL = 3;
 // std::unordered_map<int, int> port_RESTful_failCount;
 // std::vector<int> RESTful_ports = {DefaultRESRfulPort};
@@ -147,9 +149,14 @@ void RESTful_unRegister(const std::string& url, const std::string& portS) {
 }
 
 void RESTFul_send(const std::string& content) {
-  xlog("content:%s", content);
+
+  if (isTestRESTful) {
+    xlog("content:%s", content.c_str());
+    return;
+  }
+
   if (RESTful_targets.empty()) {
-    // xlog("No targets to send, skipping...");
+    xlog("No targets to send, skipping...");
     return;
   }
 
@@ -238,25 +245,21 @@ void RESTFul_sendAsync(const std::string& content) {
 }
 
 void RESTful_send_streamingStatus_gst(bool isStreaming) {
-
   string content = std::string("gst/isStreaming/") + (isStreaming ? "true" : "false");
   RESTFul_sendAsync(content);
 }
 
 void RESTful_send_streamingStatus_gige_hik(int index, bool isStreaming) {
-
   string content = "gige" + std::to_string(index + 1) + "/isStreaming/" + (isStreaming ? "true" : "false");
   RESTFul_sendAsync(content);
 }
 
 void RESTful_send_DI(int index, bool isLevelHigh) {
-
   string content = "di/" + std::to_string(index + 1) + "/status/" + (isLevelHigh ? "high" : "low");
   RESTFul_sendAsync(content);
 }
 
 void RESTful_send_DIODI(int index, bool isLevelHigh) {
-
   string content = "dio_di/" + std::to_string(index + 1) + "/status/" + (isLevelHigh ? "high" : "low");
   RESTFul_sendAsync(content);
 }
