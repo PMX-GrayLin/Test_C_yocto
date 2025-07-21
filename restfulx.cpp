@@ -123,6 +123,7 @@ void RESTful_register(const std::string& url, const std::string& portS) {
   if (RESTful_targets.find(key) == RESTful_targets.end()) {
     RESTful_targets.insert(key);
     xlog("Registered: %s:%d", urlx.c_str(), port);
+    isTestRESTful = false;
   } else {
     xlog("Already registered: %s:%d", urlx.c_str(), port);
   }
