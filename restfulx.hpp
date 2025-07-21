@@ -22,3 +22,4 @@ void RESTful_send_streamingStatus_gige_hik(int index, bool isStreaming);
 void RESTful_send_DI(int index, bool isLevelHigh);
 void RESTful_send_DIODI(int index, bool isLevelHigh);
 
+

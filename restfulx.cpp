@@ -147,8 +147,9 @@ void RESTful_unRegister(const std::string& url, const std::string& portS) {
 }
 
 void RESTFul_send(const std::string& content) {
+  xlog("content:%s", content);
   if (RESTful_targets.empty()) {
-    xlog("No targets to send, skipping...");
+    // xlog("No targets to send, skipping...");
     return;
   }
 
