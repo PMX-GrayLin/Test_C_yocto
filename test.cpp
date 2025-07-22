@@ -32,7 +32,6 @@
 
 void handle_RESTful(std::vector<std::string> segments) {
 
-  FW_toggleLED("1", "green");
   if (isSameString(segments[0], "led")) {
     if (segments.size() == 3) {
       FW_setLED(segments[1], segments[2]);
@@ -176,7 +175,7 @@ void handle_RESTful(std::vector<std::string> segments) {
     // }
 
   }
-  FW_toggleLED("1", "green");
+
 }
 
 #if defined(ENABLE_FTDI)
@@ -360,6 +359,13 @@ int main(int argc, char* argv[]) {
       // }
       for (size_t i = 0; i < segments.size(); ++i) {
         xlog("segment[%zu]:%s", i, segments[i].c_str());
+      }
+
+      // Check before access
+      if (segments.empty()) {
+        res.status = 400;
+        res.set_content("{\"error\":\"Invalid RESTful path\"}", "application/json");
+        return;
       }
 
       handle_RESTful(segments);
