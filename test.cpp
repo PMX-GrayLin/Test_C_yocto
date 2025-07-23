@@ -272,6 +272,13 @@ int main(int argc, char* argv[]) {
   xlog("");
   xlog("FW Version:%s, Compile at %s %s", FW_VERSION, __DATE__, __TIME__);
 
+#ifdef ENABLE_Gige
+  xlog("Build Flag ENABLE_Gige");
+#elif
+#ifdef ENABLE_CIS
+  xlog("Build Flag ENABLE_CIS");
+#elif
+
   for (int i = 0; i < argc; ++i) {
     xlog("argv[%d]:%s", i, argv[i]);
   }
