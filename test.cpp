@@ -274,10 +274,13 @@ int main(int argc, char* argv[]) {
 
 #ifdef ENABLE_Gige
   xlog("Build Flag ENABLE_Gige");
-#elif
+#endif
 #ifdef ENABLE_CIS
   xlog("Build Flag ENABLE_CIS");
-#elif
+#endif
+#ifdef ENABLE_TestCode
+  xlog("Build Flag ENABLE_TestCode");
+#endif
 
   for (int i = 0; i < argc; ++i) {
     xlog("argv[%d]:%s", i, argv[i]);
