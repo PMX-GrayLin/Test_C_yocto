@@ -102,7 +102,7 @@ x = 1 ~ 4
 y = on / off
 ex :
 curl http://localhost:8765/fw/dio/1/do/on
-````
+```
 
 ## Camera CIS ( Omnivision OG05b10 )
 ### Streaming
