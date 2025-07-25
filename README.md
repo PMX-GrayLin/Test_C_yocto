@@ -3,7 +3,7 @@
 **received port : 8765**\
 **sent port     : ( default localhost:7654 )**
 
-## Register to receive message from fw_daemon
+## 🏁 Register to receive message from fw_daemon
 ```
 curl http://localhost:8765/fw/register/{url}/{port}
 ```
@@ -105,8 +105,6 @@ curl http://localhost:8765/fw/dio/1/do/on
 ```
 
 ## Camera CIS ( Omnivision OG05b10 )
-### Streaming
-
 ### Streaming
 **Start**
 ```
