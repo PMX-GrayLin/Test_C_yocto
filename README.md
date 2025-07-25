@@ -107,6 +107,8 @@ curl http://localhost:8765/fw/dio/1/do/on
 ## Camera CIS ( Omnivision OG05b10 )
 ### Streaming
 
+<span style="color:red">todo...</span>
+
 ### Get exposure_time_absolute
 **Request:**
 ```
@@ -131,9 +133,7 @@ value :
 ex: curl http://localhost:7654/fw/gst/white_balance_temperature/2700
 ```
 
-```
-todo...
-```
+
 
 ## Camera GigE
 ### Streaming
