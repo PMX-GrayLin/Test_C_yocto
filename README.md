@@ -1,5 +1,7 @@
 # RESTful commands:
 
+<span style="color:green">✔ All systems operational</span>
+
 **received port : 8765**\
 **sent port     : ( default localhost:7654 )**
 
