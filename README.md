@@ -1,9 +1,17 @@
-# RESTful command:
+# RESTful commands:
+
+## Camera CIS ( Omnivision OG05b10 )
+### Streaming
 
 
-## Streaming
-curl http://localhost:8765/fw/gige1/start
+
+## Camera GigE
+### Streaming
+```
+** Start
+$ curl http://localhost:8765/fw/gige1/start
 curl http://localhost:8765/fw/gige1/stop
+```
 
 ## Streaming status
 $ get
