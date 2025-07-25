@@ -30,17 +30,17 @@ curl http://localhost:8765/fw/gige1/stop
 ```
 
 ## Streaming status
-**request status**
+**Request**
 ```
 curl http://localhost:8765/fw/gige1/get/isStreaming
 ```
-**return or status change**
+**Request Return or Status Change**
 ```
 curl http://localhost:7654/fw/gige1/isStreaming/x
 x = true / false
 ```
 
-## set streaming resolution
+## Set Resolution
 ```
 curl http://localhost:8765/fw/gige1/set/resolution/width*height
 ex:
@@ -56,6 +56,7 @@ if save to path : /mnt/reserved/12345.png
 curl http://localhost:8765/fw/gige1/tp/%252Fmnt%252Freserved%252F12345.png
 ```
 
+# Device
 ## PWM
 ```
 curl http://localhost:8765/fw/pwm/x/y
@@ -71,24 +72,37 @@ y = green / red / orange / off
 ```
 
 ## DO * 2
+```
 curl http://localhost:8765/fw/do/x/y
 x = 1 / 2
 y = on / off
 ex : 
 curl http://localhost:8765/fw/do/1/on
+```
 
 ## DI * 2
+**Start Monitor DI**
+```
 curl http://localhost:8765/fw/di/on
+```
+**Stop Monitor DI**
+```
 curl http://localhost:8765/fw/di/off
-start/stop thread to monitor DI
+```
 
-* detect DI high/low change >> send out RESTful 
+**Send Event to RESTful Register Client** 
+[!NOTE]
+1. Start Monitoring will send current status once
+2. Detect high/low change
+```
 curl http://localhost:7654/fw/di/x/status/y
 x = 1 / 2
 y = high / low
-
-ex :
+```
+**ex:**
+```
 curl http://localhost:7654/fw/di/1/status/low
+```
 
 # Triger * 2 ( behavior same as DI )
 curl http://localhost:8765/fw/triger/on
