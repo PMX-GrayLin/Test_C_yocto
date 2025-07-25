@@ -14,8 +14,9 @@ curl http://localhost:8765/fw/register/localhost/7654
 
 ## Camera CIS ( Omnivision OG05b10 )
 ### Streaming
-
-
+```
+todo...
+```
 
 ## Camera GigE
 ### Streaming
@@ -29,40 +30,54 @@ curl http://localhost:8765/fw/gige1/stop
 ```
 
 ## Streaming status
-$ get
+**request status**
+```
 curl http://localhost:8765/fw/gige1/get/isStreaming
-$ return or status change
-ex:
+```
+**return or status change**
+```
 curl http://localhost:7654/fw/gige1/isStreaming/x
 x = true / false
+```
 
-# set streaming resolution
-curl http://localhost:8765/fw/gige1/set/resolution/w*h
+## set streaming resolution
+```
+curl http://localhost:8765/fw/gige1/set/resolution/width*height
 ex:
 curl http://localhost:8765/fw/gige1/set/resolution/1920*1080
+```
 
-# Take Picture
-curl http://localhost:8765/fw/gst/tp/x
+## Take Picture
+```
+curl http://localhost:8765/fw/gige1/tp/x
 x = encoded file path name
+ex:
+if save to path : /mnt/reserved/12345.png
+curl http://localhost:8765/fw/gige1/tp/%252Fmnt%252Freserved%252F12345.png
+```
 
-# PWM
+## PWM
+```
 curl http://localhost:8765/fw/pwm/x/y
 x = 1 / 2
 y = 0 ~ 100
+```
 
-# LED
+## LED
+```
 curl http://localhost:8765/fw/led/x/y
 x = 1 ~ 5
-y = green/red/orange/off
+y = green / red / orange / off
+```
 
-# DO * 2
+## DO * 2
 curl http://localhost:8765/fw/do/x/y
 x = 1 / 2
 y = on / off
 ex : 
 curl http://localhost:8765/fw/do/1/on
 
-# DI * 2
+## DI * 2
 curl http://localhost:8765/fw/di/on
 curl http://localhost:8765/fw/di/off
 start/stop thread to monitor DI
