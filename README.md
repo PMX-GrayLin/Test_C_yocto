@@ -106,6 +106,31 @@ curl http://localhost:8765/fw/dio/1/do/on
 
 ## Camera CIS ( Omnivision OG05b10 )
 ### Streaming
+
+### Get exposure_time_absolute
+**Request:**
+```
+curl http://localhost:9876/fw/gst/get/exposure_time_absolute
+```
+**Response:**
+```
+curl http://localhost:7654/fw/gst/exposure_time_absolute/value
+value : 
+ex: curl http://localhost:7654/fw/gst/exposure_time_absolute/1000000
+```
+
+### Get white_balance_temperature
+**Request:**
+```
+curl http://localhost:9876/fw/gst/get/white_balance_temperature
+```
+**Response:**
+```
+curl http://localhost:7654/fw/gst/white_balance_temperature/value
+value : 
+ex: curl http://localhost:7654/fw/gst/white_balance_temperature/2700
+```
+
 ```
 todo...
 ```
@@ -148,7 +173,7 @@ if save to path : /mnt/reserved/12345.png
 curl http://localhost:8765/fw/gige1/tp/%252Fmnt%252Freserved%252F12345.png
 ```
 
-## Camera Configs
+### Camera Configs
 **Set exposure-auto**
 ```
 curl http://localhost:8765/fw/gige1/set/exposure-auto/x
@@ -189,22 +214,3 @@ ex :
 curl http://localhost:8765/fw/gige1/set/gain/15
 ```
 
-
-
-# get exposure_time_absolute
-request:
-curl http://localhost:9876/fw/gst/get/exposure_time_absolute
-
-response:
-curl http://localhost:7654/fw/gst/exposure_time_absolute/value
-value : 
-ex: curl http://localhost:7654/fw/gst/exposure_time_absolute/1000000
-
-# get white_balance_temperature
-request:
-curl http://localhost:9876/fw/gst/get/white_balance_temperature
-
-response:
-curl http://localhost:7654/fw/gst/white_balance_temperature/value
-value : 
-ex: curl http://localhost:7654/fw/gst/white_balance_temperature/2700
