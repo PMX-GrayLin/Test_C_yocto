@@ -1,7 +1,5 @@
 # RESTful commands:
 
-<span style="color:green">✔ All systems operational</span>
-
 **received port : 8765**\
 **sent port     : ( default localhost:7654 )**
 
@@ -109,7 +107,42 @@ curl http://localhost:8765/fw/dio/1/do/on
 ## Camera CIS ( Omnivision OG05b10 )
 ### Streaming
 
-<span style="color:red">todo...</span>
+### Streaming
+**Start**
+```
+curl http://localhost:8765/fw/gst/start
+```
+**Stop**
+```
+curl http://localhost:8765/fw/gst/stop
+```
+
+### Streaming status
+**Request**
+```
+curl http://localhost:8765/fw/gst/get/isStreaming
+```
+**Request Return or Status Change**
+```
+curl http://localhost:7654/fw/gst/isStreaming/x
+x = true / false
+```
+
+### Set Resolution
+```
+curl http://localhost:8765/fw/gst/set/resolution/width*height
+ex:
+curl http://localhost:8765/fw/gst/set/resolution/1920*1080
+```
+
+### Take Picture
+```
+curl http://localhost:8765/fw/gst/tp/x
+x = encoded file path name
+ex:
+if save to path : /mnt/reserved/12345.png
+curl http://localhost:8765/fw/gst/tp/%252Fmnt%252Freserved%252F12345.png
+```
 
 ### Get exposure_time_absolute
 **Request:**
@@ -134,8 +167,6 @@ curl http://localhost:7654/fw/gst/white_balance_temperature/value
 value : 
 ex: curl http://localhost:7654/fw/gst/white_balance_temperature/2700
 ```
-
-
 
 ## Camera GigE
 ### Streaming
