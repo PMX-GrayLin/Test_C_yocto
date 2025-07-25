@@ -12,71 +12,6 @@ curl http://localhost:8765/fw/register/{url}/{port}
 curl http://localhost:8765/fw/register/localhost/7654
 ```
 
-## Camera CIS ( Omnivision OG05b10 )
-### Streaming
-```
-todo...
-```
-
-## Camera GigE
-### Streaming
-**Start**
-```
-curl http://localhost:8765/fw/gige1/start
-```
-**Stop**
-```
-curl http://localhost:8765/fw/gige1/stop
-```
-
-### Streaming status
-**Request**
-```
-curl http://localhost:8765/fw/gige1/get/isStreaming
-```
-**Request Return or Status Change**
-```
-curl http://localhost:7654/fw/gige1/isStreaming/x
-x = true / false
-```
-
-### Set Resolution
-```
-curl http://localhost:8765/fw/gige1/set/resolution/width*height
-ex:
-curl http://localhost:8765/fw/gige1/set/resolution/1920*1080
-```
-
-### Take Picture
-```
-curl http://localhost:8765/fw/gige1/tp/x
-x = encoded file path name
-ex:
-if save to path : /mnt/reserved/12345.png
-curl http://localhost:8765/fw/gige1/tp/%252Fmnt%252Freserved%252F12345.png
-```
-
-## Camera Configs
-**Set exposure-auto**
-```
-curl http://localhost:8765/fw/gige1/set/exposure-auto/x
-x = 0/1/2 (Auto exposure mode: 0=off, 1=once, 2=continuous)
-ex :
-curl http://localhost:8765/fw/gige1/set/exposure-auto/0
-```
-
-**Set exposure**
-```
-curl http://localhost:8765/fw/gige1/set/exposure/x
-x = range of ExposureTime
-  // # arv-tool-0.8 control ExposureTime
-  // Hikrobot-MV-CS060-10GM-PRO-K44474092 (192.168.11.22)
-  // ExposureTime = 15000 min:25 max:2.49985e+06
-
-ex :
-curl http://localhost:8765/fw/gige1/set/exposure/50000
-```
-
 ## Device
 ### PWM
 ```
@@ -144,31 +79,106 @@ y = high / low
 ```
 
 ### DIO * 4
+**Should to Set to DI or DO before Use**
+```
 curl http://localhost:8765/fw/dio/x/set/y
 x = 1 ~ 4
 y = di / do
-
-* set to DI, auto start monitor DI
-* detect DI high/low change >> send out RESTful 
+```
+**If Set to DI, Start Monitor...**
+**Send Event to RESTful Register Client**
+1. Start monitoring will send current status once
+2. Detect high/low change
+```
 curl http://localhost:7654/fw/dio/x/status/y
 x = 1 ~ 4
 y = high / low
+```
 
-* set to DO, control
+**If Set to DO, Direct Control**
+```
 curl http://localhost:8765/fw/dio/x/do/y
 x = 1 ~ 4
 y = on / off
 ex :
 curl http://localhost:8765/fw/dio/1/do/on
+````
 
+## Camera CIS ( Omnivision OG05b10 )
+### Streaming
+```
+todo...
+```
 
-* set gain-auto
+## Camera GigE
+### Streaming
+**Start**
+```
+curl http://localhost:8765/fw/gige1/start
+```
+**Stop**
+```
+curl http://localhost:8765/fw/gige1/stop
+```
+
+### Streaming status
+**Request**
+```
+curl http://localhost:8765/fw/gige1/get/isStreaming
+```
+**Request Return or Status Change**
+```
+curl http://localhost:7654/fw/gige1/isStreaming/x
+x = true / false
+```
+
+### Set Resolution
+```
+curl http://localhost:8765/fw/gige1/set/resolution/width*height
+ex:
+curl http://localhost:8765/fw/gige1/set/resolution/1920*1080
+```
+
+### Take Picture
+```
+curl http://localhost:8765/fw/gige1/tp/x
+x = encoded file path name
+ex:
+if save to path : /mnt/reserved/12345.png
+curl http://localhost:8765/fw/gige1/tp/%252Fmnt%252Freserved%252F12345.png
+```
+
+## Camera Configs
+**Set exposure-auto**
+```
+curl http://localhost:8765/fw/gige1/set/exposure-auto/x
+x = 0/1/2 (Auto exposure mode: 0=off, 1=once, 2=continuous)
+ex :
+curl http://localhost:8765/fw/gige1/set/exposure-auto/0
+```
+
+**Set exposure**
+```
+curl http://localhost:8765/fw/gige1/set/exposure/x
+x = range of ExposureTime
+  // # arv-tool-0.8 control ExposureTime
+  // Hikrobot-MV-CS060-10GM-PRO-K44474092 (192.168.11.22)
+  // ExposureTime = 15000 min:25 max:2.49985e+06
+
+ex :
+curl http://localhost:8765/fw/gige1/set/exposure/50000
+```
+
+**Set gain-auto**
+```
 curl http://localhost:8765/fw/gige1/set/gain-auto/x
 x = 0/1/2 (Auto Gain mode: 0=off, 1=once, 2=continuous)
 ex :
 curl http://localhost:8765/fw/gige1/set/gain-auto/0
+```
 
-* set gain
+**Set gain**
+```
 curl http://localhost:8765/fw/gige1/set/gain/x
 x = range of Gain
   // # arv-tool-0.8 control Gain
@@ -176,7 +186,9 @@ x = range of Gain
   // Gain = 10.0161 dB min:0 max:23.9812
 
 ex :
-curl http://localhost:8765/fw/gige1/set/exposure/15
+curl http://localhost:8765/fw/gige1/set/gain/15
+```
+
 
 
 # get exposure_time_absolute
