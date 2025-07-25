@@ -1,7 +1,7 @@
 # RESTful commands:
 
-** received port : 8765 **
-** sent port     : ( default localhost:7654 ) **
+**received port : 8765**
+**sent port     : ( default localhost:7654 )**
 
 ## Register to receive message from fw_daemon
 ```
@@ -19,11 +19,11 @@ curl http://localhost:8765/fw/register/localhost/7654
 
 ## Camera GigE
 ### Streaming
-** Start **
+**Start**
 ```
 curl http://localhost:8765/fw/gige1/start
 ```
-** Stop **
+**Stop**
 ```
 curl http://localhost:8765/fw/gige1/stop
 ```
