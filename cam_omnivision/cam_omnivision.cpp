@@ -39,7 +39,7 @@ static GMainLoop *gst_loop_aic = nullptr;
 
 namespace fs = std::filesystem;
 
-void AICP_handle_RESTful(std::vector<std::string> segments) {
+void AICP_handle_RESTful(std::vector<std::string> segments, httplib::Response &res) {
   if (isSameString(segments[1], "start")) {
     AICP_streamingStart();
 
