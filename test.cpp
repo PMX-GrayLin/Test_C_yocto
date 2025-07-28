@@ -30,7 +30,7 @@
 // #include "libft4222.h"
 // #endif
 
-void handle_RESTful(std::vector<std::string> segments, , httplib::Response &res) {
+void handle_RESTful(std::vector<std::string> segments, httplib::Response &res) {
 
   if (isSameString(segments[0], "led")) {
     if (segments.size() == 3) {
