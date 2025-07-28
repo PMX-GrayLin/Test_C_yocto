@@ -19,6 +19,8 @@
 std::thread t_streaming_aic;
 std::atomic<bool> isStreaming_aic{false};
 std::chrono::steady_clock::time_point lastStartTime_aic;
+int resolution_width_aic;
+int resolution_height_aic;
 
 bool isCapturePhoto_aic = false;
 bool isCropPhoto_aic = false;
@@ -66,6 +68,18 @@ void AICP_handle_RESTful(std::vector<std::string> segments) {
     }
     AICP_setImagePath(path.c_str());
     AICP_captureImage();
+
+  } else if (isSameString(segments[1], "get")) {
+    int value = 0;
+    if (isSameString(segments[2], "exposure_time_absolute")) {
+      value = AICP_getExposureTimeAbsolute();
+    } else if (isSameString(segments[2], "white_balance_temperature")) {
+      value = AICP_getWhiteBalanceTemperature();
+    }
+    // nlohmann::ordered_json j;
+    nlohmann::json j;
+    j["value"] = value;
+    res.set_content(j.dump(), "application/json");
   }
 }
 

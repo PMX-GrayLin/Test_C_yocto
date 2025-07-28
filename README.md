@@ -3,7 +3,7 @@
 **received port : 8765**\
 **sent port     : ( default localhost:7654 )**
 
-## 🏁 Register to receive message from fw_daemon
+## ✨Register to receive message from fw_daemon
 ```
 curl http://localhost:8765/fw/register/{url}/{port}
 ```
@@ -13,7 +13,7 @@ curl http://localhost:8765/fw/register/localhost/7654
 ```
 
 ## Device
-### PWM
+### 🏁PWM
 ```
 curl http://localhost:8765/fw/pwm/x/y
 x = 1 / 2

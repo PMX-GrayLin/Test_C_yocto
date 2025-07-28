@@ -29,7 +29,10 @@ enum class VideoFlipMethod {
   vfm_AUTOMATIC = 8              // Use image-orientation tag
 };
 
-void AICP_handle_RESTful(std::vector<std::string> segments);
+namespace httplib {
+    class Response;  // Forward declaration
+}
+void AICP_handle_RESTful(std::vector<std::string> segments, httplib::Response &res);
 
 bool AICP_isUseCISCamera();
 std::string AICP_getVideoDevice();
