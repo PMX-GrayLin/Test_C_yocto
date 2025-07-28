@@ -14,6 +14,7 @@
 
 #include "device.hpp"
 #include "image_utils.hpp"
+#include "httplib.hpp"
 #include "restfulx.hpp"
 
 std::thread t_streaming_aic;
