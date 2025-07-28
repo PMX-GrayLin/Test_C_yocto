@@ -8,7 +8,7 @@
 namespace httplib {
     class Response;  // Forward declaration
 }
-void handle_RESTful(std::vector<std::string> segments, httplib::Response &res = nullptr);
+void handle_RESTful(std::vector<std::string> segments, httplib::Response &res);
 
 // #if defined(ENABLE_FTDI)
 // void test_ftdi();

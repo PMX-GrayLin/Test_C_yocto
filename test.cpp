@@ -378,7 +378,7 @@ int main(int argc, char* argv[]) {
         return;
       }
 
-      handle_RESTful(segments);
+      handle_RESTful(segments, res);
 
     } else {
       res.status = 400;  // Bad Request
