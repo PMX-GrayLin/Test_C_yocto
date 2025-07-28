@@ -239,7 +239,7 @@ void UVC_streamingLED() {
 }
 
 void UVC_setResolution(const string& resolutionS) {
-  size_t sep = resolutionStr.find('*');
+  size_t sep = resolutionS.find('*');
   if (sep == std::string::npos) {
     xlog("Invalid resolution format. Expected format: width*height");
     return;
