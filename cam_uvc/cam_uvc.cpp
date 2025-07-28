@@ -245,8 +245,8 @@ void UVC_setResolution(const string& resolutionS) {
     return;
   }
 
-  int width = std::stoi(resolutionStr.substr(0, sep));
-  int height = std::stoi(resolutionStr.substr(sep + 1));
+  int width = std::stoi(resolutionS.substr(0, sep));
+  int height = std::stoi(resolutionS.substr(sep + 1));
 
   resolution_width_uvc = width;
   resolution_height_uvc = height;
