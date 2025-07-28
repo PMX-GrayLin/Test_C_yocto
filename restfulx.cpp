@@ -255,6 +255,11 @@ void RESTful_send_streamingStatus_gige_hik(int index, bool isStreaming) {
   RESTFul_sendAsync(content);
 }
 
+void RESTful_send_streamingStatus_uvc(bool isStreaming) {
+  string content = std::string("uvc/isStreaming/") + (isStreaming ? "true" : "false");
+  RESTFul_sendAsync(content);
+}
+
 void RESTful_send_DI(int index, bool isLevelHigh) {
   string content = "di/" + std::to_string(index + 1) + "/status/" + (isLevelHigh ? "high" : "low");
   RESTFul_sendAsync(content);

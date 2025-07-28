@@ -48,6 +48,10 @@ void UVC_handle_RESTful(std::vector<std::string> segments) {
   } else if (isSameString(segments[1], "flip")) {
     // UVC_setFlip(segments[2]);
 
+  } else if (isSameString(segments[1], "resolution")) {
+    // with format "width*height"
+    UVC_setResolution(segments[2]);
+
   } else if (isSameString(segments[1], "tp")) {
     xlog("take picture");
     std::string path = "";
@@ -166,6 +170,7 @@ void Thread_UVCStreaming() {
           } else {
             xlog("Pipeline is running...");
             isStreaming_uvc = true;
+            RESTful_send_streamingStatus_uvc(isStreaming_uvc);
 
             gst_loop_uvc = g_main_loop_new(nullptr, FALSE);
             g_main_loop_run(gst_loop_uvc);
@@ -190,6 +195,7 @@ void Thread_UVCStreaming() {
   FW_CheckUVCDevices();
 
   isStreaming_uvc = false;
+  RESTful_send_streamingStatus_uvc(isStreaming_uvc);
   xlog("++++ stop ++++, pipeline stopped and cleaned");
 }
 
@@ -230,4 +236,19 @@ void UVC_streamingLED() {
   if (counterFrame_uvc % 15 == 0) {
     FW_toggleLED("2", "orange");
   }
+}
+
+void UVC_setResolution(const string& resolutionS) {
+  size_t sep = resolutionStr.find('*');
+  if (sep == std::string::npos) {
+    xlog("Invalid resolution format. Expected format: width*height");
+    return;
+  }
+
+  int width = std::stoi(resolutionStr.substr(0, sep));
+  int height = std::stoi(resolutionStr.substr(sep + 1));
+
+  resolution_width_uvc = width;
+  resolution_height_uvc = height;
+  xlog("width:%d, height:%d", resolution_width_uvc, resolution_height_uvc);
 }

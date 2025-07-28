@@ -15,3 +15,4 @@ void Thread_UVCStreaming();
 void UVC_streamingStart();
 void UVC_streamingStop();
 void UVC_streamingLED();
+void UVC_setResolution(const string& resolutionS);

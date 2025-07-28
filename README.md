@@ -12,7 +12,7 @@ curl http://localhost:8765/fw/restful/register/{url}/{port}
 curl http://localhost:8765/fw/restful/register/localhost/7654
 ```
 
-## Device
+## ✨Device
 ### 🏁PWM
 ```
 curl http://localhost:8765/fw/pwm/x/y
@@ -104,7 +104,7 @@ ex :
 curl http://localhost:8765/fw/dio/1/do/on
 ```
 
-## Camera CIS ( Omnivision OG05b10 )
+## ✨Camera CIS ( Omnivision OG05b10 )
 ### Streaming
 **Start**
 ```
@@ -166,7 +166,7 @@ value :
 ex: curl http://localhost:7654/fw/gst/white_balance_temperature/2700
 ```
 
-## Camera GigE
+## ✨Camera GigE
 ### Streaming
 **Start**
 ```
