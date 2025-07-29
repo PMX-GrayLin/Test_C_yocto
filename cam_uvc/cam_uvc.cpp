@@ -17,8 +17,8 @@
 std::thread t_streaming_uvc;
 std::atomic<bool> isStreaming_uvc{false};
 std::chrono::steady_clock::time_point lastStartTime_uvc;
-int resolution_width_uvc;
-int resolution_height_uvc;
+int resolution_width_uvc = 1920;
+int resolution_height_uvc 1080;
 
 bool isCapturePhoto_uvc = false;
 bool isCropPhoto_uvc = false;

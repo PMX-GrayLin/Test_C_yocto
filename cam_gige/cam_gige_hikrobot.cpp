@@ -23,8 +23,8 @@ static GstElement *source_gige_hik = nullptr;
 std::thread t_streaming_gige_hik;
 std::atomic<bool> isStreaming_gige_hik{false};
 std::chrono::steady_clock::time_point lastStartTime_gige_hik;
-int resolution_width_gige_hik;
-int resolution_height_gige_hik;
+int resolution_width_gige_hik[NUM_GigE] = {1920, 1920};
+int resolution_height_gige_hik[NUM_GigE] = {1080, 1080};
 
 struct GigeControlParams gigeControlParams = {0};
 
@@ -34,6 +34,13 @@ std::string pathName_savedImage_hik = "";
 static volatile int counterFrame_hik = 0;
 
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
+  string indexS = "";
+  if (isSameString(segments[0], "gige") || isSameString(segments[1], "gige1")) {
+    indexS = "1";
+  } else if (isSameString(segments[0], "gige2")) {
+    indexS = "2";
+  }
+
   if (isSameString(segments[1], "start")) {
     GigE_StreamingStart_Hik();
 
@@ -50,8 +57,8 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else if (isSameString(segments[2], "gain-auto")) {
       GigE_setGainAuto_hik(segments[3]);
     } else if (isSameString(segments[2], "resolution")) {
-      // should set before streaming start
-
+      // with format "width*height"
+      GigE_setResolution(indexS, segments[3]);
     }
 
   } else if (isSameString(segments[1], "get")) {
@@ -385,4 +392,20 @@ void GigE_streamingLED() {
   {
     FW_toggleLED("2", "orange");
   }
+}
+
+void GigE_setResolution(const string& indexS, const string& resolutionS) {
+  size_t sep = resolutionS.find('*');
+  if (sep == std::string::npos) {
+    xlog("Invalid resolution format. Expected format: width*height");
+    return;
+  }
+
+  int index = std::stoi(indexS);
+  int width = std::stoi(resolutionS.substr(0, sep));
+  int height = std::stoi(resolutionS.substr(sep + 1));
+
+  resolution_width_gige_hik[index] = width;
+  resolution_height_gige_hik[index] = height;
+  xlog("index:%d, width:%d, height:%d", index, resolution_width_gige_hik[index], resolution_height_gige_hik[index]);
 }

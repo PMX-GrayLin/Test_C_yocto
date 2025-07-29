@@ -49,8 +49,8 @@ void GigE_captureImage_hik();
 void GigE_ThreadStreaming_Hik();
 void GigE_StreamingStart_Hik();
 void GigE_StreamingStop_Hik();
-
 void GigE_streamingLED();
+void GigE_setResolution(const string& indexS, const string& resolutionS);
 
 /* 
 

@@ -90,7 +90,7 @@ void handle_RESTful(std::vector<std::string> segments, httplib::Response &res) {
 
 #if defined(ENABLE_Gige)
 
-  } else if (isSameString(segments[0], "gige") || isSameString(segments[0], "gige1")) {
+  } else if (isSameString(segments[0], "gige") || isSameString(segments[0], "gige1") || isSameString(segments[0], "gige2")) {
     Gige_handle_RESTful_hik(segments);
 
 #endif
