@@ -20,8 +20,8 @@
 std::thread t_streaming_aic;
 std::atomic<bool> isStreaming_aic{false};
 std::chrono::steady_clock::time_point lastStartTime_aic;
-int resolution_width_aic;
-int resolution_height_aic;
+int resolution_width_aic = 2592;
+int resolution_height_aic = 1944;
 
 bool isCapturePhoto_aic = false;
 bool isCropPhoto_aic = false;
@@ -81,6 +81,11 @@ void AICP_handle_RESTful(std::vector<std::string> segments, httplib::Response &r
     nlohmann::json j;
     j["value"] = value;
     res.set_content(j.dump(), "application/json");
+
+  } else if (isSameString(segments[1], "set")) {
+    // with format "width*height"
+    AICP_setResolution(segments[2]);
+
   }
 }
 
@@ -789,6 +794,21 @@ void AICP_setFlip(const std::string & methodS) {
   }
 }
 
+void AICP_setResolution(const string& resolutionS) {
+  size_t sep = resolutionS.find('*');
+  if (sep == std::string::npos) {
+    xlog("Invalid resolution format. Expected format: width*height");
+    return;
+  }
+
+  int width = std::stoi(resolutionS.substr(0, sep));
+  int height = std::stoi(resolutionS.substr(sep + 1));
+
+  resolution_width_aic = width;
+  resolution_height_aic = height;
+  xlog("width:%d, height:%d", resolution_width_aic, resolution_height_aic);
+}
+
 void AICP_load_crop_saveImage() {
   // not use thread here
   // std::thread([]() {
@@ -891,4 +911,3 @@ void AICP_publishDIODINState(int din_pin, const std::string &pin_state) {
   std::string json = j.dump();
   // ?? send mqtt
 }
-

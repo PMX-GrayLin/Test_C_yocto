@@ -48,10 +48,6 @@ void UVC_handle_RESTful(std::vector<std::string> segments) {
   } else if (isSameString(segments[1], "flip")) {
     // UVC_setFlip(segments[2]);
 
-  } else if (isSameString(segments[1], "resolution")) {
-    // with format "width*height"
-    UVC_setResolution(segments[2]);
-
   } else if (isSameString(segments[1], "tp")) {
     xlog("take picture");
     std::string path = "";
@@ -71,6 +67,14 @@ void UVC_handle_RESTful(std::vector<std::string> segments) {
     }
     UVC_setImagePath(path.c_str());
     UVC_captureImage();
+
+  } else if (isSameString(segments[1], "set")) {
+
+     if (isSameString(segments[2], "resolution")) {
+       // with format "width*height"
+       UVC_setResolution(segments[3]);
+     }
+     
   }
 
 }

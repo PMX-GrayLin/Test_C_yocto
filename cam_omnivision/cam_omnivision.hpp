@@ -84,6 +84,7 @@ void AICP_streamingStart();
 void AICP_streamingStop();
 void AICP_streamingLED();
 void AICP_setFlip(const std::string & methodS);
+void AICP_setResolution(const string& resolutionS);
 
 // image processing
 void AICP_load_crop_saveImage();
