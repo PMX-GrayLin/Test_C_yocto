@@ -17,8 +17,8 @@
 std::thread t_streaming_uvc;
 std::atomic<bool> isStreaming_uvc{false};
 std::chrono::steady_clock::time_point lastStartTime_uvc;
-int resolution_width_uvc = 1920;
-int resolution_height_uvc = 1080;
+static int resolution_width_uvc = 2592;
+static int resolution_height_uvc = 1944;
 
 bool isCapturePhoto_uvc = false;
 bool isCropPhoto_uvc = false;
@@ -137,10 +137,8 @@ void Thread_UVCStreaming() {
 
     caps = gst_caps_new_simple(
         "image/jpeg",
-        // "width", G_TYPE_INT, 1920,
-        // "height", G_TYPE_INT, 1080,
-        "width", G_TYPE_INT, 2592,
-        "height", G_TYPE_INT, 1944,
+        "width", G_TYPE_INT, resolution_width_uvc,
+        "height", G_TYPE_INT, resolution_height_uvc,
         "framerate", GST_TYPE_FRACTION, 30, 1,
         nullptr);
 
