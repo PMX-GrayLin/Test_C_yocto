@@ -237,9 +237,9 @@ ex: curl http://localhost:7654/fw/uvc/white_balance_temperature/2700
 ```
 
 ## ✨<a name="anchor-cam-gige"> Camera GigE </a> <sub>[Back to Top](#anchor-topic)</sub>
-in Vision Hub, Max number of GigE camera is 2; \
-curl http://localhost:8765/fw/{gige-index}/...; \
-{gige-index} can be **gige1** or **gige2** \
+Max number of GigE camera is 2 \
+curl http://localhost:8765/fw/{gige-index}/... \
+{gige-index} can be **gige1** or **gige2**
 
 ### 🏁Streaming
 **Start**
