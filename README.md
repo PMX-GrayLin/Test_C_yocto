@@ -20,14 +20,14 @@ x = 1 / 2
 y = 0 ~ 100
 ```
 
-### LED
+### 🏁LED
 ```
 curl http://localhost:8765/fw/led/x/y
 x = 1 ~ 5
 y = green / red / orange / off
 ```
 
-### DO * 2
+### 🏁DO * 2
 ```
 curl http://localhost:8765/fw/do/x/y
 x = 1 / 2
@@ -36,7 +36,7 @@ ex :
 curl http://localhost:8765/fw/do/1/on
 ```
 
-### DI * 2
+### 🏁DI * 2
 **Start Monitor DI**
 ```
 curl http://localhost:8765/fw/di/on
@@ -59,7 +59,7 @@ y = high / low
 curl http://localhost:7654/fw/di/1/status/low
 ```
 
-### Triger * 2 ( behavior same as DI )
+### 🏁Triger * 2 ( behavior same as DI )
 **Start Monitor Triger**
 ```
 curl http://localhost:8765/fw/triger/on
@@ -78,7 +78,7 @@ x = 1 / 2
 y = high / low
 ```
 
-### DIO * 4
+### 🏁DIO * 4
 **Should to Set to DI or DO before Use**
 ```
 curl http://localhost:8765/fw/dio/x/set/y
@@ -105,7 +105,7 @@ curl http://localhost:8765/fw/dio/1/do/on
 ```
 
 ## ✨Camera CIS ( Omnivision OG05b10 )
-### Streaming
+### 🏁Streaming
 **Start**
 ```
 curl http://localhost:8765/fw/gst/start
@@ -115,7 +115,7 @@ curl http://localhost:8765/fw/gst/start
 curl http://localhost:8765/fw/gst/stop
 ```
 
-### Streaming status
+**Streaming status**
 **Request**
 ```
 curl http://localhost:8765/fw/gst/get/isStreaming
@@ -167,7 +167,7 @@ ex: curl http://localhost:7654/fw/gst/white_balance_temperature/2700
 ```
 
 ## ✨UVC Cameras
-### Streaming
+### 🏁Streaming
 **Start**
 ```
 curl http://localhost:8765/fw/uvc/start
@@ -177,7 +177,7 @@ curl http://localhost:8765/fw/uvc/start
 curl http://localhost:8765/fw/uvc/stop
 ```
 
-### Streaming status
+**Streaming status**
 **Request**
 ```
 curl http://localhost:8765/fw/uvc/get/isStreaming
@@ -188,14 +188,14 @@ curl http://localhost:7654/fw/uvc/isStreaming/x
 x = true / false
 ```
 
-### Set Resolution
+### 🏁Set Resolution
 ```
 curl http://localhost:8765/fw/uvc/set/resolution/width*height
 ex:
 curl http://localhost:8765/fw/uvc/set/resolution/1920*1080
 ```
 
-### Take Picture
+### 🏁Take Picture
 ```
 curl http://localhost:8765/fw/uvc/tp/x
 x = encoded file path name
@@ -204,7 +204,7 @@ if save to path : /mnt/reserved/12345.png
 curl http://localhost:8765/fw/uvc/tp/%252Fmnt%252Freserved%252F12345.png
 ```
 
-### Get exposure_time_absolute
+### 🏁Get exposure_time_absolute
 **Request:**
 ```
 curl http://localhost:9876/fw/uvc/get/exposure_time_absolute
@@ -216,7 +216,7 @@ value :
 ex: curl http://localhost:7654/fw/uvc/exposure_time_absolute/1000000
 ```
 
-### Get white_balance_temperature
+### 🏁Get white_balance_temperature
 **Request:**
 ```
 curl http://localhost:9876/fw/uvc/get/white_balance_temperature
@@ -229,7 +229,7 @@ ex: curl http://localhost:7654/fw/uvc/white_balance_temperature/2700
 ```
 
 ## ✨Camera GigE
-### Streaming
+### 🏁Streaming
 **Start**
 ```
 curl http://localhost:8765/fw/gige1/start
@@ -239,7 +239,7 @@ curl http://localhost:8765/fw/gige1/start
 curl http://localhost:8765/fw/gige1/stop
 ```
 
-### Streaming status
+**Streaming status**
 **Request**
 ```
 curl http://localhost:8765/fw/gige1/get/isStreaming
@@ -250,14 +250,14 @@ curl http://localhost:7654/fw/gige1/isStreaming/x
 x = true / false
 ```
 
-### Set Resolution
+### 🏁Set Resolution
 ```
 curl http://localhost:8765/fw/gige1/set/resolution/width*height
 ex:
 curl http://localhost:8765/fw/gige1/set/resolution/1920*1080
 ```
 
-### Take Picture
+### 🏁Take Picture
 ```
 curl http://localhost:8765/fw/gige1/tp/x
 x = encoded file path name
@@ -266,7 +266,7 @@ if save to path : /mnt/reserved/12345.png
 curl http://localhost:8765/fw/gige1/tp/%252Fmnt%252Freserved%252F12345.png
 ```
 
-### Camera Configs
+### 🏁Camera Configs
 **Set exposure-auto**
 ```
 curl http://localhost:8765/fw/gige1/set/exposure-auto/x
