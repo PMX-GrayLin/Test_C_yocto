@@ -511,8 +511,8 @@ void Thread_AICPStreaming() {
   // 5M : 2592 * 1944
   GstCaps *caps = gst_caps_new_simple(
       "video/x-raw",
-      "width", resolution_width_aic,
-      "height", resolution_height_aic,
+      "width", G_TYPE_INT, resolution_width_aic,
+      "height", G_TYPE_INT, resolution_height_aic,
       "framerate", GST_TYPE_FRACTION, 30, 1,  // Add frame rate as 30/1
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
