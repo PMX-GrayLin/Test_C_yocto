@@ -1,12 +1,11 @@
 # RESTful commands:
 
-**received port : 8765**\
-**sent port     : ( default localhost:7654 )**
-
 [Device](#anchor-device)
 [Camera CIS ](#anchor-cam-cis)
 
 ## ✨Register Restful client to receive message from fw_daemon
+**received port : 8765**\
+**sent port     : ( default localhost:7654 )**
 ```
 curl http://localhost:8765/fw/restful/register/{url}/{port}
 ```
