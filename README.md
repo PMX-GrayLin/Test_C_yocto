@@ -121,8 +121,7 @@ curl http://localhost:8765/fw/gst/start
 curl http://localhost:8765/fw/gst/stop
 ```
 
-**Streaming status**
-**Request**
+**Request Streaming status**
 ```
 curl http://localhost:8765/fw/gst/get/isStreaming
 ```
@@ -184,8 +183,7 @@ curl http://localhost:8765/fw/uvc/start
 curl http://localhost:8765/fw/uvc/stop
 ```
 
-**Streaming status**
-**Request**
+**Request Streaming status**
 ```
 curl http://localhost:8765/fw/uvc/get/isStreaming
 ```
@@ -251,8 +249,7 @@ curl http://localhost:8765/fw/{gige-index}/start
 curl http://localhost:8765/fw/gige1/stop
 ```
 
-**Streaming status**
-**Request**
+**Request Streaming status**
 ```
 curl http://localhost:8765/fw/{gige-index}/get/isStreaming
 ```
