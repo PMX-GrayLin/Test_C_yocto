@@ -166,6 +166,68 @@ value :
 ex: curl http://localhost:7654/fw/gst/white_balance_temperature/2700
 ```
 
+## ✨UVC Cameras
+### Streaming
+**Start**
+```
+curl http://localhost:8765/fw/uvc/start
+```
+**Stop**
+```
+curl http://localhost:8765/fw/uvc/stop
+```
+
+### Streaming status
+**Request**
+```
+curl http://localhost:8765/fw/uvc/get/isStreaming
+```
+**Request Return or Status Change**
+```
+curl http://localhost:7654/fw/uvc/isStreaming/x
+x = true / false
+```
+
+### Set Resolution
+```
+curl http://localhost:8765/fw/uvc/set/resolution/width*height
+ex:
+curl http://localhost:8765/fw/uvc/set/resolution/1920*1080
+```
+
+### Take Picture
+```
+curl http://localhost:8765/fw/uvc/tp/x
+x = encoded file path name
+ex:
+if save to path : /mnt/reserved/12345.png
+curl http://localhost:8765/fw/uvc/tp/%252Fmnt%252Freserved%252F12345.png
+```
+
+### Get exposure_time_absolute
+**Request:**
+```
+curl http://localhost:9876/fw/uvc/get/exposure_time_absolute
+```
+**Response:**
+```
+curl http://localhost:7654/fw/uvc/exposure_time_absolute/value
+value : 
+ex: curl http://localhost:7654/fw/uvc/exposure_time_absolute/1000000
+```
+
+### Get white_balance_temperature
+**Request:**
+```
+curl http://localhost:9876/fw/uvc/get/white_balance_temperature
+```
+**Response:**
+```
+curl http://localhost:7654/fw/uvc/white_balance_temperature/value
+value : 
+ex: curl http://localhost:7654/fw/uvc/white_balance_temperature/2700
+```
+
 ## ✨Camera GigE
 ### Streaming
 **Start**
