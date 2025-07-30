@@ -126,7 +126,7 @@ curl http://localhost:7654/fw/gst/isStreaming/x
 x = true / false
 ```
 
-### Set Resolution
+### 🏁Set Resolution
 will effect next streaming
 ```
 curl http://localhost:8765/fw/gst/set/resolution/width*height
@@ -134,7 +134,7 @@ ex:
 curl http://localhost:8765/fw/gst/set/resolution/1920*1080
 ```
 
-### Take Picture
+### 🏁Take Picture
 ```
 curl http://localhost:8765/fw/gst/tp/x
 x = encoded file path name
@@ -143,7 +143,7 @@ if save to path : /mnt/reserved/12345.png
 curl http://localhost:8765/fw/gst/tp/%252Fmnt%252Freserved%252F12345.png
 ```
 
-### Get exposure_time_absolute
+### 🏁Get exposure_time_absolute
 **Request:**
 ```
 curl http://localhost:9876/fw/gst/get/exposure_time_absolute
@@ -155,7 +155,7 @@ value :
 ex: curl http://localhost:7654/fw/gst/exposure_time_absolute/1000000
 ```
 
-### Get white_balance_temperature
+### 🏁Get white_balance_temperature
 **Request:**
 ```
 curl http://localhost:9876/fw/gst/get/white_balance_temperature
