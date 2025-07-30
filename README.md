@@ -1,5 +1,6 @@
 # RESTful commands:
 
+`#0969DA`
 **received port : 8765**\
 **sent port     : ( default localhost:7654 )**
 
@@ -231,8 +232,8 @@ ex: curl http://localhost:7654/fw/uvc/white_balance_temperature/2700
 ```
 
 ## ✨Camera GigE
-in Vision Hub, Max number of GigE is 2; 
-curl http://localhost:8765/fw/{gige index}
+in Vision Hub, Max number of GigE is 2;\
+curl http://localhost:8765/fw/{gige index}\
 {gige index} can be **gige1** or **gige2**
 
 ### 🏁Streaming
