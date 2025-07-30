@@ -23,8 +23,8 @@ static GstElement *source_gige_hik = nullptr;
 std::thread t_streaming_gige_hik;
 std::atomic<bool> isStreaming_gige_hik{false};
 std::chrono::steady_clock::time_point lastStartTime_gige_hik;
-int resolution_width_gige_hik[NUM_GigE] = {1920, 1920};
-int resolution_height_gige_hik[NUM_GigE] = {1080, 1080};
+static int resolution_width_gige_hik[NUM_GigE] = {1920, 1920};
+static int resolution_height_gige_hik[NUM_GigE] = {1080, 1080};
 
 struct GigeControlParams gigeControlParams = {0};
 
