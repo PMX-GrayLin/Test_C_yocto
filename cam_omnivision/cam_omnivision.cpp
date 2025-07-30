@@ -20,8 +20,8 @@
 std::thread t_streaming_aic;
 std::atomic<bool> isStreaming_aic{false};
 std::chrono::steady_clock::time_point lastStartTime_aic;
-int resolution_width_aic = 2592;
-int resolution_height_aic = 1944;
+static int resolution_width_aic = 2592;
+static int resolution_height_aic = 1944;
 
 bool isCapturePhoto_aic = false;
 bool isCropPhoto_aic = false;
@@ -509,12 +509,10 @@ void Thread_AICPStreaming() {
 
   // Define the capabilities for the capsfilter
   // 5M : 2592 * 1944
-  // AD : 2048 * 1536
-  // elic : 1920 * 1080
   GstCaps *caps = gst_caps_new_simple(
       "video/x-raw",
-      "width", G_TYPE_INT, 2592,
-      "height", G_TYPE_INT, 1944,
+      "width", resolution_width_aic,
+      "height", resolution_height_aic,
       "framerate", GST_TYPE_FRACTION, 30, 1,  // Add frame rate as 30/1
       nullptr);
   g_object_set(capsfilter, "caps", caps, nullptr);
