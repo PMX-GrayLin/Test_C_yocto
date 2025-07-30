@@ -83,9 +83,10 @@ void AICP_handle_RESTful(std::vector<std::string> segments, httplib::Response &r
     res.set_content(j.dump(), "application/json");
 
   } else if (isSameString(segments[1], "set")) {
-    // with format "width*height"
-    AICP_setResolution(segments[2]);
-
+    if (isSameString(segments[2], "resolution")) {
+      // with format "width*height"
+      AICP_setResolution(segments[3]);
+    }
   }
 }
 
