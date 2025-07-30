@@ -1,12 +1,12 @@
 # RESTful commands:
 
-**<a name="anchor-topic"> Topic </a>**
+**<a name="anchor-topic"> <ins>Topic</ins>: </a>**\
 [RESTful](#anchor-restful)\
 [Device](#anchor-device)\
 [Camera CIS ](#anchor-cam-cis)\
 [Camera UVC ](#anchor-cam-uvc)\
-[Camera Gige ](#anchor-cam-gige)\
-
+[Camera Gige ](#anchor-cam-gige)
+\
 ## ✨<a name="anchor-restful">Register Restful Client to Receive Message (from fw_daemon)</a>
 **received port : 8765**\
 **sent port     : ( default localhost:7654 )**
@@ -19,8 +19,7 @@ curl http://localhost:8765/fw/restful/register/localhost/7654
 ```
 
 ## <a name="anchor-device"> ✨Device </a>
-[Back to Topic](#anchor-topic)\
-
+[Back to Topic](#anchor-topic)
 ### 🏁PWM
 ```
 curl http://localhost:8765/fw/pwm/x/y
@@ -113,8 +112,7 @@ curl http://localhost:8765/fw/dio/1/do/on
 ```
 
 ## ✨<a name="anchor-cam-cis"> Camera CIS ( Omnivision OG05b10 ) </a>
-[Back to Topic](#anchor-topic)\
-
+[Back to Topic](#anchor-topic)
 ### 🏁Streaming
 **Start**
 ```
@@ -178,8 +176,7 @@ ex: curl http://localhost:7654/fw/gst/white_balance_temperature/2700
 ```
 
 ## ✨<a name="anchor-cam-uvc">UVC Cameras </a>
-[Back to Topic](#anchor-topic)\
-
+[Back to Topic](#anchor-topic)
 ### 🏁Streaming
 **Start**
 ```
@@ -243,8 +240,7 @@ ex: curl http://localhost:7654/fw/uvc/white_balance_temperature/2700
 ```
 
 ## ✨<a name="anchor-cam-gige">Camera GigE</a>
-[Back to Topic](#anchor-topic)\
-
+[Back to Topic](#anchor-topic)
 in Vision Hub, Max number of GigE is 2;\
 curl http://localhost:8765/fw/{gige index}\
 {gige index} can be **gige1** or **gige2**
