@@ -1,6 +1,6 @@
 # RESTful commands:
 
-**<a name="anchor-topic"> <ins>Topic</ins>: </a>**\
+## <a name="anchor-topic"> <ins>Topic</ins>: </a>
 [RESTful](#anchor-restful)\
 [Device](#anchor-device)\
 [Camera CIS ](#anchor-cam-cis)\
@@ -18,7 +18,7 @@ curl http://localhost:8765/fw/restful/register/{url}/{port}
 curl http://localhost:8765/fw/restful/register/localhost/7654
 ```
 
-## <a name="anchor-device"> ✨Device </a>[Back to Topic](#anchor-topic)
+## <a name="anchor-device"> ✨Device </a> [Back to Top](#anchor-topic)
 ### 🏁PWM
 ```
 curl http://localhost:8765/fw/pwm/x/y
@@ -110,7 +110,7 @@ ex :
 curl http://localhost:8765/fw/dio/1/do/on
 ```
 
-## ✨<a name="anchor-cam-cis"> Camera CIS ( Omnivision OG05b10 ) </a>[Back to Topic](#anchor-topic)
+## ✨<a name="anchor-cam-cis"> Camera CIS ( Omnivision OG05b10 ) </a>[Back to Top](#anchor-topic)
 ### 🏁Streaming
 **Start**
 ```
@@ -173,7 +173,7 @@ value :
 ex: curl http://localhost:7654/fw/gst/white_balance_temperature/2700
 ```
 
-## ✨<a name="anchor-cam-uvc">UVC Cameras </a>[Back to Topic](#anchor-topic)
+## ✨<a name="anchor-cam-uvc">UVC Cameras </a>[Back to Top](#anchor-topic)
 ### 🏁Streaming
 **Start**
 ```
@@ -236,15 +236,15 @@ value :
 ex: curl http://localhost:7654/fw/uvc/white_balance_temperature/2700
 ```
 
-## ✨<a name="anchor-cam-gige">Camera GigE</a>[Back to Topic](#anchor-topic)
-in Vision Hub, Max number of GigE is 2;\
-curl http://localhost:8765/fw/{gige index}\
-{gige index} can be **gige1** or **gige2**
+## ✨<a name="anchor-cam-gige"> Camera GigE </a> [Back to Top](#anchor-topic)
+in Vision Hub, Max number of GigE camera is 2;\
+curl http://localhost:8765/fw/{gige-index}\xxx
+{gige-index} can be **gige1** or **gige2**
 
 ### 🏁Streaming
 **Start**
 ```
-curl http://localhost:8765/fw/gige1/start
+curl http://localhost:8765/fw/{gige-index}/start
 ```
 **Stop**
 ```
@@ -254,7 +254,7 @@ curl http://localhost:8765/fw/gige1/stop
 **Streaming status**
 **Request**
 ```
-curl http://localhost:8765/fw/gige1/get/isStreaming
+curl http://localhost:8765/fw/{gige-index}/get/isStreaming
 ```
 **Request Return or Status Change**
 ```
@@ -265,14 +265,14 @@ x = true / false
 ### 🏁Set Resolution
 will effect next streaming
 ```
-curl http://localhost:8765/fw/gige1/set/resolution/width*height
+curl http://localhost:8765/fw/{gige-index}/set/resolution/width*height
 ex:
 curl http://localhost:8765/fw/gige1/set/resolution/1920*1080
 ```
 
 ### 🏁Take Picture
 ```
-curl http://localhost:8765/fw/gige1/tp/x
+curl http://localhost:8765/fw/{gige-index}/tp/x
 x = encoded file path name
 ex:
 if save to path : /mnt/reserved/12345.png
@@ -282,7 +282,7 @@ curl http://localhost:8765/fw/gige1/tp/%252Fmnt%252Freserved%252F12345.png
 ### 🏁Camera Configs
 **Set exposure-auto**
 ```
-curl http://localhost:8765/fw/gige1/set/exposure-auto/x
+curl http://localhost:8765/fw/{gige-index}/set/exposure-auto/x
 x = 0/1/2 (Auto exposure mode: 0=off, 1=once, 2=continuous)
 ex :
 curl http://localhost:8765/fw/gige1/set/exposure-auto/0
@@ -290,7 +290,7 @@ curl http://localhost:8765/fw/gige1/set/exposure-auto/0
 
 **Set exposure**
 ```
-curl http://localhost:8765/fw/gige1/set/exposure/x
+curl http://localhost:8765/fw/{gige-index}/set/exposure/x
 x = range of ExposureTime
   // # arv-tool-0.8 control ExposureTime
   // Hikrobot-MV-CS060-10GM-PRO-K44474092 (192.168.11.22)
@@ -302,7 +302,7 @@ curl http://localhost:8765/fw/gige1/set/exposure/50000
 
 **Set gain-auto**
 ```
-curl http://localhost:8765/fw/gige1/set/gain-auto/x
+curl http://localhost:8765/fw/{gige-index}/set/gain-auto/x
 x = 0/1/2 (Auto Gain mode: 0=off, 1=once, 2=continuous)
 ex :
 curl http://localhost:8765/fw/gige1/set/gain-auto/0
@@ -310,7 +310,7 @@ curl http://localhost:8765/fw/gige1/set/gain-auto/0
 
 **Set gain**
 ```
-curl http://localhost:8765/fw/gige1/set/gain/x
+curl http://localhost:8765/fw/{gige-index}/set/gain/x
 x = range of Gain
   // # arv-tool-0.8 control Gain
   // Hikrobot-MV-CS060-10GM-PRO-K44474092 (192.168.11.22)
