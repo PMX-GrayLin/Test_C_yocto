@@ -127,6 +127,7 @@ x = true / false
 ```
 
 ### Set Resolution
+will effect next streaming
 ```
 curl http://localhost:8765/fw/gst/set/resolution/width*height
 ex:
@@ -189,6 +190,7 @@ x = true / false
 ```
 
 ### 🏁Set Resolution
+will effect next streaming
 ```
 curl http://localhost:8765/fw/uvc/set/resolution/width*height
 ex:
@@ -251,6 +253,7 @@ x = true / false
 ```
 
 ### 🏁Set Resolution
+will effect next streaming
 ```
 curl http://localhost:8765/fw/gige1/set/resolution/width*height
 ex:
