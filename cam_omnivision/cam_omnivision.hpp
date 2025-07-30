@@ -79,7 +79,6 @@ void AICP_enablePadding(bool enable);
 
 // Streaming
 void Thread_AICPStreaming();
-void Thread_AICPStreaming_usb();
 void AICP_streamingStart();
 void AICP_streamingStop();
 void AICP_streamingLED();
