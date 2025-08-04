@@ -15,7 +15,7 @@ struct PairHash {
   }
 };
 
-const int RESTful_MAX_FAIL = 3;
+const int RESTful_MAX_FAIL = 10;
 std::set<std::pair<std::string, int>> RESTful_targets;
 std::unordered_map<std::pair<std::string, int>, int, PairHash> RESTful_failCount;
 
