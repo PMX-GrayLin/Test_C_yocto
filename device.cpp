@@ -371,6 +371,20 @@ void Thread_FWMonitorDI() {
     RESTful_send_DI(i, (gpiod_line_get_value(lines[i]) == 1));
   }
 
+  // re-Sync state just before entering the loop
+  for (i = 0; i < NUM_DI; i++) {
+    if (!lines[i]) continue;
+
+    int val = gpiod_line_get_value(lines[i]);
+    if (val < 0) {
+      xlog("Failed to read GPIO %d value during sync", DI_GPIOs[i]);
+      continue;
+    }
+
+    DI_gpio_level_last[i] = (val == 1) ? gpiol_high : gpiol_low;
+    RESTful_send_DI(i, val == 1);
+  }
+
   xlog("^^^^ Start ^^^^");
 
   // Main loop to monitor GPIOs
