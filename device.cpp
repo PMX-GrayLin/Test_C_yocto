@@ -367,8 +367,8 @@ void Thread_FWMonitorDI() {
     fds[i].fd = gpiod_line_event_get_fd(lines[i]);
     fds[i].events = POLLIN;
 
-    // get init value & update to App
-    RESTful_send_DI(i, (gpiod_line_get_value(lines[i]) == 1));
+    // // get init value & update to App
+    // RESTful_send_DI(i, (gpiod_line_get_value(lines[i]) == 1));
   }
 
   // re-Sync state just before entering the loop
