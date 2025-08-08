@@ -396,7 +396,6 @@ void Thread_FWMonitorDI() {
       // Level-triggered validation
       levelCounter++;
       if (levelCounter > 3) {
-        xlog("Level Check");
         levelCounter = 0;
         for (i = 0; i < NUM_DI; i++) {
           if (!lines[i]) continue;
@@ -408,8 +407,8 @@ void Thread_FWMonitorDI() {
           if (current_level != DI_gpio_level_last[i]) {
             DI_gpio_level_last[i] = current_level;
             DI_last_event_time[i] = get_current_millis();;
+            xlog("Level Check!!");
             RESTful_send_DI(i, val == 1);
-            xlog("Level check corrected GPIO %d to %s", DI_GPIOs[i], (val == 1 ? "high" : "low"));
           }
         }
       }
