@@ -397,6 +397,8 @@ void Thread_FWMonitorDI() {
       levelCounter++;
       if (levelCounter > 3) {
         levelCounter = 0;
+        xlog("Level Check!!");
+
         for (i = 0; i < NUM_DI; i++) {
           if (!lines[i]) continue;
 
@@ -407,7 +409,7 @@ void Thread_FWMonitorDI() {
           if (current_level != DI_gpio_level_last[i]) {
             DI_gpio_level_last[i] = current_level;
             DI_last_event_time[i] = get_current_millis();;
-            xlog("Level Check!!");
+            xlog("Level State Change...");
             RESTful_send_DI(i, val == 1);
           }
         }
