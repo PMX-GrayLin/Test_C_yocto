@@ -397,6 +397,7 @@ void Thread_FWMonitorDI() {
 
     if (ret == 0) {
       // timeout, continue loop to check isMonitorDIO
+      xlog("timeout");
       continue;
     }
 
