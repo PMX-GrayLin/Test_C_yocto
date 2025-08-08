@@ -26,7 +26,7 @@
 
 #include "restfulx.hpp"
 
-#define DEBOUNCE_TIME_MS 20
+#define DEBOUNCE_TIME_MS 100
 
 std::string product = "ai_camera_plus";         // ai_camera_plus or vision_hub_plus
 std::string hostname_prefix = "aicamera";       // aicamera or visionhub
@@ -338,6 +338,7 @@ void Thread_FWMonitorDI() {
   struct gpiod_chip *chip;
   struct gpiod_line *lines[NUM_DI];
   struct pollfd fds[NUM_DI];
+  uint64_t last_validate_time = get_current_millis();
   int i, ret;
 
   // Open GPIO chip
@@ -360,15 +361,18 @@ void Thread_FWMonitorDI() {
     if (ret < 0) {
       xlog("Failed to request GPIO %d for edge events", DI_GPIOs[i]);
       gpiod_line_release(lines[i]);
+      lines[i] = NULL;
       continue;
+    }
+
+    // Drain stale events (optional safety)
+    struct gpiod_line_event dummy;
+    while (gpiod_line_event_read(lines[i], &dummy) == 0) {
     }
 
     // Get file descriptor for polling
     fds[i].fd = gpiod_line_event_get_fd(lines[i]);
     fds[i].events = POLLIN;
-
-    // // get init value & update to App
-    // RESTful_send_DI(i, (gpiod_line_get_value(lines[i]) == 1));
   }
 
   // re-Sync state just before entering the loop
@@ -382,6 +386,7 @@ void Thread_FWMonitorDI() {
     }
 
     DI_gpio_level_last[i] = (val == 1) ? gpiol_high : gpiol_low;
+    DI_last_event_time[i] = get_current_millis();
     RESTful_send_DI(i, val == 1);
   }
 
@@ -395,18 +400,15 @@ void Thread_FWMonitorDI() {
       break;
     }
 
-    if (ret == 0) {
-      // timeout, continue loop to check isMonitorDIO
-      continue;
-    }
-
-    // Check which GPIO triggered the event
+    // Edge-triggered events
     for (i = 0; i < NUM_DI; i++) {
+      if (!lines[i]) continue;
+
       if (fds[i].revents & POLLIN) {
         struct gpiod_line_event event;
         if (gpiod_line_event_read(lines[i], &event) < 0) {
-            xlog("Failed to read GPIO event on line %d", DI_GPIOs[i]);
-            continue;
+          xlog("Failed to read GPIO event on line %d", DI_GPIOs[i]);
+          continue;
         }
 
         // Debounce per line
@@ -428,11 +430,30 @@ void Thread_FWMonitorDI() {
     }
   }
 
+  // Level-triggered validation
+  if (now - last_validate_time >= VALIDATE_INTERVAL_MS) {
+    for (i = 0; i < NUM_DI; i++) {
+      if (!lines[i]) continue;
+
+      int val = gpiod_line_get_value(lines[i]);
+      if (val < 0) continue;
+
+      GPIO_LEVEl current_level = (val == 1) ? gpiol_high : gpiol_low;
+      if (current_level != DI_gpio_level_last[i]) {
+        DI_gpio_level_last[i] = current_level;
+        DI_last_event_time[i] = now;
+        RESTful_send_DI(i, val == 1);
+        xlog("Level check corrected GPIO %d to %s", DI_GPIOs[i], (val == 1 ? "high" : "low"));
+      }
+    }
+    last_validate_time = now;
+  }
+
   xlog("^^^^ Stop ^^^^");
 
   // Cleanup
   for (i = 0; i < NUM_DI; i++) {
-    gpiod_line_release(lines[i]);
+    if (lines[i]) gpiod_line_release(lines[i]);
   }
   gpiod_chip_close(chip);
 }
@@ -1187,3 +1208,4 @@ void FW_MonitorUVCStop() {
   if (t_monitorUVC.joinable())
     t_monitorUVC.join();
 }
+
