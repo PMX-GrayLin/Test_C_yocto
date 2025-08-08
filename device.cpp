@@ -407,7 +407,7 @@ void Thread_FWMonitorDI() {
           GPIO_LEVEl current_level = (val == 1) ? gpiol_high : gpiol_low;
           if (current_level != DI_gpio_level_last[i]) {
             DI_gpio_level_last[i] = current_level;
-            DI_last_event_time[i] = now;
+            DI_last_event_time[i] = get_current_millis();;
             RESTful_send_DI(i, val == 1);
             xlog("Level check corrected GPIO %d to %s", DI_GPIOs[i], (val == 1 ? "high" : "low"));
           }
