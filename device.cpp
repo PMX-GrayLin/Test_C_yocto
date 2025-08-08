@@ -338,7 +338,6 @@ void Thread_FWMonitorDI() {
   struct gpiod_chip *chip;
   struct gpiod_line *lines[NUM_DI];
   struct pollfd fds[NUM_DI];
-  uint64_t last_validate_time = get_current_millis();
   int i, ret;
 
   // Open GPIO chip
@@ -361,18 +360,15 @@ void Thread_FWMonitorDI() {
     if (ret < 0) {
       xlog("Failed to request GPIO %d for edge events", DI_GPIOs[i]);
       gpiod_line_release(lines[i]);
-      lines[i] = NULL;
       continue;
-    }
-
-    // Drain stale events (optional safety)
-    struct gpiod_line_event dummy;
-    while (gpiod_line_event_read(lines[i], &dummy) == 0) {
     }
 
     // Get file descriptor for polling
     fds[i].fd = gpiod_line_event_get_fd(lines[i]);
     fds[i].events = POLLIN;
+
+    // get init value & update to App
+    RESTful_send_DI(i, (gpiod_line_get_value(lines[i]) == 1));
   }
 
   // re-Sync state just before entering the loop
@@ -386,7 +382,6 @@ void Thread_FWMonitorDI() {
     }
 
     DI_gpio_level_last[i] = (val == 1) ? gpiol_high : gpiol_low;
-    DI_last_event_time[i] = get_current_millis();
     RESTful_send_DI(i, val == 1);
   }
 
@@ -395,61 +390,41 @@ void Thread_FWMonitorDI() {
   // Main loop to monitor GPIOs
   while (isMonitorDI) {
     ret = poll(fds, NUM_DI, 500);  // timeout = 500ms, to check stop flag periodically
-    uint64_t now = get_current_millis();
     if (ret < 0) {
       xlog("Error in poll");
       break;
     }
 
-    // Edge-triggered events
-    if (ret > 0) {
-      for (i = 0; i < NUM_DI; i++) {
-        if (!lines[i]) continue;
-
-        if (fds[i].revents & POLLIN) {
-          struct gpiod_line_event event;
-          if (gpiod_line_event_read(lines[i], &event) < 0) {
-            xlog("Failed to read GPIO event on line %d", DI_GPIOs[i]);
-            continue;
-          }
-
-          // Debounce per line
-          uint64_t now = get_current_millis();
-          if (now - DI_last_event_time[i] < DEBOUNCE_TIME_MS) {
-            continue;
-          }
-
-          DI_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
-
-          if (DI_gpio_level_new[i] != DI_gpio_level_last[i]) {
-            DI_gpio_level_last[i] = DI_gpio_level_new[i];
-            DI_last_event_time[i] = now;
-            // xlog("GPIO %d event detected! status:%s", DI_GPIOs[i], (DI_gpio_level_last[i] == gpiol_high) ? "high" : "low");
-
-            RESTful_send_DI(i, DI_gpio_level_last[i] == gpiol_high);
-          }
-        }
-      }
+    if (ret == 0) {
+      // timeout, continue loop to check isMonitorDIO
+      continue;
     }
 
-    // Level-triggered validation
-    if (now - last_validate_time >= 1000) {
-      xlog("Level-triggered");
-      for (i = 0; i < NUM_DI; i++) {
-        if (!lines[i]) continue;
+    // Check which GPIO triggered the event
+    for (i = 0; i < NUM_DI; i++) {
+      if (fds[i].revents & POLLIN) {
+        struct gpiod_line_event event;
+        if (gpiod_line_event_read(lines[i], &event) < 0) {
+            xlog("Failed to read GPIO event on line %d", DI_GPIOs[i]);
+            continue;
+        }
 
-        int val = gpiod_line_get_value(lines[i]);
-        if (val < 0) continue;
+        // Debounce per line
+        uint64_t now = get_current_millis();
+        if (now - DI_last_event_time[i] < DEBOUNCE_TIME_MS) {
+          continue;
+        }
 
-        GPIO_LEVEl current_level = (val == 1) ? gpiol_high : gpiol_low;
-        if (current_level != DI_gpio_level_last[i]) {
-          DI_gpio_level_last[i] = current_level;
+        DI_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
+
+        if (DI_gpio_level_new[i] != DI_gpio_level_last[i]) {
+          DI_gpio_level_last[i] = DI_gpio_level_new[i];
           DI_last_event_time[i] = now;
-          RESTful_send_DI(i, val == 1);
-          xlog("Level check corrected GPIO %d to %s", DI_GPIOs[i], (val == 1 ? "high" : "low"));
+          // xlog("GPIO %d event detected! status:%s", DI_GPIOs[i], (DI_gpio_level_last[i] == gpiol_high) ? "high" : "low");
+
+          RESTful_send_DI(i, DI_gpio_level_last[i] == gpiol_high);
         }
       }
-      last_validate_time = now;
     }
   }
 
@@ -457,7 +432,7 @@ void Thread_FWMonitorDI() {
 
   // Cleanup
   for (i = 0; i < NUM_DI; i++) {
-    if (lines[i]) gpiod_line_release(lines[i]);
+    gpiod_line_release(lines[i]);
   }
   gpiod_chip_close(chip);
 }
