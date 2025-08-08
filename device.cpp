@@ -401,37 +401,40 @@ void Thread_FWMonitorDI() {
     }
 
     // Edge-triggered events
-    for (i = 0; i < NUM_DI; i++) {
-      if (!lines[i]) continue;
+    if (ret > 0) {
+      for (i = 0; i < NUM_DI; i++) {
+        if (!lines[i]) continue;
 
-      if (fds[i].revents & POLLIN) {
-        struct gpiod_line_event event;
-        if (gpiod_line_event_read(lines[i], &event) < 0) {
-          xlog("Failed to read GPIO event on line %d", DI_GPIOs[i]);
-          continue;
-        }
+        if (fds[i].revents & POLLIN) {
+          struct gpiod_line_event event;
+          if (gpiod_line_event_read(lines[i], &event) < 0) {
+            xlog("Failed to read GPIO event on line %d", DI_GPIOs[i]);
+            continue;
+          }
 
-        // Debounce per line
-        uint64_t now = get_current_millis();
-        if (now - DI_last_event_time[i] < DEBOUNCE_TIME_MS) {
-          continue;
-        }
+          // Debounce per line
+          uint64_t now = get_current_millis();
+          if (now - DI_last_event_time[i] < DEBOUNCE_TIME_MS) {
+            continue;
+          }
 
-        DI_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
+          DI_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
 
-        if (DI_gpio_level_new[i] != DI_gpio_level_last[i]) {
-          DI_gpio_level_last[i] = DI_gpio_level_new[i];
-          DI_last_event_time[i] = now;
-          // xlog("GPIO %d event detected! status:%s", DI_GPIOs[i], (DI_gpio_level_last[i] == gpiol_high) ? "high" : "low");
+          if (DI_gpio_level_new[i] != DI_gpio_level_last[i]) {
+            DI_gpio_level_last[i] = DI_gpio_level_new[i];
+            DI_last_event_time[i] = now;
+            // xlog("GPIO %d event detected! status:%s", DI_GPIOs[i], (DI_gpio_level_last[i] == gpiol_high) ? "high" : "low");
 
-          RESTful_send_DI(i, DI_gpio_level_last[i] == gpiol_high);
+            RESTful_send_DI(i, DI_gpio_level_last[i] == gpiol_high);
+          }
         }
       }
     }
   }
 
   // Level-triggered validation
-  if (now - last_validate_time >= VALIDATE_INTERVAL_MS) {
+  if (now - last_validate_time >= 1000) {
+    xlog("Level-triggered");
     for (i = 0; i < NUM_DI; i++) {
       if (!lines[i]) continue;
 
