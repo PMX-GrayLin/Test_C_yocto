@@ -339,6 +339,7 @@ void Thread_FWMonitorDI() {
   struct gpiod_line *lines[NUM_DI];
   struct pollfd fds[NUM_DI];
   int i, ret;
+  int levelCounter = 0;
 
   // Open GPIO chip
   chip = gpiod_chip_open(GPIO_CHIP);
@@ -360,18 +361,16 @@ void Thread_FWMonitorDI() {
     if (ret < 0) {
       xlog("Failed to request GPIO %d for edge events", DI_GPIOs[i]);
       gpiod_line_release(lines[i]);
+      lines[i] = NULL;
       continue;
     }
 
     // Get file descriptor for polling
     fds[i].fd = gpiod_line_event_get_fd(lines[i]);
     fds[i].events = POLLIN;
-
-    // get init value & update to App
-    RESTful_send_DI(i, (gpiod_line_get_value(lines[i]) == 1));
   }
 
-  // re-Sync state just before entering the loop
+  // re-Sync state & update to App
   for (i = 0; i < NUM_DI; i++) {
     if (!lines[i]) continue;
 
@@ -393,6 +392,27 @@ void Thread_FWMonitorDI() {
     if (ret < 0) {
       xlog("Error in poll");
       break;
+    }
+
+    // Level-triggered validation
+    levelCounter++;
+    if (levelCounter > 3) {
+      xlog("Level Check");
+      levelCounter == 0;
+      for (i = 0; i < NUM_DI; i++) {
+        if (!lines[i]) continue;
+
+        int val = gpiod_line_get_value(lines[i]);
+        if (val < 0) continue;
+
+        GPIO_LEVEl current_level = (val == 1) ? gpiol_high : gpiol_low;
+        if (current_level != DI_gpio_level_last[i]) {
+          DI_gpio_level_last[i] = current_level;
+          DI_last_event_time[i] = now;
+          RESTful_send_DI(i, val == 1);
+          xlog("Level check corrected GPIO %d to %s", DI_GPIOs[i], (val == 1 ? "high" : "low"));
+        }
+      }
     }
 
     if (ret == 0) {
