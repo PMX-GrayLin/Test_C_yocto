@@ -389,61 +389,62 @@ void Thread_FWMonitorDI() {
   // Main loop to monitor GPIOs
   while (isMonitorDI) {
     ret = poll(fds, NUM_DI, 500);  // timeout = 500ms, to check stop flag periodically
+
+    if (ret == 0) {
+      // timeout to check stop flag "isMonitorDI" periodically
+      
+      // Level-triggered validation
+      levelCounter++;
+      if (levelCounter > 3) {
+        xlog("Level Check");
+        levelCounter == 0;
+        for (i = 0; i < NUM_DI; i++) {
+          if (!lines[i]) continue;
+
+          int val = gpiod_line_get_value(lines[i]);
+          if (val < 0) continue;
+
+          GPIO_LEVEl current_level = (val == 1) ? gpiol_high : gpiol_low;
+          if (current_level != DI_gpio_level_last[i]) {
+            DI_gpio_level_last[i] = current_level;
+            DI_last_event_time[i] = now;
+            RESTful_send_DI(i, val == 1);
+            xlog("Level check corrected GPIO %d to %s", DI_GPIOs[i], (val == 1 ? "high" : "low"));
+          }
+        }
+      }
+    }
+
     if (ret < 0) {
       xlog("Error in poll");
       break;
     }
 
-    // Level-triggered validation
-    levelCounter++;
-    if (levelCounter > 3) {
-      xlog("Level Check");
-      levelCounter == 0;
+    if (ret > 0) {
+      // Check which GPIO triggered the event
       for (i = 0; i < NUM_DI; i++) {
-        if (!lines[i]) continue;
-
-        int val = gpiod_line_get_value(lines[i]);
-        if (val < 0) continue;
-
-        GPIO_LEVEl current_level = (val == 1) ? gpiol_high : gpiol_low;
-        if (current_level != DI_gpio_level_last[i]) {
-          DI_gpio_level_last[i] = current_level;
-          DI_last_event_time[i] = now;
-          RESTful_send_DI(i, val == 1);
-          xlog("Level check corrected GPIO %d to %s", DI_GPIOs[i], (val == 1 ? "high" : "low"));
-        }
-      }
-    }
-
-    if (ret == 0) {
-      // timeout, continue loop to check isMonitorDIO
-      xlog("timeout");
-      continue;
-    }
-
-    // Check which GPIO triggered the event
-    for (i = 0; i < NUM_DI; i++) {
-      if (fds[i].revents & POLLIN) {
-        struct gpiod_line_event event;
-        if (gpiod_line_event_read(lines[i], &event) < 0) {
+        if (fds[i].revents & POLLIN) {
+          struct gpiod_line_event event;
+          if (gpiod_line_event_read(lines[i], &event) < 0) {
             xlog("Failed to read GPIO event on line %d", DI_GPIOs[i]);
             continue;
-        }
+          }
 
-        // Debounce per line
-        uint64_t now = get_current_millis();
-        if (now - DI_last_event_time[i] < DEBOUNCE_TIME_MS) {
-          continue;
-        }
+          // Debounce per line
+          uint64_t now = get_current_millis();
+          if (now - DI_last_event_time[i] < DEBOUNCE_TIME_MS) {
+            continue;
+          }
 
-        DI_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
+          DI_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
 
-        if (DI_gpio_level_new[i] != DI_gpio_level_last[i]) {
-          DI_gpio_level_last[i] = DI_gpio_level_new[i];
-          DI_last_event_time[i] = now;
-          // xlog("GPIO %d event detected! status:%s", DI_GPIOs[i], (DI_gpio_level_last[i] == gpiol_high) ? "high" : "low");
+          if (DI_gpio_level_new[i] != DI_gpio_level_last[i]) {
+            DI_gpio_level_last[i] = DI_gpio_level_new[i];
+            DI_last_event_time[i] = now;
+            // xlog("GPIO %d event detected! status:%s", DI_GPIOs[i], (DI_gpio_level_last[i] == gpiol_high) ? "high" : "low");
 
-          RESTful_send_DI(i, DI_gpio_level_last[i] == gpiol_high);
+            RESTful_send_DI(i, DI_gpio_level_last[i] == gpiol_high);
+          }
         }
       }
     }
