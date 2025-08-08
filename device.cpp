@@ -397,7 +397,7 @@ void Thread_FWMonitorDI() {
       levelCounter++;
       if (levelCounter > 3) {
         xlog("Level Check");
-        levelCounter == 0;
+        levelCounter = 0;
         for (i = 0; i < NUM_DI; i++) {
           if (!lines[i]) continue;
 
