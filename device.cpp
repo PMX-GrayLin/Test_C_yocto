@@ -395,6 +395,7 @@ void Thread_FWMonitorDI() {
   // Main loop to monitor GPIOs
   while (isMonitorDI) {
     ret = poll(fds, NUM_DI, 500);  // timeout = 500ms, to check stop flag periodically
+    uint64_t now = get_current_millis();
     if (ret < 0) {
       xlog("Error in poll");
       break;
