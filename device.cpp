@@ -431,26 +431,26 @@ void Thread_FWMonitorDI() {
         }
       }
     }
-  }
 
-  // Level-triggered validation
-  if (now - last_validate_time >= 1000) {
-    xlog("Level-triggered");
-    for (i = 0; i < NUM_DI; i++) {
-      if (!lines[i]) continue;
+    // Level-triggered validation
+    if (now - last_validate_time >= 1000) {
+      xlog("Level-triggered");
+      for (i = 0; i < NUM_DI; i++) {
+        if (!lines[i]) continue;
 
-      int val = gpiod_line_get_value(lines[i]);
-      if (val < 0) continue;
+        int val = gpiod_line_get_value(lines[i]);
+        if (val < 0) continue;
 
-      GPIO_LEVEl current_level = (val == 1) ? gpiol_high : gpiol_low;
-      if (current_level != DI_gpio_level_last[i]) {
-        DI_gpio_level_last[i] = current_level;
-        DI_last_event_time[i] = now;
-        RESTful_send_DI(i, val == 1);
-        xlog("Level check corrected GPIO %d to %s", DI_GPIOs[i], (val == 1 ? "high" : "low"));
+        GPIO_LEVEl current_level = (val == 1) ? gpiol_high : gpiol_low;
+        if (current_level != DI_gpio_level_last[i]) {
+          DI_gpio_level_last[i] = current_level;
+          DI_last_event_time[i] = now;
+          RESTful_send_DI(i, val == 1);
+          xlog("Level check corrected GPIO %d to %s", DI_GPIOs[i], (val == 1 ? "high" : "low"));
+        }
       }
+      last_validate_time = now;
     }
-    last_validate_time = now;
   }
 
   xlog("^^^^ Stop ^^^^");
