@@ -86,10 +86,12 @@ void imgu_saveImage(
   // Prepare cv::Mat
   cv::Mat bgr_frame;
   if (g_strcmp0(format, "NV12") == 0) {
+    xlog("NV12");
     cv::Mat nv12_frame(height + height / 2, width, CV_8UC1, map.data);
     bgr_frame.create(height, width, CV_8UC3);
     cv::cvtColor(nv12_frame, bgr_frame, cv::COLOR_YUV2BGR_NV12);
   } else if (g_strcmp0(format, "I420") == 0) {
+    xlog("I420");
     cv::Mat i420_frame(height + height / 2, width, CV_8UC1, map.data);
     bgr_frame.create(height, width, CV_8UC3);
     cv::cvtColor(i420_frame, bgr_frame, cv::COLOR_YUV2BGR_I420);

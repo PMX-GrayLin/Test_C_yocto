@@ -26,7 +26,7 @@
 
 #include "restfulx.hpp"
 
-#define DEBOUNCE_TIME_MS 100
+#define DEBOUNCE_TIME_MS 50
 
 std::string product = "ai_camera_plus";         // ai_camera_plus or vision_hub_plus
 std::string hostname_prefix = "aicamera";       // aicamera or visionhub
