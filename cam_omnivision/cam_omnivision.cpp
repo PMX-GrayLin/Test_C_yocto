@@ -569,7 +569,7 @@ void Thread_AICPStreaming() {
           g_error_free(err);
           g_free(dbg);
   
-          // AICP_streamingStop();
+          AICP_streamingStop();
           FW_setLED("2","red");
           break;
         }
@@ -577,7 +577,7 @@ void Thread_AICPStreaming() {
         case GST_MESSAGE_EOS:
           xlog("Received EOS, stopping...");
 
-          // AICP_streamingStop();
+          AICP_streamingStop();
           FW_setLED("2","red");
           break;
   
