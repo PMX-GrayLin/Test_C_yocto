@@ -16,7 +16,7 @@
 
 UsedGigeCam usedGigeCam = ugc_hikrobot;
 
-static GstElement *pipeline_gige_hik = nullptr;
+static GstElement *pipeline_gige_hik[NUM_GigE] = {nullptr, nullptr};
 static GMainLoop *loop_gige_hik = nullptr;
 static GstElement *source_gige_hik = nullptr;
 
@@ -222,7 +222,7 @@ void GigE_ThreadStreaming_Hik() {
   // gst-launch-1.0 aravissrc camera-name=id1 ! videoconvert ! video/x-raw,format=NV12 ! queue ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! h264parse config-interval=1 ! rtspclientsink location=rtsp://localhost:8554/mystream
 
   // Create the pipeline
-  pipeline_gige_hik = gst_pipeline_new("video-pipeline");
+  pipeline_gige_hik[0] = gst_pipeline_new("video-pipeline");
 
   source_gige_hik = gst_element_factory_make("aravissrc", "source_gige_hik");
   GstElement *videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
@@ -232,7 +232,7 @@ void GigE_ThreadStreaming_Hik() {
   GstElement *parser = gst_element_factory_make("h264parse", "parser");
   GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
 
-  if (!pipeline_gige_hik || !source_gige_hik || !videoconvert || !capsfilter || !queue || !encoder || !parser || !sink) {
+  if (!pipeline_gige_hik[0] || !source_gige_hik || !videoconvert || !capsfilter || !queue || !encoder || !parser || !sink) {
     xlog("Failed to create GStreamer elements");
     return;
   }
@@ -257,7 +257,7 @@ void GigE_ThreadStreaming_Hik() {
       nullptr);
   if (!controls) {
     xlog("Failed to create GstStructure");
-    gst_object_unref(pipeline_gige_hik);
+    gst_object_unref(pipeline_gige_hik[0]);
     return;
   }
   g_object_set(G_OBJECT(encoder), "extra-controls", controls, nullptr);
@@ -271,10 +271,10 @@ void GigE_ThreadStreaming_Hik() {
   g_object_set(G_OBJECT(sink), "location", "rtsp://localhost:8554/mystream", nullptr);
 
   // Build pipeline
-  gst_bin_add_many(GST_BIN(pipeline_gige_hik), source_gige_hik, videoconvert, capsfilter, queue, encoder, parser, sink, nullptr);
+  gst_bin_add_many(GST_BIN(pipeline_gige_hik[0]), source_gige_hik, videoconvert, capsfilter, queue, encoder, parser, sink, nullptr);
   if (!gst_element_link_many(source_gige_hik, videoconvert, capsfilter, queue, encoder, parser, sink, nullptr)) {
     xlog("Failed to link GStreamer elements");
-    gst_object_unref(pipeline_gige_hik);
+    gst_object_unref(pipeline_gige_hik[0]);
     return;
   }
 
@@ -286,7 +286,7 @@ void GigE_ThreadStreaming_Hik() {
   }
 
   // Add bus watch to handle errors and EOS
-  GstBus *bus = gst_element_get_bus(pipeline_gige_hik);
+  GstBus *bus = gst_element_get_bus(pipeline_gige_hik[0]);
   gst_bus_add_watch(bus, [](GstBus *, GstMessage *msg, gpointer user_data) -> gboolean {
       switch (GST_MESSAGE_TYPE(msg)) {
         case GST_MESSAGE_ERROR: {
@@ -315,11 +315,11 @@ void GigE_ThreadStreaming_Hik() {
       return TRUE; }, nullptr);
 
   // Start streaming
-  GstStateChangeReturn ret = gst_element_set_state(pipeline_gige_hik, GST_STATE_PLAYING);
+  GstStateChangeReturn ret = gst_element_set_state(pipeline_gige_hik[0], GST_STATE_PLAYING);
   if (ret == GST_STATE_CHANGE_FAILURE) {
     xlog("failed to start the pipeline");
-    gst_element_set_state(pipeline_gige_hik, GST_STATE_NULL);
-    gst_object_unref(pipeline_gige_hik);
+    gst_element_set_state(pipeline_gige_hik[0], GST_STATE_NULL);
+    gst_object_unref(pipeline_gige_hik[0]);
     isStreaming_gige_hik = false;
     return;
   }
@@ -336,8 +336,8 @@ void GigE_ThreadStreaming_Hik() {
 
   // Clean up
   xlog("Stopping the pipeline...");
-  gst_element_set_state(pipeline_gige_hik, GST_STATE_NULL);
-  gst_object_unref(pipeline_gige_hik);
+  gst_element_set_state(pipeline_gige_hik[0], GST_STATE_NULL);
+  gst_object_unref(pipeline_gige_hik[0]);
   if (loop_gige_hik) {
     g_main_loop_unref(loop_gige_hik);
     loop_gige_hik = nullptr;
