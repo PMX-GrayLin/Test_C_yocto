@@ -72,7 +72,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else if (isSameString(segments[2], "gain-auto")) {
       //
     } else if (isSameString(segments[2], "isStreaming")) {
-      RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik[0]);
+      RESTful_send_streamingStatus_gige_hik(index_cam, isStreaming_gige_hik[index_cam]);
     }
 
   } else if (isSameString(segments[1], "tp")) {
@@ -274,10 +274,10 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
   g_object_set(G_OBJECT(sink), "location", "rtsp://localhost:8554/mystream", nullptr);
 
   // Build pipeline
-  gst_bin_add_many(GST_BIN(pipeline_gige_hik[0]), source_gige_hik[0], videoconvert, capsfilter, queue, encoder, parser, sink, nullptr);
-  if (!gst_element_link_many(source_gige_hik[0], videoconvert, capsfilter, queue, encoder, parser, sink, nullptr)) {
+  gst_bin_add_many(GST_BIN(pipeline_gige_hik[index_cam]), source_gige_hik[index_cam], videoconvert, capsfilter, queue, encoder, parser, sink, nullptr);
+  if (!gst_element_link_many(source_gige_hik[index_cam], videoconvert, capsfilter, queue, encoder, parser, sink, nullptr)) {
     xlog("Failed to link GStreamer elements");
-    gst_object_unref(pipeline_gige_hik[0]);
+    gst_object_unref(pipeline_gige_hik[index_cam]);
     return;
   }
 
@@ -289,7 +289,7 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
   }
 
   // Add bus watch to handle errors and EOS
-  GstBus *bus = gst_element_get_bus(pipeline_gige_hik[0]);
+  GstBus *bus = gst_element_get_bus(pipeline_gige_hik[index_cam]);
   gst_bus_add_watch(bus, [](GstBus *, GstMessage *msg, gpointer user_data) -> gboolean {
       switch (GST_MESSAGE_TYPE(msg)) {
         case GST_MESSAGE_ERROR: {
@@ -318,38 +318,39 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
       return TRUE; }, nullptr);
 
   // Start streaming
-  GstStateChangeReturn ret = gst_element_set_state(pipeline_gige_hik[0], GST_STATE_PLAYING);
+  GstStateChangeReturn ret = gst_element_set_state(pipeline_gige_hik[index_cam], GST_STATE_PLAYING);
   if (ret == GST_STATE_CHANGE_FAILURE) {
     xlog("failed to start the pipeline");
-    gst_element_set_state(pipeline_gige_hik[0], GST_STATE_NULL);
-    gst_object_unref(pipeline_gige_hik[0]);
-    isStreaming_gige_hik[0] = false;
+    gst_element_set_state(pipeline_gige_hik[index_cam], GST_STATE_NULL);
+    gst_object_unref(pipeline_gige_hik[index_cam]);
+    isStreaming_gige_hik[index_cam] = false;
     return;
   }
 
   xlog("pipeline is running...");
-  isStreaming_gige_hik[0] = true;
-  RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik[0]);
+  isStreaming_gige_hik[index_cam] = true;
+  RESTful_send_streamingStatus_gige_hik(index_cam, isStreaming_gige_hik[index_cam]);
 
   // Main loop
   loop_gige_hik[0] = g_main_loop_new(nullptr, FALSE);
   gst_bus_set_sync_handler(bus, nullptr, nullptr, nullptr);
   gst_object_unref(bus);
-  g_main_loop_run(loop_gige_hik[0]);
+  g_main_loop_run(loop_gige_hik[index_cam]);
 
   // Clean up
   xlog("Stopping the pipeline...");
-  gst_element_set_state(pipeline_gige_hik[0], GST_STATE_NULL);
-  gst_object_unref(pipeline_gige_hik[0]);
-  if (loop_gige_hik[0]) {
-    g_main_loop_unref(loop_gige_hik[0]);
-    loop_gige_hik[0] = nullptr;
+  gst_element_set_state(pipeline_gige_hik[index_cam], GST_STATE_NULL);
+  gst_object_unref(pipeline_gige_hik[index_cam]);
+  if (loop_gige_hik[index_cam]) {
+    g_main_loop_unref(loop_gige_hik[index_cam]);
+    loop_gige_hik[index_cam] = nullptr;
   }
 
-  FW_CheckNetLinkState("eth1");
+  std::string ifS = "eth" + std::to_string(index_cam + 1);
+  FW_CheckNetLinkState(ifS.c_str());
 
-  isStreaming_gige_hik[0] = false;
-  RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik[0]);
+  isStreaming_gige_hik[index_cam] = false;
+  RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik[index_cam]);
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 
