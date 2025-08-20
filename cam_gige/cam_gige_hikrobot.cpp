@@ -91,17 +91,17 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else {
       path = "/home/root/primax/fw_" + getTimeString() + ".png";
     }
-    GigE_setImagePath_hik(index_cam, .c_str());
-    GigE_captureImage_hik();
+    GigE_setImagePath_hik(index_cam, path);
+    GigE_captureImage_hik(index_cam);
   }
 }
 
-void GigE_saveImage_hik(GstPad *pad, GstPadProbeInfo *info) {
-  if (isCapturePhoto_hik[0]) {
+void GigE_saveImage_hik(int index_cam, GstPad *pad, GstPadProbeInfo *info) {
+  if (isCapturePhoto_hik[index_cam]) {
     xlog("");
-    isCapturePhoto_hik[0] = false;
+    isCapturePhoto_hik[index_cam] = false;
 
-    imgu_saveImage((void *)pad, (void *)info, pathName_savedImage_hik[0]);
+    imgu_saveImage((void *)pad, (void *)info, pathName_savedImage_hik[index_cam]);
   }
 }
 
@@ -208,13 +208,13 @@ void GigE_captureImage_hik(int index_cam) {
 // Callback to handle incoming buffer data
 GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
   GigE_streamingLED(0);
-  GigE_saveImage_hik(pad, info);
+  GigE_saveImage_hik(0, pad, info);
   return GST_PAD_PROBE_OK;
 }
 // Callback to handle incoming buffer data
 GstPadProbeReturn streamingDataCallback_gige_hik2(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
   GigE_streamingLED(1);
-  GigE_saveImage_hik(pad, info);
+  GigE_saveImage_hik(1, pad, info);
   return GST_PAD_PROBE_OK;
 }
 
