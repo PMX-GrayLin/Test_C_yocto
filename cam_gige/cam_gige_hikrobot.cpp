@@ -1,18 +1,18 @@
 #include "cam_gige_hikrobot.hpp"
 
+#include <gst/gst.h>
+
 #include <atomic>
 #include <chrono>
-
-#include <gst/gst.h>
 
 // apply only used header
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
+#include "device.hpp"
 #include "image_utils.hpp"
 #include "restfulx.hpp"
-#include "device.hpp"
 
 UsedGigeCam usedGigeCam = ugc_hikrobot;
 
@@ -49,13 +49,13 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
 
   } else if (isSameString(segments[1], "set")) {
     if (isSameString(segments[2], "exposure")) {
-      GigE_setExposure_hik(segments[3]);
+      GigE_setExposure_hik(index_cam, segments[3]);
     } else if (isSameString(segments[2], "exposure-auto")) {
-      GigE_setExposureAuto_hik(segments[3]);
+      GigE_setExposureAuto_hik(index_cam, segments[3]);
     } else if (isSameString(segments[2], "gain")) {
-      GigE_setGain_hik(segments[3]);
+      GigE_setGain_hik(index_cam, segments[3]);
     } else if (isSameString(segments[2], "gain-auto")) {
-      GigE_setGainAuto_hik(segments[3]);
+      GigE_setGainAuto_hik(index_cam, segments[3]);
     } else if (isSameString(segments[2], "resolution")) {
       // with format "width*height"
       GigE_setResolution(index_cam, segments[3]);
@@ -105,80 +105,176 @@ void GigE_saveImage_hik(int index_cam, GstPad *pad, GstPadProbeInfo *info) {
   }
 }
 
-void GigE_getSettings_hik() {
+void GigE_getSettings_hik(int index_cam) {
+  if (index_cam < 0 || index_cam >= NUM_GigE) {
+    xlog("Invalid index_cam: %d", index_cam);
+    return;
+  }
+  if (!source_gige_hik[index_cam]) {
+    xlog("Camera source not initialized for index %d", index_cam);
+    return;
+  }
   // Get the current values
   double exposure, gain;
   int exposure_auto, gain_auto;
 
-  g_object_get(G_OBJECT(source_gige_hik[0]), "exposure", &exposure, NULL);
-  g_object_get(G_OBJECT(source_gige_hik[0]), "gain", &gain, NULL);
-  g_object_get(G_OBJECT(source_gige_hik[0]), "exposure-auto", &exposure_auto, NULL);
-  g_object_get(G_OBJECT(source_gige_hik[0]), "gain-auto", &gain_auto, NULL);
+  g_object_get(G_OBJECT(source_gige_hik[index_cam]), "exposure", &exposure, NULL);
+  g_object_get(G_OBJECT(source_gige_hik[index_cam]), "gain", &gain, NULL);
+  g_object_get(G_OBJECT(source_gige_hik[index_cam]), "exposure-auto", &exposure_auto, NULL);
+  g_object_get(G_OBJECT(source_gige_hik[index_cam]), "gain-auto", &gain_auto, NULL);
   xlog("exposure_auto:%d", exposure_auto);
   xlog("exposure:%f", exposure);
   xlog("gain_auto:%d", gain_auto);
   xlog("gain:%f", gain);
 
-  gigeControlParams[0].exposure_auto = exposure_auto;
-  gigeControlParams[0].exposure = exposure;
-  gigeControlParams[0].gain_auto = gain_auto;
-  gigeControlParams[0].gain = gain;
+  gigeControlParams[index_cam].exposure_auto = exposure_auto;
+  gigeControlParams[index_cam].exposure = exposure;
+  gigeControlParams[index_cam].gain_auto = gain_auto;
+  gigeControlParams[index_cam].gain = gain;
 }
 
-double GigE_getExposure_hik() {
-  return gigeControlParams[0].exposure;
+double GigE_getExposure_hik(int index_cam) {
+  if (index_cam < 0 || index_cam >= NUM_GigE) {
+    xlog("Invalid index_cam: %d", index_cam);
+    return;
+  }
+  if (!source_gige_hik[index_cam]) {
+    xlog("Camera source not initialized for index %d", index_cam);
+    return;
+  }
+  return gigeControlParams[index_cam].exposure;
 }
 
-void GigE_setExposure_hik(string exposureTimeS) {
+void GigE_setExposure_hik(int index_cam, const string &exposureTimeS) {
   // # arv-tool-0.8 control ExposureTime
   // Hikrobot-MV-CS060-10GM-PRO-K44474092 (192.168.11.22)
   // ExposureTime = 15000 min:25 max:2.49985e+06
 
   // ?? max value may incorrect, cause gige cam to crash...
 
-  double exposureTime = limitValueInRange(std::stod(exposureTimeS), 25.0, 2490000.0);
-  xlog("set exposureTime:%f", exposureTime);
-  g_object_set(G_OBJECT(source_gige_hik[0]), "exposure", exposureTime, NULL);
-}
-
-GstArvAuto GigE_getExposureAuto_hik() {
-  return (GstArvAuto)gigeControlParams[0].exposure_auto;
-}
-
-void GigE_setExposureAuto_hik(string gstArvAutoS) {
-  // Exposure auto mode (0 - off, 1 - once, 2 - continuous)
-  GstArvAuto gaa = gaa_off;
-  if (isSameString(gstArvAutoS, "off") || isSameString(gstArvAutoS, "0")) {
-    gaa = gaa_off;
-  } else if (isSameString(gstArvAutoS, "once") || isSameString(gstArvAutoS, "1")) {
-    gaa = gaa_once;
-  } else if (isSameString(gstArvAutoS, "cont") || isSameString(gstArvAutoS, "2")) {
-    gaa = gaa_continuous;
+  if (index_cam < 0 || index_cam >= NUM_GigE) {
+    xlog("Invalid index_cam: %d", index_cam);
+    return;
   }
-  xlog("set exposure-auto:%d", gaa);
-  g_object_set(G_OBJECT(source_gige_hik[0]), "exposure-auto", gaa, NULL);
+  if (!source_gige_hik[index_cam]) {
+    xlog("Camera source not initialized for index %d", index_cam);
+    return;
+  }
+
+  double exposureTime = 0.0;
+  try {
+    exposureTime = std::stod(exposureTimeS);
+  } catch (const std::exception &e) {
+    xlog("Invalid exposureTime string: '%s' (%s)", exposureTimeS.c_str(), e.what());
+    return;
+  }
+
+  if (!std::isfinite(exposureTime)) {
+    xlog("Exposure time is not finite: %f", exposureTime);
+    return;
+  }
+
+  exposureTime = limitValueInRange(std::stod(exposureTimeS), 25.0, 2490000.0);
+  xlog("Setting exposureTime: %f", exposureTime);
+  g_object_set(G_OBJECT(source_gige_hik[index_cam]), "exposure", exposureTime, nullptr);
 }
 
-double GigE_getGain_hik() {
-  return gigeControlParams[0].gain;
+GstArvAuto GigE_getExposureAuto_hik(int index_cam) {
+  if (index_cam < 0 || index_cam >= NUM_GigE) {
+    xlog("Invalid index_cam: %d", index_cam);
+    return;
+  }
+  if (!source_gige_hik[index_cam]) {
+    xlog("Camera source not initialized for index %d", index_cam);
+    return;
+  }
+  return (GstArvAuto)gigeControlParams[index_cam].exposure_auto;
 }
 
-void GigE_setGain_hik(string gainS) {
+void GigE_setExposureAuto_hik(int index_cam, const string &gstArvAutoS) {
   // # arv-tool-0.8 control Gain
   // Hikrobot-MV-CS060-10GM-PRO-K44474092 (192.168.11.22)
   // Gain = 10.0161 dB min:0 max:23.9812
 
+  if (index_cam < 0 || index_cam >= NUM_GigE) {
+    xlog("Invalid index_cam: %d", index_cam);
+    return;
+  }
+  if (!source_gige_hik[index_cam]) {
+    xlog("Camera source not initialized for index %d", index_cam);
+    return;
+  }
+
+  GstArvAuto gaa = gaa_off;  // default
+
+  if (isSameString(gstArvAutoS, "off") || isSameString(gstArvAutoS, "0")) {
+    gaa = gaa_off;
+  } else if (isSameString(gstArvAutoS, "once") || isSameString(gstArvAutoS, "1")) {
+    gaa = gaa_once;
+  } else if (isSameString(gstArvAutoS, "cont") || isSameString(gstArvAutoS, "continuous") || isSameString(gstArvAutoS, "2")) {
+    gaa = gaa_continuous;
+  } else {
+    xlog("Invalid exposure-auto string: '%s', defaulting to OFF", gstArvAutoS.c_str());
+  }
+
+  xlog("Setting exposure-auto mode: %d (%s)",
+       gaa,
+       (gaa == gaa_off ? "off" : gaa == gaa_once ? "once"
+                                                 : "continuous"));
+
+  g_object_set(G_OBJECT(source_gige_hik[index_cam]), "exposure-auto", gaa, nullptr);
+}
+
+double GigE_getGain_hik(int index_cam) {
+  if (index_cam < 0 || index_cam >= NUM_GigE) {
+    xlog("Invalid index_cam: %d", index_cam);
+    return;
+  }
+  if (!source_gige_hik[index_cam]) {
+    xlog("Camera source not initialized for index %d", index_cam);
+    return;
+  }
+  return gigeControlParams[index_cam].gain;
+}
+
+void GigE_setGain_hik(int index_cam, const string &gainS) {
+  if (index_cam < 0 || index_cam >= NUM_GigE) {
+    xlog("Invalid index_cam: %d", index_cam);
+    return;
+  }
+  if (!source_gige_hik[index_cam]) {
+    xlog("Camera source not initialized for index %d", index_cam);
+    return;
+  }
+
   double gain = limitValueInRange(std::stod(gainS), 0.0, 23.9);
   xlog("set gain:%f", gain);
-  g_object_set(G_OBJECT(source_gige_hik[0]), "gain", gain, NULL);
+  g_object_set(G_OBJECT(source_gige_hik[index_cam]), "gain", gain, NULL);
 }
 
-GstArvAuto GigE_getGainAuto_hik() {
-  return (GstArvAuto)gigeControlParams[0].gain_auto;
+GstArvAuto GigE_getGainAuto_hik(int index_cam) {
+  if (index_cam < 0 || index_cam >= NUM_GigE) {
+    xlog("Invalid index_cam: %d", index_cam);
+    return;
+  }
+  if (!source_gige_hik[index_cam]) {
+    xlog("Camera source not initialized for index %d", index_cam);
+    return;
+  }
+  return (GstArvAuto)gigeControlParams[index_cam].gain_auto;
 }
 
-void GigE_setGainAuto_hik(string gstArvAutoS) {
+void GigE_setGainAuto_hik(int index_cam, const string &gstArvAutoS) {
   // Gain auto mode (0 - off, 1 - once, 2 - continuous)
+  if (index_cam < 0 || index_cam >= NUM_GigE) {
+    xlog("Invalid index_cam: %d", index_cam);
+    return;
+  }
+  if (!source_gige_hik[index_cam]) {
+    xlog("Camera source not initialized for index %d", index_cam);
+    return;
+  }
+
   GstArvAuto gaa = gaa_off;
   if (isSameString(gstArvAutoS, "off") || isSameString(gstArvAutoS, "0")) {
     gaa = gaa_off;
@@ -187,8 +283,12 @@ void GigE_setGainAuto_hik(string gstArvAutoS) {
   } else if (isSameString(gstArvAutoS, "cont") || isSameString(gstArvAutoS, "2")) {
     gaa = gaa_continuous;
   }
-  xlog("set gain-auto:%d", gaa);
-  g_object_set(G_OBJECT(source_gige_hik[0]), "gain-auto", gaa, NULL);
+  xlog("Setting exposure-auto mode: %d (%s)",
+       gaa,
+       (gaa == gaa_off ? "off" : gaa == gaa_once ? "once"
+                                                 : "continuous"));
+
+  g_object_set(G_OBJECT(source_gige_hik[index_cam]), "gain-auto", gaa, NULL);
 }
 
 void GigE_setImagePath_hik(int index_cam, const string &imagePath) {
@@ -208,10 +308,10 @@ void GigE_captureImage_hik(int index_cam) {
 // Callback to handle incoming buffer data
 // Generic callback for all cameras
 GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
-    int index_cam = GPOINTER_TO_INT(user_data);
-    GigE_streamingLED(index_cam);
-    GigE_saveImage_hik(index_cam, pad, info);
-    return GST_PAD_PROBE_OK;
+  int index_cam = GPOINTER_TO_INT(user_data);
+  GigE_streamingLED(index_cam);
+  GigE_saveImage_hik(index_cam, pad, info);
+  return GST_PAD_PROBE_OK;
 }
 
 void GigE_ThreadStreaming_Hik(int index_cam) {
@@ -316,13 +416,21 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
             g_free(dbg);
 
             GigE_StreamingStop_Hik(index_cam);
-            FW_setLED("2", "red");
+            if (index_cam == 0) {
+              FW_setLED("2", "red");
+            } else if (index_cam == 1) {
+              FW_setLED("3", "red");
+            }
             break;
           }
           case GST_MESSAGE_EOS:
             xlog("Received EOS, stopping...");
             GigE_StreamingStop_Hik(index_cam);
-            FW_setLED("2", "red");
+            if (index_cam == 0) {
+              FW_setLED("2", "red");
+            } else if (index_cam == 1) {
+              FW_setLED("3", "red");
+            }
             break;
 
           default:
@@ -389,7 +497,7 @@ void GigE_StreamingStart_Hik(int index_cam) {
   } else if (index_cam == 1) {
     FW_setLED("3", "off");
   }
-  
+
   t_streaming_gige_hik[index_cam] = std::thread(GigE_ThreadStreaming_Hik, index_cam);
   t_streaming_gige_hik[index_cam].detach();
 }
@@ -407,7 +515,6 @@ void GigE_StreamingStop_Hik(int index_cam) {
   } else {
     xlog("loop_gige_hik is invalid or already destroyed.");
   }
-
 }
 
 void GigE_streamingLED(int index_cam) {
@@ -424,7 +531,7 @@ void GigE_streamingLED(int index_cam) {
   }
 }
 
-void GigE_setResolution(int index, const string& resolutionS) {
+void GigE_setResolution(int index, const string &resolutionS) {
   size_t sep = resolutionS.find('*');
   if (sep == std::string::npos) {
     xlog("Invalid resolution format. Expected format: width*height");
