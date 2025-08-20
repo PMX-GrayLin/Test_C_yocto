@@ -206,16 +206,12 @@ void GigE_captureImage_hik(int index_cam) {
 }
 
 // Callback to handle incoming buffer data
+// Generic callback for all cameras
 GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
-  GigE_streamingLED(0);
-  GigE_saveImage_hik(0, pad, info);
-  return GST_PAD_PROBE_OK;
-}
-// Callback to handle incoming buffer data
-GstPadProbeReturn streamingDataCallback_gige_hik2(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
-  GigE_streamingLED(1);
-  GigE_saveImage_hik(1, pad, info);
-  return GST_PAD_PROBE_OK;
+    int index_cam = GPOINTER_TO_INT(user_data);
+    GigE_streamingLED(index_cam);
+    GigE_saveImage_hik(index_cam, pad, info);
+    return GST_PAD_PROBE_OK;
 }
 
 void GigE_ThreadStreaming_Hik(int index_cam) {
@@ -294,16 +290,12 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
   // Optional: attach pad probe to monitor frames
   GstPad *pad = gst_element_get_static_pad(encoder, "sink");
   if (pad) {
-    if (index_cam == 0) {
-      gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)streamingDataCallback_gige_hik, nullptr, nullptr);
-    } else if (index_cam == 1) {
-      gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)streamingDataCallback_gige_hik2, nullptr, nullptr);
-    } else {
-      xlog("Invalid index_cam: %d", index_cam);
-      gst_object_unref(pad);
-      gst_object_unref(pipeline_gige_hik[index_cam]);
-      return;
-    }
+    gst_pad_add_probe(
+        pad,
+        GST_PAD_PROBE_TYPE_BUFFER,
+        streamingDataCallback_gige_hik,
+        GINT_TO_POINTER(index_cam),  // pass index_cam here
+        nullptr);
     gst_object_unref(pad);
   }
 
