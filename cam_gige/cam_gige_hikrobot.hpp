@@ -37,7 +37,7 @@ void GigE_getSettings_hik(int index_cam);
 double GigE_getExposure_hik(int index_cam);
 void GigE_setExposure_hik(int index_cam, const string& exposureTimeS);
 GstArvAuto GigE_getExposureAuto_hik(int index_cam);
-void GigE_setExposureAuto_hik(int index_cam, string& gstArvAutoS);
+void GigE_setExposureAuto_hik(int index_cam, const string& gstArvAutoS);
 
 double GigE_getGain_hik(int index_cam);
 void GigE_setGain_hik(int index_cam, const string& gainS);
