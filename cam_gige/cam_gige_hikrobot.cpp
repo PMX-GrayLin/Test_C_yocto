@@ -17,21 +17,21 @@
 UsedGigeCam usedGigeCam = ugc_hikrobot;
 
 static GstElement *pipeline_gige_hik[NUM_GigE] = {nullptr, nullptr};
-static GMainLoop *loop_gige_hik = nullptr;
-static GstElement *source_gige_hik = nullptr;
+static GMainLoop *loop_gige_hik[NUM_GigE] = {nullptr, nullptr};
+static GstElement *source_gige_hik[NUM_GigE] = {nullptr, nullptr};
 
-std::thread t_streaming_gige_hik;
-std::atomic<bool> isStreaming_gige_hik{false};
-std::chrono::steady_clock::time_point lastStartTime_gige_hik;
+std::thread t_streaming_gige_hik[NUM_GigE];
+std::atomic<bool> isStreaming_gige_hik[NUM_GigE]{false, false};
+std::chrono::steady_clock::time_point lastStartTime_gige_hik[NUM_GigE];
 static int resolution_width_gige_hik[NUM_GigE] = {1920, 1920};
 static int resolution_height_gige_hik[NUM_GigE] = {1080, 1080};
 
-struct GigeControlParams gigeControlParams = {0};
+struct GigeControlParams gigeControlParams[NUM_GigE] = {};
 
-bool isCapturePhoto_hik = false;
-std::string pathName_savedImage_hik = "";
+bool isCapturePhoto_hik[NUM_GigE] = {false, false};
+std::string pathName_savedImage_hik[NUM_GigE] = {"", ""};
 
-static volatile int counterFrame_hik = 0;
+static volatile int counterFrame_hik[NUM_GigE] = {0, 0};
 
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   string indexS = "";
@@ -72,7 +72,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else if (isSameString(segments[2], "gain-auto")) {
       //
     } else if (isSameString(segments[2], "isStreaming")) {
-      RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik);
+      RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik[0]);
     }
 
   } else if (isSameString(segments[1], "tp")) {
@@ -97,11 +97,11 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
 }
 
 void GigE_saveImage_hik(GstPad *pad, GstPadProbeInfo *info) {
-  if (isCapturePhoto_hik) {
+  if (isCapturePhoto_hik[0]) {
     xlog("");
-    isCapturePhoto_hik = false;
+    isCapturePhoto_hik[0] = false;
 
-    imgu_saveImage((void *)pad, (void *)info, pathName_savedImage_hik);
+    imgu_saveImage((void *)pad, (void *)info, pathName_savedImage_hik[0]);
   }
 }
 
@@ -110,23 +110,23 @@ void GigE_getSettings_hik() {
   double exposure, gain;
   int exposure_auto, gain_auto;
 
-  g_object_get(G_OBJECT(source_gige_hik), "exposure", &exposure, NULL);
-  g_object_get(G_OBJECT(source_gige_hik), "gain", &gain, NULL);
-  g_object_get(G_OBJECT(source_gige_hik), "exposure-auto", &exposure_auto, NULL);
-  g_object_get(G_OBJECT(source_gige_hik), "gain-auto", &gain_auto, NULL);
+  g_object_get(G_OBJECT(source_gige_hik[0]), "exposure", &exposure, NULL);
+  g_object_get(G_OBJECT(source_gige_hik[0]), "gain", &gain, NULL);
+  g_object_get(G_OBJECT(source_gige_hik[0]), "exposure-auto", &exposure_auto, NULL);
+  g_object_get(G_OBJECT(source_gige_hik[0]), "gain-auto", &gain_auto, NULL);
   xlog("exposure_auto:%d", exposure_auto);
   xlog("exposure:%f", exposure);
   xlog("gain_auto:%d", gain_auto);
   xlog("gain:%f", gain);
 
-  gigeControlParams.exposure_auto = exposure_auto;
-  gigeControlParams.exposure = exposure;
-  gigeControlParams.gain_auto = gain_auto;
-  gigeControlParams.gain = gain;
+  gigeControlParams[0].exposure_auto = exposure_auto;
+  gigeControlParams[0].exposure = exposure;
+  gigeControlParams[0].gain_auto = gain_auto;
+  gigeControlParams[0].gain = gain;
 }
 
 double GigE_getExposure_hik() {
-  return gigeControlParams.exposure;
+  return gigeControlParams[0].exposure;
 }
 
 void GigE_setExposure_hik(string exposureTimeS) {
@@ -138,11 +138,11 @@ void GigE_setExposure_hik(string exposureTimeS) {
 
   double exposureTime = limitValueInRange(std::stod(exposureTimeS), 25.0, 2490000.0);
   xlog("set exposureTime:%f", exposureTime);
-  g_object_set(G_OBJECT(source_gige_hik), "exposure", exposureTime, NULL);
+  g_object_set(G_OBJECT(source_gige_hik[0]), "exposure", exposureTime, NULL);
 }
 
 GstArvAuto GigE_getExposureAuto_hik() {
-  return (GstArvAuto)gigeControlParams.exposure_auto;
+  return (GstArvAuto)gigeControlParams[0].exposure_auto;
 }
 
 void GigE_setExposureAuto_hik(string gstArvAutoS) {
@@ -156,11 +156,11 @@ void GigE_setExposureAuto_hik(string gstArvAutoS) {
     gaa = gaa_continuous;
   }
   xlog("set exposure-auto:%d", gaa);
-  g_object_set(G_OBJECT(source_gige_hik), "exposure-auto", gaa, NULL);
+  g_object_set(G_OBJECT(source_gige_hik[0]), "exposure-auto", gaa, NULL);
 }
 
 double GigE_getGain_hik() {
-  return gigeControlParams.gain;
+  return gigeControlParams[0].gain;
 }
 
 void GigE_setGain_hik(string gainS) {
@@ -170,11 +170,11 @@ void GigE_setGain_hik(string gainS) {
 
   double gain = limitValueInRange(std::stod(gainS), 0.0, 23.9);
   xlog("set gain:%f", gain);
-  g_object_set(G_OBJECT(source_gige_hik), "gain", gain, NULL);
+  g_object_set(G_OBJECT(source_gige_hik[0]), "gain", gain, NULL);
 }
 
 GstArvAuto GigE_getGainAuto_hik() {
-  return (GstArvAuto)gigeControlParams.gain_auto;
+  return (GstArvAuto)gigeControlParams[0].gain_auto;
 }
 
 void GigE_setGainAuto_hik(string gstArvAutoS) {
@@ -188,21 +188,21 @@ void GigE_setGainAuto_hik(string gstArvAutoS) {
     gaa = gaa_continuous;
   }
   xlog("set gain-auto:%d", gaa);
-  g_object_set(G_OBJECT(source_gige_hik), "gain-auto", gaa, NULL);
+  g_object_set(G_OBJECT(source_gige_hik[0]), "gain-auto", gaa, NULL);
 }
 
 void GigE_setImagePath_hik(const string &imagePath) {
-  pathName_savedImage_hik = imagePath;
-  xlog("pathName_savedImage_hik:%s", pathName_savedImage_hik.c_str());
+  pathName_savedImage_hik[0] = imagePath;
+  xlog("pathName_savedImage_hik[0]:%s", pathName_savedImage_hik[0].c_str());
 }
 
 void GigE_captureImage_hik() {
-  if (!isStreaming_gige_hik.load()) {
+  if (!isStreaming_gige_hik[0].load()) {
     xlog("do nothing...camera is not streaming");
     return;
   }
   xlog("");
-  isCapturePhoto_hik = true;
+  isCapturePhoto_hik[0] = true;
 }
 
 // Callback to handle incoming buffer data
@@ -224,7 +224,7 @@ void GigE_ThreadStreaming_Hik() {
   // Create the pipeline
   pipeline_gige_hik[0] = gst_pipeline_new("video-pipeline");
 
-  source_gige_hik = gst_element_factory_make("aravissrc", "source_gige_hik");
+  source_gige_hik[0] = gst_element_factory_make("aravissrc", "source_gige_hik[0]");
   GstElement *videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
   GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
   GstElement *queue = gst_element_factory_make("queue", "queue");
@@ -232,13 +232,13 @@ void GigE_ThreadStreaming_Hik() {
   GstElement *parser = gst_element_factory_make("h264parse", "parser");
   GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
 
-  if (!pipeline_gige_hik[0] || !source_gige_hik || !videoconvert || !capsfilter || !queue || !encoder || !parser || !sink) {
+  if (!pipeline_gige_hik[0] || !source_gige_hik[0] || !videoconvert || !capsfilter || !queue || !encoder || !parser || !sink) {
     xlog("Failed to create GStreamer elements");
     return;
   }
 
   // Set camera by ID or name (adjust "id1" if needed)
-  g_object_set(G_OBJECT(source_gige_hik), "camera-name", "id1", nullptr);
+  g_object_set(G_OBJECT(source_gige_hik[0]), "camera-name", "id1", nullptr);
 
   // Define the capabilities: NV12 format
   GstCaps *caps = gst_caps_new_simple(
@@ -271,8 +271,8 @@ void GigE_ThreadStreaming_Hik() {
   g_object_set(G_OBJECT(sink), "location", "rtsp://localhost:8554/mystream", nullptr);
 
   // Build pipeline
-  gst_bin_add_many(GST_BIN(pipeline_gige_hik[0]), source_gige_hik, videoconvert, capsfilter, queue, encoder, parser, sink, nullptr);
-  if (!gst_element_link_many(source_gige_hik, videoconvert, capsfilter, queue, encoder, parser, sink, nullptr)) {
+  gst_bin_add_many(GST_BIN(pipeline_gige_hik[0]), source_gige_hik[0], videoconvert, capsfilter, queue, encoder, parser, sink, nullptr);
+  if (!gst_element_link_many(source_gige_hik[0], videoconvert, capsfilter, queue, encoder, parser, sink, nullptr)) {
     xlog("Failed to link GStreamer elements");
     gst_object_unref(pipeline_gige_hik[0]);
     return;
@@ -320,75 +320,75 @@ void GigE_ThreadStreaming_Hik() {
     xlog("failed to start the pipeline");
     gst_element_set_state(pipeline_gige_hik[0], GST_STATE_NULL);
     gst_object_unref(pipeline_gige_hik[0]);
-    isStreaming_gige_hik = false;
+    isStreaming_gige_hik[0] = false;
     return;
   }
 
   xlog("pipeline is running...");
-  isStreaming_gige_hik = true;
-  RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik);
+  isStreaming_gige_hik[0] = true;
+  RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik[0]);
 
   // Main loop
-  loop_gige_hik = g_main_loop_new(nullptr, FALSE);
+  loop_gige_hik[0] = g_main_loop_new(nullptr, FALSE);
   gst_bus_set_sync_handler(bus, nullptr, nullptr, nullptr);
   gst_object_unref(bus);
-  g_main_loop_run(loop_gige_hik);
+  g_main_loop_run(loop_gige_hik[0]);
 
   // Clean up
   xlog("Stopping the pipeline...");
   gst_element_set_state(pipeline_gige_hik[0], GST_STATE_NULL);
   gst_object_unref(pipeline_gige_hik[0]);
-  if (loop_gige_hik) {
-    g_main_loop_unref(loop_gige_hik);
-    loop_gige_hik = nullptr;
+  if (loop_gige_hik[0]) {
+    g_main_loop_unref(loop_gige_hik[0]);
+    loop_gige_hik[0] = nullptr;
   }
 
   FW_CheckNetLinkState("eth1");
 
-  isStreaming_gige_hik = false;
-  RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik);
+  isStreaming_gige_hik[0] = false;
+  RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik[0]);
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 
 void GigE_StreamingStart_Hik() {
   xlog("");
   auto now = std::chrono::steady_clock::now();
-  if (now - lastStartTime_gige_hik < std::chrono::seconds(1)) {
+  if (now - lastStartTime_gige_hik[0] < std::chrono::seconds(1)) {
     xlog("Start called too soon, ignoring");
     return;
   }
-  lastStartTime_gige_hik = now;
+  lastStartTime_gige_hik[0] = now;
 
-  if (isStreaming_gige_hik.load()) {
+  if (isStreaming_gige_hik[0].load()) {
     xlog("thread already running");
     return;
   }
 
   FW_setLED("2", "off");
-  t_streaming_gige_hik = std::thread(GigE_ThreadStreaming_Hik);
-  t_streaming_gige_hik.detach();
+  t_streaming_gige_hik[0] = std::thread(GigE_ThreadStreaming_Hik);
+  t_streaming_gige_hik[0].detach();
 }
 
 void GigE_StreamingStop_Hik() {
   xlog("");
-  if (!isStreaming_gige_hik.load()) {
+  if (!isStreaming_gige_hik[0].load()) {
     xlog("thread not running");
     return;
   }
 
-  if (loop_gige_hik) {
+  if (loop_gige_hik[0]) {
     xlog("g_main_loop_quit");
-    g_main_loop_quit(loop_gige_hik);  // Unref should only happen in the thread
+    g_main_loop_quit(loop_gige_hik[0]);  // Unref should only happen in the thread
   } else {
     xlog("gst_loop_uvc is invalid or already destroyed.");
   }
 
-  // isStreaming_gige_hik = false;
+  // isStreaming_gige_hik[0] = false;
 }
 
 void GigE_streamingLED() {
-  counterFrame_hik++;
-  if (counterFrame_hik%15 == 0)
+  counterFrame_hik[0]++;
+  if (counterFrame_hik[0]%15 == 0)
   {
     FW_toggleLED("2", "orange");
   }
