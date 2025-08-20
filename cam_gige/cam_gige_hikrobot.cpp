@@ -406,10 +406,16 @@ void GigE_StreamingStop_Hik(int index_cam) {
 }
 
 void GigE_streamingLED(int index_cam) {
-  counterFrame_hik[index_cam]++;
-  if (counterFrame_hik[index_cam]%15 == 0)
-  {
-    FW_toggleLED("2", "orange");
+  if (index_cam == 0) {
+    counterFrame_hik[index_cam]++;
+    if (counterFrame_hik[index_cam] % 15 == 0) {
+      FW_toggleLED("2", "orange");
+    }
+  } else if (index_cam == 1) {
+    counterFrame_hik[index_cam]++;
+    if (counterFrame_hik[index_cam] % 15 == 0) {
+      FW_toggleLED("3", "orange");
+    }
   }
 }
 
