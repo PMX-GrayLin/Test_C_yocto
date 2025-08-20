@@ -290,7 +290,7 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
 
   // Add bus watch to handle errors and EOS
   GstBus *bus = gst_element_get_bus(pipeline_gige_hik[index_cam]);
-  gst_bus_add_watch(bus, [](GstBus *, GstMessage *msg, gpointer user_data) -> gboolean {
+  gst_bus_add_watch(bus, [index_cam](GstBus *, GstMessage *msg, gpointer user_data) -> gboolean {
       switch (GST_MESSAGE_TYPE(msg)) {
         case GST_MESSAGE_ERROR: {
           GError *err;
