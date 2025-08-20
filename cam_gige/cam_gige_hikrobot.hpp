@@ -46,11 +46,11 @@ void GigE_setGainAuto_hik(string gstArvAutoS);
 void GigE_setImagePath_hik(const string& imagePath);
 void GigE_captureImage_hik();
 
-void GigE_ThreadStreaming_Hik();
-void GigE_StreamingStart_Hik();
-void GigE_StreamingStop_Hik();
+void GigE_ThreadStreaming_Hik(int index_cam);
+void GigE_StreamingStart_Hik(int index_cam);
+void GigE_StreamingStop_Hik(int index_cam);
 void GigE_streamingLED();
-void GigE_setResolution(const string& indexS, const string& resolutionS);
+void GigE_setResolution(int index_cam, const string& resolutionS);
 
 /* 
 

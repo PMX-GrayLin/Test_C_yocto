@@ -34,18 +34,18 @@ std::string pathName_savedImage_hik[NUM_GigE] = {"", ""};
 static volatile int counterFrame_hik[NUM_GigE] = {0, 0};
 
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
-  string indexS = "";
+  int index_cam = 0;
   if (isSameString(segments[0], "gige") || isSameString(segments[1], "gige1")) {
-    indexS = "1";
+    index_cam = 0;
   } else if (isSameString(segments[0], "gige2")) {
-    indexS = "2";
+    index_cam = 1;
   }
 
   if (isSameString(segments[1], "start")) {
-    GigE_StreamingStart_Hik();
+    GigE_StreamingStart_Hik(index_cam);
 
   } else if (isSameString(segments[1], "stop")) {
-    GigE_StreamingStop_Hik();
+    GigE_StreamingStop_Hik(index_cam);
 
   } else if (isSameString(segments[1], "set")) {
     if (isSameString(segments[2], "exposure")) {
@@ -58,7 +58,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
       GigE_setGainAuto_hik(segments[3]);
     } else if (isSameString(segments[2], "resolution")) {
       // with format "width*height"
-      GigE_setResolution(indexS, segments[3]);
+      GigE_setResolution(index_cam, segments[3]);
     }
 
   } else if (isSameString(segments[1], "get")) {
@@ -212,7 +212,7 @@ GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *i
   return GST_PAD_PROBE_OK;
 }
 
-void GigE_ThreadStreaming_Hik() {
+void GigE_ThreadStreaming_Hik(int index_cam) {
   xlog("++++ start ++++");
 
   // Initialize GStreamer
@@ -350,40 +350,39 @@ void GigE_ThreadStreaming_Hik() {
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 
-void GigE_StreamingStart_Hik() {
+void GigE_StreamingStart_Hik(int index_cam) {
   xlog("");
   auto now = std::chrono::steady_clock::now();
-  if (now - lastStartTime_gige_hik[0] < std::chrono::seconds(1)) {
+  if (now - lastStartTime_gige_hik[index_cam] < std::chrono::seconds(1)) {
     xlog("Start called too soon, ignoring");
     return;
   }
-  lastStartTime_gige_hik[0] = now;
+  lastStartTime_gige_hik[index_cam] = now;
 
-  if (isStreaming_gige_hik[0].load()) {
+  if (isStreaming_gige_hik[index_cam].load()) {
     xlog("thread already running");
     return;
   }
 
   FW_setLED("2", "off");
-  t_streaming_gige_hik[0] = std::thread(GigE_ThreadStreaming_Hik);
-  t_streaming_gige_hik[0].detach();
+  t_streaming_gige_hik[index_cam] = std::thread(GigE_ThreadStreaming_Hik, index_cam);
+  t_streaming_gige_hik[index_cam].detach();
 }
 
-void GigE_StreamingStop_Hik() {
+void GigE_StreamingStop_Hik(int index_cam) {
   xlog("");
-  if (!isStreaming_gige_hik[0].load()) {
+  if (!isStreaming_gige_hik[index_cam].load()) {
     xlog("thread not running");
     return;
   }
 
-  if (loop_gige_hik[0]) {
+  if (loop_gige_hik[index_cam]) {
     xlog("g_main_loop_quit");
-    g_main_loop_quit(loop_gige_hik[0]);  // Unref should only happen in the thread
+    g_main_loop_quit(loop_gige_hik[index_cam]);  // Unref should only happen in the thread
   } else {
-    xlog("gst_loop_uvc is invalid or already destroyed.");
+    xlog("loop_gige_hik is invalid or already destroyed.");
   }
 
-  // isStreaming_gige_hik[0] = false;
 }
 
 void GigE_streamingLED() {
@@ -394,14 +393,18 @@ void GigE_streamingLED() {
   }
 }
 
-void GigE_setResolution(const string& indexS, const string& resolutionS) {
+void GigE_setResolution(int index, const string& resolutionS) {
   size_t sep = resolutionS.find('*');
   if (sep == std::string::npos) {
     xlog("Invalid resolution format. Expected format: width*height");
     return;
   }
 
-  int index = std::stoi(indexS);
+  if (index < 0 || index >= NUM_GigE) {
+    xlog("Invalid index: %d", index);
+    return;
+  }
+
   int width = std::stoi(resolutionS.substr(0, sep));
   int height = std::stoi(resolutionS.substr(sep + 1));
 
