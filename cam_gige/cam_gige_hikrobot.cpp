@@ -136,11 +136,11 @@ void GigE_getSettings_hik(int index_cam) {
 double GigE_getExposure_hik(int index_cam) {
   if (index_cam < 0 || index_cam >= NUM_GigE) {
     xlog("Invalid index_cam: %d", index_cam);
-    return;
+    return -1.0;
   }
   if (!source_gige_hik[index_cam]) {
     xlog("Camera source not initialized for index %d", index_cam);
-    return;
+    return -1.0;
   }
   return gigeControlParams[index_cam].exposure;
 }
@@ -182,11 +182,11 @@ void GigE_setExposure_hik(int index_cam, const string &exposureTimeS) {
 GstArvAuto GigE_getExposureAuto_hik(int index_cam) {
   if (index_cam < 0 || index_cam >= NUM_GigE) {
     xlog("Invalid index_cam: %d", index_cam);
-    return;
+    return gaa_invalid;
   }
   if (!source_gige_hik[index_cam]) {
     xlog("Camera source not initialized for index %d", index_cam);
-    return;
+    return gaa_invalid;
   }
   return (GstArvAuto)gigeControlParams[index_cam].exposure_auto;
 }
@@ -228,11 +228,11 @@ void GigE_setExposureAuto_hik(int index_cam, const string &gstArvAutoS) {
 double GigE_getGain_hik(int index_cam) {
   if (index_cam < 0 || index_cam >= NUM_GigE) {
     xlog("Invalid index_cam: %d", index_cam);
-    return;
+    return -1.0;
   }
   if (!source_gige_hik[index_cam]) {
     xlog("Camera source not initialized for index %d", index_cam);
-    return;
+    return -1.0;
   }
   return gigeControlParams[index_cam].gain;
 }
@@ -255,11 +255,11 @@ void GigE_setGain_hik(int index_cam, const string &gainS) {
 GstArvAuto GigE_getGainAuto_hik(int index_cam) {
   if (index_cam < 0 || index_cam >= NUM_GigE) {
     xlog("Invalid index_cam: %d", index_cam);
-    return;
+    return gaa_invalid;
   }
   if (!source_gige_hik[index_cam]) {
     xlog("Camera source not initialized for index %d", index_cam);
-    return;
+    return gaa_invalid;
   }
   return (GstArvAuto)gigeControlParams[index_cam].gain_auto;
 }

@@ -19,6 +19,7 @@ typedef enum {
   gaa_off = 0,
   gaa_once,
   gaa_continuous,
+  gaa_invalid,
 } GstArvAuto;
 
 struct GigeControlParams {
