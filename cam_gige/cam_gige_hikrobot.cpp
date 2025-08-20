@@ -291,31 +291,28 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
   // Add bus watch to handle errors and EOS
   GstBus *bus = gst_element_get_bus(pipeline_gige_hik[index_cam]);
   gst_bus_add_watch(bus, [index_cam](GstBus *, GstMessage *msg, gpointer user_data) -> gboolean {
-      switch (GST_MESSAGE_TYPE(msg)) {
+    switch (GST_MESSAGE_TYPE(msg)) {
         case GST_MESSAGE_ERROR: {
-          GError *err;
-          gchar *dbg;
-          gst_message_parse_error(msg, &err, &dbg);
-          xlog("Pipeline error: %s", err->message);
-          g_error_free(err);
-          g_free(dbg);
-  
-          GigE_StreamingStop_Hik(index_cam);
-          FW_setLED("2","red");
-          break;
-        }
-  
-        case GST_MESSAGE_EOS:
-          xlog("Received EOS, stopping...");
+            GError *err;
+            gchar *dbg;
+            gst_message_parse_error(msg, &err, &dbg);
+            xlog("Pipeline error: %s", err->message);
+            g_error_free(err);
+            g_free(dbg);
 
-          GigE_StreamingStop_Hik(index_cam);
-          FW_setLED("2","red");
-          break;
-  
+            GigE_StreamingStop_Hik(index_cam);
+            FW_setLED("2","red");
+            break;
+        }
+        case GST_MESSAGE_EOS:
+            xlog("Received EOS, stopping...");
+            GigE_StreamingStop_Hik(index_cam);
+            FW_setLED("2","red");
+            break;
         default:
-          break;
-      }
-      return TRUE; }, nullptr);
+            break;
+    }
+    return TRUE; }, nullptr);
 
   // Start streaming
   GstStateChangeReturn ret = gst_element_set_state(pipeline_gige_hik[index_cam], GST_STATE_PLAYING);
