@@ -222,9 +222,11 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
   // gst-launch-1.0 aravissrc camera-name=id1 ! videoconvert ! video/x-raw,format=NV12 ! queue ! v4l2h264enc extra-controls="cid,video_gop_size=30" capture-io-mode=dmabuf ! h264parse config-interval=1 ! rtspclientsink location=rtsp://localhost:8554/mystream
 
   // Create the pipeline
-  pipeline_gige_hik[0] = gst_pipeline_new("video-pipeline");
+  std::string pipelineS = "video-pipeline_" + std::to_string(index_cam);
+  pipeline_gige_hik[index_cam] = gst_pipeline_new(pipelineS.c_str());
 
-  source_gige_hik[0] = gst_element_factory_make("aravissrc", "source_gige_hik[0]");
+  std::string sourceS = "source_gige_hik_" + std::to_string(index_cam);
+  source_gige_hik[index_cam] = gst_element_factory_make("aravissrc", sourceS.c_str());
   GstElement *videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
   GstElement *capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
   GstElement *queue = gst_element_factory_make("queue", "queue");
@@ -232,13 +234,14 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
   GstElement *parser = gst_element_factory_make("h264parse", "parser");
   GstElement *sink = gst_element_factory_make("rtspclientsink", "sink");
 
-  if (!pipeline_gige_hik[0] || !source_gige_hik[0] || !videoconvert || !capsfilter || !queue || !encoder || !parser || !sink) {
+  if (!pipeline_gige_hik[index_cam] || !source_gige_hik[index_cam] || !videoconvert || !capsfilter || !queue || !encoder || !parser || !sink) {
     xlog("Failed to create GStreamer elements");
     return;
   }
 
   // Set camera by ID or name (adjust "id1" if needed)
-  g_object_set(G_OBJECT(source_gige_hik[0]), "camera-name", "id1", nullptr);
+  std::string cameraNameS = "id" + std::to_string(index_cam + 1);
+  g_object_set(G_OBJECT(source_gige_hik[index_cam]), "camera-name", cameraNameS.c_str(), nullptr);
 
   // Define the capabilities: NV12 format
   GstCaps *caps = gst_caps_new_simple(
@@ -257,7 +260,7 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
       nullptr);
   if (!controls) {
     xlog("Failed to create GstStructure");
-    gst_object_unref(pipeline_gige_hik[0]);
+    gst_object_unref(pipeline_gige_hik[index_cam]);
     return;
   }
   g_object_set(G_OBJECT(encoder), "extra-controls", controls, nullptr);
@@ -297,7 +300,7 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
           g_error_free(err);
           g_free(dbg);
   
-          GigE_StreamingStop_Hik();
+          GigE_StreamingStop_Hik(index_cam);
           FW_setLED("2","red");
           break;
         }
@@ -305,7 +308,7 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
         case GST_MESSAGE_EOS:
           xlog("Received EOS, stopping...");
 
-          GigE_StreamingStop_Hik();
+          GigE_StreamingStop_Hik(index_cam);
           FW_setLED("2","red");
           break;
   
