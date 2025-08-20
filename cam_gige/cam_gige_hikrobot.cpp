@@ -62,7 +62,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     }
 
   } else if (isSameString(segments[1], "get")) {
-    GigE_getSettings_hik();
+    GigE_getSettings_hik(index_cam);
     if (isSameString(segments[2], "exposure")) {
       //
     } else if (isSameString(segments[2], "exposure-auto")) {
