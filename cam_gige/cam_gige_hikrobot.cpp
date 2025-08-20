@@ -91,7 +91,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else {
       path = "/home/root/primax/fw_" + getTimeString() + ".png";
     }
-    GigE_setImagePath_hik(path.c_str());
+    GigE_setImagePath_hik(index_cam, .c_str());
     GigE_captureImage_hik();
   }
 }
@@ -191,23 +191,29 @@ void GigE_setGainAuto_hik(string gstArvAutoS) {
   g_object_set(G_OBJECT(source_gige_hik[0]), "gain-auto", gaa, NULL);
 }
 
-void GigE_setImagePath_hik(const string &imagePath) {
-  pathName_savedImage_hik[0] = imagePath;
-  xlog("pathName_savedImage_hik[0]:%s", pathName_savedImage_hik[0].c_str());
+void GigE_setImagePath_hik(int index_cam, const string &imagePath) {
+  pathName_savedImage_hik[index_cam] = imagePath;
+  xlog("pathName_savedImage_hik[%d]:%s", index_cam, pathName_savedImage_hik[index_cam].c_str());
 }
 
-void GigE_captureImage_hik() {
-  if (!isStreaming_gige_hik[0].load()) {
+void GigE_captureImage_hik(int index_cam) {
+  if (!isStreaming_gige_hik[index_cam].load()) {
     xlog("do nothing...camera is not streaming");
     return;
   }
   xlog("");
-  isCapturePhoto_hik[0] = true;
+  isCapturePhoto_hik[index_cam] = true;
 }
 
 // Callback to handle incoming buffer data
 GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
-  GigE_streamingLED();
+  GigE_streamingLED(0);
+  GigE_saveImage_hik(pad, info);
+  return GST_PAD_PROBE_OK;
+}
+// Callback to handle incoming buffer data
+GstPadProbeReturn streamingDataCallback_gige_hik2(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+  GigE_streamingLED(1);
   GigE_saveImage_hik(pad, info);
   return GST_PAD_PROBE_OK;
 }
@@ -271,7 +277,11 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
   g_object_set(G_OBJECT(parser), "config-interval", 1, nullptr);
 
   // RTSP Sink
-  g_object_set(G_OBJECT(sink), "location", "rtsp://localhost:8554/mystream", nullptr);
+  if (index_cam == 1) {
+    g_object_set(G_OBJECT(sink), "location", "rtsp://localhost:8554/mystream2", nullptr);
+  } else {
+    g_object_set(G_OBJECT(sink), "location", "rtsp://localhost:8554/mystream", nullptr);
+  }
 
   // Build pipeline
   gst_bin_add_many(GST_BIN(pipeline_gige_hik[index_cam]), source_gige_hik[index_cam], videoconvert, capsfilter, queue, encoder, parser, sink, nullptr);
@@ -284,7 +294,16 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
   // Optional: attach pad probe to monitor frames
   GstPad *pad = gst_element_get_static_pad(encoder, "sink");
   if (pad) {
-    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)streamingDataCallback_gige_hik, nullptr, nullptr);
+    if (index_cam == 0) {
+      gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)streamingDataCallback_gige_hik, nullptr, nullptr);
+    } else if (index_cam == 1) {
+      gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback)streamingDataCallback_gige_hik2, nullptr, nullptr);
+    } else {
+      xlog("Invalid index_cam: %d", index_cam);
+      gst_object_unref(pad);
+      gst_object_unref(pipeline_gige_hik[index_cam]);
+      return;
+    }
     gst_object_unref(pad);
   }
 
@@ -337,7 +356,7 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
   RESTful_send_streamingStatus_gige_hik(index_cam, isStreaming_gige_hik[index_cam]);
 
   // Main loop
-  loop_gige_hik[0] = g_main_loop_new(nullptr, FALSE);
+  loop_gige_hik[index_cam] = g_main_loop_new(nullptr, FALSE);
   gst_bus_set_sync_handler(bus, nullptr, nullptr, nullptr);
   gst_object_unref(bus);
   g_main_loop_run(loop_gige_hik[index_cam]);
@@ -394,9 +413,9 @@ void GigE_StreamingStop_Hik(int index_cam) {
 
 }
 
-void GigE_streamingLED() {
-  counterFrame_hik[0]++;
-  if (counterFrame_hik[0]%15 == 0)
+void GigE_streamingLED(int index_cam) {
+  counterFrame_hik[index_cam]++;
+  if (counterFrame_hik[index_cam]%15 == 0)
   {
     FW_toggleLED("2", "orange");
   }
