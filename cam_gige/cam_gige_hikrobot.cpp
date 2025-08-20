@@ -384,7 +384,12 @@ void GigE_StreamingStart_Hik(int index_cam) {
     return;
   }
 
-  FW_setLED("2", "off");
+  if (index_cam == 0) {
+    FW_setLED("2", "off");
+  } else if (index_cam == 1) {
+    FW_setLED("3", "off");
+  }
+  
   t_streaming_gige_hik[index_cam] = std::thread(GigE_ThreadStreaming_Hik, index_cam);
   t_streaming_gige_hik[index_cam].detach();
 }
