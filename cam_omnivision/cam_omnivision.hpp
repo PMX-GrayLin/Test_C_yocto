@@ -65,7 +65,9 @@ void AICP_setExposureTimeAbsolute(double sec);
 int AICP_getFocusAbsolute();
 void AICP_setFocusAbsolute(int value);
 int AICP_getFocusAuto();
-void AICP_setFocusAuto(bool enable);  
+void AICP_setFocusAuto(bool enable);
+void AICP_setFlip_horizontal(bool enable);
+void AICP_setFlip_vertical(bool enable);
 // IOCTLS ===========
 
 void AICP_setImagePath(const string& imagePath);

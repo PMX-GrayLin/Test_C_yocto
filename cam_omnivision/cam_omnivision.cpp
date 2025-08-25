@@ -289,6 +289,16 @@ void AICP_setFocusAuto(bool enable) {
   ioctl_set_value_aic(V4L2_CID_FOCUS_AUTO, enable ? 1 : 0);
 }
 
+void AICP_setFlip_horizontal(bool enable) {
+  xlog("enable:%d", enable);
+  ioctl_set_value_aic(0x00980914, enable ? 1 : 0);
+}
+
+void AICP_setFlip_vertical(bool enable) {
+  xlog("enable:%d", enable);
+  ioctl_set_value_aic(0x00980915, enable ? 1 : 0);
+}
+
 void AICP_setImagePath(const string& imagePath) {
   pathName_savedImage_aic = imagePath;
   xlog("pathName_savedImage_aic:%s", pathName_savedImage_aic.c_str());
@@ -671,24 +681,36 @@ void AICP_streamingLED() {
   }
 }
 
-void AICP_setFlip(const std::string & methodS) {
-
-  VideoFlipMethod method = VideoFlipMethod::vfm_NONE;
-  if (gst_flip_aic) {
-    if (isSameString(methodS, "horizontal") || isSameString(methodS, "h")) {
-      method = VideoFlipMethod::vfm_HORIZONTAL_FLIP ;
-    } else if (isSameString(methodS, "vertical") || isSameString(methodS, "v")) {
-      method = VideoFlipMethod::vfm_VERTICAL_FLIP ;
-    } else if (isSameString(methodS, "rotate180") || isSameString(methodS, "r180")) {
-      method = VideoFlipMethod::vfm_ROTATE_180 ;
-    } else if (isSameString(methodS, "none") || isSameString(methodS, "normal") || isSameString(methodS, "n")) {
-      method = VideoFlipMethod::vfm_NONE ;
-    }
-    g_object_set(gst_flip_aic, "method", static_cast<int>(method), nullptr);
-    xlog("Flip method set to %d", static_cast<int>(method));
-  } else {
-    xlog("Flip element not initialized");
+void AICP_setFlip(const std::string &methodS) {
+  
+  if (isSameString(methodS, "horizontal") || isSameString(methodS, "h")) {
+    AICP_setFlip_horizontal(true);
+  } else if (isSameString(methodS, "vertical") || isSameString(methodS, "v")) {
+    AICP_setFlip_vertical(true);
+  } else if (isSameString(methodS, "rotate180") || isSameString(methodS, "r180")) {
+    AICP_setFlip_horizontal(true);
+    AICP_setFlip_vertical(true);
+  } else if (isSameString(methodS, "none") || isSameString(methodS, "normal") || isSameString(methodS, "n")) {
+    AICP_setFlip_horizontal(false);
+    AICP_setFlip_vertical(false);
   }
+
+  // VideoFlipMethod method = VideoFlipMethod::vfm_NONE;
+  // if (gst_flip_aic) {
+  //   if (isSameString(methodS, "horizontal") || isSameString(methodS, "h")) {
+  //     method = VideoFlipMethod::vfm_HORIZONTAL_FLIP ;
+  //   } else if (isSameString(methodS, "vertical") || isSameString(methodS, "v")) {
+  //     method = VideoFlipMethod::vfm_VERTICAL_FLIP ;
+  //   } else if (isSameString(methodS, "rotate180") || isSameString(methodS, "r180")) {
+  //     method = VideoFlipMethod::vfm_ROTATE_180 ;
+  //   } else if (isSameString(methodS, "none") || isSameString(methodS, "normal") || isSameString(methodS, "n")) {
+  //     method = VideoFlipMethod::vfm_NONE ;
+  //   }
+  //   g_object_set(gst_flip_aic, "method", static_cast<int>(method), nullptr);
+  //   xlog("Flip method set to %d", static_cast<int>(method));
+  // } else {
+  //   xlog("Flip element not initialized");
+  // }
 }
 
 void AICP_setResolution(const string& resolutionS) {
