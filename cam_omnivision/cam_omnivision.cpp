@@ -682,10 +682,13 @@ void AICP_streamingLED() {
 }
 
 void AICP_setFlip(const std::string &methodS) {
-  
+
+  // via v4l2 to driver
   if (isSameString(methodS, "horizontal") || isSameString(methodS, "h")) {
     AICP_setFlip_horizontal(true);
+    AICP_setFlip_vertical(false);
   } else if (isSameString(methodS, "vertical") || isSameString(methodS, "v")) {
+    AICP_setFlip_horizontal(false);
     AICP_setFlip_vertical(true);
   } else if (isSameString(methodS, "rotate180") || isSameString(methodS, "r180")) {
     AICP_setFlip_horizontal(true);
