@@ -555,6 +555,9 @@ void GigE_setResolution(int index, const string &resolutionS) {
 
 
 // from hikronbot sample
+bool g_bIsGetImage = true;
+bool g_bExit = false;
+
 bool PrintDeviceInfo(MV_CC_DEVICE_INFO* pstMVDevInfo)
 {
     if (NULL == pstMVDevInfo)
@@ -610,3 +613,40 @@ bool PrintDeviceInfo(MV_CC_DEVICE_INFO* pstMVDevInfo)
 
     return true;
 }
+
+void __stdcall ImageCallbackEx2(MV_FRAME_OUT* pstFrame, void *pUser, bool bAutoFree)
+{
+    if (pstFrame)
+    {
+        printf("Get One Frame: Width[%d], Height[%d], nFrameNum[%d]\n", 
+            pstFrame->stFrameInfo.nExtendWidth, pstFrame->stFrameInfo.nExtendHeight, pstFrame->stFrameInfo.nFrameNum);
+
+        if (false == bAutoFree &&
+            NULL != pUser) //非自动释放模式，需要手动释放资源
+        {
+            MV_CC_FreeImageBuffer(pUser, pstFrame);
+        }
+    }
+}
+
+static void* WorkThread(void* pUser)
+{
+    while(1)
+    {
+        if(g_bExit)
+        {
+            break;
+        }
+        
+        int nRet = MV_CC_SetCommandValue(pUser, "TriggerSoftware");
+        if(MV_OK != nRet)
+        {
+            printf("failed in TriggerSoftware[%x]\n", nRet);
+            break;
+        }
+            
+        sleep(1);
+    }
+    
+}
+
