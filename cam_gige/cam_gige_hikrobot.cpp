@@ -14,6 +14,8 @@
 #include "image_utils.hpp"
 #include "restfulx.hpp"
 
+#include "MvCameraControl.h"
+
 UsedGigeCam usedGigeCam = ugc_hikrobot;
 
 static GstElement *pipeline_gige_hik[NUM_GigE] = {nullptr, nullptr};
@@ -549,4 +551,62 @@ void GigE_setResolution(int index, const string &resolutionS) {
   resolution_width_gige_hik[index] = width;
   resolution_height_gige_hik[index] = height;
   xlog("index:%d, width:%d, height:%d", index, resolution_width_gige_hik[index], resolution_height_gige_hik[index]);
+}
+
+
+// from hikronbot sample
+bool PrintDeviceInfo(MV_CC_DEVICE_INFO* pstMVDevInfo)
+{
+    if (NULL == pstMVDevInfo)
+    {
+        printf("The Pointer of pstMVDevInfo is NULL!\n");
+        return false;
+    }
+    if (pstMVDevInfo->nTLayerType == MV_GIGE_DEVICE)
+    {
+        int nIp1 = ((pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0xff000000) >> 24);
+        int nIp2 = ((pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0x00ff0000) >> 16);
+        int nIp3 = ((pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0x0000ff00) >> 8);
+        int nIp4 = (pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0x000000ff);
+
+        // ch:打印当前相机ip和用户自定义名字 | en:print current ip and user defined name
+        printf("Device Model Name: %s\n", pstMVDevInfo->SpecialInfo.stGigEInfo.chModelName);
+        printf("CurrentIp: %d.%d.%d.%d\n" , nIp1, nIp2, nIp3, nIp4);
+        printf("UserDefinedName: %s\n\n" , pstMVDevInfo->SpecialInfo.stGigEInfo.chUserDefinedName);
+    }
+    else if (pstMVDevInfo->nTLayerType == MV_USB_DEVICE)
+    {
+        printf("Device Model Name: %s\n", pstMVDevInfo->SpecialInfo.stUsb3VInfo.chModelName);
+        printf("UserDefinedName: %s\n\n", pstMVDevInfo->SpecialInfo.stUsb3VInfo.chUserDefinedName);
+    }
+    else if (pstMVDevInfo->nTLayerType == MV_GENTL_GIGE_DEVICE)
+    {
+        printf("UserDefinedName: %s\n", pstMVDevInfo->SpecialInfo.stGigEInfo.chUserDefinedName);
+        printf("Serial Number: %s\n", pstMVDevInfo->SpecialInfo.stGigEInfo.chSerialNumber);
+        printf("Model Name: %s\n\n", pstMVDevInfo->SpecialInfo.stGigEInfo.chModelName);
+    }
+    else if (pstMVDevInfo->nTLayerType == MV_GENTL_CAMERALINK_DEVICE)
+    {
+        printf("UserDefinedName: %s\n", pstMVDevInfo->SpecialInfo.stCMLInfo.chUserDefinedName);
+        printf("Serial Number: %s\n", pstMVDevInfo->SpecialInfo.stCMLInfo.chSerialNumber);
+        printf("Model Name: %s\n\n", pstMVDevInfo->SpecialInfo.stCMLInfo.chModelName);
+    }
+    else if (pstMVDevInfo->nTLayerType == MV_GENTL_CXP_DEVICE)
+    {
+        printf("UserDefinedName: %s\n", pstMVDevInfo->SpecialInfo.stCXPInfo.chUserDefinedName);
+        printf("Serial Number: %s\n", pstMVDevInfo->SpecialInfo.stCXPInfo.chSerialNumber);
+        printf("Model Name: %s\n\n", pstMVDevInfo->SpecialInfo.stCXPInfo.chModelName);
+    }
+    else if (pstMVDevInfo->nTLayerType == MV_GENTL_XOF_DEVICE)
+    {
+        printf("UserDefinedName: %s\n", pstMVDevInfo->SpecialInfo.stXoFInfo.chUserDefinedName);
+        printf("Serial Number: %s\n", pstMVDevInfo->SpecialInfo.stXoFInfo.chSerialNumber);
+        printf("Model Name: %s\n\n", pstMVDevInfo->SpecialInfo.stXoFInfo.chModelName);
+    }
+    else
+    {
+        printf("Not support.\n");
+    }
+
+    return true;
 }
