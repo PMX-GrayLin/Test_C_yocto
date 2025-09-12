@@ -696,20 +696,19 @@ void GigE_cameraClose(int index_cam) {
 }
 
 void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
-  xlog("%s", triggerModeS);
+  xlog("%s", triggerModeS.c_str());
 
   // 设置触发模式为on
   // set trigger mode as on
   int triggerMode = (triggerModeS == "on") ? 1 : 0;
   xlog("triggerMode:%d", triggerMode);
-  nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", triggerMode);
+  int nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", triggerMode);
   if (MV_OK != nRet) {
     xlog("MV_CC_SetTriggerMode fail! nRet [%x]", nRet);
     return;
   }
 
-  if (triggerMode == 1)
-  {
+  if (triggerMode == 1) {
     // 设置触发源
     // set trigger source
     nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerSource", MV_TRIGGER_SOURCE_SOFTWARE);
@@ -728,7 +727,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
 
     // 开始取流
     // start grab image
-    nRet = MV_CC_StartGrabbing(handle);
+    nRet = MV_CC_StartGrabbing(handle_gige_hik[index_cam]);
     if (MV_OK != nRet) {
       xlog("MV_CC_StartGrabbing fail! nRet [%x]", nRet);
       return;
