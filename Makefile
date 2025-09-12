@@ -61,9 +61,9 @@ LINK_LIBS += -lgpiod
 LINK_LIBS += -lcurl
 LINK_LIBS += -ludev
 # LINK_LIBS += -lft4222 -lftd2xx
-# ifeq ($(ENABLE_Gige),1)
+ifeq ($(ENABLE_Gige),1)
 LINK_LIBS += -lMvCameraControl
-# endif
+endif
 
 OCVLDFLAG +=-lopencv_core 
 OCVLDFLAG +=-lopencv_imgproc

@@ -5,6 +5,8 @@
 
 #include <vector>
 
+#include "MvCameraControl.h"
+
 #define NUM_GigE 2
 
 typedef enum {
