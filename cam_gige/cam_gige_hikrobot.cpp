@@ -97,10 +97,10 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     GigE_captureImage_hik(index_cam);
 
   } else if (isSameString(segments[1], "t1")) {
-    xlog("%s", segments[1]);
+    xlog("t1");
     GigE_setTriggerMode(index_cam, "on");
   } else if (isSameString(segments[1], "t2")) {
-    xlog("%s", segments[1]);
+    xlog("t2");
     GigE_sendTriggerSoftware(index_cam);
   }
 }
