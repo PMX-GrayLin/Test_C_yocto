@@ -715,6 +715,15 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
 void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   xlog("%s", triggerModeS.c_str());
 
+  if (handle_gige_hik[index_cam] == nullptr) {
+    GigE_cameraOpen(index_cam);
+  }
+
+  if (handle_gige_hik[index_cam] == nullptr) {
+    xlog("camera is not opened");
+    return;
+  }
+
   // set trigger mode
   bool enable = (triggerModeS == "on");
   int nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", enable ? 1 : 0);
@@ -750,13 +759,8 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
     }
 
   } else {
-
-    // end grab image
-    nRet = MV_CC_StopGrabbing(handle_gige_hik[index_cam]);
-    if (MV_OK != nRet) {
-      xlog("MV_CC_StopGrabbing fail! nRet [%x]", nRet);
-      return;
-    }
+    
+    GigE_cameraClose(index_cam);
   }
 }
 
