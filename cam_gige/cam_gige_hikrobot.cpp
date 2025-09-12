@@ -33,7 +33,7 @@ std::string pathName_savedImage_hik[NUM_GigE] = {"", ""};
 
 static volatile int counterFrame_hik[NUM_GigE] = {0, 0};
 
-void* handle_gige_hik[NUM_GigE] = {NULL, NULL};
+void* handle_gige_hik[NUM_GigE] = {nullptr, nullptr};
 
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   int index_cam = 0;
@@ -605,10 +605,12 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
 
   // 选择设备并创建句柄
   // select device and create handle
-  nRet = MV_CC_CreateHandle(&handle_gige_hik[index_cam], stDeviceList.pDeviceInfo[nIndex]);
-  if (MV_OK != nRet) {
-    printf("MV_CC_CreateHandle fail! nRet [%x]\n", nRet);
-    return;
+  if (handle_gige_hik[index_cam] == nullptr) {
+    nRet = MV_CC_CreateHandle(&handle_gige_hik[index_cam], stDeviceList.pDeviceInfo[nIndex]);
+    if (MV_OK != nRet) {
+      printf("MV_CC_CreateHandle fail! nRet [%x]\n", nRet);
+      return;
+    }
   }
 
   // 打开设备
