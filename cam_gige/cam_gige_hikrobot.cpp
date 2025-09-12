@@ -96,9 +96,12 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     GigE_setImagePath_hik(index_cam, path);
     GigE_captureImage_hik(index_cam);
 
-  } else if (isSameString(segments[1], "tt")) {
-    xlog("test");
-
+  } else if (isSameString(segments[1], "t1")) {
+    xlog("%s", segments[1]);
+    GigE_setTriggerMode(index_cam, "on");
+  } else if (isSameString(segments[1], "t2")) {
+    xlog("%s", segments[1]);
+    GigE_sendTriggerSoftware(index_cam);
   }
 }
 
@@ -584,21 +587,21 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
       if (NULL == pDeviceInfo) {
         return;
       }
-      PrintDeviceInfo(pDeviceInfo);
+      GigE_PrintDeviceInfo(pDeviceInfo);
     }
   } else {
     printf("Find No Devices!\n");
     return;
   }
 
-  printf("Please Intput camera index: ");
+  // printf("Please Intput camera index: ");
   unsigned int nIndex = 0;
-  scanf("%d", &nIndex);
+  // scanf("%d", &nIndex);
 
-  if (nIndex >= stDeviceList.nDeviceNum) {
-    printf("Intput error!\n");
-    return;
-  }
+  // if (nIndex >= stDeviceList.nDeviceNum) {
+  //   printf("Intput error!\n");
+  //   return;
+  // }
 
   // 选择设备并创建句柄
   // select device and create handle
@@ -660,11 +663,19 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   }
 }
 
+void GigE_sendTriggerSoftware(int index_cam) {
+  int nRet = MV_CC_SetCommandValue(handle_gige_hik[index_cam], "TriggerSoftware");
+  if (MV_OK != nRet) {
+    printf("failed in TriggerSoftware[%x]\n", nRet);
+    return;
+  }
+}
+
 // from hikronbot sample
 bool g_bIsGetImage = true;
 bool g_bExit = false;
 
-bool PrintDeviceInfo(MV_CC_DEVICE_INFO *pstMVDevInfo) {
+bool GigE_PrintDeviceInfo(MV_CC_DEVICE_INFO *pstMVDevInfo) {
   if (NULL == pstMVDevInfo) {
     printf("The Pointer of pstMVDevInfo is NULL!\n");
     return false;
