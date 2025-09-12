@@ -673,7 +673,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
     nRet = MV_CC_StopGrabbing(handle_gige_hik[index_cam]);
     if (MV_OK != nRet) {
       printf("MV_CC_StopGrabbing fail! nRet [%x]\n", nRet);
-      break;
+      return;
     }
 
     // 关闭设备
@@ -681,7 +681,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
     nRet = MV_CC_CloseDevice(handle_gige_hik[index_cam]);
     if (MV_OK != nRet) {
       printf("MV_CC_CloseDevice fail! nRet [%x]\n", nRet);
-      break;
+      return;
     }
 
     // 销毁句柄
@@ -689,7 +689,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
     nRet = MV_CC_DestroyHandle(handle_gige_hik[index_cam]);
     if (MV_OK != nRet) {
       printf("MV_CC_DestroyHandle fail! nRet [%x]\n", nRet);
-      break;
+      return;
     }
     handle_gige_hik[index_cam] = NULL;
   }
