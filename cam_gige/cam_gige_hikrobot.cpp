@@ -640,26 +640,56 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
 
   // 设置触发模式为on
   // set trigger mode as on
-  nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", 1);
+  int triggerMode = (triggerModeS == "on") ? 1 : 0;
+  xlog("triggerMode:%d", triggerMode);
+  nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", triggerMode);
   if (MV_OK != nRet) {
     printf("MV_CC_SetTriggerMode fail! nRet [%x]\n", nRet);
     return;
   }
 
-  // 设置触发源
-  // set trigger source
-  nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerSource", MV_TRIGGER_SOURCE_SOFTWARE);
-  if (MV_OK != nRet) {
-    printf("MV_CC_SetTriggerSource fail! nRet [%x]\n", nRet);
-    return;
-  }
+  if (triggerMode == 1)
+  {
+    // 设置触发源
+    // set trigger source
+    nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerSource", MV_TRIGGER_SOURCE_SOFTWARE);
+    if (MV_OK != nRet) {
+      printf("MV_CC_SetTriggerSource fail! nRet [%x]\n", nRet);
+      return;
+    }
 
-  // 注册抓图回调
-  // register image callback
-  nRet = MV_CC_RegisterImageCallBackEx2(handle_gige_hik[index_cam], ImageCallbackEx2, handle_gige_hik[index_cam], true);
-  if (MV_OK != nRet) {
-    printf("MV_CC_RegisterImageCallBackEx fail! nRet [%x]\n", nRet);
-    return;
+    // 注册抓图回调
+    // register image callback
+    nRet = MV_CC_RegisterImageCallBackEx2(handle_gige_hik[index_cam], ImageCallbackEx2, handle_gige_hik[index_cam], true);
+    if (MV_OK != nRet) {
+      printf("MV_CC_RegisterImageCallBackEx fail! nRet [%x]\n", nRet);
+      return;
+    }
+  } else {
+    // 停止取流
+    // end grab image
+    nRet = MV_CC_StopGrabbing(handle_gige_hik[index_cam]);
+    if (MV_OK != nRet) {
+      printf("MV_CC_StopGrabbing fail! nRet [%x]\n", nRet);
+      break;
+    }
+
+    // 关闭设备
+    // close device
+    nRet = MV_CC_CloseDevice(handle_gige_hik[index_cam]);
+    if (MV_OK != nRet) {
+      printf("MV_CC_CloseDevice fail! nRet [%x]\n", nRet);
+      break;
+    }
+
+    // 销毁句柄
+    // destroy handle
+    nRet = MV_CC_DestroyHandle(handle_gige_hik[index_cam]);
+    if (MV_OK != nRet) {
+      printf("MV_CC_DestroyHandle fail! nRet [%x]\n", nRet);
+      break;
+    }
+    handle_gige_hik[index_cam] = NULL;
   }
 }
 

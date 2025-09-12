@@ -67,6 +67,7 @@ void __stdcall ImageCallbackEx2(MV_FRAME_OUT *pstFrame, void *pUser, bool bAutoF
 void GigE_setTriggerMode(int index_cam, const string& triggerModeS);
 void GigE_sendTriggerSoftware(int index_cam);
 
+
 /* 
 
 # gst-inspect-1.0 aravissrc
