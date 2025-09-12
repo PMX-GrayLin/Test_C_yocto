@@ -63,7 +63,10 @@ void GigE_setResolution(int index_cam, const string& resolutionS);
 
 // for trigger mode
 bool GigE_PrintDeviceInfo(MV_CC_DEVICE_INFO *pstMVDevInfo);
-void __stdcall ImageCallbackEx2(MV_FRAME_OUT *pstFrame, void *pUser, bool bAutoFree);
+void GigE_cameraOpen(int index_cam);
+void GigE_cameraClose(int index_cam);
+
+void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAutoFree);
 void GigE_setTriggerMode(int index_cam, const string& triggerModeS);
 void GigE_sendTriggerSoftware(int index_cam);
 
