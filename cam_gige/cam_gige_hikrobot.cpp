@@ -96,6 +96,14 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     GigE_setImagePath_hik(index_cam, path);
     GigE_captureImage_hik(index_cam);
 
+  } else if (isSameString(segments[1], "t0")) {
+    xlog("t0");
+    if (isSameString(segments[2], "1")) {
+      GigE_cameraOpen(index_cam);
+    } else {
+      GigE_cameraClose(index_cam);
+    }
+
   } else if (isSameString(segments[1], "t1")) {
     xlog("t1");
     GigE_setTriggerMode(index_cam, segments[2]);
