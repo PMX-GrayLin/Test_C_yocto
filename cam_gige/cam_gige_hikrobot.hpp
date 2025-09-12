@@ -24,6 +24,12 @@ typedef enum {
   gaa_invalid,
 } GstArvAuto;
 
+typedef enum {
+  tm_off = 0,
+  tm_on = 1,
+} TriggerMode;
+
+
 struct GigeControlParams {
   int exposure_auto;  // Auto exposure mode: 0=off, 1=once, 2=continuous
   double exposure;    // Exposure time (in microseconds)
@@ -55,6 +61,10 @@ void GigE_StreamingStop_Hik(int index_cam);
 void GigE_streamingLED(int index_cam);
 void GigE_setResolution(int index_cam, const string& resolutionS);
 
+// for trigger mode
+void GigE_setTriggerMode(int index_cam, const string& triggerModeS);
+void GigE_sendTriggerSoftware(int index_cam);
+
 /* 
 
 # gst-inspect-1.0 aravissrc
@@ -82,3 +92,33 @@ Enum "GstArvAuto" Default: 0, "off"
    (2): on               - Continuous
 
  */
+
+/* 
+
+# arv-tool-0.8 features
+
+         Enumeration  : [RW] 'TriggerSelector'
+              * TriggerMode
+              * TriggerSoftware
+              * TriggerSource
+              * TriggerActivation
+              * TriggerDelay
+            EnumEntry   : 'FrameBurstStart'
+        Enumeration  : [RW] 'TriggerMode'
+            EnumEntry   : 'On'
+            EnumEntry   : 'Off'
+        Command      : [WO] 'TriggerSoftware'
+        Enumeration  : [RW] 'TriggerSource'
+            EnumEntry   : 'Anyway'
+            EnumEntry   : 'Counter0'
+            EnumEntry   : 'Line2'
+            EnumEntry   : 'Line0'
+            EnumEntry   : 'Software'
+        Enumeration : 'TriggerActivation' (Not available)
+            EnumEntry   : 'AnyEdge'
+            EnumEntry   : 'LevelLow' (Not available)
+            EnumEntry   : 'LevelHigh' (Not available)
+            EnumEntry   : 'FallingEdge'
+            EnumEntry   : 'RisingEdge'
+
+*/

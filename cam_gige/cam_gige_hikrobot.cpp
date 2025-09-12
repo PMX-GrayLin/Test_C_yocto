@@ -33,6 +33,8 @@ std::string pathName_savedImage_hik[NUM_GigE] = {"", ""};
 
 static volatile int counterFrame_hik[NUM_GigE] = {0, 0};
 
+void* handle_gige_hik[NUM_GigE] = {NULL, NULL};
+
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   int index_cam = 0;
   if (isSameString(segments[0], "gige") || isSameString(segments[1], "gige1")) {
@@ -96,6 +98,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
 
   } else if (isSameString(segments[1], "tt")) {
     xlog("test");
+
   }
 }
 
@@ -554,6 +557,108 @@ void GigE_setResolution(int index, const string &resolutionS) {
   xlog("index:%d, width:%d, height:%d", index, resolution_width_gige_hik[index], resolution_height_gige_hik[index]);
 }
 
+void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
+  int nRet = MV_OK;
+
+  // ch:初始化SDK | en:Initialize SDK
+  nRet = MV_CC_Initialize();
+  if (MV_OK != nRet) {
+    printf("Initialize SDK fail! nRet [0x%x]\n", nRet);
+    break;
+  }
+
+  MV_CC_DEVICE_INFO_LIST stDeviceList;
+  memset(&stDeviceList, 0, sizeof(MV_CC_DEVICE_INFO_LIST));
+
+  // 枚举设备
+  // enum device
+  nRet = MV_CC_EnumDevices(MV_GIGE_DEVICE | MV_USB_DEVICE | MV_GENTL_CAMERALINK_DEVICE | MV_GENTL_CXP_DEVICE | MV_GENTL_XOF_DEVICE, &stDeviceList);
+  if (MV_OK != nRet) {
+    printf("MV_CC_EnumDevices fail! nRet [%x]\n", nRet);
+    break;
+  }
+  if (stDeviceList.nDeviceNum > 0) {
+    for (int i = 0; i < stDeviceList.nDeviceNum; i++) {
+      printf("[device %d]:\n", i);
+      MV_CC_DEVICE_INFO *pDeviceInfo = stDeviceList.pDeviceInfo[i];
+      if (NULL == pDeviceInfo) {
+        break;
+      }
+      PrintDeviceInfo(pDeviceInfo);
+    }
+  } else {
+    printf("Find No Devices!\n");
+    break;
+  }
+
+  printf("Please Intput camera index: ");
+  unsigned int nIndex = 0;
+  scanf("%d", &nIndex);
+
+  if (nIndex >= stDeviceList.nDeviceNum) {
+    printf("Intput error!\n");
+    break;
+  }
+
+  // 选择设备并创建句柄
+  // select device and create handle
+  nRet = MV_CC_CreateHandle(&handle_gige_hik[index_cam], stDeviceList.pDeviceInfo[nIndex]);
+  if (MV_OK != nRet) {
+    printf("MV_CC_CreateHandle fail! nRet [%x]\n", nRet);
+    break;
+  }
+
+  // 打开设备
+  // open device
+  nRet = MV_CC_OpenDevice(handle_gige_hik[index_cam]);
+  if (MV_OK != nRet) {
+    printf("MV_CC_OpenDevice fail! nRet [%x]\n", nRet);
+    break;
+  }
+
+  // ch:探测网络最佳包大小(只对GigE相机有效) | en:Detection network optimal package size(It only works for the GigE camera)
+  if (stDeviceList.pDeviceInfo[nIndex]->nTLayerType == MV_GIGE_DEVICE) {
+    int nPacketSize = MV_CC_GetOptimalPacketSize(handle_gige_hik[index_cam]);
+    if (nPacketSize > 0) {
+      nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "GevSCPSPacketSize", nPacketSize);
+      if (nRet != MV_OK) {
+        printf("Warning: Set Packet Size fail nRet [0x%x]!\n", nRet);
+      }
+    } else {
+      printf("Warning: Get Packet Size fail nRet [0x%x]!\n", nPacketSize);
+    }
+  }
+
+  nRet = MV_CC_SetBoolValue(handle_gige_hik[index_cam], "AcquisitionFrameRateEnable", false);
+  if (MV_OK != nRet) {
+    printf("set AcquisitionFrameRateEnable fail! nRet [%x]\n", nRet);
+    break;
+  }
+
+  // 设置触发模式为on
+  // set trigger mode as on
+  nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", 1);
+  if (MV_OK != nRet) {
+    printf("MV_CC_SetTriggerMode fail! nRet [%x]\n", nRet);
+    break;
+  }
+
+  // 设置触发源
+  // set trigger source
+  nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerSource", MV_TRIGGER_SOURCE_SOFTWARE);
+  if (MV_OK != nRet) {
+    printf("MV_CC_SetTriggerSource fail! nRet [%x]\n", nRet);
+    break;
+  }
+
+  // 注册抓图回调
+  // register image callback
+  nRet = MV_CC_RegisterImageCallBackEx2(handle_gige_hik[index_cam], ImageCallbackEx2, handle_gige_hik[index_cam], true);
+  if (MV_OK != nRet) {
+    printf("MV_CC_RegisterImageCallBackEx fail! nRet [%x]\n", nRet);
+    break;
+  }
+}
 
 // from hikronbot sample
 bool g_bIsGetImage = true;
