@@ -99,7 +99,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
 
   } else if (isSameString(segments[1], "t0")) {
     xlog("t0");
-    if (isSameString(segments[2], "1")) {
+    if (isSameString(segments[2], "open")) {
       GigE_cameraOpen(index_cam);
     } else {
       GigE_cameraClose(index_cam);
