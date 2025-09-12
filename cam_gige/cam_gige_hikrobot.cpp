@@ -98,7 +98,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
 
   } else if (isSameString(segments[1], "t1")) {
     xlog("t1");
-    GigE_setTriggerMode(index_cam, "on");
+    GigE_setTriggerMode(index_cam, segments[2]);
   } else if (isSameString(segments[1], "t2")) {
     xlog("t2");
     GigE_sendTriggerSoftware(index_cam);
@@ -561,6 +561,8 @@ void GigE_setResolution(int index, const string &resolutionS) {
 }
 
 void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
+  xlog("%s", triggerModeS);
+  
   int nRet = MV_OK;
 
   // ch:初始化SDK | en:Initialize SDK
