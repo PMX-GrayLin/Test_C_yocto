@@ -33,6 +33,7 @@ std::string pathName_savedImage_hik[NUM_GigE] = {"", ""};
 
 static volatile int counterFrame_hik[NUM_GigE] = {0, 0};
 
+static bool isSDKInit_gige_hik = false;
 void* handle_gige_hik[NUM_GigE] = {nullptr, nullptr};
 
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
@@ -571,61 +572,65 @@ void GigE_setResolution(int index, const string &resolutionS) {
 
 // from hikrobot sample
 bool GigE_PrintDeviceInfo(MV_CC_DEVICE_INFO *pstMVDevInfo) {
-  if (NULL == pstMVDevInfo) {
-    xlog("The Pointer of pstMVDevInfo is NULL!");
-    return false;
-  }
-  if (pstMVDevInfo->nTLayerType == MV_GIGE_DEVICE) {
-    int nIp1 = ((pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0xff000000) >> 24);
-    int nIp2 = ((pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0x00ff0000) >> 16);
-    int nIp3 = ((pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0x0000ff00) >> 8);
-    int nIp4 = (pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0x000000ff);
+    if (!pstMVDevInfo) {
+        xlog("The Pointer of pstMVDevInfo is NULL!");
+        return false;
+    }
 
-    // ch:打印当前相机ip和用户自定义名字 | en:print current ip and user defined name
-    xlog("Device Model Name: %s", pstMVDevInfo->SpecialInfo.stGigEInfo.chModelName);
-    xlog("CurrentIp: %d.%d.%d.%d", nIp1, nIp2, nIp3, nIp4);
-    xlog("UserDefinedName: %s", pstMVDevInfo->SpecialInfo.stGigEInfo.chUserDefinedName);
-  } else if (pstMVDevInfo->nTLayerType == MV_USB_DEVICE) {
-    xlog("Device Model Name: %s", pstMVDevInfo->SpecialInfo.stUsb3VInfo.chModelName);
-    xlog("UserDefinedName: %s", pstMVDevInfo->SpecialInfo.stUsb3VInfo.chUserDefinedName);
-  } else if (pstMVDevInfo->nTLayerType == MV_GENTL_GIGE_DEVICE) {
-    xlog("UserDefinedName: %s", pstMVDevInfo->SpecialInfo.stGigEInfo.chUserDefinedName);
-    xlog("Serial Number: %s", pstMVDevInfo->SpecialInfo.stGigEInfo.chSerialNumber);
-    xlog("Model Name: %s", pstMVDevInfo->SpecialInfo.stGigEInfo.chModelName);
-  } else if (pstMVDevInfo->nTLayerType == MV_GENTL_CAMERALINK_DEVICE) {
-    xlog("UserDefinedName: %s", pstMVDevInfo->SpecialInfo.stCMLInfo.chUserDefinedName);
-    xlog("Serial Number: %s", pstMVDevInfo->SpecialInfo.stCMLInfo.chSerialNumber);
-    xlog("Model Name: %s", pstMVDevInfo->SpecialInfo.stCMLInfo.chModelName);
-  } else if (pstMVDevInfo->nTLayerType == MV_GENTL_CXP_DEVICE) {
-    xlog("UserDefinedName: %s", pstMVDevInfo->SpecialInfo.stCXPInfo.chUserDefinedName);
-    xlog("Serial Number: %s", pstMVDevInfo->SpecialInfo.stCXPInfo.chSerialNumber);
-    xlog("Model Name: %s", pstMVDevInfo->SpecialInfo.stCXPInfo.chModelName);
-  } else if (pstMVDevInfo->nTLayerType == MV_GENTL_XOF_DEVICE) {
-    xlog("UserDefinedName: %s", pstMVDevInfo->SpecialInfo.stXoFInfo.chUserDefinedName);
-    xlog("Serial Number: %s", pstMVDevInfo->SpecialInfo.stXoFInfo.chSerialNumber);
-    xlog("Model Name: %s", pstMVDevInfo->SpecialInfo.stXoFInfo.chModelName);
-  } else {
-    xlog("Not support");
-  }
+    switch (pstMVDevInfo->nTLayerType) {
+        case MV_GIGE_DEVICE: {
+            int nIp1 = (pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0xff000000) >> 24;
+            int nIp2 = (pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0x00ff0000) >> 16;
+            int nIp3 = (pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0x0000ff00) >> 8;
+            int nIp4 =  pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0x000000ff;
 
-  return true;
+            xlog("Device Model Name: %s", pstMVDevInfo->SpecialInfo.stGigEInfo.chModelName);
+            xlog("CurrentIp: %d.%d.%d.%d", nIp1, nIp2, nIp3, nIp4);
+            xlog("UserDefinedName: %s", pstMVDevInfo->SpecialInfo.stGigEInfo.chUserDefinedName);
+            break;
+        }
+        case MV_USB_DEVICE:
+            xlog("Device Model Name: %s", pstMVDevInfo->SpecialInfo.stUsb3VInfo.chModelName);
+            xlog("UserDefinedName: %s", pstMVDevInfo->SpecialInfo.stUsb3VInfo.chUserDefinedName);
+            break;
+
+        case MV_GENTL_GIGE_DEVICE:
+        case MV_GENTL_CAMERALINK_DEVICE:
+        case MV_GENTL_CXP_DEVICE:
+        case MV_GENTL_XOF_DEVICE: {
+            // 統一輸出格式
+            auto &info = pstMVDevInfo->SpecialInfo;
+            xlog("UserDefinedName: %s", info.stGigEInfo.chUserDefinedName);
+            xlog("Serial Number: %s", info.stGigEInfo.chSerialNumber);
+            xlog("Model Name: %s", info.stGigEInfo.chModelName);
+            break;
+        }
+
+        default:
+            xlog("Not supported device type: %d", pstMVDevInfo->nTLayerType);
+            break;
+    }
+
+    return true;
 }
 
 void GigE_cameraOpen(int index_cam) {
-  xlog("");
+  xlog("index_cam:%d", index_cam);
   int nRet = MV_OK;
 
-  // ch:初始化SDK | en:Initialize SDK
-  nRet = MV_CC_Initialize();
-  if (MV_OK != nRet) {
-    xlog("Initialize SDK fail! nRet [0x%x]\n", nRet);
-    return;
+  // Initialize SDK
+  if (!isSDKInit_gige_hik == false) {
+    isSDKInit_gige_hik = true;
+    nRet = MV_CC_Initialize();
+    if (MV_OK != nRet) {
+      xlog("Initialize SDK fail! nRet [0x%x]\n", nRet);
+      return;
+    }
   }
 
   MV_CC_DEVICE_INFO_LIST stDeviceList;
   memset(&stDeviceList, 0, sizeof(MV_CC_DEVICE_INFO_LIST));
 
-  // 枚举设备
   // enum device
   nRet = MV_CC_EnumDevices(MV_GIGE_DEVICE | MV_USB_DEVICE | MV_GENTL_CAMERALINK_DEVICE | MV_GENTL_CXP_DEVICE | MV_GENTL_XOF_DEVICE, &stDeviceList);
   if (MV_OK != nRet) {
@@ -647,8 +652,6 @@ void GigE_cameraOpen(int index_cam) {
   }
 
   unsigned int nIndex = 0;
-
-  // 选择设备并创建句柄
   // select device and create handle
   if (handle_gige_hik[index_cam] == nullptr) {
     nRet = MV_CC_CreateHandle(&handle_gige_hik[index_cam], stDeviceList.pDeviceInfo[nIndex]);
@@ -658,7 +661,6 @@ void GigE_cameraOpen(int index_cam) {
     }
   }
 
-  // 打开设备
   // open device
   nRet = MV_CC_OpenDevice(handle_gige_hik[index_cam]);
   if (MV_OK != nRet) {
@@ -666,7 +668,7 @@ void GigE_cameraOpen(int index_cam) {
     return;
   }
 
-  // ch:探测网络最佳包大小(只对GigE相机有效) | en:Detection network optimal package size(It only works for the GigE camera)
+  // Detection network optimal package size(It only works for the GigE camera)
   if (stDeviceList.pDeviceInfo[nIndex]->nTLayerType == MV_GIGE_DEVICE) {
     int nPacketSize = MV_CC_GetOptimalPacketSize(handle_gige_hik[index_cam]);
     if (nPacketSize > 0) {
@@ -682,34 +684,46 @@ void GigE_cameraOpen(int index_cam) {
   nRet = MV_CC_SetBoolValue(handle_gige_hik[index_cam], "AcquisitionFrameRateEnable", false);
   if (MV_OK != nRet) {
     xlog("set AcquisitionFrameRateEnable fail! nRet [%x]", nRet);
-    return;
   }
 }
 
 void GigE_cameraClose(int index_cam) {
   xlog("");
   if (handle_gige_hik[index_cam]) {
+    MV_CC_StopGrabbing(handle_gige_hik[index_cam]);
     MV_CC_CloseDevice(handle_gige_hik[index_cam]);
     MV_CC_DestroyHandle(handle_gige_hik[index_cam]);
     handle_gige_hik[index_cam] = nullptr;
   }
 }
 
+void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAutoFree) {
+  if (pstFrame) {
+    xlog("Get One Frame: W[%d], H[%d], Num[%d]",
+         pstFrame->stFrameInfo.nExtendWidth,
+         pstFrame->stFrameInfo.nExtendHeight,
+         pstFrame->stFrameInfo.nFrameNum);
+
+    // release manually
+    if (!bAutoFree && pUser) {
+      auto handle = reinterpret_cast<void *>(pUser);
+      MV_CC_FreeImageBuffer(handle, pstFrame);
+    }
+  }
+}
+
 void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   xlog("%s", triggerModeS.c_str());
 
-  // 设置触发模式为on
-  // set trigger mode as on
-  int triggerMode = (triggerModeS == "on") ? 1 : 0;
-  xlog("triggerMode:%d", triggerMode);
-  int nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", triggerMode);
+  // set trigger mode
+  bool enable = (triggerModeS == "on");
+  int nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", enable ? 1 : 0);
   if (MV_OK != nRet) {
     xlog("MV_CC_SetTriggerMode fail! nRet [%x]", nRet);
     return;
   }
 
-  if (triggerMode == 1) {
-    // 设置触发源
+  if (enable) {
     // set trigger source
     nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerSource", MV_TRIGGER_SOURCE_SOFTWARE);
     if (MV_OK != nRet) {
@@ -717,15 +731,17 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
       return;
     }
 
-    // 注册抓图回调
     // register image callback
-    nRet = MV_CC_RegisterImageCallBackEx2(handle_gige_hik[index_cam], GigE_imageCallback, handle_gige_hik[index_cam], true);
+    nRet = MV_CC_RegisterImageCallBackEx2(
+        handle_gige_hik[index_cam],
+        GigE_imageCallback,
+        handle_gige_hik[index_cam],
+        true);
     if (MV_OK != nRet) {
       xlog("MV_CC_RegisterImageCallBackEx fail! nRet [%x]", nRet);
       return;
     }
 
-    // 开始取流
     // start grab image
     nRet = MV_CC_StartGrabbing(handle_gige_hik[index_cam]);
     if (MV_OK != nRet) {
@@ -734,7 +750,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
     }
 
   } else {
-    // 停止取流
+
     // end grab image
     nRet = MV_CC_StopGrabbing(handle_gige_hik[index_cam]);
     if (MV_OK != nRet) {
@@ -745,22 +761,11 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
 }
 
 void GigE_sendTriggerSoftware(int index_cam) {
-  int nRet = MV_CC_SetCommandValue(handle_gige_hik[index_cam], "TriggerSoftware");
-  if (MV_OK != nRet) {
-    xlog("failed in TriggerSoftware[%x]\n", nRet);
-    return;
-  }
-}
-
-void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAutoFree) {
-  if (pstFrame) {
-    printf("Get One Frame: Width[%d], Height[%d], nFrameNum[%d]\n",
-           pstFrame->stFrameInfo.nExtendWidth, pstFrame->stFrameInfo.nExtendHeight, pstFrame->stFrameInfo.nFrameNum);
-
-    if (false == bAutoFree &&
-        NULL != pUser)  // 非自动释放模式，需要手动释放资源
-    {
-      MV_CC_FreeImageBuffer(pUser, pstFrame);
+  if (handle_gige_hik[index_cam]) {
+    int nRet = MV_CC_SetCommandValue(handle_gige_hik[index_cam], "TriggerSoftware");
+    if (MV_OK != nRet) {
+      xlog("failed in TriggerSoftware[%x]\n", nRet);
+      return;
     }
   }
 }
