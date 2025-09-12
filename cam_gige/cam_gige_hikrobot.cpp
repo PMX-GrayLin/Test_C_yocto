@@ -564,7 +564,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   nRet = MV_CC_Initialize();
   if (MV_OK != nRet) {
     printf("Initialize SDK fail! nRet [0x%x]\n", nRet);
-    break;
+    return;
   }
 
   MV_CC_DEVICE_INFO_LIST stDeviceList;
@@ -575,20 +575,20 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   nRet = MV_CC_EnumDevices(MV_GIGE_DEVICE | MV_USB_DEVICE | MV_GENTL_CAMERALINK_DEVICE | MV_GENTL_CXP_DEVICE | MV_GENTL_XOF_DEVICE, &stDeviceList);
   if (MV_OK != nRet) {
     printf("MV_CC_EnumDevices fail! nRet [%x]\n", nRet);
-    break;
+    return;
   }
   if (stDeviceList.nDeviceNum > 0) {
     for (int i = 0; i < stDeviceList.nDeviceNum; i++) {
       printf("[device %d]:\n", i);
       MV_CC_DEVICE_INFO *pDeviceInfo = stDeviceList.pDeviceInfo[i];
       if (NULL == pDeviceInfo) {
-        break;
+        return;
       }
       PrintDeviceInfo(pDeviceInfo);
     }
   } else {
     printf("Find No Devices!\n");
-    break;
+    return;
   }
 
   printf("Please Intput camera index: ");
@@ -597,7 +597,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
 
   if (nIndex >= stDeviceList.nDeviceNum) {
     printf("Intput error!\n");
-    break;
+    return;
   }
 
   // 选择设备并创建句柄
@@ -605,7 +605,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   nRet = MV_CC_CreateHandle(&handle_gige_hik[index_cam], stDeviceList.pDeviceInfo[nIndex]);
   if (MV_OK != nRet) {
     printf("MV_CC_CreateHandle fail! nRet [%x]\n", nRet);
-    break;
+    return;
   }
 
   // 打开设备
@@ -613,7 +613,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   nRet = MV_CC_OpenDevice(handle_gige_hik[index_cam]);
   if (MV_OK != nRet) {
     printf("MV_CC_OpenDevice fail! nRet [%x]\n", nRet);
-    break;
+    return;
   }
 
   // ch:探测网络最佳包大小(只对GigE相机有效) | en:Detection network optimal package size(It only works for the GigE camera)
@@ -632,7 +632,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   nRet = MV_CC_SetBoolValue(handle_gige_hik[index_cam], "AcquisitionFrameRateEnable", false);
   if (MV_OK != nRet) {
     printf("set AcquisitionFrameRateEnable fail! nRet [%x]\n", nRet);
-    break;
+    return;
   }
 
   // 设置触发模式为on
@@ -640,7 +640,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", 1);
   if (MV_OK != nRet) {
     printf("MV_CC_SetTriggerMode fail! nRet [%x]\n", nRet);
-    break;
+    return;
   }
 
   // 设置触发源
@@ -648,7 +648,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerSource", MV_TRIGGER_SOURCE_SOFTWARE);
   if (MV_OK != nRet) {
     printf("MV_CC_SetTriggerSource fail! nRet [%x]\n", nRet);
-    break;
+    return;
   }
 
   // 注册抓图回调
@@ -656,7 +656,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   nRet = MV_CC_RegisterImageCallBackEx2(handle_gige_hik[index_cam], ImageCallbackEx2, handle_gige_hik[index_cam], true);
   if (MV_OK != nRet) {
     printf("MV_CC_RegisterImageCallBackEx fail! nRet [%x]\n", nRet);
-    break;
+    return;
   }
 }
 
