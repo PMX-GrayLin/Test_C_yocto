@@ -36,6 +36,7 @@ std::string pathName_savedImage_hik[NUM_GigE] = {"", ""};
 static volatile int counterFrame_hik[NUM_GigE] = {0, 0};
 
 static bool isSDKInit_gige_hik = false;
+bool isTriggerMode_hik[NUM_GigE] = {false, false};
 void* handle_gige_hik[NUM_GigE] = {nullptr, nullptr};
 
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
@@ -113,6 +114,10 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   } else if (isSameString(segments[1], "t2")) {
     xlog("t2");
     GigE_sendTriggerSoftware(index_cam);
+  } else if (isSameString(segments[1], "t3")) {
+    xlog("t3");
+    GigE_getTriggerMode(index_cam);
+
   }
 }
 
@@ -751,6 +756,41 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
     if (!bAutoFree && pUser) {
       auto handle = reinterpret_cast<void *>(pUser);
       MV_CC_FreeImageBuffer(handle, pstFrame);
+    }
+  }
+}
+
+void GigE_getTriggerMode(int index_cam) {
+  if (handle_gige_hik[index_cam] == nullptr) {
+    GigE_cameraOpen(index_cam);
+  }
+
+  if (handle_gige_hik[index_cam] == nullptr) {
+    xlog("camera is not opened");
+    return;
+  }
+
+  MVCC_ENUMVALUE stEnumValue = {0};
+  int nRet = MV_CC_GetEnumValue(handle_gige_hik[index_cam], "TriggerMode", &stEnumValue);
+  if (MV_OK != nRet) {
+    xlog("MV_CC_GetTriggerMode fail! nRet [%x]", nRet);
+    return;
+  }
+
+  if (stEnumValue.nCurValue == 1) {
+    xlog("TriggerMode: ON");
+  } else if (stEnumValue.nCurValue == 0) {
+    xlog("TriggerMode: OFF");
+  } else {
+    xlog("TriggerMode: Unknown (%lld)", stEnumValue.nCurValue);
+  }
+
+  // Optionally also get TriggerSource if ON
+  if (stEnumValue.nCurValue == 1) {
+    MVCC_ENUMVALUE stSrc = {0};
+    nRet = MV_CC_GetEnumValue(handle_gige_hik[index_cam], "TriggerSource", &stSrc);
+    if (MV_OK == nRet) {
+      xlog("TriggerSource: %lld", stSrc.nCurValue);
     }
   }
 }
