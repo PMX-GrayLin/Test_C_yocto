@@ -792,15 +792,6 @@ fail:
 void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   xlog("%s", triggerModeS.c_str());
 
-  if (handle_gige_hik[index_cam] == nullptr) {
-    GigE_cameraOpen(index_cam);
-  }
-
-  if (handle_gige_hik[index_cam] == nullptr) {
-    xlog("camera is not opened");
-    return;
-  }
-
   // set trigger mode
   bool enable = false;
 
@@ -814,10 +805,19 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
     return;
   }
 
+  if (handle_gige_hik[index_cam] == nullptr) {
+    GigE_cameraOpen(index_cam);
+  }
+
+  if (handle_gige_hik[index_cam] == nullptr) {
+    xlog("camera is not opened");
+    return;
+  }
+
   int nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", enable ? 1 : 0);
   if (MV_OK != nRet) {
     xlog("MV_CC_SetTriggerMode fail! nRet [%x]", nRet);
-    return;
+    goto fail;
   }
 
   if (enable) {
@@ -825,7 +825,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
     nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerSource", MV_TRIGGER_SOURCE_SOFTWARE);
     if (MV_OK != nRet) {
       xlog("MV_CC_SetTriggerSource fail! nRet [%x]", nRet);
-      return;
+      goto fail;
     }
 
     // register image callback
@@ -836,20 +836,24 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
         true);
     if (MV_OK != nRet) {
       xlog("MV_CC_RegisterImageCallBackEx fail! nRet [%x]", nRet);
-      return;
+      goto fail;
     }
 
     // start grab image
     nRet = MV_CC_StartGrabbing(handle_gige_hik[index_cam]);
     if (MV_OK != nRet) {
       xlog("MV_CC_StartGrabbing fail! nRet [%x]", nRet);
-      return;
+      goto fail;
     }
 
   } else {
     
     GigE_cameraClose(index_cam);
   }
+
+fail:
+  GigE_cameraClose(index_cam);
+  return;
 }
 
 void GigE_triggerModeStart(int index_cam) {
