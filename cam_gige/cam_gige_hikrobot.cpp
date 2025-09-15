@@ -782,10 +782,10 @@ bool GigE_isTriggerMode(int index_cam) {
 
   isTriggerMode = (stEnumValue.nCurValue == 1);
   xlog("isTriggerMode: %s", isTriggerMode ? "true" : "false");
+  return isTriggerMode;
 
 fail:
   GigE_cameraClose(index_cam);
-
   return isTriggerMode;
 }
 
