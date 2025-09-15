@@ -763,6 +763,7 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
 bool GigE_isTriggerMode(int index_cam) {
   bool isTriggerMode = false;
   int nRet = MV_OK;
+  MVCC_ENUMVALUE stEnumValue = {0};
 
   if (handle_gige_hik[index_cam] == nullptr) {
     GigE_cameraOpen(index_cam);
@@ -773,7 +774,6 @@ bool GigE_isTriggerMode(int index_cam) {
     goto fail;
   }
 
-  MVCC_ENUMVALUE stEnumValue = {0};
   nRet = MV_CC_GetEnumValue(handle_gige_hik[index_cam], "TriggerMode", &stEnumValue);
   if (MV_OK != nRet) {
     xlog("MV_CC_GetTriggerMode fail! nRet [%x]", nRet);
