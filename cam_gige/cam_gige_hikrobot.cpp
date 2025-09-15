@@ -774,7 +774,7 @@ bool GigE_isTriggerMode(int index_cam) {
   }
 
   MVCC_ENUMVALUE stEnumValue = {0};
-  int nRet = MV_CC_GetEnumValue(handle_gige_hik[index_cam], "TriggerMode", &stEnumValue);
+  nRet = MV_CC_GetEnumValue(handle_gige_hik[index_cam], "TriggerMode", &stEnumValue);
   if (MV_OK != nRet) {
     xlog("MV_CC_GetTriggerMode fail! nRet [%x]", nRet);
     goto fail;
