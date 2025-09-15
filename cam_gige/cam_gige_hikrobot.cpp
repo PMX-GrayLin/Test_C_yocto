@@ -711,31 +711,38 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
          pstFrame->stFrameInfo.nExtendHeight,
          pstFrame->stFrameInfo.nFrameNum);
 
-    // Convert pixel format to BGR8
-    MV_CC_PIXEL_CONVERT_PARAM stConvertParam = {0};
-    stConvertParam.nWidth = pstFrame->stFrameInfo.nWidth;
-    stConvertParam.nHeight = pstFrame->stFrameInfo.nHeight;
-    stConvertParam.pSrcData = pstFrame->pBufAddr;
-    stConvertParam.nSrcDataLen = pstFrame->stFrameInfo.nFrameLen;
-    stConvertParam.enSrcPixelType = pstFrame->stFrameInfo.enPixelType;
+    cv::Mat img;
 
-    std::vector<unsigned char> rgbBuf(stConvertParam.nWidth * stConvertParam.nHeight * 3);
-    stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed;
-    stConvertParam.pDstBuffer = rgbBuf.data();
-    stConvertParam.nDstBufferSize = rgbBuf.size();
-
-    int nRet = MV_CC_ConvertPixelType(handle, &stConvertParam);
-    if (MV_OK != nRet) {
-      xlog("ConvertPixelType failed! Error code: %x", nRet);
+    if (pixelType == PixelType_Gvsp_BGR8_Packed) {
+      // Already BGR
+      img = cv::Mat(height, width, CV_8UC3, pstFrame->pBufAddr).clone();
+    } else if (pixelType == PixelType_Gvsp_Mono8) {
+      // Grayscale
+      img = cv::Mat(height, width, CV_8UC1, pstFrame->pBufAddr).clone();
     } else {
-      // Wrap in OpenCV Mat
-      cv::Mat img(stConvertParam.nHeight, stConvertParam.nWidth, CV_8UC3, rgbBuf.data());
+      // Try converting Bayer or other formats to BGR8
+      MV_CC_PIXEL_CONVERT_PARAM stConvertParam = {0};
+      stConvertParam.nWidth = width;
+      stConvertParam.nHeight = height;
+      stConvertParam.pSrcData = pstFrame->pBufAddr;
+      stConvertParam.nSrcDataLen = pstFrame->stFrameInfo.nFrameLen;
+      stConvertParam.enSrcPixelType = pstFrame->stFrameInfo.enPixelType;
 
-      // Generate filename
-      string filename;
-      filename == "/home/root/primax/fw_" + getTimeString() + ".png";
+      std::vector<unsigned char> rgbBuf(width * height * 3);
+      stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed;
+      stConvertParam.pDstBuffer = rgbBuf.data();
+      stConvertParam.nDstBufferSize = rgbBuf.size();
 
-      // Save image
+      int nRet = MV_CC_ConvertPixelType(handle, &stConvertParam);
+      if (MV_OK != nRet) {
+        xlog("ConvertPixelType failed! Error code: %x", nRet);
+      } else {
+        img = cv::Mat(height, width, CV_8UC3, rgbBuf.data()).clone();
+      }
+    }
+
+    if (!img.empty()) {
+      string filename = "/home/root/primax/fw_" + getTimeString() + ".png";
       cv::imwrite(filename, img);
       xlog("saved image: %s", filename.c_str());
     }
