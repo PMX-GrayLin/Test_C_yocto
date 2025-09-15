@@ -760,7 +760,7 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
   }
 }
 
-void GigE_getTriggerMode(int index_cam) {
+bool GigE_isTriggerMode(int index_cam) {
   if (handle_gige_hik[index_cam] == nullptr) {
     GigE_cameraOpen(index_cam);
   }
@@ -777,15 +777,12 @@ void GigE_getTriggerMode(int index_cam) {
     return;
   }
 
-  if (stEnumValue.nCurValue == 1) {
-    xlog("TriggerMode: ON");
-  } else if (stEnumValue.nCurValue == 0) {
-    xlog("TriggerMode: OFF");
-  } else {
-    xlog("TriggerMode: Unknown (%lld)", stEnumValue.nCurValue);
-  }
+  bool isTriggerMode = (stEnumValue.nCurValue == 1);
+  xlog("isTriggerMode: %s", isTriggerMode ? "true" : "false");
 
   GigE_cameraClose(index_cam);
+
+  return isTriggerMode;
 }
 
 void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
