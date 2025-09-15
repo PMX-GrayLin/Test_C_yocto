@@ -725,7 +725,18 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   }
 
   // set trigger mode
-  bool enable = (triggerModeS == "on");
+  bool enable = false;
+
+  // should be "on" or "off" specifically
+  if (triggerModeS == "on") {
+    enable = true;
+  } else if (triggerModeS == "off") {
+    enable = false;
+  } else {
+    xlog("invalid trigger mode");
+    return;
+  }
+
   int nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", enable ? 1 : 0);
   if (MV_OK != nRet) {
     xlog("MV_CC_SetTriggerMode fail! nRet [%x]", nRet);
