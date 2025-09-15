@@ -698,11 +698,46 @@ void GigE_cameraClose(int index_cam) {
 }
 
 void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAutoFree) {
+  if (!pstFrame) return;
+
+  auto handle = reinterpret_cast<void *>(pUser);
+  if (!handle) return;
+
   if (pstFrame) {
     xlog("Get One Frame: W[%d], H[%d], Num[%d]",
          pstFrame->stFrameInfo.nExtendWidth,
          pstFrame->stFrameInfo.nExtendHeight,
          pstFrame->stFrameInfo.nFrameNum);
+
+    // Convert pixel format to BGR8
+    MV_CC_PIXEL_CONVERT_PARAM stConvertParam = {0};
+    stConvertParam.nWidth = pstFrame->stFrameInfo.nWidth;
+    stConvertParam.nHeight = pstFrame->stFrameInfo.nHeight;
+    stConvertParam.pSrcData = pstFrame->pBufAddr;
+    stConvertParam.nSrcDataLen = pstFrame->stFrameInfo.nFrameLen;
+    stConvertParam.enSrcPixelType = pstFrame->stFrameInfo.enPixelType;
+
+    std::vector<unsigned char> rgbBuf(stConvertParam.nWidth * stConvertParam.nHeight * 3);
+    stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed;
+    stConvertParam.pDstBuffer = rgbBuf.data();
+    stConvertParam.nDstBufferSize = rgbBuf.size();
+
+    int nRet = MV_CC_ConvertPixelType(handle, &stConvertParam);
+    if (MV_OK != nRet) {
+      std::cerr << "ConvertPixelType failed! Error code: " << nRet << std::endl;
+    } else {
+      // Wrap in OpenCV Mat
+      cv::Mat img(stConvertParam.nHeight, stConvertParam.nWidth, CV_8UC3, rgbBuf.data());
+
+      // Generate filename
+      int frameNum = g_frameCount++;
+      std::ostringstream filename;
+      filename << "frame_" << std::setw(4) << std::setfill('0') << frameNum << ".png";
+
+      // Save image
+      cv::imwrite(filename.str(), img);
+      std::cout << "Saved: " << filename.str() << std::endl;
+    }
 
     // release manually
     if (!bAutoFree && pUser) {
