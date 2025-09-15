@@ -706,13 +706,13 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
   if (!handle) return;
 
   if (pstFrame) {
-    xlog("Get One Frame: W[%d], H[%d], Num[%d]",
-         pstFrame->stFrameInfo.nExtendWidth,
-         pstFrame->stFrameInfo.nExtendHeight,
-         pstFrame->stFrameInfo.nFrameNum);
+    int width  = pstFrame->stFrameInfo.nExtendWidth;
+    int height = pstFrame->stFrameInfo.nExtendHeight;
+    int frameNum = pstFrame->stFrameInfo.nFrameNum;
+    int pixelType = pstFrame->stFrameInfo.enPixelType;
+    xlog("Get One Frame: W[%d], H[%d], Num[%d]", width, height, frameNum);
 
     cv::Mat img;
-
     if (pixelType == PixelType_Gvsp_BGR8_Packed) {
       // Already BGR
       img = cv::Mat(height, width, CV_8UC3, pstFrame->pBufAddr).clone();
