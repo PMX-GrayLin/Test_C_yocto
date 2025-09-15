@@ -785,14 +785,7 @@ void GigE_getTriggerMode(int index_cam) {
     xlog("TriggerMode: Unknown (%lld)", stEnumValue.nCurValue);
   }
 
-  // Optionally also get TriggerSource if ON
-  if (stEnumValue.nCurValue == 1) {
-    MVCC_ENUMVALUE stSrc = {0};
-    nRet = MV_CC_GetEnumValue(handle_gige_hik[index_cam], "TriggerSource", &stSrc);
-    if (MV_OK == nRet) {
-      xlog("TriggerSource: %lld", stSrc.nCurValue);
-    }
-  }
+  GigE_cameraClose(index_cam);
 }
 
 void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
