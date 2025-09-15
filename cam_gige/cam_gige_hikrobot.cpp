@@ -14,6 +14,8 @@
 #include "image_utils.hpp"
 #include "restfulx.hpp"
 
+#include "global.hpp"
+
 UsedGigeCam usedGigeCam = ugc_hikrobot;
 
 static GstElement *pipeline_gige_hik[NUM_GigE] = {nullptr, nullptr};
@@ -724,19 +726,18 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
 
     int nRet = MV_CC_ConvertPixelType(handle, &stConvertParam);
     if (MV_OK != nRet) {
-      std::cerr << "ConvertPixelType failed! Error code: " << nRet << std::endl;
+      xlog("ConvertPixelType failed! Error code: %x", nRet);
     } else {
       // Wrap in OpenCV Mat
       cv::Mat img(stConvertParam.nHeight, stConvertParam.nWidth, CV_8UC3, rgbBuf.data());
 
       // Generate filename
-      int frameNum = g_frameCount++;
-      std::ostringstream filename;
-      filename << "frame_" << std::setw(4) << std::setfill('0') << frameNum << ".png";
+      string filename;
+      filename == "/home/root/primax/fw_" + getTimeString() + ".png";
 
       // Save image
       cv::imwrite(filename.str(), img);
-      std::cout << "Saved: " << filename.str() << std::endl;
+      xlog("saved image: %s", filename.c_str());
     }
 
     // release manually
