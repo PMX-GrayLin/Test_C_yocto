@@ -736,7 +736,7 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
       filename == "/home/root/primax/fw_" + getTimeString() + ".png";
 
       // Save image
-      cv::imwrite(filename.str(), img);
+      cv::imwrite(filename, img);
       xlog("saved image: %s", filename.c_str());
     }
 
