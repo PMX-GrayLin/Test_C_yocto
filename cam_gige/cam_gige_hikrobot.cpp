@@ -849,11 +849,11 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
 }
 
 void GigE_triggerModeStart(int index_cam) {
-  GigE_setTriggerMode(int index_cam, "on");
+  GigE_setTriggerMode(index_cam, "on");
 }
 
 void GigE_triggerModeStop(int index_cam) {
-  GigE_setTriggerMode(int index_cam, "off");
+  GigE_setTriggerMode(index_cam, "off");
 }
 
 void GigE_sendTriggerSoftware(int index_cam) {
