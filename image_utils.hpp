@@ -32,9 +32,9 @@ extern SyncSignal syncSignal_crop;
 void imgu_resetSignal(SyncSignal *sync);
 void imgu_waitSignal(SyncSignal *sync);
 
-void imgu_saveImage_mat(
+bool imgu_saveImage_mat(
     cv::Mat &frame,
-    string filePathName
+    const std::string &filePathName
 );
 
 // save whole image or the cropped image

@@ -31,39 +31,34 @@ void imgu_trigerSignal(SyncSignal *sync) {
   }
 }
 
-void imgu_saveImage_mat(
-    cv::Mat &frame,
-    string filePathName) 
-{
+bool imgu_saveImage_mat(const cv::Mat &frame, const std::string &filePathName) {
   if (frame.empty()) {
     xlog("frame is empty. Cannot save image to %s", filePathName.c_str());
-  } else {
-    // save full image
-    std::vector<int> params;
+    return false;
+  }
 
-    // Lowercase file extension check (C++17 compatible)
-    std::string lower_path = filePathName;
-    std::transform(lower_path.begin(), lower_path.end(), lower_path.begin(), ::tolower);
+  std::vector<int> params;
+  std::string lower_path = filePathName;
+  std::transform(lower_path.begin(), lower_path.end(), lower_path.begin(), ::tolower);
 
-    if (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".png") {
-      params = {cv::IMWRITE_PNG_COMPRESSION, 0};  // Fastest (no compression)
-    } else if (
-        (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".jpg") ||
-        (lower_path.size() >= 5 && lower_path.substr(lower_path.size() - 5) == ".jpeg")) {
-      params = {cv::IMWRITE_JPEG_QUALITY, 95};  // Quality: 0–100 (default is 95)
-    }
+  if (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".png") {
+    params = {cv::IMWRITE_PNG_COMPRESSION, 0};
+  } else if (
+      (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".jpg") ||
+      (lower_path.size() >= 5 && lower_path.substr(lower_path.size() - 5) == ".jpeg")) {
+    params = {cv::IMWRITE_JPEG_QUALITY, 95};
+  }
 
-    try {
-      bool isSaveOK;
-      if (!params.empty()) {
-        isSaveOK = cv::imwrite(filePathName, frame, params);
-      } else {
-        isSaveOK = cv::imwrite(filePathName, frame);
-      }
-      xlog("%s frame to %s", isSaveOK ? "Saved" : "Failed to save", filePathName.c_str());
-    } catch (const cv::Exception &e) {
-      xlog("cv::imwrite exception: %s", e.what());
-    }
+  try {
+    bool isSaveOK = params.empty()
+                        ? cv::imwrite(filePathName, frame)
+                        : cv::imwrite(filePathName, frame, params);
+
+    xlog("%s frame to %s", isSaveOK ? "Saved" : "Failed to save", filePathName.c_str());
+    return isSaveOK;
+  } catch (const cv::Exception &e) {
+    xlog("cv::imwrite exception: %s", e.what());
+    return false;
   }
 }
 
