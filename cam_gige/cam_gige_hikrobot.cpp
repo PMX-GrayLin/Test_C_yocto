@@ -65,6 +65,9 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else if (isSameString(segments[2], "resolution")) {
       // with format "width*height"
       GigE_setResolution(index_cam, segments[3]);
+    } else if (isSameString(segments[2], "trigger-mode")) {
+      // on or off
+      GigE_setTriggerMode(index_cam, segments[3]);
     }
 
   } else if (isSameString(segments[1], "get")) {
@@ -709,6 +712,12 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
 
   auto handle = reinterpret_cast<void *>(pUser);
   if (!handle) return;
+
+  if (handle == handle_gige_hik[0]) {
+    GigE_streamingLED(0);
+  } else if (handle == handle_gige_hik[1]) {
+    GigE_streamingLED(0);
+  }
 
   if (pstFrame) {
     int width  = pstFrame->stFrameInfo.nExtendWidth;
