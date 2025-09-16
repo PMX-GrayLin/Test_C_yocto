@@ -30,6 +30,11 @@ extern SyncSignal syncSignal_crop;
 void imgu_resetSignal(SyncSignal *sync);
 void imgu_waitSignal(SyncSignal *sync);
 
+void imgu_saveImage_mat(
+    cv::Mat &frame,
+    string filePathName
+);
+
 // save whole image or the cropped image
 void imgu_saveImage(
     void* v_pad /* GstPad* */,

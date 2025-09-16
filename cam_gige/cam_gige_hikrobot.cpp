@@ -124,15 +124,6 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   }
 }
 
-void GigE_saveImage_hik(int index_cam, GstPad *pad, GstPadProbeInfo *info) {
-  if (isCapturePhoto_hik[index_cam]) {
-    xlog("");
-    isCapturePhoto_hik[index_cam] = false;
-
-    imgu_saveImage((void *)pad, (void *)info, pathName_savedImage_hik[index_cam]);
-  }
-}
-
 void GigE_getSettings_hik(int index_cam) {
   if (index_cam < 0 || index_cam >= NUM_GigE) {
     xlog("Invalid index_cam: %d", index_cam);
@@ -331,6 +322,16 @@ void GigE_captureImage_hik(int index_cam) {
   }
   xlog("");
   isCapturePhoto_hik[index_cam] = true;
+}
+
+void GigE_saveImage_hik(int index_cam, GstPad *pad, GstPadProbeInfo *info) {
+  if (isCapturePhoto_hik[index_cam]) {
+    xlog("");
+    isCapturePhoto_hik[index_cam] = false;
+
+    imgu_saveImage_thread((void *)pad, (void *)info, pathName_savedImage_uvc, &syncSignal_save);
+    // imgu_saveImage((void *)pad, (void *)info, pathName_savedImage_hik[index_cam]);
+  }
 }
 
 // Callback to handle incoming buffer data
