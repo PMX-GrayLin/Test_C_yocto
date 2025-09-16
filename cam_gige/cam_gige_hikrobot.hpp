@@ -55,22 +55,22 @@ void GigE_setGainAuto_hik(int index_cam, const string& gstArvAutoS);
 void GigE_setImagePath_hik(int index_cam, const string& imagePath);
 void GigE_captureImage_hik(int index_cam);
 
-void GigE_ThreadStreaming_Hik(int index_cam);
-void GigE_StreamingStart_Hik(int index_cam);
-void GigE_StreamingStop_Hik(int index_cam);
+void GigE_ThreadStreaming_hik(int index_cam);
+void GigE_StreamingStart_hik(int index_cam);
+void GigE_StreamingStop_hik(int index_cam);
 void GigE_streamingLED(int index_cam);
-void GigE_setResolution(int index_cam, const string& resolutionS);
+void GigE_setResolution_hik(int index_cam, const string& resolutionS);
 
 // for trigger mode
-bool GigE_PrintDeviceInfo(MV_CC_DEVICE_INFO *pstMVDevInfo);
-void GigE_cameraOpen(int index_cam);
-void GigE_cameraClose(int index_cam);
-void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAutoFree);
-bool GigE_isTriggerMode(int index_cam);
-void GigE_setTriggerMode(int index_cam, const string& triggerModeS);
-void GigE_triggerModeStart(int index_cam);
-void GigE_triggerModeStop(int index_cam);
-void GigE_sendTriggerSoftware(int index_cam);
+bool GigE_PrintDeviceInfo_hik(MV_CC_DEVICE_INFO *pstMVDevInfo);
+void GigE_cameraOpen_hik(int index_cam);
+void GigE_cameraClose_hik(int index_cam);
+void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool bAutoFree);
+bool GigE_isTriggerMode_hik(int index_cam);
+void GigE_setTriggerMode_hik(int index_cam, const string& triggerModeS);
+void GigE_triggerModeStart_hik(int index_cam);
+void GigE_triggerModeStop_hik(int index_cam);
+void GigE_sendTriggerSoftware_hik(int index_cam);
 
 
 /* 

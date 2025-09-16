@@ -48,10 +48,10 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   }
 
   if (isSameString(segments[1], "start")) {
-    GigE_StreamingStart_Hik(index_cam);
+    GigE_StreamingStart_hik(index_cam);
 
   } else if (isSameString(segments[1], "stop")) {
-    GigE_StreamingStop_Hik(index_cam);
+    GigE_StreamingStop_hik(index_cam);
 
   } else if (isSameString(segments[1], "set")) {
     if (isSameString(segments[2], "exposure")) {
@@ -64,10 +64,10 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
       GigE_setGainAuto_hik(index_cam, segments[3]);
     } else if (isSameString(segments[2], "resolution")) {
       // with format "width*height"
-      GigE_setResolution(index_cam, segments[3]);
+      GigE_setResolution_hik(index_cam, segments[3]);
     } else if (isSameString(segments[2], "trigger-mode")) {
       // on or off
-      GigE_setTriggerMode(index_cam, segments[3]);
+      GigE_setTriggerMode_hik(index_cam, segments[3]);
     }
 
   } else if (isSameString(segments[1], "get")) {
@@ -106,20 +106,20 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   } else if (isSameString(segments[1], "t0")) {
     xlog("t0");
     if (isSameString(segments[2], "open")) {
-      GigE_cameraOpen(index_cam);
+      GigE_cameraOpen_hik(index_cam);
     } else {
-      GigE_cameraClose(index_cam);
+      GigE_cameraClose_hik(index_cam);
     }
 
   } else if (isSameString(segments[1], "t1")) {
     xlog("t1");
-    GigE_setTriggerMode(index_cam, segments[2]);
+    GigE_setTriggerMode_hik(index_cam, segments[2]);
   } else if (isSameString(segments[1], "t2")) {
     xlog("t2");
-    GigE_sendTriggerSoftware(index_cam);
+    GigE_sendTriggerSoftware_hik(index_cam);
   } else if (isSameString(segments[1], "t3")) {
     xlog("t3");
-    GigE_isTriggerMode(index_cam);
+    GigE_isTriggerMode_hik(index_cam);
 
   }
 }
@@ -342,7 +342,7 @@ GstPadProbeReturn streamingDataCallback_gige_hik(GstPad *pad, GstPadProbeInfo *i
   return GST_PAD_PROBE_OK;
 }
 
-void GigE_ThreadStreaming_Hik(int index_cam) {
+void GigE_ThreadStreaming_hik(int index_cam) {
   xlog("++++ start ++++");
 
   // Initialize GStreamer
@@ -443,7 +443,7 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
             g_error_free(err);
             g_free(dbg);
 
-            GigE_StreamingStop_Hik(index_cam);
+            GigE_StreamingStop_hik(index_cam);
             if (index_cam == 0) {
               FW_setLED("2", "red");
             } else if (index_cam == 1) {
@@ -453,7 +453,7 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
           }
           case GST_MESSAGE_EOS:
             xlog("Received EOS, stopping...");
-            GigE_StreamingStop_Hik(index_cam);
+            GigE_StreamingStop_hik(index_cam);
             if (index_cam == 0) {
               FW_setLED("2", "red");
             } else if (index_cam == 1) {
@@ -506,7 +506,7 @@ void GigE_ThreadStreaming_Hik(int index_cam) {
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 
-void GigE_StreamingStart_Hik(int index_cam) {
+void GigE_StreamingStart_hik(int index_cam) {
   xlog("");
   auto now = std::chrono::steady_clock::now();
   if (now - lastStartTime_gige_hik[index_cam] < std::chrono::seconds(1)) {
@@ -526,11 +526,11 @@ void GigE_StreamingStart_Hik(int index_cam) {
     FW_setLED("3", "off");
   }
 
-  t_streaming_gige_hik[index_cam] = std::thread(GigE_ThreadStreaming_Hik, index_cam);
+  t_streaming_gige_hik[index_cam] = std::thread(GigE_ThreadStreaming_hik, index_cam);
   t_streaming_gige_hik[index_cam].detach();
 }
 
-void GigE_StreamingStop_Hik(int index_cam) {
+void GigE_StreamingStop_hik(int index_cam) {
   xlog("");
   if (!isStreaming_gige_hik[index_cam].load()) {
     xlog("thread not running");
@@ -559,7 +559,7 @@ void GigE_streamingLED(int index_cam) {
   }
 }
 
-void GigE_setResolution(int index, const string &resolutionS) {
+void GigE_setResolution_hik(int index, const string &resolutionS) {
   size_t sep = resolutionS.find('*');
   if (sep == std::string::npos) {
     xlog("Invalid resolution format. Expected format: width*height");
@@ -581,7 +581,7 @@ void GigE_setResolution(int index, const string &resolutionS) {
 
 
 // from hikrobot sample
-bool GigE_PrintDeviceInfo(MV_CC_DEVICE_INFO *pstMVDevInfo) {
+bool GigE_PrintDeviceInfo_hik(MV_CC_DEVICE_INFO *pstMVDevInfo) {
     if (!pstMVDevInfo) {
         xlog("The Pointer of pstMVDevInfo is NULL!");
         return false;
@@ -624,7 +624,7 @@ bool GigE_PrintDeviceInfo(MV_CC_DEVICE_INFO *pstMVDevInfo) {
     return true;
 }
 
-void GigE_cameraOpen(int index_cam) {
+void GigE_cameraOpen_hik(int index_cam) {
   xlog("index_cam:%d", index_cam);
   int nRet = MV_OK;
 
@@ -654,7 +654,7 @@ void GigE_cameraOpen(int index_cam) {
       if (NULL == pDeviceInfo) {
         return;
       }
-      GigE_PrintDeviceInfo(pDeviceInfo);
+      GigE_PrintDeviceInfo_hik(pDeviceInfo);
     }
   } else {
     xlog("Find No Devices!");
@@ -697,7 +697,7 @@ void GigE_cameraOpen(int index_cam) {
   }
 }
 
-void GigE_cameraClose(int index_cam) {
+void GigE_cameraClose_hik(int index_cam) {
   xlog("");
   if (handle_gige_hik[index_cam]) {
     MV_CC_StopGrabbing(handle_gige_hik[index_cam]);
@@ -707,7 +707,7 @@ void GigE_cameraClose(int index_cam) {
   }
 }
 
-void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAutoFree) {
+void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool bAutoFree) {
   if (!pstFrame) return;
 
   auto handle = reinterpret_cast<void *>(pUser);
@@ -776,13 +776,13 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
   }
 }
 
-bool GigE_isTriggerMode(int index_cam) {
+bool GigE_isTriggerMode_hik(int index_cam) {
   bool isTriggerMode = false;
   int nRet = MV_OK;
   MVCC_ENUMVALUE stEnumValue = {0};
 
   if (handle_gige_hik[index_cam] == nullptr) {
-    GigE_cameraOpen(index_cam);
+    GigE_cameraOpen_hik(index_cam);
   }
 
   if (handle_gige_hik[index_cam] == nullptr) {
@@ -801,20 +801,20 @@ bool GigE_isTriggerMode(int index_cam) {
   return isTriggerMode;
 
 fail:
-  GigE_cameraClose(index_cam);
+  GigE_cameraClose_hik(index_cam);
   return isTriggerMode;
 }
 
-void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
+void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
   xlog("%s", triggerModeS.c_str());
 
   // set trigger mode
   bool enable = false;
 
   // should be "on" or "off" specifically
-  if (triggerModeS == "on") {
+  if (isSameString(triggerModeS, "on")) {
     enable = true;
-  } else if (triggerModeS == "off") {
+  } else if (isSameString(triggerModeS, "off")) {
     enable = false;
   } else {
     xlog("invalid trigger mode");
@@ -822,7 +822,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
   }
 
   if (handle_gige_hik[index_cam] == nullptr) {
-    GigE_cameraOpen(index_cam);
+    GigE_cameraOpen_hik(index_cam);
   }
 
   if (handle_gige_hik[index_cam] == nullptr) {
@@ -847,7 +847,7 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
     // register image callback
     nRet = MV_CC_RegisterImageCallBackEx2(
         handle_gige_hik[index_cam],
-        GigE_imageCallback,
+        GigE_imageCallback_hik,
         handle_gige_hik[index_cam],
         true);
     if (MV_OK != nRet) {
@@ -866,25 +866,25 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
 
   } else {
     
-    GigE_cameraClose(index_cam);
+    GigE_cameraClose_hik(index_cam);
     return;
 
   }
 
 fail:
-  GigE_cameraClose(index_cam);
+  GigE_cameraClose_hik(index_cam);
   return;
 }
 
-void GigE_triggerModeStart(int index_cam) {
-  GigE_setTriggerMode(index_cam, "on");
+void GigE_triggerModeStart_hik(int index_cam) {
+  GigE_setTriggerMode_hik(index_cam, "on");
 }
 
-void GigE_triggerModeStop(int index_cam) {
-  GigE_setTriggerMode(index_cam, "off");
+void GigE_triggerModeStop_hik(int index_cam) {
+  GigE_setTriggerMode_hik(index_cam, "off");
 }
 
-void GigE_sendTriggerSoftware(int index_cam) {
+void GigE_sendTriggerSoftware_hik(int index_cam) {
   if (handle_gige_hik[index_cam]) {
     int nRet = MV_CC_SetCommandValue(handle_gige_hik[index_cam], "TriggerSoftware");
     if (MV_OK != nRet) {
