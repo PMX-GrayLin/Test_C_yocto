@@ -714,9 +714,9 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
   if (!handle) return;
 
   if (handle == handle_gige_hik[0]) {
-    GigE_streamingLED(0);
+    FW_setLED("2", "orange");
   } else if (handle == handle_gige_hik[1]) {
-    GigE_streamingLED(0);
+    FW_setLED("3", "orange");
   }
 
   if (pstFrame) {
@@ -765,6 +765,12 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
     if (!bAutoFree && pUser) {
       auto handle = reinterpret_cast<void *>(pUser);
       MV_CC_FreeImageBuffer(handle, pstFrame);
+    }
+
+    if (handle == handle_gige_hik[0]) {
+      FW_setLED("2", "green");
+    } else if (handle == handle_gige_hik[1]) {
+      FW_setLED("3", "green");
     }
   }
 }
