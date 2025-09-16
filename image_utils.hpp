@@ -33,7 +33,7 @@ void imgu_resetSignal(SyncSignal *sync);
 void imgu_waitSignal(SyncSignal *sync);
 
 bool imgu_saveImage_mat(
-    cv::Mat &frame,
+    const cv::Mat &frame,
     const std::string &filePathName
 );
 
