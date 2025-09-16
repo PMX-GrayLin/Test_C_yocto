@@ -5,6 +5,8 @@
 #include <mutex>
 #include <condition_variable>
 
+#include <opencv2/core.hpp>
+
 typedef enum {
     spf_BMP,
     spf_JPEG,
