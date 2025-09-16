@@ -713,6 +713,7 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
   auto handle = reinterpret_cast<void *>(pUser);
   if (!handle) return;
 
+  string index_cam_s = (handle == handle_gige_hik[0]) ? "1" : (handle == handle_gige_hik[1]) ? "2" : "unknown";
   if (handle == handle_gige_hik[0]) {
     FW_setLED("2", "orange");
   } else if (handle == handle_gige_hik[1]) {
@@ -756,7 +757,7 @@ void __stdcall GigE_imageCallback(MV_FRAME_OUT *pstFrame, void *pUser, bool bAut
     }
 
     if (!img.empty()) {
-      string filename = "/home/root/primax/fw_" + getTimeString() + ".png";
+      string filename = "/home/root/primax/fw_id" + index_cam_s + "_" + getTimeString() + ".png";
       cv::imwrite(filename, img);
       xlog("saved image: %s", filename.c_str());
     }
