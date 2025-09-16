@@ -329,7 +329,7 @@ void GigE_saveImage_hik(int index_cam, GstPad *pad, GstPadProbeInfo *info) {
     xlog("");
     isCapturePhoto_hik[index_cam] = false;
 
-    imgu_saveImage_thread((void *)pad, (void *)info, pathName_savedImage_uvc, &syncSignal_save);
+    imgu_saveImage_thread((void *)pad, (void *)info, pathName_savedImage_hik[index_cam], &syncSignal_save);
     // imgu_saveImage((void *)pad, (void *)info, pathName_savedImage_hik[index_cam]);
   }
 }
