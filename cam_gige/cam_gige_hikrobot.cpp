@@ -846,6 +846,8 @@ void GigE_setTriggerMode(int index_cam, const string &triggerModeS) {
       goto fail;
     }
 
+    return;
+
   } else {
     
     GigE_cameraClose(index_cam);
