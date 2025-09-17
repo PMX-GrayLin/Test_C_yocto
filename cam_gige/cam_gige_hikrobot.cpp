@@ -739,6 +739,8 @@ void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool 
   auto handle = reinterpret_cast<void *>(pUser);
   if (!handle) return;
 
+  auto start = std::chrono::high_resolution_clock::now();
+
   int index_cam = 0;
   string index_cam_s = "";
   if (handle == handle_gige_hik[0]) {
@@ -792,8 +794,6 @@ void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool 
                 + index_cam_s + "_" 
                 + std::to_string(frameNum) + ".png";
       imgu_saveImage_mat(img, filename);
-      // cv::imwrite(filename, img);
-      // xlog("saved image: %s", filename.c_str());
     }
 
     // release manually
@@ -807,6 +807,9 @@ void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool 
     } else if (handle == handle_gige_hik[1]) {
       FW_setLED("3", "green");
     }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    xlog("Elapsed time: %ld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
   }
 }
 

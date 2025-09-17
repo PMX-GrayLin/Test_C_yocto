@@ -134,37 +134,6 @@ void imgu_saveImage(
 
   imgu_saveImage_mat(bgr_frame, filePathName);
 
-  // if (bgr_frame.empty()) {
-  //   xlog("bgr_frame is empty. Cannot save image to %s", filePathName.c_str());
-  // } else {
-  //   // save full image
-  //   std::vector<int> params;
-
-  //   // Lowercase file extension check (C++17 compatible)
-  //   std::string lower_path = filePathName;
-  //   std::transform(lower_path.begin(), lower_path.end(), lower_path.begin(), ::tolower);
-
-  //   if (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".png") {
-  //     params = {cv::IMWRITE_PNG_COMPRESSION, 0};  // Fastest (no compression)
-  //   } else if (
-  //       (lower_path.size() >= 4 && lower_path.substr(lower_path.size() - 4) == ".jpg") ||
-  //       (lower_path.size() >= 5 && lower_path.substr(lower_path.size() - 5) == ".jpeg")) {
-  //     params = {cv::IMWRITE_JPEG_QUALITY, 95};  // Quality: 0–100 (default is 95)
-  //   }
-
-  //   try {
-  //     bool isSaveOK;
-  //     if (!params.empty()) {
-  //       isSaveOK = cv::imwrite(filePathName, bgr_frame, params);
-  //     } else {
-  //       isSaveOK = cv::imwrite(filePathName, bgr_frame);
-  //     }
-  //     xlog("%s frame to %s", isSaveOK ? "Saved" : "Failed to save", filePathName.c_str());
-  //   } catch (const cv::Exception &e) {
-  //     xlog("cv::imwrite exception: %s", e.what());
-  //   }
-  // }
-
   auto end = std::chrono::high_resolution_clock::now();
   xlog("Elapsed time: %ld ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 
