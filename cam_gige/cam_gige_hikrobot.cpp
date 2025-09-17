@@ -586,29 +586,29 @@ void GigE_setResolution_hik(int index, const string &resolutionS) {
   resolution_height_gige_hik[index] = height;
   xlog("index:%d, width:%d, height:%d", index, resolution_width_gige_hik[index], resolution_height_gige_hik[index]);
 
-  if (handle_gige_hik[index_cam] == nullptr) {
+  if (handle_gige_hik[index] == nullptr) {
     GigE_cameraOpen_hik(index_cam);
   }
 
-  if (handle_gige_hik[index_cam] == nullptr) {
+  if (handle_gige_hik[index] == nullptr) {
     xlog("camera is not opened");
     return;
   }
 
-  int nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "Height", resolution_height_gige_hik[index]);
+  int nRet = MV_CC_SetIntValueEx(handle_gige_hik[index], "Height", resolution_height_gige_hik[index]);
   if (MV_OK == nRet) {
     xlog("set height OK");
   } else {
     xlog("set height failed! nRet [%x]", nRet);
   }
-  nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "Width", resolution_width_gige_hik[index]);
+  nRet = MV_CC_SetIntValueEx(handle_gige_hik[index], "Width", resolution_width_gige_hik[index]);
   if (MV_OK == nRet) {
     xlog("set height OK");
   } else {
     xlog("set height failed! nRet [%x]", nRet);
   }
 
-  GigE_cameraClose_hik(index_cam);
+  GigE_cameraClose_hik(index);
 
 }
 
