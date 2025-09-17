@@ -635,6 +635,8 @@ bool GigE_PrintDeviceInfo_hik(MV_CC_DEVICE_INFO *pstMVDevInfo) {
 void GigE_cameraOpen_hik(int index_cam) {
   xlog("index_cam:%d", index_cam);
   int nRet = MV_OK;
+  string deviceUserID = "id" + std::to_string(index_cam + 1);
+  unsigned int nIndex = 0;
 
   // Initialize SDK
   if (!isSDKInit_gige_hik == false) {
@@ -662,14 +664,18 @@ void GigE_cameraOpen_hik(int index_cam) {
       if (NULL == pDeviceInfo) {
         return;
       }
-      GigE_PrintDeviceInfo_hik(pDeviceInfo);
+      if (isSameString((char *)pDeviceInfo->SpecialInfo.stGigEInfo.chUserDefinedName, deviceUserID.c_str()) ) {
+        xlog("Found device with UserDefinedName: %s", deviceUserID.c_str());
+        nIndex = i;
+        break;
+      }
+      // GigE_PrintDeviceInfo_hik(pDeviceInfo);
     }
   } else {
     xlog("Find No Devices!");
     return;
   }
 
-  unsigned int nIndex = 0;
   // select device and create handle
   if (handle_gige_hik[index_cam] == nullptr) {
     nRet = MV_CC_CreateHandle(&handle_gige_hik[index_cam], stDeviceList.pDeviceInfo[nIndex]);
