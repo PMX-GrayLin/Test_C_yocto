@@ -585,6 +585,31 @@ void GigE_setResolution_hik(int index, const string &resolutionS) {
   resolution_width_gige_hik[index] = width;
   resolution_height_gige_hik[index] = height;
   xlog("index:%d, width:%d, height:%d", index, resolution_width_gige_hik[index], resolution_height_gige_hik[index]);
+
+  if (handle_gige_hik[index_cam] == nullptr) {
+    GigE_cameraOpen_hik(index_cam);
+  }
+
+  if (handle_gige_hik[index_cam] == nullptr) {
+    xlog("camera is not opened");
+    return;
+  }
+
+  int nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "Height", resolution_height_gige_hik[index]);
+  if (MV_OK == nRet) {
+    xlog("set height OK");
+  } else {
+    xlog("set height failed! nRet [%x]", nRet);
+  }
+  nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "Width", resolution_width_gige_hik[index]);
+  if (MV_OK == nRet) {
+    xlog("set height OK");
+  } else {
+    xlog("set height failed! nRet [%x]", nRet);
+  }
+
+  GigE_cameraClose_hik(index_cam);
+
 }
 
 
@@ -659,7 +684,7 @@ void GigE_cameraOpen_hik(int index_cam) {
   }
   if (stDeviceList.nDeviceNum > 0) {
     for (int i = 0; i < stDeviceList.nDeviceNum; i++) {
-      xlog("[device %d]", i);
+      // xlog("[device %d]", i);
       MV_CC_DEVICE_INFO *pDeviceInfo = stDeviceList.pDeviceInfo[i];
       if (NULL == pDeviceInfo) {
         return;
@@ -669,7 +694,7 @@ void GigE_cameraOpen_hik(int index_cam) {
         nIndex = i;
         break;
       }
-      // GigE_PrintDeviceInfo_hik(pDeviceInfo);
+      GigE_PrintDeviceInfo_hik(pDeviceInfo);
     }
   } else {
     xlog("Find No Devices!");
