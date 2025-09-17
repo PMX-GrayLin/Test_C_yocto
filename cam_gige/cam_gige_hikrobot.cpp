@@ -587,7 +587,7 @@ void GigE_setResolution_hik(int index, const string &resolutionS) {
   xlog("index:%d, width:%d, height:%d", index, resolution_width_gige_hik[index], resolution_height_gige_hik[index]);
 
   if (handle_gige_hik[index] == nullptr) {
-    GigE_cameraOpen_hik(index_cam);
+    GigE_cameraOpen_hik(index);
   }
 
   if (handle_gige_hik[index] == nullptr) {
