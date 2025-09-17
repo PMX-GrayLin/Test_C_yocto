@@ -770,7 +770,9 @@ void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool 
     }
 
     if (!img.empty()) {
-      string filename = pathName_triggerImage_hik[index_cam] + "_" + index_cam_s + "_" + frameNum + ".png";
+      string filename = pathName_triggerImage_hik[index_cam] + "_" 
+                + index_cam_s + "_" 
+                + std::to_string(frameNum) + ".png";
       imgu_saveImage_mat(img, filename);
       // cv::imwrite(filename, img);
       // xlog("saved image: %s", filename.c_str());
