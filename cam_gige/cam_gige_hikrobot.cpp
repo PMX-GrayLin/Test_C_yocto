@@ -109,24 +109,11 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     GigE_setImagePath_hik(index_cam, path);
     GigE_captureImage_hik(index_cam);
 
-  // } else if (isSameString(segments[1], "t0")) {
-  //   xlog("t0");
-  //   if (isSameString(segments[2], "open")) {
-  //     GigE_cameraOpen_hik(index_cam);
-  //   } else {
-  //     GigE_cameraClose_hik(index_cam);
-  //   }
-
-  // } else if (isSameString(segments[1], "t1")) {
-  //   xlog("t1");
-  //   GigE_setTriggerMode_hik(index_cam, segments[2]);
+    GigE_sendTriggerSoftware_hik(index_cam);
+    
   } else if (isSameString(segments[1], "sts")) {
     xlog("send TriggerSoftware");
     GigE_sendTriggerSoftware_hik(index_cam);
-
-  // } else if (isSameString(segments[1], "t3")) {
-  //   xlog("t3");
-  //   GigE_isTriggerMode_hik(index_cam);
 
   }
 }
@@ -692,9 +679,9 @@ void GigE_cameraOpen_hik(int index_cam) {
       if (isSameString((char *)pDeviceInfo->SpecialInfo.stGigEInfo.chUserDefinedName, deviceUserID.c_str()) ) {
         xlog("Found device with UserDefinedName: %s", deviceUserID.c_str());
         nIndex = i;
+        GigE_PrintDeviceInfo_hik(pDeviceInfo);
         break;
       }
-      GigE_PrintDeviceInfo_hik(pDeviceInfo);
     }
   } else {
     xlog("Find No Devices!");
@@ -932,7 +919,7 @@ void GigE_triggerModeStop_hik(int index_cam) {
 }
 
 void GigE_sendTriggerSoftware_hik(int index_cam) {
-  if (handle_gige_hik[index_cam]) {
+  if (handle_gige_hik[index_cam] && GigE_isTriggerMode_hik(index_cam)) {
     int nRet = MV_CC_SetCommandValue(handle_gige_hik[index_cam], "TriggerSoftware");
     if (MV_OK != nRet) {
       xlog("failed in TriggerSoftware[%x]\n", nRet);
