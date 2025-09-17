@@ -38,6 +38,12 @@ static volatile int counterFrame_hik[NUM_GigE] = {0, 0};
 static bool isSDKInit_gige_hik = false;
 bool isTriggerMode_hik[NUM_GigE] = {false, false};
 void* handle_gige_hik[NUM_GigE] = {nullptr, nullptr};
+std::string pathName_triggerImage_hik[NUM_GigE] =
+    {"/home/root/primax/Test_Workstation",
+     "/home/root/primax/Test_Workstation"};
+
+// {"/mnt/reserved/HVS_AOI_APP/HVSGlueInspectionApp/test_images/Test_Workstation",
+//  "/mnt/reserved/HVS_AOI_APP/HVSGlueInspectionApp/test_images/Test_Workstation"};
 
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   int index_cam = 0;
@@ -103,23 +109,24 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     GigE_setImagePath_hik(index_cam, path);
     GigE_captureImage_hik(index_cam);
 
-  } else if (isSameString(segments[1], "t0")) {
-    xlog("t0");
-    if (isSameString(segments[2], "open")) {
-      GigE_cameraOpen_hik(index_cam);
-    } else {
-      GigE_cameraClose_hik(index_cam);
-    }
+  // } else if (isSameString(segments[1], "t0")) {
+  //   xlog("t0");
+  //   if (isSameString(segments[2], "open")) {
+  //     GigE_cameraOpen_hik(index_cam);
+  //   } else {
+  //     GigE_cameraClose_hik(index_cam);
+  //   }
 
-  } else if (isSameString(segments[1], "t1")) {
-    xlog("t1");
-    GigE_setTriggerMode_hik(index_cam, segments[2]);
-  } else if (isSameString(segments[1], "t2")) {
-    xlog("t2");
+  // } else if (isSameString(segments[1], "t1")) {
+  //   xlog("t1");
+  //   GigE_setTriggerMode_hik(index_cam, segments[2]);
+  } else if (isSameString(segments[1], "sts")) {
+    xlog("send TriggerSoftware");
     GigE_sendTriggerSoftware_hik(index_cam);
-  } else if (isSameString(segments[1], "t3")) {
-    xlog("t3");
-    GigE_isTriggerMode_hik(index_cam);
+
+  // } else if (isSameString(segments[1], "t3")) {
+  //   xlog("t3");
+  //   GigE_isTriggerMode_hik(index_cam);
 
   }
 }
@@ -714,10 +721,15 @@ void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool 
   auto handle = reinterpret_cast<void *>(pUser);
   if (!handle) return;
 
-  string index_cam_s = (handle == handle_gige_hik[0]) ? "1" : (handle == handle_gige_hik[1]) ? "2" : "unknown";
+  int index_cam = 0;
+  string index_cam_s = "";
   if (handle == handle_gige_hik[0]) {
+    index_cam = 0;
+    index_cam_s = "1";
     FW_setLED("2", "orange");
   } else if (handle == handle_gige_hik[1]) {
+    index_cam = 1;
+    index_cam_s = "2";
     FW_setLED("3", "orange");
   }
 
@@ -758,9 +770,10 @@ void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool 
     }
 
     if (!img.empty()) {
-      string filename = "/home/root/primax/fw_id" + index_cam_s + "_" + getTimeString() + ".png";
-      cv::imwrite(filename, img);
-      xlog("saved image: %s", filename.c_str());
+      string filename = pathName_triggerImage_hik[index_cam] + "_" + index_cam_s + "_" + frameNum + ".png";
+      imgu_saveImage_mat(img, filename);
+      // cv::imwrite(filename, img);
+      // xlog("saved image: %s", filename.c_str());
     }
 
     // release manually

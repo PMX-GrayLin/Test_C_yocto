@@ -72,7 +72,6 @@ void GigE_triggerModeStart_hik(int index_cam);
 void GigE_triggerModeStop_hik(int index_cam);
 void GigE_sendTriggerSoftware_hik(int index_cam);
 
-
 /* 
 
 # gst-inspect-1.0 aravissrc
