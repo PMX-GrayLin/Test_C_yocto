@@ -891,9 +891,10 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     nRet = MV_CC_SetEnumValueByString(handle_gige_hik[index_cam], "LineSelector", "Line1");
     if (MV_OK != nRet) {
       xlog("Set line selector fail! nRet [0x%x]", nRet);
-      break;
+      goto fail;
     }
-
+    xlog("set LineSelector to Line1 success");
+    
     // register image callback
     nRet = MV_CC_RegisterImageCallBackEx2(
         handle_gige_hik[index_cam],
