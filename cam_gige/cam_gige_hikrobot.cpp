@@ -896,7 +896,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     xlog("set LineSelector to Line1 success");
 
     // Set LineSource as ExposureStartActive
-    nRet = MV_CC_SetEnumValueByString(handle, "LineSource", "ExposureStartActive");
+    nRet = MV_CC_SetEnumValueByString(handle_gige_hik[index_cam], "LineSource", "ExposureStartActive");
     if (MV_OK != nRet) {
       xlog("set LineSource to ExposureStartActive fail! nRet [0x%x]", nRet);
       goto fail;
@@ -904,7 +904,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     xlog("set LineSource to ExposureStartActive success");
 
     // Turn on StrobeEnable
-    nRet = MV_CC_SetBoolValue(handle, "StrobeEnable", true);
+    nRet = MV_CC_SetBoolValue(handle_gige_hik[index_cam], "StrobeEnable", true);
     if (MV_OK != nRet) {
       xlog("set StrobeEnable fail! nRet [0x%x]", nRet);
       goto fail;
@@ -912,7 +912,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     xlog("set StrobeEnable success");
 
     // Set StrobeLineDuration(us)
-    nRet = MV_CC_SetIntValueEx(handle, "StrobeLineDuration", 0);
+    nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "StrobeLineDuration", 0);
     if (MV_OK != nRet) {
       xlog("set StrobeLineDuration fail! nRet [0x%x]", nRet);
       goto fail;
@@ -920,7 +920,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     xlog("set StrobeLineDuration success");
 
     // Set StrobeLineDelay(us)
-    nRet = MV_CC_SetIntValueEx(handle, "StrobeLineDelay", 0);
+    nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "StrobeLineDelay", 0);
     if (MV_OK != nRet) {
       xlog("set StrobeLineDelay fail! nRet [0x%x]", nRet);
       goto fail;
@@ -928,7 +928,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     xlog("set StrobeLineDelay success");
 
     // Set StrobeLinePreDelay(us)
-    nRet = MV_CC_SetIntValueEx(handle, "StrobeLinePreDelay", 0);
+    nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "StrobeLinePreDelay", 0);
     if (MV_OK != nRet) {
       xlog("set StrobeLinePreDelay fail! nRet [0x%x]", nRet);
       goto fail;
