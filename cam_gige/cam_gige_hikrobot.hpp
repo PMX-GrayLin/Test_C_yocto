@@ -71,6 +71,8 @@ void GigE_setTriggerMode_hik(int index_cam, const string& triggerModeS);
 void GigE_triggerModeStart_hik(int index_cam);
 void GigE_triggerModeStop_hik(int index_cam);
 void GigE_sendTriggerSoftware_hik(int index_cam);
+void GigE_setTriggeSource_hik(int index_cam, const string& triggerSourceS);
+
 
 /* 
 

@@ -36,6 +36,7 @@ std::string pathName_savedImage_hik[NUM_GigE] = {"", ""};
 static volatile int counterFrame_hik[NUM_GigE] = {0, 0};
 
 static bool isSDKInit_gige_hik = false;
+static MV_CAM_TRIGGER_SOURCE triggerSource_hk = MV_TRIGGER_SOURCE_LINE2;
 bool isTriggerMode_hik[NUM_GigE] = {false, false};
 void* handle_gige_hik[NUM_GigE] = {nullptr, nullptr};
 std::string pathName_triggerImage_hik[NUM_GigE] =
@@ -74,6 +75,9 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else if (isSameString(segments[2], "trigger-mode")) {
       // on or off
       GigE_setTriggerMode_hik(index_cam, segments[3]);
+    } else if (isSameString(segments[2], "trigger-source")) {
+      // Line0, Line1, Line2, Software
+      GigE_setTriggeSource_hik(index_cam, segments[3]);
     }
 
   } else if (isSameString(segments[1], "get")) {
@@ -875,7 +879,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
 
   if (enable) {
     // set trigger source
-    nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerSource", MV_TRIGGER_SOURCE_SOFTWARE);
+    nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerSource", triggerSource_hk);
     if (MV_OK != nRet) {
       xlog("MV_CC_SetTriggerSource fail! nRet [%x]", nRet);
       goto fail;
@@ -929,4 +933,16 @@ void GigE_sendTriggerSoftware_hik(int index_cam) {
       return;
     }
   }
+}
+
+void GigE_setTriggeSource_hik(int index_cam, const string &triggerSourceS) {
+  if (isSameString(triggerSourceS, "line0") || isSameString(triggerSourceS, "l0")) {
+    triggerSource_hk = MV_TRIGGER_SOURCE_LINE0;
+  } else if (isSameString(triggerSourceS, "line2") || isSameString(triggerSourceS, "l2")) {
+    triggerSource_hk = MV_TRIGGER_SOURCE_LINE2;
+  } else if (isSameString(triggerSourceS, "software") || isSameString(triggerSourceS, "sw")) {
+    triggerSource_hk = MV_TRIGGER_SOURCE_SOFTWARE;
+  }
+
+  xlog("triggerSource_hk:%d", triggerSource_hk);
 }
