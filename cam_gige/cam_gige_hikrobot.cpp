@@ -876,6 +876,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     xlog("MV_CC_SetTriggerMode fail! nRet [%x]", nRet);
     goto fail;
   }
+  xlog("set TriggerMode to %s success", enable ? "on" : "off");
 
   if (enable) {
     // set trigger source
@@ -883,6 +884,14 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     if (MV_OK != nRet) {
       xlog("MV_CC_SetTriggerSource fail! nRet [%x]", nRet);
       goto fail;
+    }
+    xlog("set TriggerSource to %d success", triggerSource_hk);
+
+    // Set LineSelector as Line1
+    nRet = MV_CC_SetEnumValueByString(handle_gige_hik[index_cam], "LineSelector", "Line1");
+    if (MV_OK != nRet) {
+      xlog("Set line selector fail! nRet [0x%x]", nRet);
+      break;
     }
 
     // register image callback
@@ -895,6 +904,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
       xlog("MV_CC_RegisterImageCallBackEx fail! nRet [%x]", nRet);
       goto fail;
     }
+    xlog("set RegisterImageCallBackEx success");
 
     // start grab image
     nRet = MV_CC_StartGrabbing(handle_gige_hik[index_cam]);
