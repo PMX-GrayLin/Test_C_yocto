@@ -880,38 +880,94 @@ bool FW_isI2CAddressExist(const std::string &busS, const std::string &addressS) 
   return false;
 }
 
+// void parseNetLinkMessage(struct nlmsghdr *nlh) {
+//   struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
+//   struct rtattr *attr = IFLA_RTA(ifi);
+//   int attr_len = IFLA_PAYLOAD(nlh);
+
+//   char ifname[IF_NAMESIZE] = {0};
+
+//   for (; RTA_OK(attr, attr_len); attr = RTA_NEXT(attr, attr_len)) {
+//     if (attr->rta_type == IFLA_IFNAME) {
+//       strncpy(ifname, (char *)RTA_DATA(attr), IF_NAMESIZE);
+//     }
+//   }
+
+//   if (ifname[0]) {
+//     bool linkUp = ifi->ifi_flags & IFF_LOWER_UP;
+//     xlog("[event] Interface %s is now %s", ifname, (linkUp ? "LINK UP" : "LINK DOWN"));
+
+//     if (isSameString(ifname, "eth1")) {
+//       if (linkUp) {
+//         FW_setLED("2", "green");
+//       } else {
+//         FW_setLED("2", "off");
+//       }
+//     } else if (isSameString(ifname, "eth2")) {
+//       if (linkUp) {
+//         FW_setLED("3", "green");
+//       } else {
+//         FW_setLED("3", "off");
+//       }
+//     }
+//   }
+// }
+
+// #include <linux/netlink.h>
+// #include <linux/rtnetlink.h>
+// #include <net/if.h>
+// #include <string.h>
+
+// Helper to parse link messages
 void parseNetLinkMessage(struct nlmsghdr *nlh) {
-  struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
-  struct rtattr *attr = IFLA_RTA(ifi);
-  int attr_len = IFLA_PAYLOAD(nlh);
+    struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
+    int len = nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*ifi));
 
-  char ifname[IF_NAMESIZE] = {0};
+    struct rtattr *attr = IFLA_RTA(ifi);
+    char ifname[IF_NAMESIZE] = {0};
+    char operstate[32] = {0};
+    int linkup = (ifi->ifi_flags & IFF_RUNNING) ? 1 : 0;
 
-  for (; RTA_OK(attr, attr_len); attr = RTA_NEXT(attr, attr_len)) {
-    if (attr->rta_type == IFLA_IFNAME) {
-      strncpy(ifname, (char *)RTA_DATA(attr), IF_NAMESIZE);
+    // Parse attributes
+    for (; RTA_OK(attr, len); attr = RTA_NEXT(attr, len)) {
+        switch (attr->rta_type) {
+            case IFLA_IFNAME:
+                strncpy(ifname, (char *)RTA_DATA(attr), sizeof(ifname) - 1);
+                break;
+            case IFLA_OPERSTATE:
+                {
+                    unsigned char state = *(unsigned char *)RTA_DATA(attr);
+                    switch (state) {
+                        case IF_OPER_UNKNOWN:   strcpy(operstate, "UNKNOWN"); break;
+                        case IF_OPER_NOTPRESENT: strcpy(operstate, "NOTPRESENT"); break;
+                        case IF_OPER_DOWN:      strcpy(operstate, "DOWN"); break;
+                        case IF_OPER_LOWERLAYERDOWN: strcpy(operstate, "LOWERLAYERDOWN"); break;
+                        case IF_OPER_TESTING:   strcpy(operstate, "TESTING"); break;
+                        case IF_OPER_DORMANT:   strcpy(operstate, "DORMANT"); break;
+                        case IF_OPER_UP:        strcpy(operstate, "UP"); break;
+                        default:                sprintf(operstate, "STATE_%d", state); break;
+                    }
+                }
+                break;
+        }
     }
-  }
 
-  if (ifname[0]) {
-    bool linkUp = ifi->ifi_flags & IFF_LOWER_UP;
-    xlog("[event] Interface %s is now %s", ifname, (linkUp ? "LINK UP" : "LINK DOWN"));
-
-    if (isSameString(ifname, "eth1")) {
-      if (linkUp) {
-        FW_setLED("2", "green");
-      } else {
-        FW_setLED("2", "off");
-      }
-    } else if (isSameString(ifname, "eth2")) {
-      if (linkUp) {
-        FW_setLED("3", "green");
-      } else {
-        FW_setLED("3", "off");
-      }
+    // Get name from index if missing
+    if (ifname[0] == '\0') {
+        if_indextoname(ifi->ifi_index, ifname);
     }
-  }
+
+    // Print info
+    xlog("Netlink: %s %s (ifindex=%d, flags=0x%x, IFF_RUNNING=%d)",
+         (nlh->nlmsg_type == RTM_NEWLINK ? "NEWLINK" :
+          nlh->nlmsg_type == RTM_DELLINK ? "DELLINK" : "LINK"),
+         ifname, ifi->ifi_index, ifi->ifi_flags, linkup);
+
+    if (operstate[0] != '\0') {
+        xlog("   operstate=%s", operstate);
+    }
 }
+
 
 void FW_CheckNetLinkState(const char *ifname, bool isInitcheck) {
   std::string path = std::string("/sys/class/net/") + ifname + "/operstate";
@@ -1024,47 +1080,6 @@ void Thread_FWMonitorNetLink() {
 
   xlog("---- Stop ----");
 }
-
-// void Thread_FWMonitorNetLink() {
-//   int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
-//   if (sock < 0) {
-//     xlog("socket error");
-//     return;
-//   }
-
-//   struct sockaddr_nl addr = {};
-//   addr.nl_family = AF_NETLINK;
-//   addr.nl_groups = RTMGRP_LINK;
-
-//   if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-//     xlog("bind error");
-//     close(sock);
-//     return;
-//   }
-
-//   xlog("---- Start ----");
-
-//   char buffer[4096];
-//   while (isMonitorNetLink.load()) {
-//     ssize_t len = recv(sock, buffer, sizeof(buffer), 0);
-//     if (len < 0) {
-//       if (errno == EINTR) continue;  // allow interruption
-//       xlog("recv error");
-//       break;
-//     }
-
-//     struct nlmsghdr *nlh = (struct nlmsghdr *)buffer;
-//     while (NLMSG_OK(nlh, len)) {
-//       if (nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK) {
-//         parseNetLinkMessage(nlh);
-//       }
-//       nlh = NLMSG_NEXT(nlh, len);
-//     }
-//   }
-
-//   close(sock);
-//   xlog("---- Stop ----");
-// }
 
 void FW_MonitorNetLinkStart() {
     if (isMonitorNetLink.load()) {
