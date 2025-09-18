@@ -993,7 +993,8 @@ void parseNetLinkMessage(struct nlmsghdr *nlh) {
       } break;
       case IFLA_ADDRESS:
         mac_to_string((unsigned char *)RTA_DATA(attr),
-                      RTA_PAYLOAD(attr), macstr, sizeof(macstr));
+                      6,  // force 6 bytes for MAC
+                      macstr, sizeof(macstr));
         break;
     }
   }
@@ -1004,14 +1005,26 @@ void parseNetLinkMessage(struct nlmsghdr *nlh) {
   }
 
   // Log everything
-  xlog("Netlink: %s ifname=%s ifindex=%d flags=0x%x IFF_RUNNING=%d MAC=%s",
+  xlog("Netlink: %s ifname=%s ifindex=%d flags=0x%x IFF_RUNNING=%d MAC=%s operstate=%s",
        (nlh->nlmsg_type == RTM_NEWLINK ? "NEWLINK" : nlh->nlmsg_type == RTM_DELLINK ? "DELLINK"
                                                                                     : "LINK"),
        ifname, ifi->ifi_index, ifi->ifi_flags, linkup,
-       (macstr[0] ? macstr : "N/A"));
+       (macstr[0] ? macstr : "N/A"),
+       (operstate[0] ? operstate : "N/A"));
 
-  if (operstate[0] != '\0') {
-    xlog("   operstate=%s", operstate);
+  // LED control
+  if (isSameString(ifname, "eth1")) {
+    if (linkup) {
+      FW_setLED("2", "green");
+    } else {
+      FW_setLED("2", "off");
+    }
+  } else if (isSameString(ifname, "eth2")) {
+    if (linkup) {
+      FW_setLED("3", "green");
+    } else {
+      FW_setLED("3", "off");
+    }
   }
 }
 
