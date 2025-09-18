@@ -12,7 +12,6 @@
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <atomic>
-#include <linux/if_link.h>
 
 #include <libudev.h>
 
@@ -28,6 +27,28 @@
 #include "restfulx.hpp"
 
 #define DEBOUNCE_TIME_MS 50
+
+#ifndef IF_OPER_UNKNOWN
+#define IF_OPER_UNKNOWN        0
+#endif
+#ifndef IF_OPER_NOTPRESENT
+#define IF_OPER_NOTPRESENT     1
+#endif
+#ifndef IF_OPER_DOWN
+#define IF_OPER_DOWN           2
+#endif
+#ifndef IF_OPER_LOWERLAYERDOWN
+#define IF_OPER_LOWERLAYERDOWN 3
+#endif
+#ifndef IF_OPER_TESTING
+#define IF_OPER_TESTING        4
+#endif
+#ifndef IF_OPER_DORMANT
+#define IF_OPER_DORMANT        5
+#endif
+#ifndef IF_OPER_UP
+#define IF_OPER_UP             6
+#endif
 
 std::string product = "ai_camera_plus";         // ai_camera_plus or vision_hub_plus
 std::string hostname_prefix = "aicamera";       // aicamera or visionhub
