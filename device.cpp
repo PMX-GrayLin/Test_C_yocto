@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <atomic>
+#include <linux/if_link.h>
 
 #include <libudev.h>
 
