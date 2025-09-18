@@ -486,6 +486,7 @@ void Thread_FWMonitorTriger() {
   struct gpiod_line *lines[NUM_Triger];
   struct pollfd fds[NUM_Triger];
   int i, ret;
+  int levelCounter = 0;
 
   // Open GPIO chip
   chip = gpiod_chip_open(GPIO_CHIP);
@@ -507,15 +508,27 @@ void Thread_FWMonitorTriger() {
     if (ret < 0) {
       xlog("Failed to request GPIO %d for edge events", Triger_GPIOs[i]);
       gpiod_line_release(lines[i]);
+      lines[i] = NULL;
       continue;
     }
 
     // Get file descriptor for polling
     fds[i].fd = gpiod_line_event_get_fd(lines[i]);
     fds[i].events = POLLIN;
+  }
 
-    // get init value & update to App
-    RESTful_send_DI(i, (gpiod_line_get_value(lines[i]) == 1));
+  // re-Sync state & update to App
+  for (i = 0; i < NUM_Triger; i++) {
+    if (!lines[i]) continue;
+
+    int val = gpiod_line_get_value(lines[i]);
+    if (val < 0) {
+      xlog("Failed to read GPIO %d value during sync", Triger_GPIOs[i]);
+      continue;
+    }
+
+    Triger_gpio_level_last[i] = (val == 1) ? gpiol_high : gpiol_low;
+    RESTful_send_Trigger(i, val == 1);
   }
 
   xlog("^^^^ Start ^^^^");
@@ -523,39 +536,62 @@ void Thread_FWMonitorTriger() {
   // Main loop to monitor GPIOs
   while (isMonitorTriger) {
     ret = poll(fds, NUM_Triger, 500);  // timeout = 500ms, to check stop flag periodically
+
+    if (ret == 0) {
+      // timeout to check stop flag "isMonitorTriger" periodically
+
+      // Level-triggered validation
+      levelCounter++;
+      if (levelCounter > 3) {
+        levelCounter = 0;
+
+        for (i = 0; i < NUM_Triger; i++) {
+          if (!lines[i]) continue;
+
+          int val = gpiod_line_get_value(lines[i]);
+          if (val < 0) continue;
+
+          GPIO_LEVEl current_level = (val == 1) ? gpiol_high : gpiol_low;
+          if (current_level != Triger_gpio_level_last[i]) {
+            Triger_gpio_level_last[i] = current_level;
+            Triger_last_event_time[i] = get_current_millis();
+            xlog("Level State Change (Triger %d)...", Triger_GPIOs[i]);
+            RESTful_send_Trigger(i, val == 1);
+          }
+        }
+      }
+    }
+
     if (ret < 0) {
       xlog("Error in poll");
       break;
     }
 
-    if (ret == 0) {
-      // timeout, continue loop to check isMonitorDIO
-      continue;
-    }
-
-    // Check which GPIO triggered the event
-    for (i = 0; i < NUM_Triger; i++) {
-      if (fds[i].revents & POLLIN) {
-        struct gpiod_line_event event;
-        if (gpiod_line_event_read(lines[i], &event) < 0) {
+    if (ret > 0) {
+      // Check which GPIO triggered the event
+      for (i = 0; i < NUM_Triger; i++) {
+        if (fds[i].revents & POLLIN) {
+          struct gpiod_line_event event;
+          if (gpiod_line_event_read(lines[i], &event) < 0) {
             xlog("Failed to read GPIO event on line %d", Triger_GPIOs[i]);
             continue;
-        }
+          }
 
-        // Debounce per line
-        uint64_t now = get_current_millis();
-        if (now - Triger_last_event_time[i] < DEBOUNCE_TIME_MS) {
-          continue;
-        }
+          // Debounce per line
+          uint64_t now = get_current_millis();
+          if (now - Triger_last_event_time[i] < DEBOUNCE_TIME_MS) {
+            continue;
+          }
 
-        Triger_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
+          Triger_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
 
-        if (Triger_gpio_level_new[i] != Triger_gpio_level_last[i]) {
-          Triger_gpio_level_last[i] = Triger_gpio_level_new[i];
-          Triger_last_event_time[i] = now;
-          // xlog("GPIO %d event detected! status:%s", Triger_GPIOs[i], (Triger_gpio_level_last[i] == gpiol_high) ? "high" : "low");
+          if (Triger_gpio_level_new[i] != Triger_gpio_level_last[i]) {
+            Triger_gpio_level_last[i] = Triger_gpio_level_new[i];
+            Triger_last_event_time[i] = now;
+            // xlog("GPIO %d event detected! status:%s", Triger_GPIOs[i], (Triger_gpio_level_last[i] == gpiol_high) ? "high" : "low");
 
-          RESTful_send_DI(i, (Triger_gpio_level_last[i] == gpiol_high));
+            RESTful_send_Trigger(i, Triger_gpio_level_last[i] == gpiol_high);
+          }
         }
       }
     }
@@ -569,7 +605,6 @@ void Thread_FWMonitorTriger() {
   }
   gpiod_chip_close(chip);
 }
-
 void FW_MonitorTrigerStart() {
   if (!FW_isDeviceVisionHub()) {
     xlog("return... Triger function it's only for VisionHub");
@@ -581,7 +616,7 @@ void FW_MonitorTrigerStart() {
     return;
   }
   isMonitorTriger = true;
-  t_aicamera_monitorTriger = std::thread(Thread_FWMonitorTriger);  
+  t_aicamera_monitorTriger = std::thread(Thread_FWMonitorTriger);
 }
 void FW_MonitorTrigerStop() {
   if (!isMonitorTriger) {

@@ -265,6 +265,11 @@ void RESTful_send_DI(int index, bool isLevelHigh) {
   RESTFul_sendAsync(content);
 }
 
+void RESTful_send_Trigger(int index, bool isLevelHigh) {
+  string content = "trigger/" + std::to_string(index + 1) + "/status/" + (isLevelHigh ? "high" : "low");
+  RESTFul_sendAsync(content);
+}
+
 void RESTful_send_DIODI(int index, bool isLevelHigh) {
   string content = "dio_di/" + std::to_string(index + 1) + "/status/" + (isLevelHigh ? "high" : "low");
   RESTFul_sendAsync(content);
