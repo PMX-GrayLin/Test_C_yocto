@@ -935,61 +935,85 @@ bool FW_isI2CAddressExist(const std::string &busS, const std::string &addressS) 
 //   }
 // }
 
-// #include <linux/netlink.h>
-// #include <linux/rtnetlink.h>
-// #include <net/if.h>
-// #include <string.h>
-
-// Helper to parse link messages
-void parseNetLinkMessage(struct nlmsghdr *nlh) {
-    struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
-    int len = nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*ifi));
-
-    struct rtattr *attr = IFLA_RTA(ifi);
-    char ifname[IF_NAMESIZE] = {0};
-    char operstate[32] = {0};
-    int linkup = (ifi->ifi_flags & IFF_RUNNING) ? 1 : 0;
-
-    // Parse attributes
-    for (; RTA_OK(attr, len); attr = RTA_NEXT(attr, len)) {
-        switch (attr->rta_type) {
-            case IFLA_IFNAME:
-                strncpy(ifname, (char *)RTA_DATA(attr), sizeof(ifname) - 1);
-                break;
-            case IFLA_OPERSTATE:
-                {
-                    unsigned char state = *(unsigned char *)RTA_DATA(attr);
-                    switch (state) {
-                        case IF_OPER_UNKNOWN:   strcpy(operstate, "UNKNOWN"); break;
-                        case IF_OPER_NOTPRESENT: strcpy(operstate, "NOTPRESENT"); break;
-                        case IF_OPER_DOWN:      strcpy(operstate, "DOWN"); break;
-                        case IF_OPER_LOWERLAYERDOWN: strcpy(operstate, "LOWERLAYERDOWN"); break;
-                        case IF_OPER_TESTING:   strcpy(operstate, "TESTING"); break;
-                        case IF_OPER_DORMANT:   strcpy(operstate, "DORMANT"); break;
-                        case IF_OPER_UP:        strcpy(operstate, "UP"); break;
-                        default:                sprintf(operstate, "STATE_%d", state); break;
-                    }
-                }
-                break;
-        }
-    }
-
-    // Get name from index if missing
-    if (ifname[0] == '\0') {
-        if_indextoname(ifi->ifi_index, ifname);
-    }
-
-    // Print info
-    xlog("Netlink: %s %s (ifindex=%d, flags=0x%x, IFF_RUNNING=%d)",
-         (nlh->nlmsg_type == RTM_NEWLINK ? "NEWLINK" :
-          nlh->nlmsg_type == RTM_DELLINK ? "DELLINK" : "LINK"),
-         ifname, ifi->ifi_index, ifi->ifi_flags, linkup);
-
-    if (operstate[0] != '\0') {
-        xlog("   operstate=%s", operstate);
-    }
+// Helper to format MAC into human-readable string
+static void mac_to_string(unsigned char *mac, int len, char *out, size_t outlen) {
+  if (len == 6) {
+    snprintf(out, outlen, "%02x:%02x:%02x:%02x:%02x:%02x",
+             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  } else {
+    snprintf(out, outlen, "len=%d?", len);
+  }
 }
 
+// Extended netlink parser
+void parseNetLinkMessage(struct nlmsghdr *nlh) {
+  struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
+  int len = nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*ifi));
+
+  struct rtattr *attr = IFLA_RTA(ifi);
+  char ifname[IF_NAMESIZE] = {0};
+  char operstate[32] = {0};
+  char macstr[32] = {0};
+  int linkup = (ifi->ifi_flags & IFF_RUNNING) ? 1 : 0;
+
+  // Parse attributes
+  for (; RTA_OK(attr, len); attr = RTA_NEXT(attr, len)) {
+    switch (attr->rta_type) {
+      case IFLA_IFNAME:
+        strncpy(ifname, (char *)RTA_DATA(attr), sizeof(ifname) - 1);
+        break;
+      case IFLA_OPERSTATE: {
+        unsigned char state = *(unsigned char *)RTA_DATA(attr);
+        switch (state) {
+          case IF_OPER_UNKNOWN:
+            strcpy(operstate, "UNKNOWN");
+            break;
+          case IF_OPER_NOTPRESENT:
+            strcpy(operstate, "NOTPRESENT");
+            break;
+          case IF_OPER_DOWN:
+            strcpy(operstate, "DOWN");
+            break;
+          case IF_OPER_LOWERLAYERDOWN:
+            strcpy(operstate, "LOWERLAYERDOWN");
+            break;
+          case IF_OPER_TESTING:
+            strcpy(operstate, "TESTING");
+            break;
+          case IF_OPER_DORMANT:
+            strcpy(operstate, "DORMANT");
+            break;
+          case IF_OPER_UP:
+            strcpy(operstate, "UP");
+            break;
+          default:
+            snprintf(operstate, sizeof(operstate), "STATE_%d", state);
+            break;
+        }
+      } break;
+      case IFLA_ADDRESS:
+        mac_to_string((unsigned char *)RTA_DATA(attr),
+                      RTA_PAYLOAD(attr), macstr, sizeof(macstr));
+        break;
+    }
+  }
+
+  // Get name from index if missing
+  if (ifname[0] == '\0') {
+    if_indextoname(ifi->ifi_index, ifname);
+  }
+
+  // Log everything
+  xlog("Netlink: %s ifname=%s ifindex=%d flags=0x%x IFF_RUNNING=%d MAC=%s",
+       (nlh->nlmsg_type == RTM_NEWLINK ? "NEWLINK" : nlh->nlmsg_type == RTM_DELLINK ? "DELLINK"
+                                                                                    : "LINK"),
+       ifname, ifi->ifi_index, ifi->ifi_flags, linkup,
+       (macstr[0] ? macstr : "N/A"));
+
+  if (operstate[0] != '\0') {
+    xlog("   operstate=%s", operstate);
+  }
+}
 
 void FW_CheckNetLinkState(const char *ifname, bool isInitcheck) {
   std::string path = std::string("/sys/class/net/") + ifname + "/operstate";
