@@ -912,7 +912,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     xlog("set StrobeEnable success");
 
     // Set StrobeLineDuration(us)
-    nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "StrobeLineDuration", 0);
+    nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "StrobeLineDuration", 500000); // 500ms
     if (MV_OK != nRet) {
       xlog("set StrobeLineDuration fail! nRet [0x%x]", nRet);
       goto fail;
