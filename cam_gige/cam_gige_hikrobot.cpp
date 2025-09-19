@@ -1060,7 +1060,7 @@ void GigE_setStrobeLineDuration_hik(int index_cam, const std::string &StrobeLine
   }
 
   // Set StrobeLineDuration (in microseconds)
-  nRet = MV_CC_SetFloatValue(handle_gige_hik[index_cam], "StrobeLineDuration", (double)strobeDuration);
+  nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "StrobeLineDuration", strobeDuration);
   if (MV_OK != nRet) {
     xlog("set StrobeLineDuration fail! nRet [%x]", nRet);
   } else {
