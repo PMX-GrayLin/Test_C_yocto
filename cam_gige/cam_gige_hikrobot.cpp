@@ -78,6 +78,12 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else if (isSameString(segments[2], "trigger-source")) {
       // Line0, Line1, Line2, Software
       GigE_setTriggeSource_hik(index_cam, segments[3]);
+    } else if (isSameString(segments[2], "trigger-delay")) {
+      // in microseconds
+      GigE_setTriggerDelay_hik(index_cam, segments[3]);
+    } else if (isSameString(segments[2], "strobe-line-duration")) {
+      // in microseconds
+      GigE_setStrobeLineDuration_hik(index_cam, segments[3]);
     }
 
   } else if (isSameString(segments[1], "get")) {
@@ -996,4 +1002,62 @@ void GigE_setTriggeSource_hik(int index_cam, const string &triggerSourceS) {
   }
 
   xlog("triggerSource_hk:%d", triggerSource_hk);
+}
+
+void GigE_setTriggerDelay_hik(int index_cam, const std::string &triggerDelayS) {
+  if (index_cam < 0 || index_cam >= NUM_GigE) {
+    xlog("Invalid index: %d", index_cam);
+    return;
+  }
+
+  int triggerDelay = std::stoi(triggerDelayS);
+  xlog("index:%d, triggerDelay:%d", index_cam, triggerDelay);
+
+  if (handle_gige_hik[index_cam] == nullptr) {
+    GigE_cameraOpen_hik(index_cam);
+  }
+
+  if (handle_gige_hik[index_cam] == nullptr) {
+    xlog("camera is not opened");
+    return;
+  }
+
+  // Set TriggerDelay (in microseconds)
+  int nRet = MV_CC_SetFloatValue(handle_gige_hik[index_cam], "TriggerDelay", (double)triggerDelay);
+  if (MV_OK != nRet) {
+    xlog("set TriggerDelay fail! nRet [%x]", nRet);
+  } else {
+    xlog("set TriggerDelay success");
+  }
+
+  GigE_cameraClose_hik(index_cam);
+}
+
+void GigE_setStrobeLineDuration_hik(int index_cam, const std::string &StrobeLineDurationS) {
+  if (index_cam < 0 || index_cam >= NUM_GigE) {
+    xlog("Invalid index: %d", index_cam);
+    return;
+  }
+
+  int strobeDuration = std::stoi(StrobeLineDurationS);
+  xlog("index:%d, StrobeLineDuration:%d", index_cam, strobeDuration);
+
+  if (handle_gige_hik[index_cam] == nullptr) {
+    GigE_cameraOpen_hik(index_cam);
+  }
+
+  if (handle_gige_hik[index_cam] == nullptr) {
+    xlog("camera is not opened");
+    return;
+  }
+
+  // Set StrobeLineDuration (in microseconds)
+  int nRet = MV_CC_SetFloatValue(handle_gige_hik[index_cam], "StrobeLineDuration", (double)strobeDuration);
+  if (MV_OK != nRet) {
+    xlog("set StrobeLineDuration fail! nRet [%x]", nRet);
+  } else {
+    xlog("set StrobeLineDuration success");
+  }
+
+  GigE_cameraClose_hik(index_cam);
 }

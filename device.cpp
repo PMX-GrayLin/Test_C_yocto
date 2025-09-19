@@ -902,39 +902,6 @@ bool FW_isI2CAddressExist(const std::string &busS, const std::string &addressS) 
   return false;
 }
 
-// void parseNetLinkMessage(struct nlmsghdr *nlh) {
-//   struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
-//   struct rtattr *attr = IFLA_RTA(ifi);
-//   int attr_len = IFLA_PAYLOAD(nlh);
-
-//   char ifname[IF_NAMESIZE] = {0};
-
-//   for (; RTA_OK(attr, attr_len); attr = RTA_NEXT(attr, attr_len)) {
-//     if (attr->rta_type == IFLA_IFNAME) {
-//       strncpy(ifname, (char *)RTA_DATA(attr), IF_NAMESIZE);
-//     }
-//   }
-
-//   if (ifname[0]) {
-//     bool linkUp = ifi->ifi_flags & IFF_LOWER_UP;
-//     xlog("[event] Interface %s is now %s", ifname, (linkUp ? "LINK UP" : "LINK DOWN"));
-
-//     if (isSameString(ifname, "eth1")) {
-//       if (linkUp) {
-//         FW_setLED("2", "green");
-//       } else {
-//         FW_setLED("2", "off");
-//       }
-//     } else if (isSameString(ifname, "eth2")) {
-//       if (linkUp) {
-//         FW_setLED("3", "green");
-//       } else {
-//         FW_setLED("3", "off");
-//       }
-//     }
-//   }
-// }
-
 // Helper to format MAC into human-readable string
 static void mac_to_string(unsigned char *mac, int len, char *out, size_t outlen) {
   if (len == 6) {
