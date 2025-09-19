@@ -1052,7 +1052,7 @@ void GigE_setStrobeLineDuration_hik(int index_cam, const std::string &StrobeLine
   }
 
   // Set LineSelector as Line1
-  nRet = MV_CC_SetEnumValueByString(handle_gige_hik[index_cam], "LineSelector", "Line1");
+  int nRet = MV_CC_SetEnumValueByString(handle_gige_hik[index_cam], "LineSelector", "Line1");
   if (MV_OK != nRet) {
     xlog("Set line selector fail! nRet [0x%x]", nRet);
   } else {
@@ -1060,7 +1060,7 @@ void GigE_setStrobeLineDuration_hik(int index_cam, const std::string &StrobeLine
   }
 
   // Set StrobeLineDuration (in microseconds)
-  int nRet = MV_CC_SetFloatValue(handle_gige_hik[index_cam], "StrobeLineDuration", (double)strobeDuration);
+  nRet = MV_CC_SetFloatValue(handle_gige_hik[index_cam], "StrobeLineDuration", (double)strobeDuration);
   if (MV_OK != nRet) {
     xlog("set StrobeLineDuration fail! nRet [%x]", nRet);
   } else {
