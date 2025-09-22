@@ -538,7 +538,7 @@ void GigE_StreamingStart_hik(int index_cam) {
 void GigE_StreamingStop_hik(int index_cam) {
   xlog("");
   if (!isStreaming_gige_hik[index_cam].load()) {
-    xlog("thread not running");
+    // xlog("thread not running");
     return;
   }
 

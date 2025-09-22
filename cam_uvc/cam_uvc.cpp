@@ -221,7 +221,7 @@ void UVC_streamingStart() {
 
 void UVC_streamingStop() {
   if (!isStreaming_uvc.load()) {
-    xlog("thread not running");
+    // xlog("thread not running");
     return;
   }
 

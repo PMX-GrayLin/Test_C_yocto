@@ -492,7 +492,7 @@ void FW_MonitorDIStart() {
 }
 void FW_MonitorDIStop() {
   if (!isMonitorDI) {
-    xlog("thread not running...");
+    // xlog("thread not running...");
     return;
   }
 
@@ -579,6 +579,15 @@ void Thread_FWMonitorTriger() {
             Triger_last_event_time[i] = get_current_millis();
             xlog("Level State Change (Triger %d)...", Triger_GPIOs[i]);
             RESTful_send_Trigger(i, val == 1);
+
+            // ?? test
+            if (i == 0) {
+              if (current_level == gpiol_high) {
+                FW_setPWM("1", "10");
+              } else {
+                FW_setPWM("1", "0");
+              }
+            }
           }
         }
       }
@@ -613,6 +622,15 @@ void Thread_FWMonitorTriger() {
             // xlog("GPIO %d event detected! status:%s", Triger_GPIOs[i], (Triger_gpio_level_last[i] == gpiol_high) ? "high" : "low");
 
             RESTful_send_Trigger(i, Triger_gpio_level_last[i] == gpiol_high);
+
+            // ?? test
+            if (i == 0) {
+              if (current_level == gpiol_high) {
+                FW_setPWM("1", "10");
+              } else {
+                FW_setPWM("1", "0");
+              }
+            }
           }
         }
       }
@@ -642,7 +660,7 @@ void FW_MonitorTrigerStart() {
 }
 void FW_MonitorTrigerStop() {
   if (!isMonitorTriger) {
-    xlog("thread not running...");
+    // xlog("thread not running...");
     return;
   }
 
@@ -776,7 +794,7 @@ void FW_MonitorDIOInStart(int index_dio) {
 
 void FW_MonitorDIOInStop(int index_dio) {
   if (!isMonitorDIO[index_dio]) {
-    xlog("thread not running...");
+    // xlog("thread not running...");
     return;
   }
 
