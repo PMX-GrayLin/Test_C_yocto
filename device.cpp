@@ -630,6 +630,9 @@ void Thread_FWMonitorTriger() {
             // ?? test
             if (i == 0) {
               if (Triger_gpio_level_last[i] == gpiol_high) {
+                // ?? test
+                g_start = std::chrono::high_resolution_clock::now();
+                
                 FW_setPWM("1", "10");
               } else {
                 FW_setPWM("1", "0");
