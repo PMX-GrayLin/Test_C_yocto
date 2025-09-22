@@ -26,6 +26,9 @@ using namespace std;
 #define xlog(fmt, ...) printf("%s:%d, " fmt "\n\r", __func__, __LINE__, ##__VA_ARGS__)
 #endif
 
+// test vars
+extern auto g_start;
+extern auto g_end;
 
 void startTimer(int ms);
 void stopTimer();

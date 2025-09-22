@@ -349,7 +349,7 @@ int main(int argc, char* argv[]) {
     std::smatch match;
     std::regex regex(R"(/fw/(.*))");
 
-    xlog("req.path:%s", req.path.c_str());
+    // xlog("req.path:%s", req.path.c_str());
     if (std::regex_match(req.path, match, regex)) {
       // Create a dynamic array (vector) to store path segments
       std::vector<std::string> segments;
@@ -367,9 +367,9 @@ int main(int argc, char* argv[]) {
       // for (const auto& seg : segments) {
       //   xlog("segment:%s", seg.c_str());
       // }
-      for (size_t i = 0; i < segments.size(); ++i) {
-        xlog("segment[%zu]:%s", i, segments[i].c_str());
-      }
+      // for (size_t i = 0; i < segments.size(); ++i) {
+      //   xlog("segment[%zu]:%s", i, segments[i].c_str());
+      // }
 
       // Check before access
       if (segments.empty()) {
