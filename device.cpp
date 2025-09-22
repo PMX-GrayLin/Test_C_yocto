@@ -625,7 +625,7 @@ void Thread_FWMonitorTriger() {
 
             // ?? test
             if (i == 0) {
-              if (current_level == gpiol_high) {
+              if (Triger_gpio_level_last[i] == gpiol_high) {
                 FW_setPWM("1", "10");
               } else {
                 FW_setPWM("1", "0");
