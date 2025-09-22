@@ -10,8 +10,9 @@
 #include <libgen.h>
 
 // test vars
-auto g_start = std::chrono::high_resolution_clock::now();
-auto g_end = std::chrono::high_resolution_clock::now();
+
+std::chrono::high_resolution_clock::time_point g_start = std::chrono::high_resolution_clock::now();
+std::chrono::high_resolution_clock::time_point g_end   = std::chrono::high_resolution_clock::now();
 
 bool isTimerRunning = false;
 int counterTimer = 0;

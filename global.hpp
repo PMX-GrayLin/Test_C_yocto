@@ -17,6 +17,8 @@
 // C++ Standard Library headers, heavier
 #include <thread>
 
+#include <chrono>
+
 using namespace std;
 
 #define DEBUGX
@@ -27,8 +29,8 @@ using namespace std;
 #endif
 
 // test vars
-extern auto g_start;
-extern auto g_end;
+extern std::chrono::high_resolution_clock::time_point g_start;
+extern std::chrono::high_resolution_clock::time_point g_end;
 
 void startTimer(int ms);
 void stopTimer();
