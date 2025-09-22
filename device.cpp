@@ -583,6 +583,10 @@ void Thread_FWMonitorTriger() {
             // ?? test
             if (i == 0) {
               if (current_level == gpiol_high) {
+                
+                // ?? test
+                g_start = std::chrono::high_resolution_clock::now();
+
                 FW_setPWM("1", "10");
               } else {
                 FW_setPWM("1", "0");
@@ -867,9 +871,6 @@ void FW_setDIOOut(string index_dio, string on_off) {
     xlog("input string should be on or off...");
     return;
   }
-
-    // ?? test
-  g_start = std::chrono::high_resolution_clock::now();
 
   FW_setGPIO(index_gpio, isON ? 1 : 0);
 }
