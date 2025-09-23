@@ -39,12 +39,14 @@ static bool isSDKInit_gige_hik = false;
 static MV_CAM_TRIGGER_SOURCE triggerSource_hk = MV_TRIGGER_SOURCE_LINE2;
 bool isTriggerMode_hik[NUM_GigE] = {false, false};
 void* handle_gige_hik[NUM_GigE] = {nullptr, nullptr};
-std::string pathName_triggerImage_hik[NUM_GigE] =
+std::string pathNamePrefix_triggerImage_hik[NUM_GigE] =
     {"/home/root/primax/Test_Workstation",
      "/home/root/primax/Test_Workstation"};
 
 // {"/mnt/reserved/HVS_AOI_APP/HVSGlueInspectionApp/test_images/Test_Workstation",
 //  "/mnt/reserved/HVS_AOI_APP/HVSGlueInspectionApp/test_images/Test_Workstation"};
+int couner_TriggerImage_hik[NUM_GigE] = {0, 0};
+int divider_TriggerImage_hik[NUM_GigE] = {999, 999};
 
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   int index_cam = 0;
@@ -84,6 +86,10 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else if (isSameString(segments[2], "strobe-line-duration")) {
       // in microseconds
       GigE_setStrobeLineDuration_hik(index_cam, segments[3]);
+    } else if (isSameString(segments[2], "imagePathPrefix")) {
+      // image path prefix
+      GigE_setImagePathPrefix_hik(index_cam, segments[3]);
+
     }
 
   } else if (isSameString(segments[1], "get")) {
@@ -102,25 +108,19 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
 
   } else if (isSameString(segments[1], "tp")) {
     xlog("take picture");
-    std::string path = "";
+    std::string path;
     if (segments.size() > 2 && !segments[2].empty()) {
-      // ex: curl http://localhost:8765/fw/gige/tp/%252Fhome%252Froot%252Fprimax%252F12345.png
-      path = segments[2];
-      const std::string from = "%2F";
-      const std::string to = "/";
-      size_t start_pos = 0;
-      while ((start_pos = path.find(from, start_pos)) != std::string::npos) {
-        path.replace(start_pos, from.length(), to);
-        start_pos += to.length();
-      }
+        // ex: curl http://localhost:8765/fw/gige/tp/%252Fhome%252Froot%252Fprimax%252F12345.png
+        path = decodePath(segments[2]);
     } else {
-      path = "/home/root/primax/fw_" + getTimeString() + ".png";
+        path = "/home/root/primax/fw_" + getTimeString() + ".png";
     }
+
     GigE_setImagePath_hik(index_cam, path);
     GigE_captureImage_hik(index_cam);
 
     GigE_sendTriggerSoftware_hik(index_cam);
-    
+        
   } else if (isSameString(segments[1], "sts")) {
     xlog("send TriggerSoftware");
     GigE_sendTriggerSoftware_hik(index_cam);
@@ -743,6 +743,15 @@ void GigE_cameraClose_hik(int index_cam) {
   }
 }
 
+void GigE_setImagePathPrefix_hik(int index_cam, const string &imagePath) {
+  pathNamePrefix_triggerImage_hik[index_cam] = imagePath;
+  xlog("pathNamePrefix_triggerImage_hik[%d]:%s", index_cam, pathName_savedImage_hik[index_cam].c_str());
+}
+
+void GigE_setImageCounter_hik(int index_cam, int counter) {
+  divider_TriggerImage_hik[index_cam] = counter;
+}
+
 void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool bAutoFree) {
   if (!pstFrame) return;
 
@@ -803,7 +812,7 @@ void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool 
     }
 
     if (!img.empty()) {
-      string filename = pathName_triggerImage_hik[index_cam] + "_" 
+      string filename = pathNamePrefix_triggerImage_hik[index_cam] + "_" 
                 + index_cam_s + "_" 
                 + std::to_string(frameNum) + ".png";
       imgu_saveImage_mat(img, filename);

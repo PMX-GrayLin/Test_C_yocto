@@ -129,3 +129,14 @@ std::string exec_command(const std::string& cmd) {
   return result;
 }
 
+std::string decodePath(const std::string &encodedPath) {
+    std::string path = encodedPath;
+    const std::string from = "%2F";
+    const std::string to = "/";
+    size_t start_pos = 0;
+    while ((start_pos = path.find(from, start_pos)) != std::string::npos) {
+        path.replace(start_pos, from.length(), to);
+        start_pos += to.length();
+    }
+    return path;
+}

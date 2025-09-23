@@ -47,3 +47,4 @@ std::string getTimeString();
 std::string get_parent_directory(const std::string& path);
 std::string exec_command(const std::string& cmd);
 
+std::string decodePath(const std::string &encodedPath);
