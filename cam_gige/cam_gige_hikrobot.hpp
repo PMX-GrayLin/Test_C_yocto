@@ -66,7 +66,7 @@ bool GigE_PrintDeviceInfo_hik(MV_CC_DEVICE_INFO *pstMVDevInfo);
 void GigE_cameraOpen_hik(int index_cam);
 void GigE_cameraClose_hik(int index_cam);
 void GigE_setImagePathPrefix_hik(int index_cam, const string& imagePath);
-void GigE_setImageCounter_hik(int index_cam, int counter);
+void GigE_setImageMaxIndex_hik(int index_cam, const string& counterS);
 void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool bAutoFree);
 bool GigE_isTriggerMode_hik(int index_cam);
 void GigE_setTriggerMode_hik(int index_cam, const string& triggerModeS);

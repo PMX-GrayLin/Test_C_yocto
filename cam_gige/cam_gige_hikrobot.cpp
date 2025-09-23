@@ -89,7 +89,9 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else if (isSameString(segments[2], "imagePathPrefix")) {
       // image path prefix
       GigE_setImagePathPrefix_hik(index_cam, segments[3]);
-
+    } else if (isSameString(segments[2], "imageMaxIndex")) {
+      // image name max index
+      GigE_setImageMaxIndex_hik(index_cam, segments[3]);
     }
 
   } else if (isSameString(segments[1], "get")) {
@@ -748,8 +750,8 @@ void GigE_setImagePathPrefix_hik(int index_cam, const string &imagePath) {
   xlog("pathNamePrefix_triggerImage_hik[%d]:%s", index_cam, pathName_savedImage_hik[index_cam].c_str());
 }
 
-void GigE_setImageCounter_hik(int index_cam, int counter) {
-  divider_TriggerImage_hik[index_cam] = counter;
+void GigE_setImageMaxIndex_hik(int index_cam, const string &counterS) {
+  divider_TriggerImage_hik[index_cam] = std::stoi(counterS);
 }
 
 void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool bAutoFree) {
@@ -812,9 +814,11 @@ void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool 
     }
 
     if (!img.empty()) {
+      int imgIndex = frameNum / divider_TriggerImage_hik[index_cam];
+      if (imgIndex == 0) imgIndex = divider_TriggerImage_hik[index_cam];  // avoid zero
       string filename = pathNamePrefix_triggerImage_hik[index_cam] + "_" 
                 + index_cam_s + "_" 
-                + std::to_string(frameNum) + ".png";
+                + std::to_string(imgIndex) + ".png";
       imgu_saveImage_mat(img, filename);
     }
 
