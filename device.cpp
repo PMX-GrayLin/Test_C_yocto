@@ -26,7 +26,7 @@
 
 #include "restfulx.hpp"
 
-#define DEBOUNCE_TIME_MS 50
+#define DEBOUNCE_TIME_MS 20
 
 #ifndef IF_OPER_UNKNOWN
 #define IF_OPER_UNKNOWN        0
