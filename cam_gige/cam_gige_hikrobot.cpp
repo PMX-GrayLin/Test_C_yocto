@@ -90,7 +90,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
       // image path prefix
       GigE_setImagePathPrefix_hik(index_cam, segments[3]);
     } else if (isSameString(segments[2], "imageMaxIndex")) {
-      // image name max index
+      // image name max index, naming index start from 1
       GigE_setImageMaxIndex_hik(index_cam, segments[3]);
     }
 
@@ -814,7 +814,7 @@ void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool 
     }
 
     if (!img.empty()) {
-      int imgIndex = frameNum / divider_TriggerImage_hik[index_cam];
+      int imgIndex = frameNum % divider_TriggerImage_hik[index_cam];
       if (imgIndex == 0) imgIndex = divider_TriggerImage_hik[index_cam];  // avoid zero
       string filename = pathNamePrefix_triggerImage_hik[index_cam] + "_" 
                 + index_cam_s + "_" 
