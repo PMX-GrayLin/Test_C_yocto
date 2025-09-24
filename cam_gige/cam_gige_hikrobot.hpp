@@ -76,7 +76,6 @@ void GigE_sendTriggerSoftware_hik(int index_cam);
 void GigE_setTriggeSource_hik(int index_cam, const string& triggerSourceS);
 void GigE_setTriggerDelay_hik(int index_cam, const string& triggerDelayS);
 void GigE_setStrobeLineDuration_hik(int index_cam, const string& StrobeLineDurationS);
-void GigE_setTriggerModePWM_hik(int index_cam, const string& triggerModePwmS);
 
 
 /* 

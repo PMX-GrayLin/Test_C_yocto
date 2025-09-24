@@ -1082,16 +1082,3 @@ void GigE_setStrobeLineDuration_hik(int index_cam, const std::string &StrobeLine
 
   GigE_cameraClose_hik(index_cam);
 }
-
-void GigE_setTriggerModePWM_hik(int index_cam, const string &triggerModePwmS) {
-  try {
-    int value = std::stoi(triggerModePwmS);
-    pwmValue_trigger[index_cam] = clampValue(value, 0, 100);
-
-    xlog("index:%d, pwmValue_trigger:%d", index_cam, pwmValue_trigger[index_cam]);
-  } catch (const std::invalid_argument &e) {
-    xlog("Invalid input string for triggerModePwmS: %s", triggerModePwmS.c_str());
-  } catch (const std::out_of_range &e) {
-    xlog("Out of range input string for triggerModePwmS: %s", triggerModePwmS.c_str());
-  }
-}
