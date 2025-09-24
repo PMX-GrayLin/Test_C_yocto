@@ -818,7 +818,7 @@ void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool 
       if (imgIndex == 0) imgIndex = divider_TriggerImage_hik[index_cam];  // avoid zero
       string filename = pathNamePrefix_triggerImage_hik[index_cam] + "_" 
                 + index_cam_s + "_" 
-                + std::to_string(imgIndex) + ".png";
+                + std::to_string(imgIndex) + ".bmp";
       imgu_saveImage_mat(img, filename);
     }
 
