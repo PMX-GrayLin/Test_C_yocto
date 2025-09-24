@@ -41,10 +41,15 @@ bool isSameString(const char* s1, const char* s2, bool isCaseSensitive = false);
 bool isSameString(const std::string& s1, const std::string& s2, bool isCaseSensitive = false);
 bool isPathExist(const char* path);
 
-double limitValueInRange(double input, double rangeMin, double rangeMax);
-
 std::string getTimeString();
 std::string get_parent_directory(const std::string& path);
 std::string exec_command(const std::string& cmd);
 
 std::string decodePath(const std::string &encodedPath);
+
+template <typename T>
+T clampValue(const T& input, const T& minVal, const T& maxVal) {
+    return (input < minVal) ? minVal :
+           (input > maxVal) ? maxVal : input;
+}
+
