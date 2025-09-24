@@ -615,7 +615,7 @@ void Thread_FWMonitorTriger() {
 
           // Debounce per line
           uint64_t now = get_current_millis();
-          if (now - Triger_last_event_time[i] < DEBOUNCE_TIME_MS) {
+          if (now - Triger_last_event_time[i] < DEBOUNCE_TIME_MS_Trigger) {
             continue;
           }
 
