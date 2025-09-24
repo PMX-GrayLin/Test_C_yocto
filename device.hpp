@@ -6,6 +6,7 @@
 #define NUM_DI          2                 // Number of DI
 #define NUM_Triger      2                 // Number of Triger, treat as DI
 #define NUM_DO          2                 // Number of DO
+#define NUM_PWM          2                // Number of PWM
 
 // NUM_DIOm aicamera = 2, visionhb = 4
 #define NUM_DIO         4                 // Number of DIO
@@ -83,7 +84,8 @@ bool FW_isDeviceVisionHub();
 
 // PWM 
 void FW_writePWMFile(const std::string &path, const std::string &value);
-extern void FW_setPWM(const std::string &pwmIndex, const std::string &sPercent);
+void FW_setPWM(const std::string &pwmIndex, const std::string &sPercent);
+void FW_setPWMTrigger(const std::string &pwmIndex, const std::string &sPercent);
 
 // GPIO ops
 int FW_getGPIO(int gpio_num);

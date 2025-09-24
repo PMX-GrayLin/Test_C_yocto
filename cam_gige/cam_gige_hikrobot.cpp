@@ -44,7 +44,6 @@ std::string pathNamePrefix_triggerImage_hik[NUM_GigE] =
      "/home/root/primax/Test_Workstation"};
 int couner_TriggerImage_hik[NUM_GigE] = {0, 0};
 int divider_TriggerImage_hik[NUM_GigE] = {999, 999};
-int trigger_pwm_hik[NUM_GigE] = {10, 10};
 
 void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   int index_cam = 0;
@@ -90,8 +89,6 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     } else if (isSameString(segments[2], "imageMaxIndex")) {
       // image name max index, naming index start from 1
       GigE_setImageMaxIndex_hik(index_cam, segments[3]);
-    } else if (isSameString(segments[2], "trigger-mode-pwm")) {
-      GigE_setTriggerModePWM_hik(index_cam, segments[3]);
     }
 
   } else if (isSameString(segments[1], "get")) {
@@ -1089,9 +1086,9 @@ void GigE_setStrobeLineDuration_hik(int index_cam, const std::string &StrobeLine
 void GigE_setTriggerModePWM_hik(int index_cam, const string &triggerModePwmS) {
   try {
     int value = std::stoi(triggerModePwmS);
-    trigger_pwm_hik[index_cam] = clampValue(value, 0, 100);
+    pwmValue_trigger[index_cam] = clampValue(value, 0, 100);
 
-    xlog("index:%d, trigger_pwm_hik:%d", index_cam, trigger_pwm_hik[index_cam]);
+    xlog("index:%d, pwmValue_trigger:%d", index_cam, pwmValue_trigger[index_cam]);
   } catch (const std::invalid_argument &e) {
     xlog("Invalid input string for triggerModePwmS: %s", triggerModePwmS.c_str());
   } catch (const std::out_of_range &e) {

@@ -59,6 +59,9 @@ void handle_RESTful(std::vector<std::string> segments, httplib::Response &res) {
   } else if (isSameString(segments[0], "pwm")) {
     FW_setPWM(segments[1], segments[2]);
 
+  } else if (isSameString(segments[0], "pwmTrigger")) {
+    FW_setPWMTrigger(segments[1], segments[2]);
+
   } else if (isSameString(segments[0], "dio")) {
     if (isSameString(segments[2], "set")) {
       FW_setDIODirection(segments[1], segments[3]);
@@ -67,7 +70,6 @@ void handle_RESTful(std::vector<std::string> segments, httplib::Response &res) {
     }
 
   } else if (isSameString(segments[0], "gpio")) {
-
     if (segments.size() >=3 && isSameString(segments[1], "set")) {
       int gpio_num = stoi(segments[2]);
       int gpio_vaue = (segments[3] == "1") ? 1 : 0 ;

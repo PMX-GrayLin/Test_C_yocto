@@ -57,6 +57,7 @@ std::string hostname_prefix = "aicamera";       // aicamera or visionhub
 // PWM
 const std::string path_pwm = "/sys/devices/platform/soc/10048000.pwm/pwm/pwmchip0";
 const int pwmPeriod = 200000;                   // 5 kHz
+std::string pwmValue_trigger[NUM_PWM] = {"10", "10"};
 
 // DI
 int DI_GPIOs[NUM_DI] = {digp_1, digp_2};        // DI GPIO
@@ -170,6 +171,15 @@ void FW_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
   } else {
     FW_writePWMFile(pwmTarget + "/enable", "0");
   }
+}
+
+void FW_setPWMTrigger(const std::string &pwmIndex, const std::string &sPercent) {
+  int index = std::stoi(pwmIndex) - 1;
+  if (index < 0 || index >= NUM_PWM) {
+    xlog("Invalid pwmIndex: %s", pwmIndex.c_str());
+    return;
+  }
+  pwmValue_trigger[index] = sPercent;
 }
 
 int FW_getGPIO(int gpio_num) {
@@ -586,7 +596,7 @@ void Thread_FWMonitorTriger() {
               if (current_level == gpiol_high) {
                 g_start = std::chrono::high_resolution_clock::now();
 
-                FW_setPWM("1", std::to_string(trigger_pwm_hik[index_cam]));
+                FW_setPWM("1", std::to_string(pwmValue_trigger[i]));
               } else {
                 FW_setPWM("1", "0");
               }
@@ -631,7 +641,7 @@ void Thread_FWMonitorTriger() {
               if (Triger_gpio_level_last[i] == gpiol_high) {
                 g_start = std::chrono::high_resolution_clock::now();
                 
-                FW_setPWM("1", std::to_string(trigger_pwm_hik[index_cam]));
+                FW_setPWM("1", std::to_string(pwmValue_trigger[i]));
               } else {
                 FW_setPWM("1", "0");
               }
