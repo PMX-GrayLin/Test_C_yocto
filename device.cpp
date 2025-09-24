@@ -596,7 +596,7 @@ void Thread_FWMonitorTriger() {
               if (current_level == gpiol_high) {
                 g_start = std::chrono::high_resolution_clock::now();
 
-                FW_setPWM("1", std::to_string(pwmValue_trigger[i]));
+                FW_setPWM("1", pwmValue_trigger[i]);
               } else {
                 FW_setPWM("1", "0");
               }
@@ -641,7 +641,7 @@ void Thread_FWMonitorTriger() {
               if (Triger_gpio_level_last[i] == gpiol_high) {
                 g_start = std::chrono::high_resolution_clock::now();
                 
-                FW_setPWM("1", std::to_string(pwmValue_trigger[i]));
+                FW_setPWM("1", pwmValue_trigger[i]);
               } else {
                 FW_setPWM("1", "0");
               }
