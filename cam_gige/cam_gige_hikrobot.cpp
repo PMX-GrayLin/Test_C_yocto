@@ -993,6 +993,10 @@ void GigE_triggerModeStart_hik(int index_cam) {
 
 void GigE_triggerModeStop_hik(int index_cam) {
   GigE_setTriggerMode_hik(index_cam, "off");
+
+  // turn off PWM
+  FW_setPWM("1", "0");
+  FW_setPWM("2", "0");
 }
 
 void GigE_sendTriggerSoftware_hik(int index_cam) {

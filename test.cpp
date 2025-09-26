@@ -294,6 +294,10 @@ int main(int argc, char* argv[]) {
 
   FW_getDeviceInfo();
 
+  // make sure PWM init & turn off it
+  FW_setPWM("1", "0");
+  FW_setPWM("2", "0");
+
   // set power led to system ready
   FW_setLED("1", "green");
 
