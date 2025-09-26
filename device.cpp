@@ -948,72 +948,113 @@ static void mac_to_string(unsigned char *mac, int len, char *out, size_t outlen)
   }
 }
 
-// Extended netlink parser
-void parseNetLinkMessage(struct nlmsghdr *nlh) {
+// // Extended netlink parser
+// void parseNetLinkMessage(struct nlmsghdr *nlh) {
+//   struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
+//   int len = nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*ifi));
+
+//   struct rtattr *attr = IFLA_RTA(ifi);
+//   char ifname[IF_NAMESIZE] = {0};
+//   char operstate[32] = {0};
+//   char macstr[32] = {0};
+//   int linkup = (ifi->ifi_flags & IFF_RUNNING) ? 1 : 0;
+
+//   // Parse attributes
+//   for (; RTA_OK(attr, len); attr = RTA_NEXT(attr, len)) {
+//     switch (attr->rta_type) {
+//       case IFLA_IFNAME:
+//         strncpy(ifname, (char *)RTA_DATA(attr), sizeof(ifname) - 1);
+//         break;
+//       case IFLA_OPERSTATE: {
+//         unsigned char state = *(unsigned char *)RTA_DATA(attr);
+//         switch (state) {
+//           case IF_OPER_UNKNOWN:
+//             strcpy(operstate, "UNKNOWN");
+//             break;
+//           case IF_OPER_NOTPRESENT:
+//             strcpy(operstate, "NOTPRESENT");
+//             break;
+//           case IF_OPER_DOWN:
+//             strcpy(operstate, "DOWN");
+//             break;
+//           case IF_OPER_LOWERLAYERDOWN:
+//             strcpy(operstate, "LOWERLAYERDOWN");
+//             break;
+//           case IF_OPER_TESTING:
+//             strcpy(operstate, "TESTING");
+//             break;
+//           case IF_OPER_DORMANT:
+//             strcpy(operstate, "DORMANT");
+//             break;
+//           case IF_OPER_UP:
+//             strcpy(operstate, "UP");
+//             break;
+//           default:
+//             snprintf(operstate, sizeof(operstate), "STATE_%d", state);
+//             break;
+//         }
+//       } break;
+//       case IFLA_ADDRESS:
+//         mac_to_string((unsigned char *)RTA_DATA(attr),
+//                       6,  // force 6 bytes for MAC
+//                       macstr, sizeof(macstr));
+//         break;
+//     }
+//   }
+
+//   // Get name from index if missing
+//   if (ifname[0] == '\0') {
+//     if_indextoname(ifi->ifi_index, ifname);
+//   }
+
+//   // Log everything
+//   xlog("Netlink: %s ifname=%s ifindex=%d flags=0x%x IFF_RUNNING=%d MAC=%s operstate=%s",
+//        (nlh->nlmsg_type == RTM_NEWLINK ? "NEWLINK" : nlh->nlmsg_type == RTM_DELLINK ? "DELLINK"
+//                                                                                     : "LINK"),
+//        ifname, ifi->ifi_index, ifi->ifi_flags, linkup,
+//        (macstr[0] ? macstr : "N/A"),
+//        (operstate[0] ? operstate : "N/A"));
+
+//   // LED control
+//   if (isSameString(ifname, "eth1")) {
+//     if (linkup) {
+//       FW_setLED("2", "green");
+//     } else {
+//       FW_setLED("2", "off");
+//     }
+//   } else if (isSameString(ifname, "eth2")) {
+//     if (linkup) {
+//       FW_setLED("3", "green");
+//     } else {
+//       FW_setLED("3", "off");
+//     }
+//   }
+// }
+
+// Parse link events
+void parseLinkMessage(struct nlmsghdr *nlh) {
   struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA(nlh);
   int len = nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*ifi));
 
   struct rtattr *attr = IFLA_RTA(ifi);
   char ifname[IF_NAMESIZE] = {0};
-  char operstate[32] = {0};
-  char macstr[32] = {0};
   int linkup = (ifi->ifi_flags & IFF_RUNNING) ? 1 : 0;
 
-  // Parse attributes
   for (; RTA_OK(attr, len); attr = RTA_NEXT(attr, len)) {
-    switch (attr->rta_type) {
-      case IFLA_IFNAME:
-        strncpy(ifname, (char *)RTA_DATA(attr), sizeof(ifname) - 1);
-        break;
-      case IFLA_OPERSTATE: {
-        unsigned char state = *(unsigned char *)RTA_DATA(attr);
-        switch (state) {
-          case IF_OPER_UNKNOWN:
-            strcpy(operstate, "UNKNOWN");
-            break;
-          case IF_OPER_NOTPRESENT:
-            strcpy(operstate, "NOTPRESENT");
-            break;
-          case IF_OPER_DOWN:
-            strcpy(operstate, "DOWN");
-            break;
-          case IF_OPER_LOWERLAYERDOWN:
-            strcpy(operstate, "LOWERLAYERDOWN");
-            break;
-          case IF_OPER_TESTING:
-            strcpy(operstate, "TESTING");
-            break;
-          case IF_OPER_DORMANT:
-            strcpy(operstate, "DORMANT");
-            break;
-          case IF_OPER_UP:
-            strcpy(operstate, "UP");
-            break;
-          default:
-            snprintf(operstate, sizeof(operstate), "STATE_%d", state);
-            break;
-        }
-      } break;
-      case IFLA_ADDRESS:
-        mac_to_string((unsigned char *)RTA_DATA(attr),
-                      6,  // force 6 bytes for MAC
-                      macstr, sizeof(macstr));
-        break;
+    if (attr->rta_type == IFLA_IFNAME) {
+      strncpy(ifname, (char *)RTA_DATA(attr), sizeof(ifname) - 1);
     }
   }
 
-  // Get name from index if missing
   if (ifname[0] == '\0') {
     if_indextoname(ifi->ifi_index, ifname);
   }
 
-  // Log everything
-  xlog("Netlink: %s ifname=%s ifindex=%d flags=0x%x IFF_RUNNING=%d MAC=%s operstate=%s",
-       (nlh->nlmsg_type == RTM_NEWLINK ? "NEWLINK" : nlh->nlmsg_type == RTM_DELLINK ? "DELLINK"
-                                                                                    : "LINK"),
-       ifname, ifi->ifi_index, ifi->ifi_flags, linkup,
-       (macstr[0] ? macstr : "N/A"),
-       (operstate[0] ? operstate : "N/A"));
+  xlog("LINK: %s ifname=%s index=%d state=%s",
+       (nlh->nlmsg_type == RTM_NEWLINK ? "NEWLINK" : "DELLINK"),
+       ifname,
+       ifi->ifi_index,
+       linkup ? "UP" : "DOWN");
 
   // LED control
   if (isSameString(ifname, "eth1")) {
@@ -1027,6 +1068,27 @@ void parseNetLinkMessage(struct nlmsghdr *nlh) {
       FW_setLED("3", "green");
     } else {
       FW_setLED("3", "off");
+    }
+  }
+}
+
+// Parse route events
+void parseRouteMessage(struct nlmsghdr *nlh) {
+  struct rtmsg *rtm = (struct rtmsg *)NLMSG_DATA(nlh);
+  int len = nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*rtm));
+
+  for (struct rtattr *attr = RTM_RTA(rtm); RTA_OK(attr, len); attr = RTA_NEXT(attr, len)) {
+    if (attr->rta_type == RTA_DST) {
+      char dst[64] = {0};
+      inet_ntop(rtm->rtm_family, RTA_DATA(attr), dst, sizeof(dst));
+      xlog("ROUTE: %s dst=%s/%d",
+           (nlh->nlmsg_type == RTM_NEWROUTE ? "NEWROUTE" : "DELROUTE"),
+           dst,
+           rtm->rtm_dst_len);
+    } else if (attr->rta_type == RTA_GATEWAY) {
+      char gw[64] = {0};
+      inet_ntop(rtm->rtm_family, RTA_DATA(attr), gw, sizeof(gw));
+      xlog("ROUTE: via gateway %s", gw);
     }
   }
 }
@@ -1152,17 +1214,14 @@ void Thread_FWMonitorNetLink() {
       struct nlmsghdr *nlh = (struct nlmsghdr *)buffer;
       while (NLMSG_OK(nlh, len)) {
         if (nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK) {
-          parseNetLinkMessage(nlh);
-        } 
-        else if (nlh->nlmsg_type == RTM_NEWROUTE || nlh->nlmsg_type == RTM_DELROUTE) {
+          parseLinkMessage(nlh);
+        } else if (nlh->nlmsg_type == RTM_NEWROUTE || nlh->nlmsg_type == RTM_DELROUTE) {
+          parseRouteMessage(nlh);
+
+          // Optional: test connectivity
           bool online = checkInternetReachable();
-          if (online) {
-            xlog(" Internet is reachable ✅");
-          } else {
-            xlog(" Internet is NOT reachable ❌");
-          }
+          xlog(online ? "Internet is reachable ✅" : "Internet is NOT reachable ❌");
         }
-        // Always advance to the next message
         nlh = NLMSG_NEXT(nlh, len);
       }
     }
