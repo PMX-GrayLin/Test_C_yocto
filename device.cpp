@@ -9,6 +9,9 @@
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <net/if.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <atomic>
@@ -1153,11 +1156,11 @@ void Thread_FWMonitorNetLink() {
         } else if (nlh->nlmsg_type == RTM_NEWROUTE || nlh->nlmsg_type == RTM_DELROUTE) {
           // When routes change, check internet
           bool online = checkInternetReachable();
-          if (online)
-            std::cout << "[CHECK] Internet is reachable ✅" << std::endl;
-          else
-            std::cout << "[CHECK] Internet is NOT reachable ❌" << std::endl;
-        }
+          if (online) {
+            xlog(" Internet is reachable ✅");
+          } else {
+            xlog(" Internet is NOT reachable ❌");
+          }
         nlh = NLMSG_NEXT(nlh, len);
       }
     }
