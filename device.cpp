@@ -1098,7 +1098,7 @@ void Thread_FWMonitorNetLink() {
 
   struct sockaddr_nl addr = {};
   addr.nl_family = AF_NETLINK;
-  addr.nl_groups = RTMGRP_LINK;
+  addr.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_ROUTE | RTMGRP_IPV6_ROUTE;
 
   if (bind(netlinkSock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
     xlog("bind error");
@@ -1153,16 +1153,17 @@ void Thread_FWMonitorNetLink() {
       while (NLMSG_OK(nlh, len)) {
         if (nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK) {
           parseNetLinkMessage(nlh);
-        } else if (nlh->nlmsg_type == RTM_NEWROUTE || nlh->nlmsg_type == RTM_DELROUTE) {
-          // When routes change, check internet
+        } 
+        else if (nlh->nlmsg_type == RTM_NEWROUTE || nlh->nlmsg_type == RTM_DELROUTE) {
           bool online = checkInternetReachable();
           if (online) {
             xlog(" Internet is reachable ✅");
           } else {
             xlog(" Internet is NOT reachable ❌");
           }
-          nlh = NLMSG_NEXT(nlh, len);
         }
+        // Always advance to the next message
+        nlh = NLMSG_NEXT(nlh, len);
       }
     }
   }
