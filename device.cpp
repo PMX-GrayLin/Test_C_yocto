@@ -1055,39 +1055,39 @@ bool checkInternetReachable() {
     return (result == 0);
 }
 
-// void FW_CheckNetLinkState(const char *ifname, bool isInitcheck) {
-//   std::string path = std::string("/sys/class/net/") + ifname + "/operstate";
-//   std::ifstream file(path);
+void FW_CheckNetLinkState(const char *ifname, bool isInitcheck) {
+  std::string path = std::string("/sys/class/net/") + ifname + "/operstate";
+  std::ifstream file(path);
 
-//   if (!file.is_open()) {
-//     xlog("Initial check: failed to open %s", path.c_str());
-//     return;
-//   }
+  if (!file.is_open()) {
+    xlog("Initial check: failed to open %s", path.c_str());
+    return;
+  }
 
-//   std::string state;
-//   std::getline(file, state);
-//   file.close();
+  std::string state;
+  std::getline(file, state);
+  file.close();
 
-//   xlog("[initial] Interface %s is %s", ifname, state.c_str());
+  xlog("[initial] Interface %s is %s", ifname, state.c_str());
 
-//   if (isSameString(ifname, "eth1")) {
-//     if (isSameString(state, "up")) {
-//       FW_setLED("2", "green");
-//     } else if (isSameString(state, "down")) {
-//       if (!isInitcheck) {
-//         FW_setLED("2", "off");
-//       }
-//     }
-//   } else if (isSameString(ifname, "eth2")) {
-//     if (isSameString(state, "up")) {
-//       FW_setLED("3", "green");
-//     } else if (isSameString(state, "down")) {
-//       if (!isInitcheck) {
-//         FW_setLED("3", "off");
-//       }
-//     }
-//   }
-// }
+  if (isSameString(ifname, "eth1")) {
+    if (isSameString(state, "up")) {
+      FW_setLED("2", "green");
+    } else if (isSameString(state, "down")) {
+      if (!isInitcheck) {
+        FW_setLED("2", "off");
+      }
+    }
+  } else if (isSameString(ifname, "eth2")) {
+    if (isSameString(state, "up")) {
+      FW_setLED("3", "green");
+    } else if (isSameString(state, "down")) {
+      if (!isInitcheck) {
+        FW_setLED("3", "off");
+      }
+    }
+  }
+}
 
 void Thread_FWMonitorNetLink() {
   int netlinkSock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
