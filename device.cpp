@@ -1161,10 +1161,10 @@ void Thread_FWMonitorNetLink() {
           } else {
             xlog(" Internet is NOT reachable ❌");
           }
-        nlh = NLMSG_NEXT(nlh, len);
+          nlh = NLMSG_NEXT(nlh, len);
+        }
       }
     }
-  }
 
   close(netlinkSock);
   close(readFd);
