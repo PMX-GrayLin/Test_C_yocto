@@ -1220,7 +1220,7 @@ void Thread_FWMonitorNetLink() {
 
           // Optional: test connectivity
           bool online = checkInternetReachable();
-          xlog(online ? "Internet is reachable ✅" : "Internet is NOT reachable ❌");
+          xlog("%s", online ? "Internet is reachable ✅" : "Internet is NOT reachable ❌");
         }
         nlh = NLMSG_NEXT(nlh, len);
       }
