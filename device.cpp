@@ -1028,39 +1028,63 @@ void parseNetLinkMessage(struct nlmsghdr *nlh) {
   }
 }
 
-void FW_CheckNetLinkState(const char *ifname, bool isInitcheck) {
-  std::string path = std::string("/sys/class/net/") + ifname + "/operstate";
-  std::ifstream file(path);
+// Check if we can connect to 8.8.8.8:53 (Google DNS)
+bool checkInternetReachable() {
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) return false;
 
-  if (!file.is_open()) {
-    xlog("Initial check: failed to open %s", path.c_str());
-    return;
-  }
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(53); // DNS port
+    inet_pton(AF_INET, "8.8.8.8", &addr.sin_addr);
 
-  std::string state;
-  std::getline(file, state);
-  file.close();
+    // Non-blocking connect with timeout
+    struct timeval tv;
+    tv.tv_sec = 2;  // 2s timeout
+    tv.tv_usec = 0;
+    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
+    setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (const char*)&tv, sizeof tv);
 
-  xlog("[initial] Interface %s is %s", ifname, state.c_str());
+    int result = connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+    close(sock);
 
-  if (isSameString(ifname, "eth1")) {
-    if (isSameString(state, "up")) {
-      FW_setLED("2", "green");
-    } else if (isSameString(state, "down")) {
-      if (!isInitcheck) {
-        FW_setLED("2", "off");
-      }
-    }
-  } else if (isSameString(ifname, "eth2")) {
-    if (isSameString(state, "up")) {
-      FW_setLED("3", "green");
-    } else if (isSameString(state, "down")) {
-      if (!isInitcheck) {
-        FW_setLED("3", "off");
-      }
-    }
-  }
+    return (result == 0);
 }
+
+// void FW_CheckNetLinkState(const char *ifname, bool isInitcheck) {
+//   std::string path = std::string("/sys/class/net/") + ifname + "/operstate";
+//   std::ifstream file(path);
+
+//   if (!file.is_open()) {
+//     xlog("Initial check: failed to open %s", path.c_str());
+//     return;
+//   }
+
+//   std::string state;
+//   std::getline(file, state);
+//   file.close();
+
+//   xlog("[initial] Interface %s is %s", ifname, state.c_str());
+
+//   if (isSameString(ifname, "eth1")) {
+//     if (isSameString(state, "up")) {
+//       FW_setLED("2", "green");
+//     } else if (isSameString(state, "down")) {
+//       if (!isInitcheck) {
+//         FW_setLED("2", "off");
+//       }
+//     }
+//   } else if (isSameString(ifname, "eth2")) {
+//     if (isSameString(state, "up")) {
+//       FW_setLED("3", "green");
+//     } else if (isSameString(state, "down")) {
+//       if (!isInitcheck) {
+//         FW_setLED("3", "off");
+//       }
+//     }
+//   }
+// }
 
 void Thread_FWMonitorNetLink() {
   int netlinkSock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
@@ -1126,6 +1150,13 @@ void Thread_FWMonitorNetLink() {
       while (NLMSG_OK(nlh, len)) {
         if (nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK) {
           parseNetLinkMessage(nlh);
+        } else if (nlh->nlmsg_type == RTM_NEWROUTE || nlh->nlmsg_type == RTM_DELROUTE) {
+          // When routes change, check internet
+          bool online = checkInternetReachable();
+          if (online)
+            std::cout << "[CHECK] Internet is reachable ✅" << std::endl;
+          else
+            std::cout << "[CHECK] Internet is NOT reachable ❌" << std::endl;
         }
         nlh = NLMSG_NEXT(nlh, len);
       }
