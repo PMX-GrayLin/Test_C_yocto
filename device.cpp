@@ -1165,6 +1165,7 @@ void Thread_FWMonitorNetLink() {
         }
       }
     }
+  }
 
   close(netlinkSock);
   close(readFd);
