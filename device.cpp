@@ -146,13 +146,15 @@ void FW_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
   // actual is pwm1 & pwm0 (aicamera always 1)
   // Map logical index to actual hardware index
   std::string actualPwmIndex;
-  if (pwmIndex == "1") {
-    actualPwmIndex = "1";
-  } else if (pwmIndex == "2" && FW_isDeviceVisionHub()) {
-    actualPwmIndex = "0";
-  } else {
-    xlog("Invalid pwmIndex: %s", pwmIndex.c_str());
-    return;
+  if (FW_isDeviceVisionHub()) {
+    if (pwmIndex == "1") {
+      actualPwmIndex = "0";
+    } else if (pwmIndex == "2") {
+      actualPwmIndex = "1";
+    } else {
+      xlog("Invalid pwmIndex: %s", pwmIndex.c_str());
+      return;
+    }
   }
 
   std::string pwmTarget = path_pwm + "/pwm" + actualPwmIndex;
