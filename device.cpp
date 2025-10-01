@@ -77,6 +77,7 @@ std::atomic<bool> isMonitorTriger = false;
 GPIO_LEVEl Triger_gpio_level_last[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
 GPIO_LEVEl Triger_gpio_level_new[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
 uint64_t Triger_last_event_time[NUM_Triger] = {0};
+bool isTrigerBindPWN[NUM_Triger] = {true, true};
 
 // DO
 int DO_GPIOs[NUM_DO] = {dogp_1, dogp_2};        // DO GPIO
@@ -594,14 +595,18 @@ void Thread_FWMonitorTriger() {
             xlog("Level State Change (Triger %d)...", Triger_GPIOs[i]);
             RESTful_send_Trigger(i, val == 1);
 
-            // ?? test
-            if (i == 0) {
-              if (current_level == gpiol_high) {
-                g_start = std::chrono::high_resolution_clock::now();
+            // bind pwm
+            if (isTrigerBindPWN[i]) {
+              std::string pwmIndexS = "1";
+              if (i == 1) {
+                pwmIndexS = "2";
+              }
 
-                FW_setPWM("1", pwmValue_trigger[i]);
+              if (current_level == gpiol_high) {
+                // g_start = std::chrono::high_resolution_clock::now();
+                FW_setPWM(pwmIndexS, pwmValue_trigger[i]);
               } else {
-                FW_setPWM("1", "0");
+                FW_setPWM(pwmIndexS, "0");
               }
             }
           }
@@ -639,16 +644,21 @@ void Thread_FWMonitorTriger() {
 
             RESTful_send_Trigger(i, Triger_gpio_level_last[i] == gpiol_high);
 
-            // ?? test
-            if (i == 0) {
-              if (Triger_gpio_level_last[i] == gpiol_high) {
-                g_start = std::chrono::high_resolution_clock::now();
-                
-                FW_setPWM("1", pwmValue_trigger[i]);
+            // bind pwm
+            if (isTrigerBindPWN[i]) {
+              std::string pwmIndexS = "1";
+              if (i == 1) {
+                pwmIndexS = "2";
+              }
+
+              if (current_level == gpiol_high) {
+                // g_start = std::chrono::high_resolution_clock::now();
+                FW_setPWM(pwmIndexS, pwmValue_trigger[i]);
               } else {
-                FW_setPWM("1", "0");
+                FW_setPWM(pwmIndexS, "0");
               }
             }
+
           }
         }
       }

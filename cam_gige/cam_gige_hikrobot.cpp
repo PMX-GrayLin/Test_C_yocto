@@ -757,8 +757,8 @@ void __stdcall GigE_imageCallback_hik(MV_FRAME_OUT *pstFrame, void *pUser, bool 
   auto handle = reinterpret_cast<void *>(pUser);
   if (!handle) return;
 
-  g_end = std::chrono::high_resolution_clock::now();
-  xlog("trigger >> imgCallback time: %ld ms", std::chrono::duration_cast<std::chrono::milliseconds>(g_end - g_start).count());
+  // g_end = std::chrono::high_resolution_clock::now();
+  // xlog("trigger >> imgCallback time: %ld ms", std::chrono::duration_cast<std::chrono::milliseconds>(g_end - g_start).count());
 
   auto start = std::chrono::high_resolution_clock::now();
 
