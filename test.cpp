@@ -296,7 +296,9 @@ int main(int argc, char* argv[]) {
 
   // make sure PWM init & turn it off
   FW_setPWM("1", "0");
-  FW_setPWM("2", "0");
+  if (FW_isDeviceVisionHub) {
+    FW_setPWM("2", "0");
+  }
 
   // set power led to system ready
   FW_setLED("1", "green");
