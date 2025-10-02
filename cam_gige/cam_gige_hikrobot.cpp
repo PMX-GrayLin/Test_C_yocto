@@ -973,13 +973,15 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
       goto fail;
     }
 
+    FW_setTrigerBindPWM(index_cam, true); // bind trigger to PWM1 or PWM2
     return;
 
   } else {
     
+    FW_setTrigerBindPWM(index_cam, false); // bind trigger to PWM1 or PWM2
+
     // turn off PWM
-    FW_setPWM("1", "0");
-    FW_setPWM("2", "0");
+    FW_setPWM(std::to_string(index_cam + 1), "0");
 
     GigE_cameraClose_hik(index_cam);
     return;
@@ -987,6 +989,12 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
   }
 
 fail:
+
+    FW_setTrigerBindPWM(index_cam, false); // bind trigger to PWM1 or PWM2
+
+    // turn off PWM
+    FW_setPWM(std::to_string(index_cam + 1), "0");
+    
   GigE_cameraClose_hik(index_cam);
   return;
 }

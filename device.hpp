@@ -98,13 +98,14 @@ void FW_toggleLED(string led_index, string led_color);
 
 // DI
 void Thread_FWMonitorDI();
-extern void FW_MonitorDIStart();
-extern void FW_MonitorDIStop();
+void FW_MonitorDIStart();
+void FW_MonitorDIStop();
 
 // Triger
 void Thread_FWMonitorTriger();
-extern void FW_MonitorTrigerStart();
-extern void FW_MonitorTrigerStop();
+void FW_MonitorTrigerStart();
+void FW_MonitorTrigerStop();
+void FW_setTrigerBindPWM(int index_triger, bool isBind);
 
 // DO
 void FW_setDO(string index_do, string on_off);

@@ -701,6 +701,10 @@ void FW_MonitorTrigerStop() {
   }
 }
 
+void FW_setTrigerBindPWM(int index_triger, bool isBind) {
+  isTrigerBindPWN[index_triger] = isBind;
+}
+
 void FW_setDO(string index_do, string on_off) {
   int index_gpio = 0;
   bool isON = false;
