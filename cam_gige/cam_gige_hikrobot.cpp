@@ -744,7 +744,7 @@ void GigE_cameraClose_hik(int index_cam) {
 
 void GigE_setImagePathPrefix_hik(int index_cam, const string &imagePath) {
   pathNamePrefix_triggerImage_hik[index_cam] = imagePath;
-  xlog("pathNamePrefix_triggerImage_hik[%d]:%s", index_cam, pathName_savedImage_hik[index_cam].c_str());
+  xlog("pathNamePrefix_triggerImage_hik[%d]:%s", index_cam, pathNamePrefix_triggerImage_hik[index_cam].c_str());
 }
 
 void GigE_setImageMaxIndex_hik(int index_cam, const string &counterS) {
@@ -994,7 +994,7 @@ fail:
 
     // turn off PWM
     FW_setPWM(std::to_string(index_cam + 1), "0");
-    
+
   GigE_cameraClose_hik(index_cam);
   return;
 }
