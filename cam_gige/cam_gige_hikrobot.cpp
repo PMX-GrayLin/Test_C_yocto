@@ -977,6 +977,10 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
 
   } else {
     
+    // turn off PWM
+    FW_setPWM("1", "0");
+    FW_setPWM("2", "0");
+
     GigE_cameraClose_hik(index_cam);
     return;
 
@@ -985,18 +989,6 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
 fail:
   GigE_cameraClose_hik(index_cam);
   return;
-}
-
-void GigE_triggerModeStart_hik(int index_cam) {
-  GigE_setTriggerMode_hik(index_cam, "on");
-}
-
-void GigE_triggerModeStop_hik(int index_cam) {
-  GigE_setTriggerMode_hik(index_cam, "off");
-
-  // turn off PWM
-  FW_setPWM("1", "0");
-  FW_setPWM("2", "0");
 }
 
 void GigE_sendTriggerSoftware_hik(int index_cam) {
