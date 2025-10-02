@@ -145,7 +145,7 @@ void FW_writePWMFile(const std::string &path, const std::string &value) {
 void FW_setPWM(const std::string &pwmIndex, const std::string &sPercent) {
   // actual is pwm1 & pwm0 (aicamera always 1)
   // Map logical index to actual hardware index
-  std::string actualPwmIndex;
+  std::string actualPwmIndex = "1";
   if (FW_isDeviceVisionHub()) {
     if (pwmIndex == "1") {
       actualPwmIndex = "0";
