@@ -85,7 +85,7 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
       GigE_setStrobeLineDuration_hik(index_cam, segments[3]);
     } else if (isSameString(segments[2], "imagePathPrefix")) {
       // image path prefix
-      GigE_setImagePathPrefix_hik(index_cam, segments[3]);
+      GigE_setImagePathPrefix_hik(index_cam, decodePath(segments[3]));
     } else if (isSameString(segments[2], "imageMaxIndex")) {
       // image name max index, naming index start from 1
       GigE_setImageMaxIndex_hik(index_cam, segments[3]);
