@@ -77,7 +77,7 @@ std::atomic<bool> isMonitorTriger = false;
 GPIO_LEVEl Triger_gpio_level_last[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
 GPIO_LEVEl Triger_gpio_level_new[NUM_Triger] = {gpiol_unknown, gpiol_unknown};
 uint64_t Triger_last_event_time[NUM_Triger] = {0};
-bool isTrigerBindPWN[NUM_Triger] = {true, true};
+bool isTrigerBindPWN[NUM_Triger] = {false, false};
 
 // DO
 int DO_GPIOs[NUM_DO] = {dogp_1, dogp_2};        // DO GPIO
