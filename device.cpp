@@ -30,6 +30,8 @@
 #include "restfulx.hpp"
 
 #define DEBOUNCE_TIME_MS 20
+
+#define DEBOUNCE_Enable_Trigger 0
 #define DEBOUNCE_TIME_MS_Trigger 1
 
 #ifndef IF_OPER_UNKNOWN
@@ -631,17 +633,22 @@ void Thread_FWMonitorTriger() {
             continue;
           }
 
-          // Debounce per line
+#if defined(DEBOUNCE_Enable_Trigger)
           uint64_t now = get_current_millis();
           if (now - Triger_last_event_time[i] < DEBOUNCE_TIME_MS_Trigger) {
             continue;
           }
+#endif
 
           Triger_gpio_level_new[i] = (gpiod_line_get_value(lines[i]) == 1) ? gpiol_high : gpiol_low;
 
           if (Triger_gpio_level_new[i] != Triger_gpio_level_last[i]) {
             Triger_gpio_level_last[i] = Triger_gpio_level_new[i];
+
+#if defined(DEBOUNCE_Enable_Trigger)
             Triger_last_event_time[i] = now;
+#endif
+
             // xlog("GPIO %d event detected! status:%s", Triger_GPIOs[i], (Triger_gpio_level_last[i] == gpiol_high) ? "high" : "low");
 
             RESTful_send_Trigger(i, Triger_gpio_level_last[i] == gpiol_high);
@@ -660,7 +667,6 @@ void Thread_FWMonitorTriger() {
                 FW_setPWM(pwmIndexS, "0");
               }
             }
-
           }
         }
       }
