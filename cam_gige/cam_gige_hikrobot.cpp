@@ -983,6 +983,15 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     // turn off PWM
     FW_setPWM(std::to_string(index_cam + 1), "0");
 
+    // Turn off StrobeEnable
+    nRet = MV_CC_SetBoolValue(handle_gige_hik[index_cam], "StrobeEnable", false);
+    if (MV_OK != nRet) {
+      xlog("set StrobeEnable fail! nRet [0x%x]", nRet);
+      goto fail;
+    }
+    xlog("set StrobeEnable success");
+
+
     GigE_cameraClose_hik(index_cam);
     return;
 

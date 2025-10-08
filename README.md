@@ -328,14 +328,14 @@ curl http://localhost:8765/fw/gige1/set/trigger-mode/off
 ```
 
 ### 🏁Trigger Mode Image:
-**path & naming prefix**
+**set path & naming prefix**
 ```
 curl http://localhost:8765/fw/gige1/set/imagePathPrefix/x
 x : full saved path & image prefix (double encode)
 ex : "%252Fhome%252Froot%252Fprimax%252FTest_Workstation"
 ```
 
-**naming index**
+**set naming index**
 ```
 curl http://localhost:8765/fw/gige1/set/imageMaxIndex/x
 x = auto save image post index;
@@ -344,8 +344,7 @@ loop saved image will be /home/root/primax/Test_Workstation_1~4.png
 ```
 
 ### 🏁Trigger Mode PWM:
-**Trigger Mode Linked PWM Value**
-
+**set trigger mode linked PWM value**
 ```
 curl http://localhost:8765/fw/pwmTrigger/x/y
 x = 1 or 2
