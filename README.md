@@ -347,7 +347,6 @@ loop saved image will be /home/root/primax/Test_Workstation_1~4.png
 **Trigger Mode Linked PWM Value**
 
 ```
-4. set trigger mode linked PWM value:
 curl http://localhost:8765/fw/pwmTrigger/x/y
 x = 1 or 2
 y = 0~100 ( default : 50 )
