@@ -928,7 +928,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
       xlog("set StrobeEnable fail! nRet [0x%x]", nRet);
       goto fail;
     }
-    xlog("set StrobeEnable success");
+    xlog("set StrobeEnable to true success");
 
     // // Set StrobeLineDuration(us)
     // nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "StrobeLineDuration", 500000); // 500ms
@@ -946,13 +946,13 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     // }
     // xlog("set StrobeLineDelay success");
 
-    // // Set StrobeLinePreDelay(us)
-    // nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "StrobeLinePreDelay", 0);
-    // if (MV_OK != nRet) {
-    //   xlog("set StrobeLinePreDelay fail! nRet [0x%x]", nRet);
-    //   goto fail;
-    // }
-    // xlog("set StrobeLinePreDelay success");
+    // Set StrobeLinePreDelay(us)
+    nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "StrobeLinePreDelay", 1170); // 1.17ms
+    if (MV_OK != nRet) {
+      xlog("set StrobeLinePreDelay fail! nRet [0x%x]", nRet);
+      goto fail;
+    }
+    xlog("set StrobeLinePreDelay success");
 
     // register image callback
     nRet = MV_CC_RegisterImageCallBackEx2(
@@ -997,12 +997,10 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
       xlog("set StrobeEnable fail! nRet [0x%x]", nRet);
       goto fail;
     }
-    xlog("set StrobeEnable success");
-
+    xlog("set StrobeEnable to false success");
 
     GigE_cameraClose_hik(index_cam);
     return;
-
   }
 
 fail:
