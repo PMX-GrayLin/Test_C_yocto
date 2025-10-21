@@ -506,7 +506,7 @@ void GigE_ThreadStreaming_hik(int index_cam) {
   FW_CheckNetLinkState(ifS.c_str());
 
   isStreaming_gige_hik[index_cam] = false;
-  RESTful_send_streamingStatus_gige_hik(0, isStreaming_gige_hik[index_cam]);
+  RESTful_send_streamingStatus_gige_hik(index_cam, isStreaming_gige_hik[index_cam]);
   xlog("++++ stop ++++, Pipeline stopped and resources cleaned up");
 }
 
@@ -866,6 +866,7 @@ fail:
 }
 
 void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
+
   xlog("%s", triggerModeS.c_str());
 
   // set trigger mode
@@ -887,6 +888,12 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
 
   if (handle_gige_hik[index_cam] == nullptr) {
     xlog("camera is not opened");
+    return;
+  }
+
+  if (GigE_isTriggerMode_hik(index_cam)) {
+    xlog("already set trigger mode");
+    RESTful_send_triggerMode_gige_hik(index_cam, true);
     return;
   }
 
@@ -974,6 +981,8 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     }
 
     FW_setTrigerBindPWM(index_cam, true); // bind trigger to PWM1 or PWM2
+    
+    RESTful_send_triggerMode_gige_hik(index_cam, true);
     return;
 
   } else {
@@ -1005,12 +1014,13 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
 
 fail:
 
-    FW_setTrigerBindPWM(index_cam, false); // bind trigger to PWM1 or PWM2
+  FW_setTrigerBindPWM(index_cam, false);  // bind trigger to PWM1 or PWM2
 
-    // turn off PWM
-    FW_setPWM(std::to_string(index_cam + 1), "0");
+  // turn off PWM
+  FW_setPWM(std::to_string(index_cam + 1), "0");
 
   GigE_cameraClose_hik(index_cam);
+  RESTful_send_triggerMode_gige_hik(index_cam, false);
   return;
 }
 
@@ -1018,7 +1028,7 @@ void GigE_sendTriggerSoftware_hik(int index_cam) {
   if (handle_gige_hik[index_cam] && GigE_isTriggerMode_hik(index_cam)) {
     int nRet = MV_CC_SetCommandValue(handle_gige_hik[index_cam], "TriggerSoftware");
     if (MV_OK != nRet) {
-      xlog("failed in TriggerSoftware[%x]\n", nRet);
+      xlog("failed in TriggerSoftware[%x]", nRet);
       return;
     }
   }
