@@ -98,6 +98,7 @@ uint64_t DIODI_last_event_time[NUM_DIO] = {0};
 std::thread t_monitorNetLink;
 std::atomic<bool> isMonitorNetLink(false);
 int wakeupFd = -1;
+bool isNetLinkExist[NUM_GigE] = {false, false};
 
 // UVC
 static std::thread t_monitorUVC;
@@ -1073,17 +1074,21 @@ void FW_CheckNetLinkState(const char *ifname, bool isInitcheck) {
 
   if (isSameString(ifname, "eth1")) {
     if (isSameString(state, "up")) {
+      isNetLinkExist[0] = true;
       FW_setLED("2", "green");
     } else if (isSameString(state, "down")) {
       if (!isInitcheck) {
+        isNetLinkExist[0] = false;
         FW_setLED("2", "off");
       }
     }
   } else if (isSameString(ifname, "eth2")) {
     if (isSameString(state, "up")) {
+      isNetLinkExist[1] = true;
       FW_setLED("3", "green");
     } else if (isSameString(state, "down")) {
       if (!isInitcheck) {
+        isNetLinkExist[1] = false;
         FW_setLED("3", "off");
       }
     }

@@ -659,6 +659,12 @@ void GigE_cameraOpen_hik(int index_cam) {
   string deviceUserID = "id" + std::to_string(index_cam + 1);
   unsigned int nIndex = 0;
 
+  // check NetLink exist
+  if (isNetLinkExist[index_cam] == false) {
+    xlog("NetLinkExist[%d] == false, do nothing...", index_cam);
+    return;
+  }
+
   // Initialize SDK
   if (!isSDKInit_gige_hik == false) {
     isSDKInit_gige_hik = true;
@@ -981,7 +987,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     }
 
     FW_setTrigerBindPWM(index_cam, true); // bind trigger to PWM1 or PWM2
-    
+
     RESTful_send_triggerMode_gige_hik(index_cam, true);
     return;
 

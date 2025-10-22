@@ -8,8 +8,11 @@
 #define NUM_DO          2                 // Number of DO
 #define NUM_PWM          2                // Number of PWM
 
-// NUM_DIOm aicamera = 2, visionhb = 4
-#define NUM_DIO         4                 // Number of DIO
+// NUM_DIO aicamera = 2, visionhb = 4
+#define NUM_DIO         4
+
+// NUM_GigE aicamera = 0, visionhb = 2
+#define NUM_GigE        2
 
 
 typedef enum {
