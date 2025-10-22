@@ -76,6 +76,7 @@ typedef enum {
 
 extern std::string product;
 extern std::string hostname_prefix;
+extern bool isNetLinkExist[NUM_GigE];
 
 void FW_getProduct();
 void FW_getHostnamePrefix();
