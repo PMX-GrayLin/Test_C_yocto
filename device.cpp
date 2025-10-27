@@ -999,14 +999,18 @@ void parseLinkMessage(struct nlmsghdr *nlh) {
   // LED control
   if (isSameString(ifname, "eth1")) {
     if (linkup) {
+      isNetLinkExist[0] = true;
       FW_setLED("2", "green");
     } else {
+      isNetLinkExist[0] = false;
       FW_setLED("2", "off");
     }
   } else if (isSameString(ifname, "eth2")) {
     if (linkup) {
+      isNetLinkExist[1] = true;
       FW_setLED("3", "green");
     } else {
+      isNetLinkExist[1] = false;
       FW_setLED("3", "off");
     }
   }
