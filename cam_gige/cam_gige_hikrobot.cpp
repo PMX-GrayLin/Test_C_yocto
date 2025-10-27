@@ -891,6 +891,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
 
   if (enable && isTriggerMode_gige_hik[index_cam]) {
     xlog("trigger mode already enabled");
+    RESTful_send_triggerMode_gige_hik(index_cam, true);
     return;
   }
 
@@ -904,7 +905,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
 
   if (handle_gige_hik[index_cam] == nullptr) {
     xlog("camera is not opened");
-    return;
+    goto fail;
   }
 
   int nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", enable ? 1 : 0);
