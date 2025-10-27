@@ -897,12 +897,6 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     return;
   }
 
-  if (GigE_isTriggerMode_hik(index_cam)) {
-    xlog("already set trigger mode");
-    RESTful_send_triggerMode_gige_hik(index_cam, true);
-    return;
-  }
-
   int nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", enable ? 1 : 0);
   if (MV_OK != nRet) {
     xlog("MV_CC_SetTriggerMode fail! nRet [%x]", nRet);
@@ -1031,7 +1025,7 @@ fail:
 }
 
 void GigE_sendTriggerSoftware_hik(int index_cam) {
-  if (handle_gige_hik[index_cam] && GigE_isTriggerMode_hik(index_cam)) {
+  if (handle_gige_hik[index_cam]) {
     int nRet = MV_CC_SetCommandValue(handle_gige_hik[index_cam], "TriggerSoftware");
     if (MV_OK != nRet) {
       xlog("failed in TriggerSoftware[%x]", nRet);
