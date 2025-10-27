@@ -662,6 +662,7 @@ void GigE_cameraOpen_hik(int index_cam) {
   // check NetLink exist
   if (isNetLinkExist[index_cam] == false) {
     xlog("NetLinkExist[%d] == false, do nothing...", index_cam);
+    handle_gige_hik[index_cam] = nullptr;
     return;
   }
 
@@ -888,7 +889,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     return;
   }
 
-  if (handle_gige_hik[index_cam] == nullptr) {
+  if (isNetLinkExist[index_cam] && handle_gige_hik[index_cam] == nullptr) {
     GigE_cameraOpen_hik(index_cam);
   }
 
@@ -1007,6 +1008,8 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
       goto fail;
     }
     xlog("set StrobeEnable to false success");
+
+    RESTful_send_triggerMode_gige_hik(index_cam, false);
 
     GigE_cameraClose_hik(index_cam);
     return;
