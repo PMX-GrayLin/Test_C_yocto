@@ -37,7 +37,7 @@ static volatile int counterFrame_hik[NUM_GigE] = {0, 0};
 
 static bool isSDKInit_gige_hik = false;
 static MV_CAM_TRIGGER_SOURCE triggerSource_hk = MV_TRIGGER_SOURCE_LINE2;
-bool isTriggerMode_hik[NUM_GigE] = {false, false};
+std::atomic<bool> isTriggerMode_gige_hik[NUM_GigE]{false, false};
 void* handle_gige_hik[NUM_GigE] = {nullptr, nullptr};
 std::string pathNamePrefix_triggerImage_hik[NUM_GigE] =
     {"/home/root/primax/Test_Workstation",
@@ -889,8 +889,17 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     return;
   }
 
-  if (isNetLinkExist[index_cam] && handle_gige_hik[index_cam] == nullptr) {
-    GigE_cameraOpen_hik(index_cam);
+  if (enable && isTriggerMode_gige_hik[index_cam]) {
+    xlog("trigger mode already enabled");
+    return;
+  }
+
+  if (isNetLinkExist[index_cam]) {
+    if (handle_gige_hik[index_cam] == nullptr) {
+      GigE_cameraOpen_hik(index_cam);
+    }
+  } else {
+    xlog("Network link not available for camera %d", index_cam);
   }
 
   if (handle_gige_hik[index_cam] == nullptr) {
@@ -906,6 +915,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
   xlog("set TriggerMode to %s success", enable ? "on" : "off");
 
   if (enable) {
+
     // set trigger source
     nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerSource", triggerSource_hk);
     if (MV_OK != nRet) {
@@ -983,6 +993,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
 
     FW_setTrigerBindPWM(index_cam, true); // bind trigger to PWM1 or PWM2
 
+    isTriggerMode_gige_hik[index_cam] = true;
     RESTful_send_triggerMode_gige_hik(index_cam, true);
     return;
 
@@ -1009,6 +1020,7 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     }
     xlog("set StrobeEnable to false success");
 
+    isTriggerMode_gige_hik[index_cam] = false;
     RESTful_send_triggerMode_gige_hik(index_cam, false);
 
     GigE_cameraClose_hik(index_cam);
