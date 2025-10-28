@@ -10,11 +10,11 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "device.hpp"
 #include "image_utils.hpp"
 #include "restfulx.hpp"
 
 #include "global.hpp"
+#include "device.hpp"
 
 UsedGigeCam usedGigeCam = ugc_hikrobot;
 
@@ -890,23 +890,24 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     return;
   }
 
-  if (enable && isTriggerMode_gige_hik[index_cam]) {
-    xlog("trigger mode already enabled");
-    RESTful_send_triggerMode_gige_hik(index_cam, true);
-    return;
-  }
-
   if (isNetLinkExist[index_cam]) {
     if (handle_gige_hik[index_cam] == nullptr) {
       GigE_cameraOpen_hik(index_cam);
     }
   } else {
-    xlog("Network link not available for camera %d", index_cam);
+    isTriggerMode_gige_hik[index_cam] = false;
+    xlog("Network link not available for camera %d", index_cam + 1);
   }
 
   if (handle_gige_hik[index_cam] == nullptr) {
     xlog("camera is not opened");
     goto fail;
+  }
+
+  if (enable && isTriggerMode_gige_hik[index_cam]) {
+    xlog("trigger mode already enabled");
+    RESTful_send_triggerMode_gige_hik(index_cam, true);
+    return;
   }
 
   nRet = MV_CC_SetEnumValue(handle_gige_hik[index_cam], "TriggerMode", enable ? 1 : 0);
