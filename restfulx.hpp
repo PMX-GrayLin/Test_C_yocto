@@ -17,6 +17,7 @@ void RESTful_send_streamingStatus_uvc(bool isStreaming);
 void RESTful_send_DI(int index, bool isLevelHigh);
 void RESTful_send_Trigger(int index, bool isLevelHigh);
 void RESTful_send_DIODI(int index, bool isLevelHigh);
+void RESTful_send_ethLinkStatus(int index, bool isLink);
 
 void RESTful_send_triggerMode_gige_hik(int index, bool triggerMode);
 

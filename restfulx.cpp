@@ -158,6 +158,11 @@ void RESTful_send_DIODI(int index, bool isLevelHigh) {
   RESTFul_sendAsync(content);
 }
 
+void RESTful_send_ethLinkStatus(int index, bool isLink) {
+  string content = "eth" + std::to_string(index + 1) + "/isLink/" + (isLink ? "true" : "false");
+  RESTFul_sendAsync(content);
+}
+
 void RESTful_send_triggerMode_gige_hik(int index, bool triggerMode) {
   string content = "gige" + std::to_string(index + 1) + "/isTriggerMode/" + (triggerMode ? "true" : "false");
   RESTFul_sendAsync(content);

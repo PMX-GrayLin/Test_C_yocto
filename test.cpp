@@ -82,6 +82,15 @@ void handle_RESTful(std::vector<std::string> segments, httplib::Response &res) {
       FW_toggleGPIO(gpio_num);
     }
 
+  } else if (isSameString(segments[0], "eth1")) {
+    if (isSameString(segments[1], "isLink")) {
+      RESTful_send_ethLinkStatus(0, isNetLinkExist[0]);      
+    }
+  } else if (isSameString(segments[0], "eth2")) {
+    if (isSameString(segments[1], "isLink")) {
+      RESTful_send_ethLinkStatus(1, isNetLinkExist[1]);
+    }
+
 #if defined(ENABLE_CIS)
 
   } else if (isSameString(segments[0], "gst")) {

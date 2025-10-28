@@ -1005,6 +1005,8 @@ void parseLinkMessage(struct nlmsghdr *nlh) {
       isNetLinkExist[0] = false;
       FW_setLED("2", "off");
     }
+    RESTful_send_ethLinkStatus(0, isNetLinkExist[0]);
+
   } else if (isSameString(ifname, "eth2")) {
     if (linkup) {
       isNetLinkExist[1] = true;
@@ -1013,6 +1015,8 @@ void parseLinkMessage(struct nlmsghdr *nlh) {
       isNetLinkExist[1] = false;
       FW_setLED("3", "off");
     }
+    RESTful_send_ethLinkStatus(1, isNetLinkExist[1]);
+
   }
 }
 
@@ -1086,6 +1090,8 @@ void FW_CheckNetLinkState(const char *ifname, bool isInitcheck) {
         FW_setLED("2", "off");
       }
     }
+    RESTful_send_ethLinkStatus(0, isNetLinkExist[0]);
+
   } else if (isSameString(ifname, "eth2")) {
     if (isSameString(state, "up")) {
       isNetLinkExist[1] = true;
@@ -1096,6 +1102,8 @@ void FW_CheckNetLinkState(const char *ifname, bool isInitcheck) {
         FW_setLED("3", "off");
       }
     }
+    RESTful_send_ethLinkStatus(1, isNetLinkExist[1]);
+    
   }
 }
 
