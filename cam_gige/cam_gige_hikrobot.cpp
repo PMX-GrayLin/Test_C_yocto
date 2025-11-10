@@ -94,13 +94,17 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   } else if (isSameString(segments[1], "get")) {
     GigE_getSettings_hik(index_cam);
     if (isSameString(segments[2], "exposure")) {
-      //
+      RESTful_send_currentSetting_gige_hik(index_cam, "exposure",
+            std::to_string(GigE_getExposure_hik(index_cam)));
     } else if (isSameString(segments[2], "exposure-auto")) {
-      //
+      RESTful_send_currentSetting_gige_hik(index_cam, "exposure-auto",
+            getGaaString(GigE_getExposureAuto_hik(index_cam)));
     } else if (isSameString(segments[2], "gain")) {
-      //
+      RESTful_send_currentSetting_gige_hik(index_cam, "gain",
+            std::to_string(GigE_getGain_hik(index_cam)));
     } else if (isSameString(segments[2], "gain-auto")) {
-      //
+      RESTful_send_currentSetting_gige_hik(index_cam, "gain-auto",
+            getGaaString(GigE_getGainAuto_hik(index_cam)));
     } else if (isSameString(segments[2], "isStreaming")) {
       RESTful_send_streamingStatus_gige_hik(index_cam, isStreaming_gige_hik[index_cam]);
     }
@@ -144,10 +148,10 @@ void GigE_getSettings_hik(int index_cam) {
   g_object_get(G_OBJECT(source_gige_hik[index_cam]), "gain", &gain, NULL);
   g_object_get(G_OBJECT(source_gige_hik[index_cam]), "exposure-auto", &exposure_auto, NULL);
   g_object_get(G_OBJECT(source_gige_hik[index_cam]), "gain-auto", &gain_auto, NULL);
-  xlog("exposure_auto:%d", exposure_auto);
-  xlog("exposure:%f", exposure);
-  xlog("gain_auto:%d", gain_auto);
-  xlog("gain:%f", gain);
+  // xlog("exposure_auto:%d", exposure_auto);
+  // xlog("exposure:%f", exposure);
+  // xlog("gain_auto:%d", gain_auto);
+  // xlog("gain:%f", gain);
 
   gigeControlParams[index_cam].exposure_auto = exposure_auto;
   gigeControlParams[index_cam].exposure = exposure;
@@ -1128,4 +1132,18 @@ void GigE_setStrobeLineDuration_hik(int index_cam, const std::string &StrobeLine
   }
 
   GigE_cameraClose_hik(index_cam);
+}
+
+const char* getGaaString(GstArvAuto gaa) {
+  switch (gaa) {
+    case gaa_off:
+      return "off";
+    case gaa_once:
+      return "once";
+    case gaa_continuous:
+      return "continuous";
+    case gaa_invalid:
+    default:
+      return "invalid";
+  }
 }

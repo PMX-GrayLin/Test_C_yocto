@@ -167,3 +167,8 @@ void RESTful_send_triggerMode_gige_hik(int index, bool triggerMode) {
   string content = "gige" + std::to_string(index + 1) + "/isTriggerMode/" + (triggerMode ? "true" : "false");
   RESTFul_sendAsync(content);
 }
+
+void RESTful_send_currentSetting_gige_hik(int index, const std::string& settingS, const std::string& valueS) {
+  string content = "gige" + std::to_string(index + 1) + "/" + settingS + "/" + valueS;
+  RESTFul_sendAsync(content);
+}

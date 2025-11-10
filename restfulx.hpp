@@ -20,5 +20,6 @@ void RESTful_send_DIODI(int index, bool isLevelHigh);
 void RESTful_send_ethLinkStatus(int index, bool isLink);
 
 void RESTful_send_triggerMode_gige_hik(int index, bool triggerMode);
+void RESTful_send_currentSetting_gige_hik(int index, const std::string& settingS, const std::string& valueS);
 
 

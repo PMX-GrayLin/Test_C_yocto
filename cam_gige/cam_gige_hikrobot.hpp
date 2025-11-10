@@ -75,6 +75,7 @@ void GigE_setTriggeSource_hik(int index_cam, const string& triggerSourceS);
 void GigE_setTriggerDelay_hik(int index_cam, const string& triggerDelayS);
 void GigE_setStrobeLineDuration_hik(int index_cam, const string& StrobeLineDurationS);
 
+const char* getGaaString(GstArvAuto gaa);
 
 /* 
 
