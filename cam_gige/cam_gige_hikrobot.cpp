@@ -94,8 +94,10 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
   } else if (isSameString(segments[1], "get")) {
     GigE_getSettings_hik(index_cam);
     if (isSameString(segments[2], "exposure")) {
-      RESTful_send_currentSetting_gige_hik(index_cam, "exposure",
-            std::to_string(GigE_getExposure_hik(index_cam)));
+      exec_command("arv-tool-0.8 control ExposureTime --device " +
+                   GigE_getIP_hik(index_cam));
+      // RESTful_send_currentSetting_gige_hik(index_cam, "exposure",
+      //       std::to_string(GigE_getExposure_hik(index_cam)));
     } else if (isSameString(segments[2], "exposure-auto")) {
       RESTful_send_currentSetting_gige_hik(index_cam, "exposure-auto",
             getGaaString(GigE_getExposureAuto_hik(index_cam)));
