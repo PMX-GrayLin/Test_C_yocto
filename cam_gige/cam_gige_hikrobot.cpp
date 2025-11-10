@@ -148,10 +148,10 @@ void GigE_getSettings_hik(int index_cam) {
   g_object_get(G_OBJECT(source_gige_hik[index_cam]), "gain", &gain, NULL);
   g_object_get(G_OBJECT(source_gige_hik[index_cam]), "exposure-auto", &exposure_auto, NULL);
   g_object_get(G_OBJECT(source_gige_hik[index_cam]), "gain-auto", &gain_auto, NULL);
-  // xlog("exposure_auto:%d", exposure_auto);
-  // xlog("exposure:%f", exposure);
-  // xlog("gain_auto:%d", gain_auto);
-  // xlog("gain:%f", gain);
+  xlog("exposure_auto:%d", exposure_auto);
+  xlog("exposure:%f", exposure);
+  xlog("gain_auto:%d", gain_auto);
+  xlog("gain:%f", gain);
 
   gigeControlParams[index_cam].exposure_auto = exposure_auto;
   gigeControlParams[index_cam].exposure = exposure;
