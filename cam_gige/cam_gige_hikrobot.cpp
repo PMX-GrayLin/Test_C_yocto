@@ -986,8 +986,9 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     if (MV_OK != nRet) {
       xlog("set StrobeLinePreDelay fail! nRet [0x%x]", nRet);
       // goto fail;
+    } else {
+      xlog("set StrobeLinePreDelay to 1170 us success");
     }
-    xlog("set StrobeLinePreDelay success");
 
     // register image callback
     nRet = MV_CC_RegisterImageCallBackEx2(
