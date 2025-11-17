@@ -973,6 +973,14 @@ void GigE_setTriggerMode_hik(int index_cam, const string &triggerModeS) {
     // }
     // xlog("set StrobeLineDelay success");
 
+    // VERY IMPORTANT: Set line mode to strobe output
+    nRet = MV_CC_SetEnumValueByString(handle, "LineMode", "Strobe");
+    if (MV_OK != nRet) {
+      xlog("Set LineMode to Strobe fail! [%x]", nRet);
+      goto fail;
+    }
+    xlog("LineMode set to Strobe success");
+
     // Set StrobeLinePreDelay(us)
     nRet = MV_CC_SetIntValueEx(handle_gige_hik[index_cam], "StrobeLinePreDelay", 1170); // 1.17ms
     if (MV_OK != nRet) {
