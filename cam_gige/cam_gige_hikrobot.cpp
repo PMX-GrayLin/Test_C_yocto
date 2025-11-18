@@ -169,7 +169,7 @@ double GigE_getExposure_hik(int index_cam) {
 
   if (isTriggerMode_gige_hik[index_cam]) {
     MVCC_FLOATVALUE stExposureTime = {0};
-    nRet = MV_CC_GetFloatValue(handle, "ExposureTime", &stExposureTime);
+    nRet = MV_CC_GetFloatValue(handle_gige_hik[index_cam], "ExposureTime", &stExposureTime);
     if (MV_OK == nRet) {
       xlog("current:%.2f, min:%.2f, max:%.2f", stExposureTime.fCurValue, stExposureTime.fMin, stExposureTime.fMax);
       return stExposureTime.fCurValue;
