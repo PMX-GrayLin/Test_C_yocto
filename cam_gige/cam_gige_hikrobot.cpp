@@ -167,13 +167,19 @@ double GigE_getExposure_hik(int index_cam) {
   }
 
   if (isTriggerMode_gige_hik[index_cam]) {
+    
+    if (handle_gige_hik[index_cam] == nullptr) {
+      xlog("camera is not opened for index %d", index_cam);
+      return;
+    }
+
     MVCC_FLOATVALUE stExposureTime = {0};
     int nRet = MV_CC_GetFloatValue(handle_gige_hik[index_cam], "ExposureTime", &stExposureTime);
     if (MV_OK == nRet) {
       xlog("current:%.2f, min:%.2f, max:%.2f", stExposureTime.fCurValue, stExposureTime.fMin, stExposureTime.fMax);
       return stExposureTime.fCurValue;
     } else {
-      xlog("et exposure time failed! nRet [%x]", nRet);
+      xlog("set exposure time failed! nRet [%x]", nRet);
     }
   } else {
     if (!source_gige_hik[index_cam]) {
