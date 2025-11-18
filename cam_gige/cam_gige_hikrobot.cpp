@@ -182,9 +182,11 @@ double GigE_getExposure_hik(int index_cam) {
       xlog("set exposure time failed! nRet [%x]", nRet);
     }
   } else {
+
     if (!source_gige_hik[index_cam]) {
       xlog("Camera source not initialized for index %d", index_cam);
     } else {
+      GigE_getSettings_hik(index_cam);
       return gigeControlParams[index_cam].exposure;
     }
   }
