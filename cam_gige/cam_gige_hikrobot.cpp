@@ -92,19 +92,18 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
     }
 
   } else if (isSameString(segments[1], "get")) {
-    GigE_getSettings_hik(index_cam);
     if (isSameString(segments[2], "exposure")) {
       double exposure = GigE_getExposure_hik(index_cam);
       RESTful_send_currentSetting_gige_hik(index_cam, "exposure", std::to_string(exposure));
     } else if (isSameString(segments[2], "exposure-auto")) {
-      RESTful_send_currentSetting_gige_hik(index_cam, "exposure-auto",
-            getGaaString(GigE_getExposureAuto_hik(index_cam)));
+      GigE_getSettings_hik(index_cam);
+      RESTful_send_currentSetting_gige_hik(index_cam, "exposure-auto", getGaaString(GigE_getExposureAuto_hik(index_cam)));
     } else if (isSameString(segments[2], "gain")) {
-      RESTful_send_currentSetting_gige_hik(index_cam, "gain",
-            std::to_string(GigE_getGain_hik(index_cam)));
+      GigE_getSettings_hik(index_cam);
+      RESTful_send_currentSetting_gige_hik(index_cam, "gain", std::to_string(GigE_getGain_hik(index_cam)));
     } else if (isSameString(segments[2], "gain-auto")) {
-      RESTful_send_currentSetting_gige_hik(index_cam, "gain-auto",
-            getGaaString(GigE_getGainAuto_hik(index_cam)));
+      GigE_getSettings_hik(index_cam);
+      RESTful_send_currentSetting_gige_hik(index_cam, "gain-auto", getGaaString(GigE_getGainAuto_hik(index_cam)));
     } else if (isSameString(segments[2], "isStreaming")) {
       RESTful_send_streamingStatus_gige_hik(index_cam, isStreaming_gige_hik[index_cam]);
 
@@ -167,10 +166,10 @@ double GigE_getExposure_hik(int index_cam) {
   }
 
   if (isTriggerMode_gige_hik[index_cam]) {
-    
+
     if (handle_gige_hik[index_cam] == nullptr) {
       xlog("camera is not opened for index %d", index_cam);
-      return;
+      return -1.0;
     }
 
     MVCC_FLOATVALUE stExposureTime = {0};
