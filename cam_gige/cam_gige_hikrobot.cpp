@@ -166,11 +166,24 @@ double GigE_getExposure_hik(int index_cam) {
     xlog("Invalid index_cam: %d", index_cam);
     return -1.0;
   }
-  if (!source_gige_hik[index_cam]) {
-    xlog("Camera source not initialized for index %d", index_cam);
-    return -1.0;
+
+  if (isTriggerMode_gige_hik[index_cam]) {
+    MVCC_FLOATVALUE stExposureTime = {0};
+    nRet = MV_CC_GetFloatValue(handle, "ExposureTime", &stExposureTime);
+    if (MV_OK == nRet) {
+      xlog("current:%.2f, min:%.2f, max:%.2f", stExposureTime.fCurValue, stExposureTime.fMin, stExposureTime.fMax);
+      return stExposureTime.fCurValue;
+    } else {
+      xlog("et exposure time failed! nRet [%x]", nRet);
+    }
+  } else {
+    if (!source_gige_hik[index_cam]) {
+      xlog("Camera source not initialized for index %d", index_cam);
+    } else {
+      return gigeControlParams[index_cam].exposure;
+    }
   }
-  return gigeControlParams[index_cam].exposure;
+  return -1.0;
 }
 
 void GigE_setExposure_hik(int index_cam, const string &exposureTimeS) {
