@@ -184,27 +184,46 @@ void GigE_setExposure_hik(int index_cam, const string &exposureTimeS) {
     xlog("Invalid index_cam: %d", index_cam);
     return;
   }
-  if (!source_gige_hik[index_cam]) {
-    xlog("Camera source not initialized for index %d", index_cam);
-    return;
-  }
 
-  double exposureTime = 0.0;
-  try {
-    exposureTime = std::stod(exposureTimeS);
-  } catch (const std::exception &e) {
-    xlog("Invalid exposureTime string: '%s' (%s)", exposureTimeS.c_str(), e.what());
-    return;
-  }
+  if (isTriggerMode_gige_hik[index_cam]) {
 
-  if (!std::isfinite(exposureTime)) {
-    xlog("Exposure time is not finite: %f", exposureTime);
-    return;
-  }
+    if (handle_gige_hik[index_cam] == nullptr) {
+      xlog("camera is not opened for index %d", index_cam);
+      return;
+    }
 
-  exposureTime = clampValue(std::stod(exposureTimeS), 25.0, 2490000.0);
-  xlog("Setting exposureTime: %f", exposureTime);
-  g_object_set(G_OBJECT(source_gige_hik[index_cam]), "exposure", exposureTime, nullptr);
+    float fExposureTime = exposureTimeS.empty() ? 25000.0f : static_cast<float>(std::stod(exposureTimeS));
+    int nRet = MV_CC_SetFloatValue(handle, "ExposureTime", fExposureTime);
+    if (MV_OK == nRet) {
+      xlog("set exposure time to %f us", fExposureTime);
+    } else {
+      xlog("set exposure time failed! nRet [%x]", nRet);
+      return;
+    }
+
+  } else {
+    if (!source_gige_hik[index_cam]) {
+      xlog("Camera source not initialized for index %d", index_cam);
+      return;
+    }
+
+    double exposureTime = 0.0;
+    try {
+      exposureTime = std::stod(exposureTimeS);
+    } catch (const std::exception& e) {
+      xlog("Invalid exposureTime string: '%s' (%s)", exposureTimeS.c_str(), e.what());
+      return;
+    }
+
+    if (!std::isfinite(exposureTime)) {
+      xlog("Exposure time is not finite: %f", exposureTime);
+      return;
+    }
+
+    exposureTime = clampValue(std::stod(exposureTimeS), 25.0, 2490000.0);
+    xlog("Setting exposureTime: %f", exposureTime);
+    g_object_set(G_OBJECT(source_gige_hik[index_cam]), "exposure", exposureTime, nullptr);
+  }
 }
 
 GstArvAuto GigE_getExposureAuto_hik(int index_cam) {
