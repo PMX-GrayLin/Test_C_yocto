@@ -106,7 +106,8 @@ void Gige_handle_RESTful_hik(std::vector<std::string> segments) {
       RESTful_send_currentSetting_gige_hik(index_cam, "gain-auto", getGaaString(GigE_getGainAuto_hik(index_cam)));
     } else if (isSameString(segments[2], "isStreaming")) {
       RESTful_send_streamingStatus_gige_hik(index_cam, isStreaming_gige_hik[index_cam]);
-
+    } else if (isSameString(segments[2], "isTriggerMode")) {
+      RESTful_send_triggerMode_gige_hik(index_cam, isTriggerMode_gige_hik[index_cam]);
     }
 
   } else if (isSameString(segments[1], "tp")) {
