@@ -193,7 +193,7 @@ void GigE_setExposure_hik(int index_cam, const string &exposureTimeS) {
     }
 
     float fExposureTime = exposureTimeS.empty() ? 25000.0f : static_cast<float>(std::stod(exposureTimeS));
-    int nRet = MV_CC_SetFloatValue(handle, "ExposureTime", fExposureTime);
+    int nRet = MV_CC_SetFloatValue(handle_gige_hik[index_cam], "ExposureTime", fExposureTime);
     if (MV_OK == nRet) {
       xlog("set exposure time to %f us", fExposureTime);
     } else {
