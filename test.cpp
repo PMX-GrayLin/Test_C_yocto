@@ -309,7 +309,16 @@ int main(int argc, char* argv[]) {
     FW_setPWM("2", "0");
   }
 
-  // set power led to system ready
+  // detect UVC thread
+  FW_MonitorUVCStart();
+
+  // detect GigE plug-in/out thread
+  if (FW_isDeviceVisionHub()) {
+    FW_MonitorNetLinkStart();
+  }
+
+  // kill led blink script and set power led to system ready
+  exec_command("killall led_set.sh");
   FW_setLED("1", "green");
 
   // set camera led
@@ -319,14 +328,6 @@ int main(int argc, char* argv[]) {
     } else {
       // AI Box, detect UVC devices
     }
-  }
-
-  // detect UVC thread
-  FW_MonitorUVCStart();
-
-  // detect GigE plug-in/out thread
-  if (FW_isDeviceVisionHub()) {
-    FW_MonitorNetLinkStart();
   }
 
   // RSETful
