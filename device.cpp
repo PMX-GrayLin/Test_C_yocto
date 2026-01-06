@@ -103,6 +103,7 @@ bool isNetLinkExist[NUM_GigE] = {false, false};
 // UVC
 static std::thread t_monitorUVC;
 static std::atomic<bool> isMonitorUVC{false};
+static std::string g_uvcNode;   // Currently bound UVC node (ONLY ONE)
 extern void UVC_setDevicePath(const string& devicePath);
 extern void UVC_streamingStop();
 
@@ -1225,67 +1226,75 @@ void FW_MonitorNetLinkStop() {
   // pthread_cancel(t_monitorNetLink.native_handle());
 }
 
+static int getVideoIndex(const std::string& dev) {
+    // "/dev/video139" → 139
+    if (dev.find("/dev/video") != 0)
+        return 99999;
+    return atoi(dev.c_str() + strlen("/dev/video"));
+}
+
 bool isUvcCamera(struct udev_device* dev) {
-    const char* subsystem = udev_device_get_subsystem(dev);
-    if (!subsystem || std::string(subsystem) != "video4linux")
-        return false;
+  if (!dev) return false;
 
-    const char* devNode = udev_device_get_devnode(dev);
-    if (!devNode || std::string(devNode).find("/dev/video") != 0)
-        return false;
-
-    const char* cap = udev_device_get_property_value(dev, "ID_V4L_CAPABILITIES");
-    const char* driver = udev_device_get_property_value(dev, "ID_USB_DRIVER");
-    const char* id_model = udev_device_get_property_value(dev, "ID_MODEL");
-
-    // Only consider real UVC video devices
-    if (cap && std::string(cap).find("capture") != std::string::npos &&
-        driver && std::string(driver) == "uvcvideo") {
-        return true;
-    }
-
+  const char* subsystem = udev_device_get_subsystem(dev);
+  if (!subsystem || strcmp(subsystem, "video4linux") != 0)
     return false;
+
+  const char* devNode = udev_device_get_devnode(dev);
+  if (!devNode || strncmp(devNode, "/dev/video", 10) != 0)
+    return false;
+
+  const char* driver = udev_device_get_property_value(dev, "ID_USB_DRIVER");
+  if (!driver || strcmp(driver, "uvcvideo") != 0)
+    return false;
+
+  const char* caps = udev_device_get_property_value(dev, "ID_V4L_CAPABILITIES");
+  if (!caps || strstr(caps, ":capture:") == nullptr)
+    return false;
+
+  return true;
 }
 
 void FW_CheckUVCDevices(bool isInitcheck) {
-  struct udev *udev = udev_new();
+  struct udev* udev = udev_new();
   if (!udev) {
     xlog("Failed to create udev context (initial check)");
     return;
   }
 
-  struct udev_enumerate *enumerate = udev_enumerate_new(udev);
+  struct udev_enumerate* enumerate = udev_enumerate_new(udev);
   udev_enumerate_add_match_subsystem(enumerate, "video4linux");
   udev_enumerate_scan_devices(enumerate);
 
-  struct udev_list_entry *devices = udev_enumerate_get_list_entry(enumerate);
-  struct udev_list_entry *entry;
+  struct udev_list_entry* devices = udev_enumerate_get_list_entry(enumerate);
+  struct udev_list_entry* entry;
 
-  bool isUVCDetected = false;
+  std::string bestNode;
 
   udev_list_entry_foreach(entry, devices) {
-    const char *path = udev_list_entry_get_name(entry);
-    struct udev_device *dev = udev_device_new_from_syspath(udev, path);
-    const char *devNode = udev_device_get_devnode(dev);
+    const char* path = udev_list_entry_get_name(entry);
+    struct udev_device* dev = udev_device_new_from_syspath(udev, path);
 
     if (isUvcCamera(dev)) {
-      xlog("[UVC] Initial found : %s", (devNode ? devNode : "unknown"));
-      isUVCDetected = true;
-      UVC_setDevicePath(std::string(devNode));
-
-      udev_device_unref(dev);
-      break;
-    } 
+      const char* devNode = udev_device_get_devnode(dev);
+      if (devNode) {
+        if (bestNode.empty() ||
+            getVideoIndex(devNode) < getVideoIndex(bestNode)) {
+          bestNode = devNode;
+        }
+      }
+    }
 
     udev_device_unref(dev);
   }
 
-  if (isUVCDetected) {
+  if (!bestNode.empty()) {
+    g_uvcNode = bestNode;
+    xlog("[UVC] Initial bind : %s", g_uvcNode.c_str());
+    UVC_setDevicePath(g_uvcNode);
     FW_setLED("2", "green");
-  } else {
-    if (!isInitcheck) {
-      FW_setLED("2", "off");
-    }
+  } else if (!isInitcheck) {
+    FW_setLED("2", "off");
   }
 
   udev_enumerate_unref(enumerate);
@@ -1293,59 +1302,84 @@ void FW_CheckUVCDevices(bool isInitcheck) {
 }
 
 void Thread_FWMonitorUVC() {
-  struct udev *udev = udev_new();
+  struct udev* udev = udev_new();
   if (!udev) {
     xlog("Failed to create udev context");
     return;
   }
 
-  struct udev_monitor *mon = udev_monitor_new_from_netlink(udev, "udev");
+  struct udev_monitor* mon =
+      udev_monitor_new_from_netlink(udev, "udev");
   if (!mon) {
     xlog("Failed to create udev monitor");
     udev_unref(udev);
     return;
   }
 
-  udev_monitor_filter_add_match_subsystem_devtype(mon, "video4linux", nullptr);
+  udev_monitor_filter_add_match_subsystem_devtype(
+      mon, "video4linux", nullptr);
   udev_monitor_enable_receiving(mon);
   int fd = udev_monitor_get_fd(mon);
 
-  xlog("---- Start ----");
+  xlog("---- UVC Monitor Start ----");
 
   while (isMonitorUVC) {
     fd_set fds;
     FD_ZERO(&fds);
     FD_SET(fd, &fds);
 
-    struct timeval tv;
-    tv.tv_sec = 1;
-    tv.tv_usec = 0;
-
+    struct timeval tv{1, 0};
     int ret = select(fd + 1, &fds, nullptr, nullptr, &tv);
-    if (ret > 0 && FD_ISSET(fd, &fds)) {
-      struct udev_device *dev = udev_monitor_receive_device(mon);
-      if (dev) {
-        const char *devNode = udev_device_get_devnode(dev);
 
-        if (isUvcCamera(dev)) {
-          const char *action = udev_device_get_action(dev);
-          const char *devNode = udev_device_get_devnode(dev);
-          xlog("[UVC] %s : %s", (action ? action : "unknown"), (devNode ? devNode : "unknown"));
-          if (isSameString(action, "add")) {
-            UVC_setDevicePath(std::string(devNode));
+    if (ret > 0 && FD_ISSET(fd, &fds)) {
+      struct udev_device* dev =
+          udev_monitor_receive_device(mon);
+
+      if (!dev)
+        continue;
+
+      if (isUvcCamera(dev)) {
+        const char* action =
+            udev_device_get_action(dev);
+        const char* devNode =
+            udev_device_get_devnode(dev);
+
+        if (!action || !devNode) {
+          udev_device_unref(dev);
+          continue;
+        }
+
+        xlog("[UVC] %s : %s", action, devNode);
+
+        if (isSameString(action, "add")) {
+          if (g_uvcNode.empty()) {
+            g_uvcNode = devNode;
+            xlog("[UVC] bind primary : %s",
+                 g_uvcNode.c_str());
+            UVC_setDevicePath(g_uvcNode);
             FW_setLED("2", "green");
-          } else if (isSameString(action, "remove")) {
+          } else {
+            xlog("[UVC] ignore extra node : %s",
+                 devNode);
+          }
+        } else if (isSameString(action, "remove")) {
+          if (!g_uvcNode.empty() &&
+              g_uvcNode == devNode) {
+            xlog("[UVC] primary removed : %s",
+                 devNode);
+            g_uvcNode.clear();
             UVC_setDevicePath("");
             FW_setLED("2", "off");
             UVC_streamingStop();
           }
         }
-        udev_device_unref(dev);
       }
+
+      udev_device_unref(dev);
     }
   }
 
-  xlog("---- Stop ----");
+  xlog("---- UVC Monitor Stop ----");
   udev_monitor_unref(mon);
   udev_unref(udev);
 }
