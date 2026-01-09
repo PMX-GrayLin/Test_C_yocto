@@ -57,7 +57,7 @@
 #endif
 
 std::string product = "ai_camera_plus";         // ai_camera_plus or vision_hub_plus
-std::string hostname_prefix = "aicamera";       // aicamera or visionhub
+std::string hostname_prefix = "aicamera";       // aicamera, aibox or visionhub
 
 // PWM
 const std::string path_pwm = "/sys/devices/platform/soc/10048000.pwm/pwm/pwmchip0";
@@ -124,6 +124,7 @@ void FW_getDeviceInfo() {
 
 bool FW_isDeviceAICamera() {
   return (product.find("ai_camera_plus") != std::string::npos ||
+          hostname_prefix.find("aibox") != std::string::npos ||
           hostname_prefix.find("aicamera") != std::string::npos);
 }
 bool FW_isDeviceAICameraPlus() {
