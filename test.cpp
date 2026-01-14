@@ -293,6 +293,9 @@ int main(int argc, char* argv[]) {
   xlog("Build Flag ENABLE_TestCode");
 #endif
 
+  // kill led blink script since fw take over led control
+  exec_command("killall led_set.sh");
+
   for (int i = 0; i < argc; ++i) {
     xlog("argv[%d]:%s", i, argv[i]);
   }
@@ -317,8 +320,7 @@ int main(int argc, char* argv[]) {
     FW_MonitorNetLinkStart();
   }
 
-  // kill led blink script and set power led to system ready
-  exec_command("killall led_set.sh");
+  // set power led to system ready
   FW_setLED("1", "green");
 
   // set camera led
