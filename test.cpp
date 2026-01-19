@@ -321,6 +321,7 @@ int main(int argc, char* argv[]) {
   }
 
   // set power led to system ready
+  sleep(0.2);
   FW_setLED("1", "green");
 
   // set camera led
